@@ -9,14 +9,17 @@ import fi.csc.idp.stepup.api.ChallengeSender;
 
 public class LogChallengeSender implements ChallengeSender {
 
-	/** Class logger. */
-    @Nonnull private final Logger log = LoggerFactory.getLogger(LogChallengeSender.class);
-	@Override
-	public void send(String challenge, String target) {
-		log.trace("Entering");
-		log.info("Sending Challenge "+challenge+" to "+target);
-		log.trace("Leaving");
+    /** Class logger. */
+    @Nonnull
+    private final Logger log = LoggerFactory
+            .getLogger(LogChallengeSender.class);
 
-	}
+    @Override
+    public void send(String challenge, String target) {
+        log.trace("Entering");
+        log.info("Sending Challenge " + challenge + " to " + target);
+        log.trace("Leaving");
+
+    }
 
 }

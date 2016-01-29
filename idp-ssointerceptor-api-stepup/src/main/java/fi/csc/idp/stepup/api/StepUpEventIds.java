@@ -25,34 +25,48 @@ package fi.csc.idp.stepup.api;
 import javax.annotation.Nonnull;
 
 import net.shibboleth.utilities.java.support.annotation.constraint.NotEmpty;
+
 /**
- * Constants to use for error results related to
- * social user authentication.
+ * Constants to use for error results related to social user authentication.
  */
 public final class StepUpEventIds {
 
-    /** Generic ID for exception thrown. */ 
-    @Nonnull @NotEmpty public static final String EXCEPTION = "StepUpException";
-    
+    /** Generic ID for exception thrown. */
+    @Nonnull
+    @NotEmpty
+    public static final String EXCEPTION = "StepUpException";
+
     /** event id for case of missing requested authentication context. */
-    @Nonnull @NotEmpty public static final String EVENTID_AUTHNCONTEXT_NOT_REQUESTED="AuthnContextNotRequested";
-    
-    /** event id for case of requested authentication context that is not step up. */
-    @Nonnull @NotEmpty public static final String EVENTID_AUTHNCONTEXT_UNKNOWN="AuthnContextNotStepUp";
-    
+    @Nonnull
+    @NotEmpty
+    public static final String EVENTID_AUTHNCONTEXT_NOT_REQUESTED = "AuthnContextNotRequested";
+
+    /**
+     * event id for case of requested authentication context that is not step
+     * up.
+     */
+    @Nonnull
+    @NotEmpty
+    public static final String EVENTID_AUTHNCONTEXT_UNKNOWN = "AuthnContextNotStepUp";
+
     /** event id for the case of continuing with stepup. */
-    @Nonnull @NotEmpty public static final String EVENTID_CONTINUE_STEPUP="ContinueStepUp";
-    
+    @Nonnull
+    @NotEmpty
+    public static final String EVENTID_CONTINUE_STEPUP = "ContinueStepUp";
+
     /** event id for case of user not able to perform step up. */
-    @Nonnull @NotEmpty public static final String EVENTID_INVALID_USER="InvalidUser";
-    
+    @Nonnull
+    @NotEmpty
+    public static final String EVENTID_INVALID_USER = "InvalidUser";
+
     /** event id for case of user not able to perform step up. */
-    @Nonnull @NotEmpty public static final String EVENTID_INVALID_RESPONSE="StepUpWrongResponse";
-    
-    
-    /** private constructor to prohibit use of it.*/
-    private StepUpEventIds(){
-        
+    @Nonnull
+    @NotEmpty
+    public static final String EVENTID_INVALID_RESPONSE = "StepUpWrongResponse";
+
+    /** private constructor to prohibit use of it. */
+    private StepUpEventIds() {
+
     };
-    
+
 }

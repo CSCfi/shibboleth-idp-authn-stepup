@@ -61,41 +61,48 @@ import fi.csc.idp.stepup.api.StepUpEventIds;
 public class GenerateStepUpChallenge extends AbstractProfileInterceptorAction {
 
     /** Class logger. */
-    @Nonnull private final Logger log = LoggerFactory.getLogger(GenerateStepUpChallenge.class);
-      
-       
-    @Nonnull private Function<ProfileRequestContext,AttributeContext> attributeContextLookupStrategy;
-    
+    @Nonnull
+    private final Logger log = LoggerFactory
+            .getLogger(GenerateStepUpChallenge.class);
+
+    @Nonnull
+    private Function<ProfileRequestContext, AttributeContext> attributeContextLookupStrategy;
+
     /** The attribute ID to look for. */
-    @Nullable private String attributeId;
-    
+    @Nullable
+    private String attributeId;
+
     /** The attribute to match against. */
-    @Nullable private IdPAttribute attribute;
-    
+    @Nullable
+    private IdPAttribute attribute;
+
     /** AttributeContext to filter. */
-    @Nullable private AttributeContext attributeContext;
-    
+    @Nullable
+    private AttributeContext attributeContext;
+
     /** Challenge Generator. */
     private ChallengeGenerator challengeGenerator;
-    
+
     /** Challenge Sender. */
     private ChallengeSender challengeSender;
-    
+
     /**
      * Set the login hint parameter names.
      * 
-     * @param sender for sending the challenge 
+     * @param sender
+     *            for sending the challenge
      */
     public void setChallengeSender(@Nonnull ChallengeSender sender) {
         log.trace("Entering");
         challengeSender = sender;
         log.trace("Leaving");
     }
-    
+
     /**
      * Set the login hint parameter names.
      * 
-     * @param sender for sending the challenge 
+     * @param sender
+     *            for sending the challenge
      */
     public void setChallengeGenerator(@Nonnull ChallengeGenerator generator) {
         log.trace("Entering");
@@ -103,120 +110,133 @@ public class GenerateStepUpChallenge extends AbstractProfileInterceptorAction {
         log.trace("Leaving");
     }
 
-    
-    
     /** Constructor. */
     public GenerateStepUpChallenge() {
-    	log.trace("Entering");
-    	attributeContextLookupStrategy =
-                Functions.compose(new ChildContextLookup<>(AttributeContext.class),
-                        new ChildContextLookup<ProfileRequestContext, RelyingPartyContext>(RelyingPartyContext.class));
+        log.trace("Entering");
+        attributeContextLookupStrategy = Functions
+                .compose(
+                        new ChildContextLookup<>(AttributeContext.class),
+                        new ChildContextLookup<ProfileRequestContext, RelyingPartyContext>(
+                                RelyingPartyContext.class));
         log.trace("Leaving");
     }
 
-    
-    
     /**
      * Set the lookup strategy for the {@link AttributeContext}.
      * 
-     * @param strategy lookup strategy
+     * @param strategy
+     *            lookup strategy
      */
-    
-      public void setAttributeContextLookupStrategy(
-    		@Nonnull final Function<ProfileRequestContext,AttributeContext> strategy) {
-    	log.trace("Entering");
-    	attributeContextLookupStrategy = Constraint.isNotNull(strategy,
+
+    public void setAttributeContextLookupStrategy(
+            @Nonnull final Function<ProfileRequestContext, AttributeContext> strategy) {
+        log.trace("Entering");
+        attributeContextLookupStrategy = Constraint.isNotNull(strategy,
                 "AttributeContext lookup strategy cannot be null");
         log.trace("Leaving");
     }
-    
-    
+
     /**
      * Set the attribute ID to look for.
      * 
-     * @param id attribute ID to look for
+     * @param id
+     *            attribute ID to look for
      */
-    
+
     public void setAttributeId(@Nullable String id) {
-    	log.trace("Entering");
+        log.trace("Entering");
         attributeId = StringSupport.trimOrNull(id);
         log.trace("Leaving");
     }
-    
-    
+
     /** {@inheritDoc} */
-    
+
     /** {@inheritDoc} */
     @SuppressWarnings("unchecked")
-	@Override
-    protected boolean doPreExecute(@Nonnull final ProfileRequestContext profileRequestContext,
+    @Override
+    protected boolean doPreExecute(
+            @Nonnull final ProfileRequestContext profileRequestContext,
             @Nonnull final ProfileInterceptorContext interceptorContext) {
-        
-    	log.trace("Entering");
-    	attributeContext = attributeContextLookupStrategy.apply(profileRequestContext);
+
+        log.trace("Entering");
+        attributeContext = attributeContextLookupStrategy
+                .apply(profileRequestContext);
         if (attributeContext == null) {
             log.error("{} Unable to locate attribute context", getLogPrefix());
-            //Add StepUpEventIds.EXCEPTION to supported errors, map it
-            ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EXCEPTION);
+            // Add StepUpEventIds.EXCEPTION to supported errors, map it
+            ActionSupport.buildEvent(profileRequestContext,
+                    StepUpEventIds.EXCEPTION);
             log.trace("Leaving");
             return false;
         }
-        log.debug("{} Found attributeContext '{}'", getLogPrefix(), attributeContext);
+        log.debug("{} Found attributeContext '{}'", getLogPrefix(),
+                attributeContext);
         return super.doPreExecute(profileRequestContext, interceptorContext);
     }
-   
-    
+
     /** {@inheritDoc} */
     @Override
-    protected void doExecute(@Nonnull final ProfileRequestContext profileRequestContext,
+    protected void doExecute(
+            @Nonnull final ProfileRequestContext profileRequestContext,
             @Nonnull final ProfileInterceptorContext interceptorContext) {
-    	log.trace("Entering");
- 
-    	
-    	//TODO: Move this to PreExecute, maybe we should return false already from there?
-    	final HttpServletRequest request = getHttpServletRequest();
+        log.trace("Entering");
+
+        // TODO: Move this to PreExecute, maybe we should return false already
+        // from there?
+        final HttpServletRequest request = getHttpServletRequest();
         if (request == null) {
-            log.debug("{} Profile action does not contain an HttpServletRequest", getLogPrefix());
-            ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EXCEPTION);
+            log.debug(
+                    "{} Profile action does not contain an HttpServletRequest",
+                    getLogPrefix());
+            ActionSupport.buildEvent(profileRequestContext,
+                    StepUpEventIds.EXCEPTION);
             log.trace("Leaving");
             return;
         }
-        
-        //Check that user has required attribute
-        if (!attributeContext.getIdPAttributes().containsKey(attributeId) || 
-        		attributeContext.getIdPAttributes().get(attributeId).getValues().isEmpty()){
-        	log.debug("Attributes do not contain value for "+attributeId, getLogPrefix());
-            ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EVENTID_INVALID_USER);
+
+        // Check that user has required attribute
+        if (!attributeContext.getIdPAttributes().containsKey(attributeId)
+                || attributeContext.getIdPAttributes().get(attributeId)
+                        .getValues().isEmpty()) {
+            log.debug("Attributes do not contain value for " + attributeId,
+                    getLogPrefix());
+            ActionSupport.buildEvent(profileRequestContext,
+                    StepUpEventIds.EVENTID_INVALID_USER);
             log.trace("Leaving");
             return;
         }
-        final IdPAttribute attribute = attributeContext.getIdPAttributes().get(attributeId);
-        //We search for first string value
+        final IdPAttribute attribute = attributeContext.getIdPAttributes().get(
+                attributeId);
+        // We search for first string value
         String target = null;
         for (final IdPAttributeValue value : attribute.getValues()) {
             if (value instanceof StringAttributeValue) {
-                  target = ((StringAttributeValue) value).getValue();
+                target = ((StringAttributeValue) value).getValue();
             }
         }
-        if (target == null){
-        	log.debug("Attributes did not contain String value for "+attributeId, getLogPrefix());
-            ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EVENTID_INVALID_USER);
+        if (target == null) {
+            log.debug("Attributes did not contain String value for "
+                    + attributeId, getLogPrefix());
+            ActionSupport.buildEvent(profileRequestContext,
+                    StepUpEventIds.EVENTID_INVALID_USER);
             log.trace("Leaving");
             return;
         }
-        String challenge=challengeGenerator.generate(target);
-        if (challenge == null){
-        	log.debug("Unable to generate challenge", getLogPrefix());
-            ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EXCEPTION);
+        String challenge = challengeGenerator.generate(target);
+        if (challenge == null) {
+            log.debug("Unable to generate challenge", getLogPrefix());
+            ActionSupport.buildEvent(profileRequestContext,
+                    StepUpEventIds.EXCEPTION);
             log.trace("Leaving");
             return;
         }
-        request.getSession().setAttribute("fi.csc.idp.stepup.impl.GenerateStepUpChallenge", challenge);
+        request.getSession().setAttribute(
+                "fi.csc.idp.stepup.impl.GenerateStepUpChallenge", challenge);
         challengeSender.send(challenge, target);
-        ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EVENTID_CONTINUE_STEPUP);
+        ActionSupport.buildEvent(profileRequestContext,
+                StepUpEventIds.EVENTID_CONTINUE_STEPUP);
         log.trace("Leaving");
-        
+
     }
-    
-    
+
 }

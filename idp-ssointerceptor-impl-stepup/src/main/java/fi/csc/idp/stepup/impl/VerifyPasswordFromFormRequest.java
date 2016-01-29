@@ -23,7 +23,6 @@
 
 package fi.csc.idp.stepup.impl;
 
-
 import javax.annotation.Nonnull;
 import javax.servlet.http.HttpServletRequest;
 
@@ -46,51 +45,63 @@ import fi.csc.idp.stepup.api.StepUpEventIds;
 public class VerifyPasswordFromFormRequest extends AbstractExtractionAction {
 
     /** Class logger. */
-    @Nonnull private final Logger log = LoggerFactory.getLogger(VerifyPasswordFromFormRequest.class);
-      
+    @Nonnull
+    private final Logger log = LoggerFactory
+            .getLogger(VerifyPasswordFromFormRequest.class);
 
     /** {@inheritDoc} */
     @Override
-    protected void doExecute(@Nonnull final ProfileRequestContext profileRequestContext,
+    protected void doExecute(
+            @Nonnull final ProfileRequestContext profileRequestContext,
             @Nonnull final AuthenticationContext authenticationContext) {
 
         log.trace("Entering");
-        //TODO: Move this to PreExecute, maybe we should return false already from there?
+        // TODO: Move this to PreExecute, maybe we should return false already
+        // from there?
         final HttpServletRequest request = getHttpServletRequest();
         if (request == null) {
-        	//Add StepUpEventIds.EXCEPTION to supported errors, map it?
-            log.debug("{} Profile action does not contain an HttpServletRequest", getLogPrefix());
-            ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EXCEPTION);
+            // Add StepUpEventIds.EXCEPTION to supported errors, map it?
+            log.debug(
+                    "{} Profile action does not contain an HttpServletRequest",
+                    getLogPrefix());
+            ActionSupport.buildEvent(profileRequestContext,
+                    StepUpEventIds.EXCEPTION);
             log.trace("Leaving");
             return;
         }
-        //TODO: parameter name to xml
-        final String challengeResponse = request.getParameter("j_challengeResponse");
-        if (challengeResponse == null || challengeResponse.isEmpty()){
-        	//This is a case that should result in SAML error right from here
-        	// make it and verify
-        	//Add StepUpEventIds.EXCEPTION to supported errors, map it?
-        	log.debug("User did not present response to challenge", getLogPrefix());
-            ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EVENTID_INVALID_RESPONSE);
+        // TODO: parameter name to xml
+        final String challengeResponse = request
+                .getParameter("j_challengeResponse");
+        if (challengeResponse == null || challengeResponse.isEmpty()) {
+            // This is a case that should result in SAML error right from here
+            // make it and verify
+            // Add StepUpEventIds.EXCEPTION to supported errors, map it?
+            log.debug("User did not present response to challenge",
+                    getLogPrefix());
+            ActionSupport.buildEvent(profileRequestContext,
+                    StepUpEventIds.EVENTID_INVALID_RESPONSE);
             log.trace("Leaving");
             return;
         }
         challengeResponse.trim();
-        log.debug("User challenge response was "+challengeResponse);
-        String challenge=(String)request.getSession().getAttribute("fi.csc.idp.stepup.impl.GenerateStepUpChallenge");
-        if (!challengeResponse.trim().equals(challenge)){
-        	//This is a case that should result in SAML error right from here
-        	// make it and verify
-        	//Add StepUpEventIds.EXCEPTION to supported errors, map it?
-        	log.debug("User presented wrong response to  challenge", getLogPrefix());
-            ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EVENTID_INVALID_RESPONSE);
+        log.debug("User challenge response was " + challengeResponse);
+        String challenge = (String) request.getSession().getAttribute(
+                "fi.csc.idp.stepup.impl.GenerateStepUpChallenge");
+        if (!challengeResponse.trim().equals(challenge)) {
+            // This is a case that should result in SAML error right from here
+            // make it and verify
+            // Add StepUpEventIds.EXCEPTION to supported errors, map it?
+            log.debug("User presented wrong response to  challenge",
+                    getLogPrefix());
+            ActionSupport.buildEvent(profileRequestContext,
+                    StepUpEventIds.EVENTID_INVALID_RESPONSE);
             log.trace("Leaving");
             return;
         }
-        ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EVENTID_CONTINUE_STEPUP);
+        ActionSupport.buildEvent(profileRequestContext,
+                StepUpEventIds.EVENTID_CONTINUE_STEPUP);
         log.trace("Leaving");
-        
+
     }
-    
-    
+
 }

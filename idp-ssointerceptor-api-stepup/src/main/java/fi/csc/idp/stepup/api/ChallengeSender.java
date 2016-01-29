@@ -4,12 +4,14 @@ import javax.annotation.Nonnull;
 
 public interface ChallengeSender {
 
-	/**
+    /**
      * Sends the given challenge to target.
      * 
-     * @param challenge to be sent.
+     * @param challenge
+     *            to be sent.
      * 
-     * @param target of the challenge.
+     * @param target
+     *            of the challenge.
      * 
      */
     void send(@Nonnull final String challenge, @Nonnull final String target);
