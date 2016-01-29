@@ -4,10 +4,11 @@ import javax.annotation.Nonnull;
 
 public interface ChallengeGenerator {
 
-	/**
+    /**
      * Sends the given challenge to target.
      * 
-     * @param target of the challenge.
+     * @param target
+     *            of the challenge.
      * 
      * @return challenge
      * 
