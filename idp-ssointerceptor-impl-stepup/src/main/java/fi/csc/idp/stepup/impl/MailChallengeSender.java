@@ -61,6 +61,7 @@ public class MailChallengeSender implements ChallengeSender {
      */
     public void setFromField(String fromField) {
         log.trace("Entering");
+        log.debug("setting from to "+fromField);
         this.from = fromField;
         log.trace("Leaving");
     }
@@ -71,6 +72,7 @@ public class MailChallengeSender implements ChallengeSender {
      */
     public void setSubjectField(String subjectField) {
         log.trace("Entering");
+        log.debug("setting subject to "+subjectField);
         this.subject = subjectField;
         log.trace("Leaving");
     }
@@ -81,6 +83,7 @@ public class MailChallengeSender implements ChallengeSender {
      */
     public void setUserName(String accountUserName) {
         log.trace("Entering");
+        log.debug("setting account username to "+accountUserName);
         this.userName = accountUserName;
         log.trace("Leaving");
     }
@@ -91,6 +94,7 @@ public class MailChallengeSender implements ChallengeSender {
      */
     public void setPassword(String accountPassword) {
         log.trace("Entering");
+        log.debug("setting account password to "+accountPassword);
         this.password = accountPassword;
         log.trace("Leaving");
     }
@@ -101,6 +105,7 @@ public class MailChallengeSender implements ChallengeSender {
      */
     public void setSMTPAuth(String serverSMTPAuth) {
         log.trace("Entering");
+        log.debug("setting SMTP Auth to "+serverSMTPAuth);
         this.smtpAuth=serverSMTPAuth;
         log.trace("Leaving");
     }
@@ -111,6 +116,7 @@ public class MailChallengeSender implements ChallengeSender {
      */
     public void setSMTPTtls(String serverSMTPTtls) {
         log.trace("Entering");
+        log.debug("setting SMTP Start TLS to "+serverSMTPTtls);
         this.smtpTtls=serverSMTPTtls;
         log.trace("Leaving");
     }
@@ -121,6 +127,7 @@ public class MailChallengeSender implements ChallengeSender {
      */
     public void setHost(String hostName) {
         log.trace("Entering");
+        log.debug("setting host to "+hostName);
         this.host=hostName;
         log.trace("Leaving");
     }
@@ -131,6 +138,7 @@ public class MailChallengeSender implements ChallengeSender {
      */
     public void setPort(String serverPort) {
         log.trace("Entering");
+        log.debug("setting port to "+serverPort);
         this.port=serverPort;
         log.trace("Leaving");
     }
@@ -141,6 +149,7 @@ public class MailChallengeSender implements ChallengeSender {
      */
     public void setTemplateFile(String fileName) {
         log.trace("Entering");
+        log.debug("setting template filename to "+fileName);
         this.templateFileName = fileName;
         log.trace("Leaving");
     }
@@ -168,6 +177,7 @@ public class MailChallengeSender implements ChallengeSender {
     @Override
     public void send(String challenge, String target) {
         log.trace("Entering");
+        log.debug("Sending challenge "+challenge+" to "+target);
         Template template = getVelocityTemplate();
         final VelocityContext velocityContext = new VelocityContext();
         velocityContext.put("otp", challenge);
@@ -176,6 +186,7 @@ public class MailChallengeSender implements ChallengeSender {
         body=writer.toString();
         Thread t = new Thread(new SendMessage());
         t.start();
+        log.debug("Challenge sending triggered");
         log.trace("Leaving");
     }
 
@@ -207,8 +218,10 @@ public class MailChallengeSender implements ChallengeSender {
                 message.setText(body);
                 Transport.send(message);
             } catch (SendFailedException e) {
+                log.error(e.getMessage());
                 e.printStackTrace();
             } catch (Exception e) {
+                log.error(e.getMessage());
                 e.printStackTrace();
             }
         }
