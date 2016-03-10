@@ -27,7 +27,6 @@ import javax.annotation.Nonnull;
 import javax.servlet.http.HttpServletRequest;
 
 import net.shibboleth.idp.authn.AbstractExtractionAction;
-import net.shibboleth.idp.authn.AuthnEventIds;
 import net.shibboleth.idp.authn.context.AuthenticationContext;
 
 import org.opensaml.profile.action.ActionSupport;
