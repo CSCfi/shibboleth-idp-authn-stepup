@@ -49,6 +49,11 @@
 			<groupId>fi.csc.idp.stepup</groupId>
 			<artifactId>idp-ssointerceptor-api-stepup</artifactId>
 		</dependency>
+                <dependency>
+	               <groupId>org.apache.velocity</groupId>
+	               <artifactId>velocity</artifactId>
+	               <version>1.7</version>
+                </dependency>
 
 		<!-- Test Dependencies, add to parent POM -->
 	</dependencies>
