@@ -29,7 +29,7 @@ public class MailChallengeSender implements ChallengeSender {
     /** Class logger. */
     @Nonnull
     static final Logger log = LoggerFactory
-            .getLogger(LogChallengeSender.class);
+            .getLogger(MailChallengeSender.class);
 
     /** Sender address of email. */
     private String from;
@@ -222,7 +222,7 @@ public class MailChallengeSender implements ChallengeSender {
                 e.printStackTrace();
             } catch (Exception e) {
                 log.error(e.getMessage());
-                e.printStackTrace();
+                log.error(e.getStackTrace().toString());
             }
         }
     }
