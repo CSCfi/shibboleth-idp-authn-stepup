@@ -227,9 +227,6 @@ public class MailChallengeSender implements ChallengeSender {
                 message.setSubject(subject);
                 message.setText(body);
                 Transport.send(message);
-            } catch (SendFailedException e) {
-                log.error(e.getMessage());
-                e.printStackTrace();
             } catch (Exception e) {
                 log.error(e.getMessage());
                 StringWriter sw = new StringWriter();
