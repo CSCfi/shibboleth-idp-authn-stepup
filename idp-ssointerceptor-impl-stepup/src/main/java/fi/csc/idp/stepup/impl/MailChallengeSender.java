@@ -1,6 +1,7 @@
 package fi.csc.idp.stepup.impl;
 
 import java.io.File;
+import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Properties;
 
@@ -222,7 +223,10 @@ public class MailChallengeSender implements ChallengeSender {
                 e.printStackTrace();
             } catch (Exception e) {
                 log.error(e.getMessage());
-                log.error(e.getStackTrace().toString());
+                StringWriter sw = new StringWriter();
+                e.printStackTrace(new PrintWriter(sw));
+                String exceptionAsString = sw.toString();
+                log.error(exceptionAsString);
             }
         }
     }
