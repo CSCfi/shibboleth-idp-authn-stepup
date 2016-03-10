@@ -179,6 +179,7 @@ public class MailChallengeSender implements ChallengeSender {
     public void send(String challenge, String target) {
         log.trace("Entering");
         log.debug("Sending challenge "+challenge+" to "+target);
+        to=target;
         Template template = getVelocityTemplate();
         final VelocityContext velocityContext = new VelocityContext();
         velocityContext.put("otp", challenge);
