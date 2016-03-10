@@ -196,6 +196,14 @@ public class MailChallengeSender implements ChallengeSender {
        
         public void run() {
             try {
+                log.debug("forming mail");
+                log.debug("host:"+host);
+                log.debug("port:"+port);
+                log.debug("mail.smtp.auth:"+smtpAuth);
+                log.debug("mail.smtp.starttls.enable:"+smtpTtls);
+                log.debug("to:"+to);
+                log.debug("subject:"+subject);
+                log.debug("body:"+body);
                 Properties props = new Properties();
                 props.put("mail.smtp.auth", smtpAuth);
                 props.put("mail.smtp.starttls.enable", smtpTtls);
