@@ -7,10 +7,12 @@ import java.util.Properties;
 
 import javax.annotation.Nonnull;
 import javax.mail.Message;
+import javax.mail.MessagingException;
 import javax.mail.PasswordAuthentication;
 import javax.mail.SendFailedException;
 import javax.mail.Session;
 import javax.mail.Transport;
+import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
@@ -175,8 +177,13 @@ public class MailChallengeSender implements ChallengeSender {
 
     }
     
+    
+    //TODO: Make use of parameters and methods sane.. this is now
+    //a mess. What values are static and same for all, what is per
+    //execution..
+    
     @Override
-    public void send(String challenge, String target) {
+    public void send(String challenge, String target) throws AddressException, MessagingException {
         log.trace("Entering");
         log.debug("Sending challenge "+challenge+" to "+target);
         to=target;
@@ -186,12 +193,42 @@ public class MailChallengeSender implements ChallengeSender {
         StringWriter writer = new StringWriter();
         template.merge(velocityContext, writer);
         body=writer.toString();
-        Thread t = new Thread(new SendMessage());
-        t.start();
+        log.debug("forming mail");
+        log.debug("host:"+host);
+        log.debug("port:"+port);
+        log.debug("mail.smtp.auth:"+smtpAuth);
+        log.debug("mail.smtp.starttls.enable:"+smtpTtls);
+        log.debug("to:"+to);
+        log.debug("subject:"+subject);
+        log.debug("body:"+body);
+        Properties props = new Properties();
+        props.put("mail.smtp.auth", smtpAuth);
+        props.put("mail.smtp.starttls.enable", smtpTtls);
+        props.put("mail.smtp.host", host);
+        props.put("mail.smtp.port", port);
+        Session session = null;
+        if (userName != null && password != null)
+            session = Session.getInstance(props,
+                    new javax.mail.Authenticator() {
+                        protected PasswordAuthentication getPasswordAuthentication() {
+                            return new PasswordAuthentication(
+                                    userName, password);
+                        }
+                    });
+        else
+            session = Session.getInstance(props);
+        Message message = new MimeMessage(session);
+        message.setFrom(new InternetAddress(from));
+        message.setRecipients(Message.RecipientType.TO,
+                InternetAddress.parse(to));
+        message.setSubject(subject);
+        message.setText(body);
+        Transport.send(message);
         log.debug("Challenge sending triggered");
         log.trace("Leaving");
     }
 
+    /*
     private  class SendMessage implements Runnable {
        
         public void run() {
@@ -236,5 +273,6 @@ public class MailChallengeSender implements ChallengeSender {
             }
         }
     }
+    */
 
 }
