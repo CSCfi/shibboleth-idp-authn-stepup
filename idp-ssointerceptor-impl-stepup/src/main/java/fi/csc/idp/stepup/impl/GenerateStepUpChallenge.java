@@ -222,17 +222,31 @@ public class GenerateStepUpChallenge extends AbstractProfileInterceptorAction {
             log.trace("Leaving");
             return;
         }
-        String challenge = challengeGenerator.generate(target);
-        if (challenge == null) {
-            log.debug("Unable to generate challenge", getLogPrefix());
+        String challenge;
+        try {
+            //TODO: Exception to SEND interface method ipmlementation
+            //WE need to know if it failed
+            
+            challenge = challengeGenerator.generate(target);
+           
+            //value of challenge is to be checked by verifier
+            //TODO: verifier interface and example implementation
+            
+            //TODO: Store the challenge value to "flow", not session if that is possible
+            request.getSession().setAttribute(
+                    "fi.csc.idp.stepup.impl.GenerateStepUpChallenge", challenge);
+            
+            //TODO: Exception to SEND interface method and to implementation
+            //WE need to know if it failed
+            challengeSender.send(challenge, target);
+        } catch (Exception e) {
+            log.debug("Unable to generate/pass challenge", getLogPrefix());
             ActionSupport.buildEvent(profileRequestContext,
                     StepUpEventIds.EXCEPTION);
             log.trace("Leaving");
             return;
         }
-        request.getSession().setAttribute(
-                "fi.csc.idp.stepup.impl.GenerateStepUpChallenge", challenge);
-        challengeSender.send(challenge, target);
+       
         ActionSupport.buildEvent(profileRequestContext,
                 StepUpEventIds.EVENTID_CONTINUE_STEPUP);
         log.trace("Leaving");
