@@ -14,5 +14,5 @@ public interface ChallengeSender {
      *            of the challenge.
      * 
      */
-    void send(@Nonnull final String challenge, @Nonnull final String target);
+    void send(@Nonnull final String challenge, @Nonnull final String target) throws Exception;
 }

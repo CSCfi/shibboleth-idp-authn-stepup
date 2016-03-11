@@ -13,5 +13,5 @@ public interface ChallengeGenerator {
      * @return challenge
      * 
      */
-    String generate(@Nonnull final String target);
+    String generate(@Nonnull final String target) throws Exception;
 }
