@@ -1,51 +1,47 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xmlns:context="http://www.springframework.org/schema/context" xmlns:c="http://www.springframework.org/schema/c"
-    xmlns:p="http://www.springframework.org/schema/p" xmlns:util="http://www.springframework.org/schema/util"
-    xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:c="http://www.springframework.org/schema/c" xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
                            http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
                            http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd"
 
-    default-init-method="initialize" default-destroy-method="destroy">
+	default-init-method="initialize" default-destroy-method="destroy">
 
-    <bean class="org.springframework.context.support.PropertySourcesPlaceholderConfigurer"
-        p:placeholderPrefix="%{" p:placeholderSuffix="}" />
+	<bean
+		class="org.springframework.context.support.PropertySourcesPlaceholderConfigurer"
+		p:placeholderPrefix="%{" p:placeholderSuffix="}" />
 
-    <bean class="net.shibboleth.idp.profile.impl.ProfileActionBeanPostProcessor" />
-    <bean class="net.shibboleth.ext.spring.config.IdentifiableBeanPostProcessor" />
+	<bean class="net.shibboleth.idp.profile.impl.ProfileActionBeanPostProcessor" />
+	<bean class="net.shibboleth.ext.spring.config.IdentifiableBeanPostProcessor" />
 
-    <bean id="GenerateStepUpChallenge"
-        class="fi.csc.idp.stepup.impl.GenerateStepUpChallenge" scope="prototype"
-        p:httpServletRequest-ref="shibboleth.HttpServletRequest"
-        p:attributeId="mail"
-        p:challengeSender-ref="ChallengeSender"
-        p:challengeGenerator-ref="ChallengeGenerator">
-     </bean>
+	<bean id="GenerateStepUpChallenge" class="fi.csc.idp.stepup.impl.GenerateStepUpChallenge"
+		scope="prototype" p:httpServletRequest-ref="shibboleth.HttpServletRequest"
+		p:attributeId="mail" p:challengeSender-ref="ChallengeSender"
+		p:challengeGenerator-ref="ChallengeGenerator">
+	</bean>
 
-    <bean id="CheckRequestedAuthenticationContext"
-        class="fi.csc.idp.stepup.impl.CheckRequestedAuthenticationContext" scope="prototype"
-        p:httpServletRequest-ref="shibboleth.HttpServletRequest">
-     </bean>
+	<bean id="CheckRequestedAuthenticationContext"
+		class="fi.csc.idp.stepup.impl.CheckRequestedAuthenticationContext"
+		scope="prototype" p:httpServletRequest-ref="shibboleth.HttpServletRequest">
+	</bean>
 
-     <bean id="ChallengeSender"
-        class="fi.csc.idp.stepup.impl.LogChallengeSender" scope="prototype">
-     </bean>
+	<bean id="ChallengeSender" class="fi.csc.idp.stepup.impl.LogChallengeSender"
+		scope="prototype">
+	</bean>
 
-     <bean id="ChallengeGenerator"
-        class="fi.csc.idp.stepup.impl.DigestChallengeGenerator" scope="prototype">
-     </bean>
+	<bean id="ChallengeGenerator" class="fi.csc.idp.stepup.impl.DigestChallengeGenerator"
+		scope="prototype">
+	</bean>
 
-    <bean id="VerifyPasswordFromFormRequest"
-        class="fi.csc.idp.stepup.impl.VerifyPasswordFromFormRequest" scope="prototype"
-        p:httpServletRequest-ref="shibboleth.HttpServletRequest">
-<!--
-        <property name="loginHintFieldName">
-         <list>
-            <value>j_loginhint</value>
-         </list>
-        </property>
-        <property name="LoginHintCoder" ref="LoginHintJsonBase64Coder"/>
--->
-     </bean>
+	<bean id="VerifyPasswordFromFormRequest" class="fi.csc.idp.stepup.impl.VerifyPasswordFromFormRequest"
+		scope="prototype" p:httpServletRequest-ref="shibboleth.HttpServletRequest"
+		p:challengeVerifier-ref="EqualVerifier">
+	</bean>
+
+	<bean id="EqualVerifier" class="fi.csc.idp.stepup.impl.EqualChallengeResponseVerifier"
+		scope="prototype">
+	</bean>
 
 </beans>
