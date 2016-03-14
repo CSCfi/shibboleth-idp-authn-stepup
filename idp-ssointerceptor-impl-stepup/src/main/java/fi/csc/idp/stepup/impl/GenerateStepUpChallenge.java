@@ -37,7 +37,6 @@ import net.shibboleth.utilities.java.support.primitive.StringSupport;
 
 import org.opensaml.messaging.context.navigate.ChildContextLookup;
 import org.opensaml.profile.action.ActionSupport;
-import org.opensaml.profile.action.EventIds;
 import org.opensaml.profile.context.ProfileRequestContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,7 +52,7 @@ import fi.csc.idp.stepup.api.ChallengeSender;
 import fi.csc.idp.stepup.api.StepUpEventIds;
 
 /**
- * An action that create step up challenge
+ * An action that create step up challenge.
  * 
  */
 
@@ -87,7 +86,7 @@ public class GenerateStepUpChallenge extends AbstractProfileInterceptorAction {
     private ChallengeSender challengeSender;
 
     /**
-     * Set the login hint parameter names.
+     * Set the challenge sender.
      * 
      * @param sender
      *            for sending the challenge
@@ -99,7 +98,7 @@ public class GenerateStepUpChallenge extends AbstractProfileInterceptorAction {
     }
 
     /**
-     * Set the login hint parameter names.
+     * Set the challenge generator.
      * 
      * @param sender
      *            for sending the challenge
@@ -163,7 +162,7 @@ public class GenerateStepUpChallenge extends AbstractProfileInterceptorAction {
                 .apply(profileRequestContext);
         if (attributeContext == null) {
             log.error("{} Unable to locate attribute context", getLogPrefix());
-            // Add StepUpEventIds.EXCEPTION to supported errors, map it
+            // TODO :Add StepUpEventIds.EXCEPTION to supported errors, map it
             ActionSupport.buildEvent(profileRequestContext,
                     StepUpEventIds.EXCEPTION);
             log.trace("Leaving");
@@ -194,6 +193,10 @@ public class GenerateStepUpChallenge extends AbstractProfileInterceptorAction {
             return;
         }
 
+        // Following logic assumes attribute is defined and
+        // and it has a value. Maybe we should support also
+        // case of attribute not being defined or being a null
+        
         // Check that user has required attribute
         if (!attributeContext.getIdPAttributes().containsKey(attributeId)
                 || attributeContext.getIdPAttributes().get(attributeId)
@@ -224,23 +227,13 @@ public class GenerateStepUpChallenge extends AbstractProfileInterceptorAction {
         }
         String challenge;
         try {
-            //TODO: Exception to SEND interface method ipmlementation
-            //WE need to know if it failed
-            
             challenge = challengeGenerator.generate(target);
-           
-            //value of challenge is to be checked by verifier
-            //TODO: verifier interface and example implementation
-            
             //TODO: Store the challenge value to context, not session .
             request.getSession().setAttribute(
                     "fi.csc.idp.stepup.impl.GenerateStepUpChallenge.challenge", challenge);
             //TODO: Store the challenge value to context, not session .
             request.getSession().setAttribute(
                     "fi.csc.idp.stepup.impl.GenerateStepUpChallenge.target", target);
-            
-            //TODO: Exception to SEND interface method and to implementation
-            //WE need to know if it failed
             challengeSender.send(challenge, target);
         } catch (Exception e) {
             log.debug("Unable to generate/pass challenge", getLogPrefix());

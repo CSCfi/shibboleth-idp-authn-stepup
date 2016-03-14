@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import fi.csc.idp.stepup.api.ChallengeGenerator;
+
 import org.apache.commons.codec.binary.Hex;
 
 public class DigestChallengeGenerator implements ChallengeGenerator {
@@ -71,12 +72,12 @@ public class DigestChallengeGenerator implements ChallengeGenerator {
     }
 
     @Override
-    public String generate(String target) {
+    public String generate(String target) throws Exception {
         log.trace("Entering");
         String challenge = null;
         if (target == null) {
             log.trace("Leaving");
-            return null;
+            throw new Exception("Cannot generate digest for null value");
         }
         try {
             String time = "" + System.currentTimeMillis();

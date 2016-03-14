@@ -14,8 +14,7 @@ public class EqualChallengeResponseVerifier implements ChallengeVerifier {
     private final Logger log = LoggerFactory
             .getLogger(EqualChallengeResponseVerifier.class);
     @Override
-    public boolean verify(String challenge, String response, String target)
-            {
+    public boolean verify(String challenge, String response, String target){
         log.trace("Entering");
         if (challenge == null && response == null){
             log.trace("Leaving");

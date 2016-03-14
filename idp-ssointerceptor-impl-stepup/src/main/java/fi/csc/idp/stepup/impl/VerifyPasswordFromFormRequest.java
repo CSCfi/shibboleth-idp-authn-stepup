@@ -34,12 +34,11 @@ import org.opensaml.profile.context.ProfileRequestContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import fi.csc.idp.stepup.api.ChallengeSender;
 import fi.csc.idp.stepup.api.ChallengeVerifier;
 import fi.csc.idp.stepup.api.StepUpEventIds;
 
 /**
- * An action that verifies user challenge response
+ * An action that verifies user challenge response.
  * 
  */
 @SuppressWarnings("rawtypes")
@@ -50,11 +49,11 @@ public class VerifyPasswordFromFormRequest extends AbstractExtractionAction {
     private final Logger log = LoggerFactory
             .getLogger(VerifyPasswordFromFormRequest.class);
     
-    /** Challenge Sender. */
+    /** Challenge Verifier. */
     private ChallengeVerifier challengeVerifier;
 
     /**
-     * Set the login hint parameter names.
+     * Set the challenge verifier.
      * 
      * @param sender
      *            for sending the challenge
@@ -85,11 +84,11 @@ public class VerifyPasswordFromFormRequest extends AbstractExtractionAction {
             log.trace("Leaving");
             return;
         }
-        // TODO: parameter name to xml
+        // TODO: parameter name to as init value
         final String challengeResponse = request
                 .getParameter("j_challengeResponse");
         if (challengeResponse == null || challengeResponse.isEmpty()) {
-            // This is a case that should result in SAML error right from here
+            // TODO: This is a case that should result in SAML error right from here
             // make it and verify
             // Add StepUpEventIds.EXCEPTION to supported errors, map it?
             log.debug("User did not present response to challenge",
@@ -99,8 +98,8 @@ public class VerifyPasswordFromFormRequest extends AbstractExtractionAction {
             log.trace("Leaving");
             return;
         }
-        challengeResponse.trim();
         log.debug("User challenge response was " + challengeResponse);
+        //TODO: Read following from context once supported.
         String challenge = (String) request.getSession().getAttribute(
                 "fi.csc.idp.stepup.impl.GenerateStepUpChallenge.challenge");
         String target = (String) request.getSession().getAttribute(

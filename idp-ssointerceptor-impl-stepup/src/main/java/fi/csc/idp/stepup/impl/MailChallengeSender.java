@@ -1,7 +1,6 @@
 package fi.csc.idp.stepup.impl;
 
 import java.io.File;
-import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Properties;
 
@@ -9,7 +8,6 @@ import javax.annotation.Nonnull;
 import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.PasswordAuthentication;
-import javax.mail.SendFailedException;
 import javax.mail.Session;
 import javax.mail.Transport;
 import javax.mail.internet.AddressException;
@@ -193,14 +191,6 @@ public class MailChallengeSender implements ChallengeSender {
         StringWriter writer = new StringWriter();
         template.merge(velocityContext, writer);
         body=writer.toString();
-        log.debug("forming mail");
-        log.debug("host:"+host);
-        log.debug("port:"+port);
-        log.debug("mail.smtp.auth:"+smtpAuth);
-        log.debug("mail.smtp.starttls.enable:"+smtpTtls);
-        log.debug("to:"+to);
-        log.debug("subject:"+subject);
-        log.debug("body:"+body);
         Properties props = new Properties();
         props.put("mail.smtp.auth", smtpAuth);
         props.put("mail.smtp.starttls.enable", smtpTtls);
@@ -227,52 +217,6 @@ public class MailChallengeSender implements ChallengeSender {
         log.debug("Challenge sending triggered");
         log.trace("Leaving");
     }
-
-    /*
-    private  class SendMessage implements Runnable {
-       
-        public void run() {
-            try {
-                log.debug("forming mail");
-                log.debug("host:"+host);
-                log.debug("port:"+port);
-                log.debug("mail.smtp.auth:"+smtpAuth);
-                log.debug("mail.smtp.starttls.enable:"+smtpTtls);
-                log.debug("to:"+to);
-                log.debug("subject:"+subject);
-                log.debug("body:"+body);
-                Properties props = new Properties();
-                props.put("mail.smtp.auth", smtpAuth);
-                props.put("mail.smtp.starttls.enable", smtpTtls);
-                props.put("mail.smtp.host", host);
-                props.put("mail.smtp.port", port);
-                Session session = null;
-                if (userName != null && password != null)
-                    session = Session.getInstance(props,
-                            new javax.mail.Authenticator() {
-                                protected PasswordAuthentication getPasswordAuthentication() {
-                                    return new PasswordAuthentication(
-                                            userName, password);
-                                }
-                            });
-                else
-                    session = Session.getInstance(props);
-                Message message = new MimeMessage(session);
-                message.setFrom(new InternetAddress(from));
-                message.setRecipients(Message.RecipientType.TO,
-                        InternetAddress.parse(to));
-                message.setSubject(subject);
-                message.setText(body);
-                Transport.send(message);
-            } catch (Exception e) {
-                log.error(e.getMessage());
-                StringWriter sw = new StringWriter();
-                e.printStackTrace(new PrintWriter(sw));
-                String exceptionAsString = sw.toString();
-                log.error(exceptionAsString);
-            }
-        }
-    }
-    */
+   
 
 }

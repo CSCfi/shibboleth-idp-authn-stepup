@@ -25,11 +25,9 @@ package fi.csc.idp.stepup.impl;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import javax.servlet.http.HttpServletRequest;
 
 import net.shibboleth.idp.attribute.IdPAttribute;
 import net.shibboleth.idp.authn.AbstractAuthenticationAction;
-import net.shibboleth.idp.authn.AuthnEventIds;
 import net.shibboleth.idp.authn.context.AuthenticationContext;
 import net.shibboleth.utilities.java.support.component.ComponentSupport;
 import net.shibboleth.utilities.java.support.logic.Constraint;
@@ -117,7 +115,7 @@ public class CheckRequestedAuthenticationContext extends
             log.debug(
                     "{} AuthnRequest message was not returned by lookup strategy",
                     getLogPrefix());
-            // Add StepUpEventIds.EXCEPTION to supported errors, map it
+            // TODO :Add StepUpEventIds.EXCEPTION to supported errors, map it
             ActionSupport.buildEvent(profileRequestContext,
                     StepUpEventIds.EXCEPTION);
             log.trace("Leaving");
@@ -152,7 +150,7 @@ public class CheckRequestedAuthenticationContext extends
         log.debug("TBD, logic to compare requested context class:"
                 + requestedCtx.getAuthnContextClassRefs().get(0)
                         .getAuthnContextClassRef());
-        // There is a match
+        // Hardcoded success:
         ActionSupport.buildEvent(profileRequestContext,
                 StepUpEventIds.EVENTID_CONTINUE_STEPUP);
         log.trace("Leaving");
