@@ -34,6 +34,8 @@ import org.opensaml.profile.context.ProfileRequestContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import fi.csc.idp.stepup.api.ChallengeSender;
+import fi.csc.idp.stepup.api.ChallengeVerifier;
 import fi.csc.idp.stepup.api.StepUpEventIds;
 
 /**
@@ -47,7 +49,22 @@ public class VerifyPasswordFromFormRequest extends AbstractExtractionAction {
     @Nonnull
     private final Logger log = LoggerFactory
             .getLogger(VerifyPasswordFromFormRequest.class);
+    
+    /** Challenge Sender. */
+    private ChallengeVerifier challengeVerifier;
 
+    /**
+     * Set the login hint parameter names.
+     * 
+     * @param sender
+     *            for sending the challenge
+     */
+    public void setChallengeVerifier(@Nonnull ChallengeVerifier verifier) {
+        log.trace("Entering");
+        challengeVerifier = verifier;
+        log.trace("Leaving");
+    }
+    
     /** {@inheritDoc} */
     @Override
     protected void doExecute(
@@ -85,8 +102,10 @@ public class VerifyPasswordFromFormRequest extends AbstractExtractionAction {
         challengeResponse.trim();
         log.debug("User challenge response was " + challengeResponse);
         String challenge = (String) request.getSession().getAttribute(
-                "fi.csc.idp.stepup.impl.GenerateStepUpChallenge");
-        if (!challengeResponse.trim().equals(challenge)) {
+                "fi.csc.idp.stepup.impl.GenerateStepUpChallenge.challenge");
+        String target = (String) request.getSession().getAttribute(
+                "fi.csc.idp.stepup.impl.GenerateStepUpChallenge.target");
+        if (!challengeVerifier.verify(challenge, challengeResponse, target)){
             // This is a case that should result in SAML error right from here
             // make it and verify
             // Add StepUpEventIds.EXCEPTION to supported errors, map it?
