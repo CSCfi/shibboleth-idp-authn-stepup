@@ -1,6 +1,6 @@
 /*
  * The MIT License
- * Copyright (c) 2015 CSC - IT Center for Science, http://www.csc.fi
+ * Copyright (c) 2015 CSC  IT Center for Science, http://www.csc.fi
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -35,6 +35,34 @@ public final class StepUpEventIds {
     @Nonnull
     @NotEmpty
     public static final String EXCEPTION = "StepUpException";
+
+    /** event id for case of missing requested authentication context. */
+    @Nonnull
+    @NotEmpty
+    public static final String EVENTID_AUTHNCONTEXT_NOT_REQUESTED = "AuthnContextNotRequested";
+
+    /**
+     * event id for case of requested authentication context that is not step
+     * up.
+     */
+    @Nonnull
+    @NotEmpty
+    public static final String EVENTID_AUTHNCONTEXT_UNKNOWN = "AuthnContextNotStepUp";
+
+    /** event id for the case of continuing with stepup. */
+    @Nonnull
+    @NotEmpty
+    public static final String EVENTID_CONTINUE_STEPUP = "ContinueStepUp";
+
+    /** event id for case of user not able to perform step up. */
+    @Nonnull
+    @NotEmpty
+    public static final String EVENTID_INVALID_USER = "InvalidUser";
+
+    /** event id for case of user not able to perform step up. */
+    @Nonnull
+    @NotEmpty
+    public static final String EVENTID_INVALID_RESPONSE = "StepUpWrongResponse";
 
     /** private constructor to prohibit use of it. */
     private StepUpEventIds() {
