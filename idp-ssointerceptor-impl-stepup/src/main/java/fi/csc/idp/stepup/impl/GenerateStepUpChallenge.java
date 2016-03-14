@@ -232,9 +232,12 @@ public class GenerateStepUpChallenge extends AbstractProfileInterceptorAction {
             //value of challenge is to be checked by verifier
             //TODO: verifier interface and example implementation
             
-            //TODO: Store the challenge value to "flow", not session if that is possible
+            //TODO: Store the challenge value to context, not session .
             request.getSession().setAttribute(
-                    "fi.csc.idp.stepup.impl.GenerateStepUpChallenge", challenge);
+                    "fi.csc.idp.stepup.impl.GenerateStepUpChallenge.challenge", challenge);
+            //TODO: Store the challenge value to context, not session .
+            request.getSession().setAttribute(
+                    "fi.csc.idp.stepup.impl.GenerateStepUpChallenge.target", target);
             
             //TODO: Exception to SEND interface method and to implementation
             //WE need to know if it failed
