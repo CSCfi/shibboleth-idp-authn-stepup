@@ -1,18 +1,18 @@
 package fi.csc.idp.stepup.api;
 
-import javax.annotation.Nonnull;
-
+/** interface for passing the challenge to target. */
 public interface ChallengeSender {
 
     /**
-     * Sends the given challenge to target.
+     * Sends the given challenge to user represented by the target parameter.
      * 
      * @param challenge
      *            to be sent.
-     * 
      * @param target
-     *            of the challenge.
+     *            of the challenge. Represents the user.
+     * @throws Exception
+     *             if the sending of the challenge has failed.
      * 
      */
-    void send(@Nonnull final String challenge, @Nonnull final String target) throws Exception;
+    void send(final String challenge, final String target) throws Exception;
 }

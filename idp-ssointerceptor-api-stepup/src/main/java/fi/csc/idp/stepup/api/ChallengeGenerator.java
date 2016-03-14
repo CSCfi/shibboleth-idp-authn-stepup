@@ -1,17 +1,17 @@
 package fi.csc.idp.stepup.api;
 
-import javax.annotation.Nonnull;
-
+/** Interface for generating the challenge. */
 public interface ChallengeGenerator {
 
     /**
-     * Sends the given challenge to target.
+     * Generates a challenge for the target.
      * 
      * @param target
-     *            of the challenge.
+     *            represents the target of the challenge.
      * 
      * @return challenge
-     * 
+     * @throws Exception
+     *             if the sending of the challenge has failed.
      */
-    String generate(@Nonnull final String target) throws Exception;
+    String generate(final String target) throws Exception;
 }

@@ -1,9 +1,8 @@
 package fi.csc.idp.stepup.api;
 
-import javax.annotation.Nonnull;
-
+/** Interface for performing challenge response verification. */
 public interface ChallengeVerifier {
-    
+
     /**
      * Verifies that the response is acceptable for the challenge and target.
      * 
@@ -13,9 +12,11 @@ public interface ChallengeVerifier {
      * @param response
      *            Users response to the challenge
      * @param target
-     *            identifier for the user.            
-     * 
+     *            input used for generating the challenge. Represents the user
+     *            responding to challenge.
+     * @return boolean true if the response was acceptable
      */
-    boolean verify(final String challenge, final String response, final String target);
+    boolean verify(final String challenge, final String response,
+            final String target);
 
 }
