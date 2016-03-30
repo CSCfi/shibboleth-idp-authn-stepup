@@ -64,17 +64,14 @@ public class GenerateStepUpChallenge extends AbstractProfileInterceptorAction {
     private final Logger log = LoggerFactory
             .getLogger(GenerateStepUpChallenge.class);
 
+    /** Context to look attributes for. */
     @Nonnull
     private Function<ProfileRequestContext, AttributeContext> attributeContextLookupStrategy;
 
     /** The attribute ID to look for. */
     @Nullable
     private String attributeId;
-
-    /** The attribute to match against. */
-    @Nullable
-    private IdPAttribute attribute;
-
+    
     /** AttributeContext to filter. */
     @Nullable
     private AttributeContext attributeContext;
@@ -85,6 +82,17 @@ public class GenerateStepUpChallenge extends AbstractProfileInterceptorAction {
     /** Challenge Sender. */
     private ChallengeSender challengeSender;
 
+    /** Constructor. */
+    public GenerateStepUpChallenge() {
+        log.trace("Entering");
+        attributeContextLookupStrategy = Functions
+                .compose(
+                        new ChildContextLookup<>(AttributeContext.class),
+                        new ChildContextLookup<ProfileRequestContext, RelyingPartyContext>(
+                                RelyingPartyContext.class));
+        log.trace("Leaving");
+    }
+    
     /**
      * Set the challenge sender.
      * 
@@ -100,8 +108,8 @@ public class GenerateStepUpChallenge extends AbstractProfileInterceptorAction {
     /**
      * Set the challenge generator.
      * 
-     * @param sender
-     *            for sending the challenge
+     * @param generator
+     *            for generating the challenge
      */
     public void setChallengeGenerator(@Nonnull ChallengeGenerator generator) {
         log.trace("Entering");
@@ -109,17 +117,7 @@ public class GenerateStepUpChallenge extends AbstractProfileInterceptorAction {
         log.trace("Leaving");
     }
 
-    /** Constructor. */
-    public GenerateStepUpChallenge() {
-        log.trace("Entering");
-        attributeContextLookupStrategy = Functions
-                .compose(
-                        new ChildContextLookup<>(AttributeContext.class),
-                        new ChildContextLookup<ProfileRequestContext, RelyingPartyContext>(
-                                RelyingPartyContext.class));
-        log.trace("Leaving");
-    }
-
+    
     /**
      * Set the lookup strategy for the {@link AttributeContext}.
      * 
@@ -192,11 +190,10 @@ public class GenerateStepUpChallenge extends AbstractProfileInterceptorAction {
             log.trace("Leaving");
             return;
         }
-
         // Following logic assumes attribute is defined and
         // and it has a value. Maybe we should support also
         // case of attribute not being defined or being a null
-        
+
         // Check that user has required attribute
         if (!attributeContext.getIdPAttributes().containsKey(attributeId)
                 || attributeContext.getIdPAttributes().get(attributeId)

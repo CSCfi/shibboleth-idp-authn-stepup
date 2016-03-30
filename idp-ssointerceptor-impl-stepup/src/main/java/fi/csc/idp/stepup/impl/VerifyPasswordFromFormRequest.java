@@ -55,8 +55,8 @@ public class VerifyPasswordFromFormRequest extends AbstractExtractionAction {
     /**
      * Set the challenge verifier.
      * 
-     * @param sender
-     *            for sending the challenge
+     * @param verifier
+     *            for verifying the challenge
      */
     public void setChallengeVerifier(@Nonnull ChallengeVerifier verifier) {
         log.trace("Entering");
