@@ -233,6 +233,7 @@ public class GenerateStepUpChallenge extends AbstractProfileInterceptorAction {
                     "fi.csc.idp.stepup.impl.GenerateStepUpChallenge.target", target);
             challengeSender.send(challenge, target);
         } catch (Exception e) {
+            log.error(e.getMessage());
             log.debug("Unable to generate/pass challenge", getLogPrefix());
             ActionSupport.buildEvent(profileRequestContext,
                     StepUpEventIds.EXCEPTION);
