@@ -24,6 +24,7 @@
 package fi.csc.idp.stepup.impl;
 
 import java.io.File;
+import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Properties;
 
@@ -209,7 +210,7 @@ public class MailChallengeSender implements ChallengeSender {
     //execution..
     
     @Override
-    public void send(String challenge, String target) throws AddressException, MessagingException {
+    public void send(String challenge, String target) /*throws AddressException, MessagingException*/ {
         log.trace("Entering");
         log.debug("Sending challenge "+challenge+" to "+target);
         to=target;
@@ -237,12 +238,21 @@ public class MailChallengeSender implements ChallengeSender {
             session = Session.getInstance(props);
         }
         Message message = new MimeMessage(session);
-        message.setFrom(new InternetAddress(from));
-        message.setRecipients(Message.RecipientType.TO,
-                InternetAddress.parse(to));
-        message.setSubject(subject);
-        message.setText(body);
-        Transport.send(message);
+        try {
+            message.setFrom(new InternetAddress(from));
+            message.setRecipients(Message.RecipientType.TO,
+                    InternetAddress.parse(to));
+            message.setSubject(subject);
+            message.setText(body);
+            Transport.send(message);
+            
+        } catch (MessagingException e) {
+            // TODO Auto-generated catch block
+            StringWriter sw = new StringWriter();
+            e.printStackTrace(new PrintWriter(sw));
+            String exceptionAsString = sw.toString();
+            log.error(exceptionAsString);
+        }
         log.debug("Challenge sending triggered");
         log.trace("Leaving");
     }
