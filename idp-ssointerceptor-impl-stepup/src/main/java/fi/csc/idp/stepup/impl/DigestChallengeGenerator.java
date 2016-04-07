@@ -115,7 +115,6 @@ public class DigestChallengeGenerator implements ChallengeGenerator {
             challenge = Hex.encodeHexString(md.digest());
         } catch (NoSuchAlgorithmException e) {
             log.error("unable to generate challenge " + e.getMessage());
-            log.error(e.getStackTrace().toString());
             return null;
         }
         log.trace("Leaving");
