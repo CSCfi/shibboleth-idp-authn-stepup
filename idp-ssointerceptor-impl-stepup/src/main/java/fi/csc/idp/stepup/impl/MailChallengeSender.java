@@ -210,7 +210,7 @@ public class MailChallengeSender implements ChallengeSender {
     //execution..
     
     @Override
-    public void send(String challenge, String target) /*throws AddressException, MessagingException*/ {
+    public void send(String challenge, String target) throws AddressException, MessagingException {
         log.trace("Entering");
         log.debug("Sending challenge "+challenge+" to "+target);
         to=target;
@@ -247,11 +247,11 @@ public class MailChallengeSender implements ChallengeSender {
             Transport.send(message);
             
         } catch (MessagingException e) {
-            // TODO Auto-generated catch block
             StringWriter sw = new StringWriter();
             e.printStackTrace(new PrintWriter(sw));
             String exceptionAsString = sw.toString();
             log.error(exceptionAsString);
+            throw e;
         }
         log.debug("Challenge sending triggered");
         log.trace("Leaving");
