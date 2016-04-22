@@ -70,6 +70,16 @@
                 <artifactId>idp-authn-api</artifactId>
                 <version>${shib.idp.version}</version>
             </dependency>
+            <dependency>
+	        <groupId>net.shibboleth.idp</groupId>
+		<artifactId>idp-saml-api</artifactId>
+                <version>${shib.idp.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>net.shibboleth.idp</groupId>
+                <artifactId>idp-saml-impl</artifactId>
+                <version>${shib.idp.version}</version>
+            </dependency>
 	    <dependency>
 		<groupId>fi.csc.idp.stepup</groupId>
     		<artifactId>idp-ssointerceptor-api-stepup</artifactId>
@@ -79,6 +89,11 @@
 	        <groupId>org.apache.velocity</groupId>
 	        <artifactId>velocity</artifactId>
 	        <version>1.7</version>
+            </dependency>
+	    <dependency>
+               <groupId>fi.okm.mpass</groupId>
+               <artifactId>idp-authn-api-shibsp</artifactId>
+               <version>1.0-SNAPSHOT</version>
             </dependency>
             <!-- Provided Dependencies -->
 
