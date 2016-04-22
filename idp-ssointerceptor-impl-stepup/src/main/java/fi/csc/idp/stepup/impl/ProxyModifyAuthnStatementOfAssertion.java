@@ -69,10 +69,11 @@ import com.google.common.collect.Collections2;
 import fi.okm.mpass.shibboleth.authn.context.ShibbolethAuthnContext;
 
 /**
- * Action that modifies {@link Assertion} of a {@link AuthnStatement}.
- * This actions modifies the authentication method passed in assertion for Proxy use case.
- * The new value reflects the value passed by originating IdP or if a reserved internal value
- * is defined (like for step-up), that value is used if also requested originally by SP.
+ * Action that modifies {@link Assertion} of a {@link AuthnStatement}. This
+ * actions modifies the authentication method passed in assertion for Proxy use
+ * case. The new value reflects the value passed by originating IdP or if a
+ * reserved internal value is defined (like for step-up), that value is used if
+ * also requested originally by SP.
  * 
  * 
  * 
@@ -82,63 +83,78 @@ import fi.okm.mpass.shibboleth.authn.context.ShibbolethAuthnContext;
  * @event {@link EventIds#INVALID_PROFILE_CTX}
  * @event {@link net.shibboleth.idp.authn.AuthnEventIds#INVALID_AUTHN_CTX}
  */
-public class ProxyModifyAuthnStatementOfAssertion extends BaseAddAuthenticationStatementToAssertion {
+public class ProxyModifyAuthnStatementOfAssertion extends
+        BaseAddAuthenticationStatementToAssertion {
 
     /** The authentication methods internal to proxy<->SP. */
-    @Nonnull private Subject internalPrincipals;
-    
+    @Nonnull
+    private Subject internalPrincipals;
+
     /** Class logger. */
-    @Nonnull private final Logger log = LoggerFactory.getLogger(ProxyModifyAuthnStatementOfAssertion.class);
-    
+    @Nonnull
+    private final Logger log = LoggerFactory
+            .getLogger(ProxyModifyAuthnStatementOfAssertion.class);
+
     /** Lookup strategy function for obtaining {@link AuthnRequest}. */
     @SuppressWarnings("rawtypes")
     @Nonnull
     private Function<ProfileRequestContext, AuthnRequest> authnRequestLookupStrategy;
-    
+
     /** The request message to read from. */
     @Nullable
     private AuthnRequest authnRequest;
-    
+
     /** Strategy used to locate the {@link Assertion} to operate on. */
     @SuppressWarnings("rawtypes")
-    @NonnullAfterInit private Function<ProfileRequestContext,Assertion> assertionLookupStrategy;
-    
+    @NonnullAfterInit
+    private Function<ProfileRequestContext, Assertion> assertionLookupStrategy;
+
     /** Strategy used to determine the AuthnContextClassRef. */
     @SuppressWarnings("rawtypes")
-    @NonnullAfterInit private Function<ProfileRequestContext,AuthnContextClassRefPrincipal> classRefLookupStrategy;
+    @NonnullAfterInit
+    private Function<ProfileRequestContext, AuthnContextClassRefPrincipal> classRefLookupStrategy;
 
     /** Strategy used to determine SessionNotOnOrAfter value to set. */
     @SuppressWarnings("rawtypes")
-    @Nullable private Function<ProfileRequestContext,Long> sessionLifetimeLookupStrategy;
-        
+    @Nullable
+    private Function<ProfileRequestContext, Long> sessionLifetimeLookupStrategy;
+
     /** Constructor. */
     public ProxyModifyAuthnStatementOfAssertion() {
         sessionLifetimeLookupStrategy = new SessionLifetimeLookupFunction();
     }
-    
+
     /**
      * Set the strategy used to locate the {@link Assertion} to operate on.
      * 
-     * @param strategy strategy used to locate the {@link Assertion} to operate on
+     * @param strategy
+     *            strategy used to locate the {@link Assertion} to operate on
      */
-    public void setAssertionLookupStrategy(@SuppressWarnings("rawtypes") @Nonnull final Function<ProfileRequestContext,Assertion> strategy) {
-        ComponentSupport.ifInitializedThrowUnmodifiabledComponentException(this);
-        assertionLookupStrategy = Constraint.isNotNull(strategy, "Assertion lookup strategy cannot be null");
+    public void setAssertionLookupStrategy(
+            @SuppressWarnings("rawtypes") @Nonnull final Function<ProfileRequestContext, Assertion> strategy) {
+        ComponentSupport
+                .ifInitializedThrowUnmodifiabledComponentException(this);
+        assertionLookupStrategy = Constraint.isNotNull(strategy,
+                "Assertion lookup strategy cannot be null");
     }
-    
+
     /**
-     * Set the strategy function to use to obtain the authentication context class reference to use.
+     * Set the strategy function to use to obtain the authentication context
+     * class reference to use.
      * 
-     * @param strategy  authentication context class reference lookup strategy
+     * @param strategy
+     *            authentication context class reference lookup strategy
      */
     public void setClassRefLookupStrategy(
-            @SuppressWarnings("rawtypes") @Nonnull final Function<ProfileRequestContext,AuthnContextClassRefPrincipal> strategy) {
-        ComponentSupport.ifInitializedThrowUnmodifiabledComponentException(this);
-        
-        classRefLookupStrategy = Constraint.isNotNull(strategy,
-                "Authentication context class reference strategy cannot be null");
+            @SuppressWarnings("rawtypes") @Nonnull final Function<ProfileRequestContext, AuthnContextClassRefPrincipal> strategy) {
+        ComponentSupport
+                .ifInitializedThrowUnmodifiabledComponentException(this);
+
+        classRefLookupStrategy = Constraint
+                .isNotNull(strategy,
+                        "Authentication context class reference strategy cannot be null");
     }
-    
+
     /**
      * Set the strategy used to locate the {@link AuthnRequest} to read from.
      * 
@@ -159,55 +175,67 @@ public class ProxyModifyAuthnStatementOfAssertion extends BaseAddAuthenticationS
     /**
      * Set the strategy used to locate the SessionNotOnOrAfter value to use.
      * 
-     * @param strategy lookup strategy
+     * @param strategy
+     *            lookup strategy
      */
-    public void setSessionLifetimeLookupStrategy(@SuppressWarnings("rawtypes") @Nullable final Function<ProfileRequestContext,Long> strategy) {
-        ComponentSupport.ifInitializedThrowUnmodifiabledComponentException(this);
+    public void setSessionLifetimeLookupStrategy(
+            @SuppressWarnings("rawtypes") @Nullable final Function<ProfileRequestContext, Long> strategy) {
+        ComponentSupport
+                .ifInitializedThrowUnmodifiabledComponentException(this);
 
         sessionLifetimeLookupStrategy = strategy;
     }
-    
+
     /** {@inheritDoc} */
     @Override
     protected void doInitialize() throws ComponentInitializationException {
         super.doInitialize();
-        if (authnRequestLookupStrategy == null){
+        if (authnRequestLookupStrategy == null) {
             authnRequestLookupStrategy = Functions.compose(new MessageLookup<>(
                     AuthnRequest.class), new InboundMessageContextLookup());
         }
-        
+
         if (classRefLookupStrategy == null) {
-            classRefLookupStrategy = new DefaultPrincipalDeterminationStrategy<>(AuthnContextClassRefPrincipal.class,
-                    new AuthnContextClassRefPrincipal(AuthnContext.UNSPECIFIED_AUTHN_CTX));
+            classRefLookupStrategy = new DefaultPrincipalDeterminationStrategy<>(
+                    AuthnContextClassRefPrincipal.class,
+                    new AuthnContextClassRefPrincipal(
+                            AuthnContext.UNSPECIFIED_AUTHN_CTX));
         }
 
         if (assertionLookupStrategy == null) {
             assertionLookupStrategy = new AssertionStrategy();
         }
     }
-    
+
     /**
-     * Set internal principals used between proxy and SP. 
+     * Set internal principals used between proxy and SP.
      * 
      * 
-     * @param <T> a type of principal to add, if not generic
-     * @param principals supported principals to add
+     * @param <T>
+     *            a type of principal to add, if not generic
+     * @param principals
+     *            supported principals to add
      */
-    public <T extends Principal> void setInternalPrincipals(@Nonnull @NonnullElements final Collection<T> principals) {
+    public <T extends Principal> void setInternalPrincipals(
+            @Nonnull @NonnullElements final Collection<T> principals) {
         log.trace("Entering");
-        ComponentSupport.ifInitializedThrowUnmodifiabledComponentException(this);
-        Constraint.isNotNull(principals, "Principal collection cannot be null.");
-        if (internalPrincipals==null){
-            internalPrincipals=new Subject();
+        ComponentSupport
+                .ifInitializedThrowUnmodifiabledComponentException(this);
+        Constraint
+                .isNotNull(principals, "Principal collection cannot be null.");
+        if (internalPrincipals == null) {
+            internalPrincipals = new Subject();
         }
         internalPrincipals.getPrincipals().clear();
-        internalPrincipals.getPrincipals().addAll(Collections2.filter(principals, Predicates.notNull()));
+        internalPrincipals.getPrincipals().addAll(
+                Collections2.filter(principals, Predicates.notNull()));
         log.trace("Leaving");
     }
 
     /** {@inheritDoc} */
     @Override
-    protected void doExecute(@SuppressWarnings("rawtypes") @Nonnull final ProfileRequestContext profileRequestContext,
+    protected void doExecute(
+            @SuppressWarnings("rawtypes") @Nonnull final ProfileRequestContext profileRequestContext,
             @Nonnull final AuthenticationContext authenticationContext) {
 
         log.trace("Entering");
@@ -216,131 +244,188 @@ public class ProxyModifyAuthnStatementOfAssertion extends BaseAddAuthenticationS
             log.debug(
                     "{} AuthnRequest message was not returned by lookup strategy",
                     getLogPrefix());
-            ActionSupport.buildEvent(profileRequestContext, EventIds.INVALID_PROFILE_CTX);
+            ActionSupport.buildEvent(profileRequestContext,
+                    EventIds.INVALID_PROFILE_CTX);
             log.trace("Leaving");
             return;
         }
-        final ShibbolethAuthnContext shibbolethContext =
-              authenticationContext.getSubcontext(ShibbolethAuthnContext.class);
-        if (shibbolethContext == null){
-            log.debug(
-                    "{} Could not get shib proxy context",
-                    getLogPrefix());
-            ActionSupport.buildEvent(profileRequestContext, EventIds.INVALID_PROFILE_CTX);
+        final ShibbolethAuthnContext shibbolethContext = authenticationContext
+                .getSubcontext(ShibbolethAuthnContext.class);
+        if (shibbolethContext == null) {
+            log.debug("{} Could not get shib proxy context", getLogPrefix());
+            ActionSupport.buildEvent(profileRequestContext,
+                    EventIds.INVALID_PROFILE_CTX);
             log.trace("Leaving");
             return;
         }
-        final Assertion assertion = assertionLookupStrategy.apply(profileRequestContext);
+        final Assertion assertion = assertionLookupStrategy
+                .apply(profileRequestContext);
         if (assertion == null) {
             log.error("Unable to obtain Assertion to modify");
-            ActionSupport.buildEvent(profileRequestContext, EventIds.INVALID_MSG_CTX);
+            ActionSupport.buildEvent(profileRequestContext,
+                    EventIds.INVALID_MSG_CTX);
             return;
         }
-        
-        
-        //We clear current auth methods from statement
-        //TODO: statements are indexed, how can we know which one?
-        assertion.getAuthnStatements().get(0).getAuthnContext().setAuthnContextClassRef(null);
-        assertion.getAuthnStatements().get(0).getAuthnContext().setAuthnContextDecl(null);
-        
+
+        // We clear current auth methods from statement
+        // TODO: statements are indexed, how can we know which one?
+        assertion.getAuthnStatements().get(0).getAuthnContext()
+                .setAuthnContextClassRef(null);
+        assertion.getAuthnStatements().get(0).getAuthnContext()
+                .setAuthnContextDecl(null);
+
         final RequestedAuthnContext requestedCtx = authnRequest
                 .getRequestedAuthnContext();
-        
-        /*
-         * If SP has asked for specific method we set a 'internal method' as such if
-         * it has been requested and listed as supported.
-         * 
-         * This could maybe be done also by shibs conventional means by using weighted map
-         * 
-         */
-        if (internalPrincipals != null && requestedCtx != null
-                && (!requestedCtx.getAuthnContextClassRefs().isEmpty() || !requestedCtx.getAuthnContextDeclRefs().isEmpty())) {
-            log.debug("Locating proxy internal auth methods");
-            
-            //TODO: do we have to break from the loops or use weights as shib itself?
-            //now we just set the last matching one. Is that ok?
-            for (AuthnContextClassRef authnContextClassRef:requestedCtx.getAuthnContextClassRefs()){
-                for (Principal matchingPrincipal:internalPrincipals.getPrincipals()){
-                    if (matchingPrincipal instanceof AuthnContextClassRefPrincipal &&
-                            authnContextClassRef.getAuthnContextClassRef().equals(((AuthnContextClassRefPrincipal) matchingPrincipal).getAuthnContextClassRef().getAuthnContextClassRef())) {
-                        log.debug("setting ClassRef "+((AuthnContextClassRefPrincipal)matchingPrincipal).getAuthnContextClassRef());
-                        assertion.getAuthnStatements().get(0).getAuthnContext().setAuthnContextClassRef(((AuthnContextClassRefPrincipal)matchingPrincipal).getAuthnContextClassRef());  
-                    } 
-                                
-                }
-            }
-            for (AuthnContextDeclRef authnContextDeclRef:requestedCtx.getAuthnContextDeclRefs()){
-                for (Principal matchingPrincipal:internalPrincipals.getPrincipals()){
-                    if (matchingPrincipal instanceof AuthnContextDeclRefPrincipal &&
-                            authnContextDeclRef.getAuthnContextDeclRef().equals(((AuthnContextDeclRefPrincipal) matchingPrincipal).getAuthnContextDeclRef().getAuthnContextDeclRef())) {
-                        log.debug("setting DeclRef "+(((AuthnContextDeclRefPrincipal)matchingPrincipal).getAuthnContextDeclRef()));
-                        assertion.getAuthnStatements().get(0).getAuthnContext().setAuthnContextDeclRef((((AuthnContextDeclRefPrincipal)matchingPrincipal).getAuthnContextDeclRef()));  
-                    } 
-                                
-                }
-            }
-        }
-        /*
-         * If SP request did not match any of the internal methods we use
-         * values provided by the original provider
-         * 
-         */
-        
-        if (assertion.getAuthnStatements().get(0).getAuthnContext().getAuthnContextClassRef() == null &&
-            assertion.getAuthnStatements().get(0).getAuthnContext().getAuthnContextDeclRef() == null){
-            log.debug("using auth method provided by original provider");
-            String declRef=shibbolethContext.getHeaders().get("Shib-AuthnContext-Decl");
-            String classRef=shibbolethContext.getHeaders().get("Shib-AuthnContext-Class");
-            if (declRef != null){
-                log.debug("DeclRef "+declRef);
-                AuthnContextDeclRefPrincipal authnContextDeclRefPrincipal = new AuthnContextDeclRefPrincipal(declRef);
-                assertion.getAuthnStatements().get(0).getAuthnContext().setAuthnContextDeclRef(
-                        authnContextDeclRefPrincipal.getAuthnContextDeclRef());   
-            }
-            if (classRef != null){
-                log.debug("classRef "+classRef);
-                AuthnContextClassRefPrincipal authnContextClassRefPrincipal = new AuthnContextClassRefPrincipal(classRef);
-                assertion.getAuthnStatements().get(0).getAuthnContext().setAuthnContextClassRef(
-                        authnContextClassRefPrincipal.getAuthnContextClassRef());   
-            }
-        }
-        
-        log.debug("{} Modified AuthenticationStatement of Assertion {}", getLogPrefix(), assertion.getID());
-        
-    }
-    
-    
 
-       
+        /*
+         * If SP has asked for specific method we set a 'internal method' as
+         * such if it has been requested and listed as supported.
+         * 
+         * This could maybe be done also by shibs conventional means by using
+         * weighted map
+         */
+        if (internalPrincipals != null
+                && requestedCtx != null
+                && (!requestedCtx.getAuthnContextClassRefs().isEmpty() || !requestedCtx
+                        .getAuthnContextDeclRefs().isEmpty())) {
+            log.debug("Locating proxy internal auth methods");
+
+            // TODO: do we have to break from the loops or use weights as shib
+            // itself?
+            // now we just set the last matching one. Is that ok?
+            for (AuthnContextClassRef authnContextClassRef : requestedCtx
+                    .getAuthnContextClassRefs()) {
+                for (Principal matchingPrincipal : internalPrincipals
+                        .getPrincipals()) {
+                    if (matchingPrincipal instanceof AuthnContextClassRefPrincipal
+                            && authnContextClassRef
+                                    .getAuthnContextClassRef()
+                                    .equals(((AuthnContextClassRefPrincipal) matchingPrincipal)
+                                            .getAuthnContextClassRef()
+                                            .getAuthnContextClassRef())) {
+                        log.debug("setting ClassRef "
+                                + ((AuthnContextClassRefPrincipal) matchingPrincipal)
+                                        .getAuthnContextClassRef());
+                        assertion
+                                .getAuthnStatements()
+                                .get(0)
+                                .getAuthnContext()
+                                .setAuthnContextClassRef(
+                                        ((AuthnContextClassRefPrincipal) matchingPrincipal)
+                                                .getAuthnContextClassRef());
+                    }
+
+                }
+            }
+            for (AuthnContextDeclRef authnContextDeclRef : requestedCtx
+                    .getAuthnContextDeclRefs()) {
+                for (Principal matchingPrincipal : internalPrincipals
+                        .getPrincipals()) {
+                    if (matchingPrincipal instanceof AuthnContextDeclRefPrincipal
+                            && authnContextDeclRef
+                                    .getAuthnContextDeclRef()
+                                    .equals(((AuthnContextDeclRefPrincipal) matchingPrincipal)
+                                            .getAuthnContextDeclRef()
+                                            .getAuthnContextDeclRef())) {
+                        log.debug("setting DeclRef "
+                                + (((AuthnContextDeclRefPrincipal) matchingPrincipal)
+                                        .getAuthnContextDeclRef()));
+                        assertion
+                                .getAuthnStatements()
+                                .get(0)
+                                .getAuthnContext()
+                                .setAuthnContextDeclRef(
+                                        (((AuthnContextDeclRefPrincipal) matchingPrincipal)
+                                                .getAuthnContextDeclRef()));
+                    }
+
+                }
+            }
+        }
+        /*
+         * If SP request did not match any of the internal methods we use values
+         * provided by the original provider
+         */
+
+        if (assertion.getAuthnStatements().get(0).getAuthnContext()
+                .getAuthnContextClassRef() == null
+                && assertion.getAuthnStatements().get(0).getAuthnContext()
+                        .getAuthnContextDeclRef() == null) {
+            log.debug("using auth method provided by original provider");
+            String declRef = shibbolethContext.getHeaders().get(
+                    "Shib-AuthnContext-Decl");
+            String classRef = shibbolethContext.getHeaders().get(
+                    "Shib-AuthnContext-Class");
+            if (declRef != null) {
+                log.debug("DeclRef " + declRef);
+                AuthnContextDeclRefPrincipal authnContextDeclRefPrincipal = new AuthnContextDeclRefPrincipal(
+                        declRef);
+                assertion
+                        .getAuthnStatements()
+                        .get(0)
+                        .getAuthnContext()
+                        .setAuthnContextDeclRef(
+                                authnContextDeclRefPrincipal
+                                        .getAuthnContextDeclRef());
+            }
+            if (classRef != null) {
+                log.debug("classRef " + classRef);
+                AuthnContextClassRefPrincipal authnContextClassRefPrincipal = new AuthnContextClassRefPrincipal(
+                        classRef);
+                assertion
+                        .getAuthnStatements()
+                        .get(0)
+                        .getAuthnContext()
+                        .setAuthnContextClassRef(
+                                authnContextClassRefPrincipal
+                                        .getAuthnContextClassRef());
+            }
+        }
+
+        log.debug("{} Modified AuthenticationStatement of Assertion {}",
+                getLogPrefix(), assertion.getID());
+
+    }
+
     /**
      * Default strategy for obtaining assertion to modify.
      * 
-     * <p>If the outbound message is already an assertion, it's returned. If the outbound message
-     * is a response, then either
-     * an existing or new assertion in the response is returned, depending on the action setting. If the
-     * outbound message is anything else, null is returned.</p>
+     * <p>
+     * If the outbound message is already an assertion, it's returned. If the
+     * outbound message is a response, then either an existing or new assertion
+     * in the response is returned, depending on the action setting. If the
+     * outbound message is anything else, null is returned.
+     * </p>
      */
-    
+
     @SuppressWarnings("rawtypes")
-    private class AssertionStrategy implements Function<ProfileRequestContext,Assertion> {
+    private class AssertionStrategy implements
+            Function<ProfileRequestContext, Assertion> {
 
         /** {@inheritDoc} */
         @Override
-        @Nullable public Assertion apply(@Nullable final ProfileRequestContext input) {
+        @Nullable
+        public Assertion apply(@Nullable final ProfileRequestContext input) {
             if (input != null && input.getOutboundMessageContext() != null) {
-                final Object outboundMessage = input.getOutboundMessageContext().getMessage();
+                final Object outboundMessage = input
+                        .getOutboundMessageContext().getMessage();
                 if (outboundMessage instanceof Assertion) {
                     return (Assertion) outboundMessage;
                 } else if (outboundMessage instanceof Response) {
-                    if (isStatementInOwnAssertion() || ((Response) outboundMessage).getAssertions().isEmpty()) {
-                        return SAML2ActionSupport.addAssertionToResponse(ProxyModifyAuthnStatementOfAssertion.this,
-                                (Response) outboundMessage, getIdGenerator(), getIssuerId());
+                    if (isStatementInOwnAssertion()
+                            || ((Response) outboundMessage).getAssertions()
+                                    .isEmpty()) {
+                        return SAML2ActionSupport.addAssertionToResponse(
+                                ProxyModifyAuthnStatementOfAssertion.this,
+                                (Response) outboundMessage, getIdGenerator(),
+                                getIssuerId());
                     } else {
-                        return ((Response) outboundMessage).getAssertions().get(0);
-                    } 
+                        return ((Response) outboundMessage).getAssertions()
+                                .get(0);
+                    }
                 }
             }
-            
+
             return null;
         }
     }
