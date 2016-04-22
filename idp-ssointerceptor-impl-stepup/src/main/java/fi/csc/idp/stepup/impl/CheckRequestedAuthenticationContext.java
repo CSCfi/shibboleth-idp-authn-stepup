@@ -136,21 +136,22 @@ public class CheckRequestedAuthenticationContext extends
                 .getRequestedAuthnContext();
         if (requestedCtx == null
                 || requestedCtx.getAuthnContextClassRefs().isEmpty()) {
+            //We should set somehow the original method set by home idp
+            //This may need step modded from AddAuthnStatementToAssertion 
             log.debug(
-                    "{} AuthnRequest did not contain a RequestedAuthnContext, nothing to do",
+                    "{} AuthnRequest did not contain a RequestedAuthnContext, stepup not needed",
                     getLogPrefix());
             ActionSupport.buildEvent(profileRequestContext,
                     StepUpEventIds.EVENTID_AUTHNCONTEXT_NOT_REQUESTED);
             log.trace("Leaving");
             return;
         }
-        // TODO : COMPARE requested context class ref
-        // Return StepUpEventIds.EVENTID_AUTHNCONTEXT_UNKNOWN if no match
-        // Another step will then set the value for bypassed authentication
-        log.debug("TBD, logic to compare requested context class:"
-                + requestedCtx.getAuthnContextClassRefs().get(0)
-                        .getAuthnContextClassRef());
-        // Hardcoded success:
+       
+        // TODO: Compare requested context to 'reserved' ones
+        // StepUp needed only if they match
+        // otherwise 'normal' authentication
+        
+        
         ActionSupport.buildEvent(profileRequestContext,
                 StepUpEventIds.EVENTID_CONTINUE_STEPUP);
         log.trace("Leaving");
