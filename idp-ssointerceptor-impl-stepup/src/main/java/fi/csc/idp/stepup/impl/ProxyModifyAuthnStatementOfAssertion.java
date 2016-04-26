@@ -330,36 +330,31 @@ public class ProxyModifyAuthnStatementOfAssertion extends
          * If SP request did not match any of the internal methods we use value
          * provided by the original provider
          */
-
-        if (assertion.getAuthnStatements().get(0).getAuthnContext()
-                .getAuthnContextClassRef() == null
-                && assertion.getAuthnStatements().get(0).getAuthnContext()
-                        .getAuthnContextDeclRef() == null) {
-            log.debug("using auth method provided by original provider");
-            String declRef = shibbolethContext.getHeaders().get(
-                    "Shib-AuthnContext-Decl");
-            if (declRef != null && !declRef.isEmpty()) {
-                log.debug("DeclRef " + declRef);
-                AuthnContextDeclRefPrincipal authnContextDeclRefPrincipal = new AuthnContextDeclRefPrincipal(
-                        declRef);
-                setAuthnContextPrincipal(authnContextDeclRefPrincipal, assertion);
-                log.debug("{} Modified AuthenticationStatement of Assertion {}",
-                        getLogPrefix(), assertion.getID());
-                log.trace("leaving");
-                return;
-            }
-            String classRef = shibbolethContext.getHeaders().get(
-                    "Shib-AuthnContext-Class");
-            if (classRef != null && !classRef.isEmpty()) {
-                log.debug("classRef " + classRef);
-                AuthnContextClassRefPrincipal authnContextClassRefPrincipal = new AuthnContextClassRefPrincipal(
-                        classRef);
-                setAuthnContextPrincipal(authnContextClassRefPrincipal, assertion);
-                log.debug("{} Modified AuthenticationStatement of Assertion {}",
-                        getLogPrefix(), assertion.getID());
-                log.trace("leaving");
-                return;
-            }
+        log.debug("using auth method provided by original provider");
+        String declRef = shibbolethContext.getHeaders().get(
+                "Shib-AuthnContext-Decl");
+        if (declRef != null && !declRef.isEmpty()) {
+            log.debug("DeclRef " + declRef);
+            AuthnContextDeclRefPrincipal authnContextDeclRefPrincipal = new AuthnContextDeclRefPrincipal(
+                    declRef);
+            setAuthnContextPrincipal(authnContextDeclRefPrincipal, assertion);
+            log.debug("{} Modified AuthenticationStatement of Assertion {}",
+                    getLogPrefix(), assertion.getID());
+            log.trace("leaving");
+            return;
+        }
+ 
+        String classRef = shibbolethContext.getHeaders().get(
+                "Shib-AuthnContext-Class");
+        if (classRef != null && !classRef.isEmpty()) {
+            log.debug("classRef " + classRef);
+            AuthnContextClassRefPrincipal authnContextClassRefPrincipal = new AuthnContextClassRefPrincipal(
+                    classRef);
+            setAuthnContextPrincipal(authnContextClassRefPrincipal, assertion);
+            log.debug("{} Modified AuthenticationStatement of Assertion {}",
+                    getLogPrefix(), assertion.getID());
+            log.trace("leaving");
+            return;
         }
         log.debug("auth method not changed");
         log.trace("leaving");
