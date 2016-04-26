@@ -266,13 +266,7 @@ public class ProxyModifyAuthnStatementOfAssertion extends
             return;
         }
 
-        // We clear current auth methods from statement
-        // TODO: statements are indexed, find out how indexing should be used
-        assertion.getAuthnStatements().get(0).getAuthnContext()
-                .setAuthnContextClassRef(null);
-        assertion.getAuthnStatements().get(0).getAuthnContext()
-                .setAuthnContextDeclRef(null);
-
+      
         final RequestedAuthnContext requestedCtx = authnRequest
                 .getRequestedAuthnContext();
 
@@ -300,16 +294,7 @@ public class ProxyModifyAuthnStatementOfAssertion extends
                                     .equals(((AuthnContextClassRefPrincipal) matchingPrincipal)
                                             .getAuthnContextClassRef()
                                             .getAuthnContextClassRef())) {
-                        log.debug("setting ClassRef "
-                                + ((AuthnContextClassRefPrincipal) matchingPrincipal)
-                                        .getAuthnContextClassRef().getAuthnContextClassRef());
-                        assertion
-                                .getAuthnStatements()
-                                .get(0)
-                                .getAuthnContext()
-                                .setAuthnContextClassRef(
-                                        ((AuthnContextClassRefPrincipal) matchingPrincipal)
-                                                .getAuthnContextClassRef());
+                        setAuthnContextPrincipal(matchingPrincipal, assertion);
                         log.debug("{} Modified AuthenticationStatement of Assertion {}",
                                 getLogPrefix(), assertion.getID());
                         log.trace("leaving");
@@ -331,13 +316,7 @@ public class ProxyModifyAuthnStatementOfAssertion extends
                         log.debug("setting DeclRef "
                                 + (((AuthnContextDeclRefPrincipal) matchingPrincipal)
                                         .getAuthnContextDeclRef().getAuthnContextDeclRef()));
-                        assertion
-                                .getAuthnStatements()
-                                .get(0)
-                                .getAuthnContext()
-                                .setAuthnContextDeclRef(
-                                        (((AuthnContextDeclRefPrincipal) matchingPrincipal)
-                                                .getAuthnContextDeclRef()));
+                        setAuthnContextPrincipal(matchingPrincipal, assertion);
                         log.debug("{} Modified AuthenticationStatement of Assertion {}",
                                 getLogPrefix(), assertion.getID());
                         log.trace("leaving");
@@ -359,41 +338,56 @@ public class ProxyModifyAuthnStatementOfAssertion extends
             log.debug("using auth method provided by original provider");
             String declRef = shibbolethContext.getHeaders().get(
                     "Shib-AuthnContext-Decl");
-            String classRef = shibbolethContext.getHeaders().get(
-                    "Shib-AuthnContext-Class");
-            if (declRef != null) {
+            if (declRef != null && !declRef.isEmpty()) {
                 log.debug("DeclRef " + declRef);
                 AuthnContextDeclRefPrincipal authnContextDeclRefPrincipal = new AuthnContextDeclRefPrincipal(
                         declRef);
-                assertion
-                        .getAuthnStatements()
-                        .get(0)
-                        .getAuthnContext()
-                        .setAuthnContextDeclRef(
-                                authnContextDeclRefPrincipal
-                                        .getAuthnContextDeclRef());
+                setAuthnContextPrincipal(authnContextDeclRefPrincipal, assertion);
                 log.debug("{} Modified AuthenticationStatement of Assertion {}",
                         getLogPrefix(), assertion.getID());
                 log.trace("leaving");
                 return;
             }
-            if (classRef != null) {
+            String classRef = shibbolethContext.getHeaders().get(
+                    "Shib-AuthnContext-Class");
+            if (classRef != null && !classRef.isEmpty()) {
                 log.debug("classRef " + classRef);
                 AuthnContextClassRefPrincipal authnContextClassRefPrincipal = new AuthnContextClassRefPrincipal(
                         classRef);
-                assertion
-                        .getAuthnStatements()
-                        .get(0)
-                        .getAuthnContext()
-                        .setAuthnContextClassRef(
-                                authnContextClassRefPrincipal
-                                        .getAuthnContextClassRef());
+                setAuthnContextPrincipal(authnContextClassRefPrincipal, assertion);
                 log.debug("{} Modified AuthenticationStatement of Assertion {}",
                         getLogPrefix(), assertion.getID());
                 log.trace("leaving");
                 return;
             }
         }
+        log.debug("auth method not changed");
+        log.trace("leaving");
+        
+    }
+    
+    private void setAuthnContextPrincipal(Principal principal, Assertion assertion){
+        log.trace("Entering");
+        assertion.getAuthnStatements().get(0).getAuthnContext()
+        .setAuthnContextClassRef(null);
+        assertion.getAuthnStatements().get(0).getAuthnContext()
+        .setAuthnContextDeclRef(null);
+        if (principal instanceof AuthnContextDeclRefPrincipal){
+            assertion
+            .getAuthnStatements()
+            .get(0)
+            .getAuthnContext()
+            .setAuthnContextDeclRef(((AuthnContextDeclRefPrincipal)principal).getAuthnContextDeclRef());
+        }else
+        if (principal instanceof AuthnContextClassRefPrincipal){
+            assertion
+            .getAuthnStatements()
+            .get(0)
+            .getAuthnContext()
+            .setAuthnContextClassRef(((AuthnContextClassRefPrincipal)principal)
+                            .getAuthnContextClassRef());
+        }
+        log.trace("Leaving");
     }
 
     /**
