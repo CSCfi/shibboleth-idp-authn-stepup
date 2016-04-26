@@ -344,8 +344,7 @@ public class ProxyModifyAuthnStatementOfAssertion extends
             return;
         }
  
-        String classRef = shibbolethContext.getHeaders().get(
-                "Shib-AuthnContext-Class");
+        String classRef = shibbolethContext.getContextClass();
         if (classRef != null && !classRef.isEmpty()) {
             log.debug("classRef " + classRef);
             AuthnContextClassRefPrincipal authnContextClassRefPrincipal = new AuthnContextClassRefPrincipal(
