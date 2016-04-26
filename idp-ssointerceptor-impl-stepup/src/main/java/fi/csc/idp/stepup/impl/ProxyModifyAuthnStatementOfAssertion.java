@@ -267,11 +267,11 @@ public class ProxyModifyAuthnStatementOfAssertion extends
         }
 
         // We clear current auth methods from statement
-        // TODO: statements are indexed, how can we know which one?
+        // TODO: statements are indexed, find out how indexing should be used
         assertion.getAuthnStatements().get(0).getAuthnContext()
                 .setAuthnContextClassRef(null);
         assertion.getAuthnStatements().get(0).getAuthnContext()
-                .setAuthnContextDecl(null);
+                .setAuthnContextDeclRef(null);
 
         final RequestedAuthnContext requestedCtx = authnRequest
                 .getRequestedAuthnContext();
@@ -289,9 +289,7 @@ public class ProxyModifyAuthnStatementOfAssertion extends
                         .getAuthnContextDeclRefs().isEmpty())) {
             log.debug("Locating proxy internal auth methods");
 
-            // TODO: do we have to break from the loops or use weights as shib
-            // itself?
-            // now we just set the last matching one. Is that ok?
+            // We set the first one found
             for (AuthnContextClassRef authnContextClassRef : requestedCtx
                     .getAuthnContextClassRefs()) {
                 for (Principal matchingPrincipal : internalPrincipals
@@ -312,6 +310,10 @@ public class ProxyModifyAuthnStatementOfAssertion extends
                                 .setAuthnContextClassRef(
                                         ((AuthnContextClassRefPrincipal) matchingPrincipal)
                                                 .getAuthnContextClassRef());
+                        log.debug("{} Modified AuthenticationStatement of Assertion {}",
+                                getLogPrefix(), assertion.getID());
+                        log.trace("leaving");
+                        return;
                     }
 
                 }
@@ -336,13 +338,17 @@ public class ProxyModifyAuthnStatementOfAssertion extends
                                 .setAuthnContextDeclRef(
                                         (((AuthnContextDeclRefPrincipal) matchingPrincipal)
                                                 .getAuthnContextDeclRef()));
+                        log.debug("{} Modified AuthenticationStatement of Assertion {}",
+                                getLogPrefix(), assertion.getID());
+                        log.trace("leaving");
+                        return;
                     }
 
                 }
             }
         }
         /*
-         * If SP request did not match any of the internal methods we use values
+         * If SP request did not match any of the internal methods we use value
          * provided by the original provider
          */
 
@@ -366,6 +372,10 @@ public class ProxyModifyAuthnStatementOfAssertion extends
                         .setAuthnContextDeclRef(
                                 authnContextDeclRefPrincipal
                                         .getAuthnContextDeclRef());
+                log.debug("{} Modified AuthenticationStatement of Assertion {}",
+                        getLogPrefix(), assertion.getID());
+                log.trace("leaving");
+                return;
             }
             if (classRef != null) {
                 log.debug("classRef " + classRef);
@@ -378,12 +388,12 @@ public class ProxyModifyAuthnStatementOfAssertion extends
                         .setAuthnContextClassRef(
                                 authnContextClassRefPrincipal
                                         .getAuthnContextClassRef());
+                log.debug("{} Modified AuthenticationStatement of Assertion {}",
+                        getLogPrefix(), assertion.getID());
+                log.trace("leaving");
+                return;
             }
         }
-
-        log.debug("{} Modified AuthenticationStatement of Assertion {}",
-                getLogPrefix(), assertion.getID());
-
     }
 
     /**
