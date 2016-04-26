@@ -302,7 +302,7 @@ public class ProxyModifyAuthnStatementOfAssertion extends
                                             .getAuthnContextClassRef())) {
                         log.debug("setting ClassRef "
                                 + ((AuthnContextClassRefPrincipal) matchingPrincipal)
-                                        .getAuthnContextClassRef());
+                                        .getAuthnContextClassRef().getAuthnContextClassRef());
                         assertion
                                 .getAuthnStatements()
                                 .get(0)
@@ -330,7 +330,7 @@ public class ProxyModifyAuthnStatementOfAssertion extends
                                             .getAuthnContextDeclRef())) {
                         log.debug("setting DeclRef "
                                 + (((AuthnContextDeclRefPrincipal) matchingPrincipal)
-                                        .getAuthnContextDeclRef()));
+                                        .getAuthnContextDeclRef().getAuthnContextDeclRef()));
                         assertion
                                 .getAuthnStatements()
                                 .get(0)
