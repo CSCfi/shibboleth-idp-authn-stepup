@@ -151,7 +151,7 @@ public class CheckRequestedAuthenticationContext extends
      *            supported principals to add
      */
     
-    public <T extends Principal> void setInternalPrincipals(
+    public <T extends Principal> void setStepupMethods(
             @Nonnull @NonnullElements final Collection<T> principals) {
         log.trace("Entering");
         ComponentSupport
