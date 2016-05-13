@@ -48,7 +48,7 @@ public final class StepUpEventIds {
      */
     @Nonnull
     @NotEmpty
-    public static final String EVENTID_AUTHNCONTEXT_UNKNOWN = "AuthnContextNotStepUp";
+    public static final String EVENTID_AUTHNCONTEXT_NOT_STEPUP = "AuthnContextNotStepUp";
 
     /** event id for the case of continuing with stepup. */
     @Nonnull
