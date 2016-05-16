@@ -176,6 +176,7 @@ public class CheckRequestedAuthenticationContext extends
         log.trace("Entering");
         final RequestedAuthnContext requestedCtx = authnRequest
                 .getRequestedAuthnContext();
+        
         if (requestedCtx == null || !stepupRequested(requestedCtx,stepupPrincipals)) {
             log.debug(
                     "{} AuthnRequest did not contain a RequestedAuthnContext matching any StepUp",
