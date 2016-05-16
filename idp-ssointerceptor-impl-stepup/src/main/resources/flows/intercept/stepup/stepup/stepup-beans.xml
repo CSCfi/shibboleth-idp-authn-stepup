@@ -16,18 +16,46 @@
 	<bean class="net.shibboleth.idp.profile.impl.ProfileActionBeanPostProcessor" />
 	<bean class="net.shibboleth.ext.spring.config.IdentifiableBeanPostProcessor" />
 
-	<bean id="GenerateStepUpChallenge" class="fi.csc.idp.stepup.impl.GenerateStepUpChallenge"
-		scope="prototype" p:httpServletRequest-ref="shibboleth.HttpServletRequest"
-		p:attributeId="mail" p:challengeSender-ref="ChallengeSender"
-		p:challengeGenerator-ref="ChallengeGenerator">
-	</bean>
+	<bean id="GenerateStepUpChallenge"
+        class="fi.csc.idp.stepup.impl.GenerateStepUpChallenge" scope="prototype"
+        p:httpServletRequest-ref="shibboleth.HttpServletRequest">
+        <property name="attributeIds">
+          <map>
+            <entry key-ref="stepup" value="mail"/>
+          </map>
+        </property>
+        <property name="challengeSenders">
+          <map>
+            <entry key-ref="stepup" value-ref="MailChallengeSender"/>
+            <entry key-ref="stepup2" value-ref="LogChallengeSender"/>
+          </map>
+        </property>
+        <property name="challengeGenerators">
+          <map>
+            <entry key-ref="stepup" value-ref="ChallengeGenerator"/>
+            <entry key-ref="stepup2" value-ref="ChallengeGenerator"/>
+          </map>
+        </property>
+     </bean>
+
+    <bean id="stepup" parent="shibboleth.SAML2AuthnContextClassRef" c:classRef="urn:test:stepup"/>
+    <bean id="stepup2" parent="shibboleth.SAML2AuthnContextClassRef" c:classRef="urn:test:stepup2"/>
+
+
 
 	<bean id="CheckRequestedAuthenticationContext"
-		class="fi.csc.idp.stepup.impl.CheckRequestedAuthenticationContext"
-		scope="prototype" p:httpServletRequest-ref="shibboleth.HttpServletRequest">
-	</bean>
-
-	<bean id="ChallengeSender" class="fi.csc.idp.stepup.impl.LogChallengeSender"
+        class="fi.csc.idp.stepup.impl.CheckRequestedAuthenticationContext" scope="prototype"
+        p:httpServletRequest-ref="shibboleth.HttpServletRequest">
+        <property name="stepupMethods">
+                <list>
+                    <bean parent="shibboleth.SAML2AuthnContextClassRef"
+                        c:classRef="urn:test:stepup" />
+                </list>
+        </property>
+     </bean>
+     
+ 
+	<bean id="LogChallengeSender" class="fi.csc.idp.stepup.impl.LogChallengeSender"
 		scope="prototype">
 	</bean>
 
