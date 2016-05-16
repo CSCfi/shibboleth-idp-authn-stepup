@@ -249,9 +249,12 @@ public class GenerateStepUpChallenge<T> extends AbstractProfileInterceptorAction
             return;
         }
         
-        //1. read attribute value
-        Principal key=findKey(requestedCtx,attributeIds.keySet());
+        //1. read attribute value if required
         String attributeId = null;
+        Principal key = null;
+        if (attributeIds != null){
+            key=findKey(requestedCtx,attributeIds.keySet());
+        }
         if (key != null){
             attributeId=attributeIds.get(key);   
         }
@@ -285,7 +288,10 @@ public class GenerateStepUpChallenge<T> extends AbstractProfileInterceptorAction
             }
         }
         //Resolve generator
-        ChallengeGenerator challengeGenerator =challengeGenerators.get(findKey(requestedCtx,challengeGenerators.keySet()));
+        ChallengeGenerator challengeGenerator = null;
+        if (challengeGenerators != null){
+            challengeGenerator=challengeGenerators.get(findKey(requestedCtx,challengeGenerators.keySet()));
+        }
         if (challengeGenerator == null){
             log.debug("no challenge generator defined for requested context");
             ActionSupport.buildEvent(profileRequestContext,
@@ -294,7 +300,10 @@ public class GenerateStepUpChallenge<T> extends AbstractProfileInterceptorAction
             return;
         }
         //Resolve sender
-        ChallengeSender challengeSender =challengeSenders.get(findKey(requestedCtx,challengeSenders.keySet()));
+        ChallengeSender challengeSender = null;
+        if (challengeSenders != null){
+            challengeSender =challengeSenders.get(findKey(requestedCtx,challengeSenders.keySet()));
+        }
         if (challengeSender == null){
             log.debug("no challenge sender defined for requested context");
             ActionSupport.buildEvent(profileRequestContext,
