@@ -99,15 +99,13 @@ public class DigestChallengeGenerator implements ChallengeGenerator {
     public String generate(String target) throws Exception {
         log.trace("Entering");
         String challenge = null;
-        if (target == null) {
-            log.trace("Leaving");
-            throw new Exception("Cannot generate digest for null value");
-        }
         try {
             String time = "" + System.currentTimeMillis();
             MessageDigest md = MessageDigest.getInstance(digest);
             // to make challenge user specific
-            md.update(target.getBytes());
+            if (target != null){
+                md.update(target.getBytes());
+            }
             // to make challenge installation specific
             md.update(salt.getBytes());
             // to make challenge time specific
