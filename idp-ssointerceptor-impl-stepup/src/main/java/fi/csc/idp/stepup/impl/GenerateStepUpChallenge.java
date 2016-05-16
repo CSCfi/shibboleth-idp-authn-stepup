@@ -23,6 +23,11 @@
 
 package fi.csc.idp.stepup.impl;
 
+import java.security.Principal;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.servlet.http.HttpServletRequest;
@@ -33,16 +38,23 @@ import net.shibboleth.idp.attribute.StringAttributeValue;
 import net.shibboleth.idp.attribute.context.AttributeContext;
 import net.shibboleth.idp.profile.interceptor.AbstractProfileInterceptorAction;
 import net.shibboleth.utilities.java.support.logic.Constraint;
-import net.shibboleth.utilities.java.support.primitive.StringSupport;
 
 import org.opensaml.messaging.context.navigate.ChildContextLookup;
+import org.opensaml.messaging.context.navigate.MessageLookup;
 import org.opensaml.profile.action.ActionSupport;
 import org.opensaml.profile.context.ProfileRequestContext;
+import org.opensaml.profile.context.navigate.InboundMessageContextLookup;
+import org.opensaml.saml.saml2.core.AuthnContextClassRef;
+import org.opensaml.saml.saml2.core.AuthnContextDeclRef;
+import org.opensaml.saml.saml2.core.AuthnRequest;
+import org.opensaml.saml.saml2.core.RequestedAuthnContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import net.shibboleth.idp.profile.context.ProfileInterceptorContext;
 import net.shibboleth.idp.profile.context.RelyingPartyContext;
+import net.shibboleth.idp.saml.authn.principal.AuthnContextClassRefPrincipal;
+import net.shibboleth.idp.saml.authn.principal.AuthnContextDeclRefPrincipal;
 
 import com.google.common.base.Function;
 import com.google.common.base.Functions;
@@ -53,11 +65,12 @@ import fi.csc.idp.stepup.api.StepUpEventIds;
 
 /**
  * An action that create step up challenge.
+ * @param <T>
  * 
  */
 
 @SuppressWarnings("rawtypes")
-public class GenerateStepUpChallenge extends AbstractProfileInterceptorAction {
+public class GenerateStepUpChallenge<T> extends AbstractProfileInterceptorAction {
 
     /** Class logger. */
     @Nonnull
@@ -67,21 +80,29 @@ public class GenerateStepUpChallenge extends AbstractProfileInterceptorAction {
     /** Context to look attributes for. */
     @Nonnull
     private Function<ProfileRequestContext, AttributeContext> attributeContextLookupStrategy;
+    
+    /** Lookup strategy function for obtaining {@link AuthnRequest}. */
+    @Nonnull
+    private Function<ProfileRequestContext, AuthnRequest> authnRequestLookupStrategy;
+    
+    /** The request message to read from. */
+    @Nullable
+    private AuthnRequest authnRequest;
 
     /** The attribute ID to look for. */
     @Nullable
-    private String attributeId;
+    private  Map<Principal, String> attributeIds;
     
     /** AttributeContext to filter. */
     @Nullable
     private AttributeContext attributeContext;
 
-    /** Challenge Generator. */
-    private ChallengeGenerator challengeGenerator;
-
-    /** Challenge Sender. */
-    private ChallengeSender challengeSender;
-
+    /** Challenge Generators. */
+    private  Map<Principal, ChallengeGenerator> challengeGenerators;
+    
+    /** Challenge Senders. */
+    private  Map<Principal, ChallengeSender> challengeSenders;
+ 
     /** Constructor. */
     public GenerateStepUpChallenge() {
         log.trace("Entering");
@@ -90,30 +111,57 @@ public class GenerateStepUpChallenge extends AbstractProfileInterceptorAction {
                         new ChildContextLookup<>(AttributeContext.class),
                         new ChildContextLookup<ProfileRequestContext, RelyingPartyContext>(
                                 RelyingPartyContext.class));
+        authnRequestLookupStrategy = Functions.compose(new MessageLookup<>(
+                AuthnRequest.class), new InboundMessageContextLookup());
         log.trace("Leaving");
     }
     
+  
     /**
-     * Set the challenge sender.
+     * Set the challenge senders.
+     * @param <T>
      * 
      * @param sender
      *            for sending the challenge
      */
-    public void setChallengeSender(@Nonnull ChallengeSender sender) {
+    
+    public <T extends Principal> void  setChallengeSenders(@Nonnull Map<T, ChallengeSender> senders) {
         log.trace("Entering");
-        challengeSender = sender;
+        this.challengeSenders=new HashMap<Principal, ChallengeSender>();
+        for ( Map.Entry<T, ChallengeSender>entry:senders.entrySet()){
+            this.challengeSenders.put(entry.getKey(), entry.getValue());   
+        }
         log.trace("Leaving");
     }
 
     /**
-     * Set the challenge generator.
+     * Set the attribute IDs to look for.
+     * 
+     * @param id
+     *            attribute ID to look for
+     */
+
+    public <T extends Principal> void setAttributeIds(@Nonnull Map<T, String> ids) {
+        log.trace("Entering");
+        this.attributeIds=new HashMap<Principal, String>();
+        for ( Map.Entry<T, String>entry:ids.entrySet()){
+            this.attributeIds.put(entry.getKey(), entry.getValue());   
+        }
+        log.trace("Leaving");
+    }
+    
+    /**
+     * Set the challenge generators.
      * 
      * @param generator
      *            for generating the challenge
      */
-    public void setChallengeGenerator(@Nonnull ChallengeGenerator generator) {
+    public <T extends Principal> void setChallengeGenerators(@Nonnull Map<T, ChallengeGenerator> generators) {
         log.trace("Entering");
-        challengeGenerator = generator;
+        this.challengeGenerators=new HashMap<Principal, ChallengeGenerator>();
+        for ( Map.Entry<T, ChallengeGenerator>entry:generators.entrySet()){
+            this.challengeGenerators.put(entry.getKey(), entry.getValue());   
+        }
         log.trace("Leaving");
     }
 
@@ -133,18 +181,7 @@ public class GenerateStepUpChallenge extends AbstractProfileInterceptorAction {
         log.trace("Leaving");
     }
 
-    /**
-     * Set the attribute ID to look for.
-     * 
-     * @param id
-     *            attribute ID to look for
-     */
-
-    public void setAttributeId(@Nullable String id) {
-        log.trace("Entering");
-        attributeId = StringSupport.trimOrNull(id);
-        log.trace("Leaving");
-    }
+   
 
     /** {@inheritDoc} */
 
@@ -168,6 +205,18 @@ public class GenerateStepUpChallenge extends AbstractProfileInterceptorAction {
         }
         log.debug("{} Found attributeContext '{}'", getLogPrefix(),
                 attributeContext);
+        authnRequest = authnRequestLookupStrategy.apply(profileRequestContext);
+        if (authnRequest == null) {
+            log.debug(
+                    "{} AuthnRequest message was not returned by lookup strategy",
+                    getLogPrefix());
+            
+            // TODO :Add StepUpEventIds.EXCEPTION to supported errors, map it
+            ActionSupport.buildEvent(profileRequestContext,
+                    StepUpEventIds.EXCEPTION);
+            log.trace("Leaving");
+            return false;
+        }
         return super.doPreExecute(profileRequestContext, interceptorContext);
     }
 
@@ -178,8 +227,6 @@ public class GenerateStepUpChallenge extends AbstractProfileInterceptorAction {
             @Nonnull final ProfileInterceptorContext interceptorContext) {
         log.trace("Entering");
 
-        // TODO: Move this to PreExecute, maybe we should return false already
-        // from there?
         final HttpServletRequest request = getHttpServletRequest();
         if (request == null) {
             log.debug(
@@ -190,38 +237,72 @@ public class GenerateStepUpChallenge extends AbstractProfileInterceptorAction {
             log.trace("Leaving");
             return;
         }
-        // Following logic assumes attribute is defined and
-        // and it has a value. Maybe we should support also
-        // case of attribute not being defined or being a null
-
-        // Check that user has required attribute
-        if (!attributeContext.getIdPAttributes().containsKey(attributeId)
-                || attributeContext.getIdPAttributes().get(attributeId)
-                        .getValues().isEmpty()) {
-            log.debug("Attributes do not contain value for " + attributeId,
-                    getLogPrefix());
+        final RequestedAuthnContext requestedCtx = authnRequest
+                .getRequestedAuthnContext();
+        
+        if (requestedCtx == null){
+            log.debug(
+                    "There should be requested context for stepup");
             ActionSupport.buildEvent(profileRequestContext,
-                    StepUpEventIds.EVENTID_INVALID_USER);
+                    StepUpEventIds.EXCEPTION);
             log.trace("Leaving");
             return;
         }
-        final IdPAttribute attribute = attributeContext.getIdPAttributes().get(
-                attributeId);
-        // We search for first string value
+        
+        //1. read attribute value
+        Principal key=findKey(requestedCtx,attributeIds.keySet());
+        String attributeId = null;
+        if (key != null){
+            attributeId=attributeIds.get(key);   
+        }
+        
+        // target is either a null or string value of attribute
         String target = null;
-        for (final IdPAttributeValue value : attribute.getValues()) {
-            if (value instanceof StringAttributeValue) {
-                target = ((StringAttributeValue) value).getValue();
+        if (attributeId != null){
+            //As attributeId is defined we expect to resolve a string value for target
+            IdPAttribute attribute = attributeContext.getIdPAttributes().get(
+                    attributeId);
+            if (attribute == null){
+                log.debug("Attributes do not contain value for " + attributeId,
+                        getLogPrefix());
+                ActionSupport.buildEvent(profileRequestContext,
+                        StepUpEventIds.EVENTID_INVALID_USER);
+                log.trace("Leaving");
+                return;
+            }
+            for (final IdPAttributeValue value : attribute.getValues()) {
+                if (value instanceof StringAttributeValue) {
+                    target = ((StringAttributeValue) value).getValue();
+                }
+            }
+            if (target == null) {
+                log.debug("Attributes did not contain String value for "
+                        + attributeId, getLogPrefix());
+                ActionSupport.buildEvent(profileRequestContext,
+                        StepUpEventIds.EVENTID_INVALID_USER);
+                log.trace("Leaving");
+                return;
             }
         }
-        if (target == null) {
-            log.debug("Attributes did not contain String value for "
-                    + attributeId, getLogPrefix());
+        //Resolve generator
+        ChallengeGenerator challengeGenerator =challengeGenerators.get(findKey(requestedCtx,challengeGenerators.keySet()));
+        if (challengeGenerator == null){
+            log.debug("no challenge generator defined for requested context");
             ActionSupport.buildEvent(profileRequestContext,
-                    StepUpEventIds.EVENTID_INVALID_USER);
+                    StepUpEventIds.EVENTID_AUTHNCONTEXT_NOT_STEPUP);
             log.trace("Leaving");
             return;
         }
+        //Resolve sender
+        ChallengeSender challengeSender =challengeSenders.get(findKey(requestedCtx,challengeSenders.keySet()));
+        if (challengeSender == null){
+            log.debug("no challenge sender defined for requested context");
+            ActionSupport.buildEvent(profileRequestContext,
+                    StepUpEventIds.EVENTID_AUTHNCONTEXT_NOT_STEPUP);
+            log.trace("Leaving");
+            return;
+        }
+        
         String challenge;
         try {
             challenge = challengeGenerator.generate(target);
@@ -246,5 +327,57 @@ public class GenerateStepUpChallenge extends AbstractProfileInterceptorAction {
         log.trace("Leaving");
 
     }
+    
+    /**
+     * Method tries to locate requested method from the configured set of methods
+     * 
+     * @param requestedCtx contains the requested methods
+     * @param configuredCtxs configured requested methods
+     * @return null or the matching item in the set
+     */
+    private Principal findKey(RequestedAuthnContext requestedCtx, Set<Principal> configuredCtxs){
+        log.trace("Entering");
+        if (configuredCtxs == null){
+            log.trace("Leaving");
+            return null;
+        }
+        for (AuthnContextClassRef authnContextClassRef : requestedCtx
+                .getAuthnContextClassRefs()) {
+            for (Principal matchingPrincipal : configuredCtxs) {
+                if (matchingPrincipal instanceof AuthnContextClassRefPrincipal
+                        && authnContextClassRef
+                                .getAuthnContextClassRef()
+                                .equals(((AuthnContextClassRefPrincipal) matchingPrincipal)
+                                        .getAuthnContextClassRef()
+                                        .getAuthnContextClassRef())) {
+                    log.debug("stepup requested {}",authnContextClassRef
+                                .getAuthnContextClassRef());
+                    log.trace("leaving");
+                    return matchingPrincipal;
+                }
+
+            }
+        }
+        for (AuthnContextDeclRef authnContextDeclRef : requestedCtx
+                .getAuthnContextDeclRefs()) {
+            for (Principal matchingPrincipal : configuredCtxs) {
+                if (matchingPrincipal instanceof AuthnContextDeclRefPrincipal
+                        && authnContextDeclRef
+                                .getAuthnContextDeclRef()
+                                .equals(((AuthnContextDeclRefPrincipal) matchingPrincipal)
+                                        .getAuthnContextDeclRef()
+                                        .getAuthnContextDeclRef())) {
+                    log.debug("stepup requested {}",authnContextDeclRef
+                            .getAuthnContextDeclRef());
+                    log.trace("leaving");
+                    return matchingPrincipal;
+                }
+
+            }
+        }
+        log.trace("Leaving");
+        return null;
+    }
+
 
 }
