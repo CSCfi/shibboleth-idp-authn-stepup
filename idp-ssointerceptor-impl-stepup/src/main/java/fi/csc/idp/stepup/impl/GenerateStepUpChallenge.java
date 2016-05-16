@@ -64,13 +64,16 @@ import fi.csc.idp.stepup.api.ChallengeSender;
 import fi.csc.idp.stepup.api.StepUpEventIds;
 
 /**
- * An action that create step up challenge.
- * @param <T>
+ * An action that create step up challenge. The action selects attribute id,
+ * challenge generator and sender implementations on the basis of requested 
+ * authentication context. Attribute value, if defined, is passed to challenge 
+ * generator, challenge is stored and passed with attribute value to challenge 
+ * sender. 
  * 
  */
 
 @SuppressWarnings("rawtypes")
-public class GenerateStepUpChallenge<T> extends AbstractProfileInterceptorAction {
+public class GenerateStepUpChallenge extends AbstractProfileInterceptorAction {
 
     /** Class logger. */
     @Nonnull
@@ -118,13 +121,11 @@ public class GenerateStepUpChallenge<T> extends AbstractProfileInterceptorAction
     
   
     /**
-     * Set the challenge senders.
-     * @param <T>
+     * Set the challenge senders keyed by requested authentication context.
      * 
      * @param sender
-     *            for sending the challenge
+     *            implementations of challenge sender in a map
      */
-    
     public <T extends Principal> void  setChallengeSenders(@Nonnull Map<T, ChallengeSender> senders) {
         log.trace("Entering");
         this.challengeSenders=new HashMap<Principal, ChallengeSender>();
@@ -135,10 +136,10 @@ public class GenerateStepUpChallenge<T> extends AbstractProfileInterceptorAction
     }
 
     /**
-     * Set the attribute IDs to look for.
+     * Set the attribute IDs keyed by requested authentication context
      * 
-     * @param id
-     *            attribute ID to look for
+     * @param ids
+     *            attribute IDs to look for in a map
      */
 
     public <T extends Principal> void setAttributeIds(@Nonnull Map<T, String> ids) {
@@ -151,10 +152,10 @@ public class GenerateStepUpChallenge<T> extends AbstractProfileInterceptorAction
     }
     
     /**
-     * Set the challenge generators.
+     * Set the challenge generators keyed by requested authentication context.
      * 
      * @param generator
-     *            for generating the challenge
+     *            implementations of challenge generators in a map
      */
     public <T extends Principal> void setChallengeGenerators(@Nonnull Map<T, ChallengeGenerator> generators) {
         log.trace("Entering");
@@ -197,7 +198,6 @@ public class GenerateStepUpChallenge<T> extends AbstractProfileInterceptorAction
                 .apply(profileRequestContext);
         if (attributeContext == null) {
             log.error("{} Unable to locate attribute context", getLogPrefix());
-            // TODO :Add StepUpEventIds.EXCEPTION to supported errors, map it
             ActionSupport.buildEvent(profileRequestContext,
                     StepUpEventIds.EXCEPTION);
             log.trace("Leaving");
@@ -210,8 +210,6 @@ public class GenerateStepUpChallenge<T> extends AbstractProfileInterceptorAction
             log.debug(
                     "{} AuthnRequest message was not returned by lookup strategy",
                     getLogPrefix());
-            
-            // TODO :Add StepUpEventIds.EXCEPTION to supported errors, map it
             ActionSupport.buildEvent(profileRequestContext,
                     StepUpEventIds.EXCEPTION);
             log.trace("Leaving");
@@ -249,7 +247,7 @@ public class GenerateStepUpChallenge<T> extends AbstractProfileInterceptorAction
             return;
         }
         
-        //1. read attribute value if required
+        //Resolve attribute value
         String attributeId = null;
         Principal key = null;
         if (attributeIds != null){
@@ -258,8 +256,6 @@ public class GenerateStepUpChallenge<T> extends AbstractProfileInterceptorAction
         if (key != null){
             attributeId=attributeIds.get(key);   
         }
-        
-        // target is either a null or string value of attribute
         String target = null;
         if (attributeId != null){
             //As attributeId is defined we expect to resolve a string value for target
@@ -287,7 +283,7 @@ public class GenerateStepUpChallenge<T> extends AbstractProfileInterceptorAction
                 return;
             }
         }
-        //Resolve generator
+        //Resolve challenge generator
         ChallengeGenerator challengeGenerator = null;
         if (challengeGenerators != null){
             challengeGenerator=challengeGenerators.get(findKey(requestedCtx,challengeGenerators.keySet()));
@@ -299,7 +295,7 @@ public class GenerateStepUpChallenge<T> extends AbstractProfileInterceptorAction
             log.trace("Leaving");
             return;
         }
-        //Resolve sender
+        //Resolve challenge sender
         ChallengeSender challengeSender = null;
         if (challengeSenders != null){
             challengeSender =challengeSenders.get(findKey(requestedCtx,challengeSenders.keySet()));
