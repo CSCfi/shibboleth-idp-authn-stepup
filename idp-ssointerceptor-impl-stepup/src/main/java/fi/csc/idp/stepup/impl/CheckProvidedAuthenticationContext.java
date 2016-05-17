@@ -34,22 +34,28 @@ import javax.annotation.Nullable;
 
 import net.shibboleth.idp.authn.AbstractAuthenticationAction;
 import net.shibboleth.idp.authn.context.AuthenticationContext;
+import net.shibboleth.idp.saml.authn.principal.AuthnContextClassRefPrincipal;
+import net.shibboleth.idp.saml.authn.principal.AuthnContextDeclRefPrincipal;
 import net.shibboleth.utilities.java.support.component.ComponentSupport;
 import net.shibboleth.utilities.java.support.logic.Constraint;
 
 import org.opensaml.messaging.context.navigate.MessageLookup;
 import org.opensaml.profile.action.ActionSupport;
+import org.opensaml.profile.action.EventIds;
 import org.opensaml.profile.context.ProfileRequestContext;
 import org.opensaml.profile.context.navigate.InboundMessageContextLookup;
+import org.opensaml.saml.saml2.core.AuthnContextClassRef;
+import org.opensaml.saml.saml2.core.AuthnContextDeclRef;
 import org.opensaml.saml.saml2.core.AuthnRequest;
+import org.opensaml.saml.saml2.core.RequestedAuthnContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Function;
 import com.google.common.base.Functions;
 
-import fi.csc.idp.stepup.api.ChallengeGenerator;
 import fi.csc.idp.stepup.api.StepUpEventIds;
+import fi.okm.mpass.shibboleth.authn.context.ShibbolethAuthnContext;
 
 /**
  * An action that sets the requested authentication context value
@@ -64,30 +70,6 @@ public class CheckProvidedAuthenticationContext extends
         AbstractAuthenticationAction {
     
     
-    /**
-     * 
-     * This is done in a phase need for step up is recognised.
-     * 
-     *  sp asks for x, y is sent to idp
-     *  idp returns y, that may be resolved to z
-     *  
-     *  this step assumes x is "stepup"
-     *  stepup1 x ->otp1 y
-     *  otp1 y ->stepup1 z
-     *  
-     *  we compare x to y/z ie. possiblt resolved value
-     *  if there is a match x==y/z it means we want to 
-     *  verify still that there exists (idp,sp,y/x value) whitelist
-     * 
-     *  Why we need verification? if idp knows x and sends that
-     *  and there is no mapping x->something else we still make
-     *  the elevation unless it is specifically allowed 
-     * 
-     * 
-     * 
-     */
-    
-
     /** Class logger. */
     @Nonnull
     private final Logger log = LoggerFactory
@@ -178,8 +160,115 @@ public class CheckProvidedAuthenticationContext extends
             @Nonnull final ProfileRequestContext profileRequestContext,
             @Nonnull final AuthenticationContext authenticationContext) {
         log.trace("Entering");
+        
+        if (trustedStepupProviders == null){
+            //We continue with stepup as there are no trusted idps defined
+            ActionSupport.buildEvent(profileRequestContext,
+                    StepUpEventIds.EVENTID_CONTINUE_STEPUP);
+            log.trace("Leaving");
+            return;
+        }
+        final RequestedAuthnContext requestedCtx = authnRequest
+                .getRequestedAuthnContext();
+        
+        if (requestedCtx == null){
+            log.debug(
+                    "There should be requested context for stepup");
+            ActionSupport.buildEvent(profileRequestContext,
+                    StepUpEventIds.EXCEPTION);
+            log.trace("Leaving");
+            return;
+        }
+        final ShibbolethAuthnContext shibbolethContext = authenticationContext
+                .getSubcontext(ShibbolethAuthnContext.class);
+        if (shibbolethContext == null) {
+            log.debug("{} Could not get shib proxy context", getLogPrefix());
+            ActionSupport.buildEvent(profileRequestContext,
+                    EventIds.INVALID_PROFILE_CTX);
+            log.trace("Leaving");
+            return;
+        }
+        String providerId = shibbolethContext.getHeaders().get(
+                "Shib-Identity-Provider");
+        if (providerId == null){
+            log.debug("{} Could not get provider entitytid ", getLogPrefix());
+            ActionSupport.buildEvent(profileRequestContext,
+                    EventIds.INVALID_PROFILE_CTX);
+            log.trace("Leaving");
+            return;
+        }
+        if (!trustedStepupProviders.containsKey(providerId)){
+            //We continue with stepup as the idp is not trusted
+            ActionSupport.buildEvent(profileRequestContext,
+                    StepUpEventIds.EVENTID_CONTINUE_STEPUP);
+            log.trace("Leaving");
+            return;
+        }
+        // NOW TRY TO MATCH REQUESTED TO PROVIDED 
+        if(isTrusted(requestedCtx,trustedStepupProviders.get(providerId))){
+            log.debug("authentication method satisfactory");
+            ActionSupport.buildEvent(profileRequestContext,
+                    StepUpEventIds.EVENTID_AUTHNCONTEXT_STEPUP);
+            log.trace("Leaving");
+        }
+               
+        
+        ActionSupport.buildEvent(profileRequestContext,
+                StepUpEventIds.EVENTID_CONTINUE_STEPUP);
         log.trace("Leaving");
     }
     
+    //TODO make following more generic
     
+    /**
+     * Method tries to locate requested method from the configured set of methods
+     * 
+     * @param requestedCtx contains the requested methods
+     * @param configuredCtxs configured trusted methods
+     * @return true if the requested ctx is among trusted ctxs
+     */
+    private boolean isTrusted(RequestedAuthnContext requestedCtx, List<Principal> trustedCtxs){
+        log.trace("Entering");
+        if (trustedCtxs == null){
+            log.trace("Leaving");
+            return false;
+        }
+        for (AuthnContextClassRef authnContextClassRef : requestedCtx
+                .getAuthnContextClassRefs()) {
+            for (Principal matchingPrincipal : trustedCtxs) {
+                if (matchingPrincipal instanceof AuthnContextClassRefPrincipal
+                        && authnContextClassRef
+                                .getAuthnContextClassRef()
+                                .equals(((AuthnContextClassRefPrincipal) matchingPrincipal)
+                                        .getAuthnContextClassRef()
+                                        .getAuthnContextClassRef())) {
+                    log.debug("stepup trusted {}",authnContextClassRef
+                                .getAuthnContextClassRef());
+                    log.trace("leaving");
+                    return true;
+                }
+
+            }
+        }
+        for (AuthnContextDeclRef authnContextDeclRef : requestedCtx
+                .getAuthnContextDeclRefs()) {
+            for (Principal matchingPrincipal : trustedCtxs) {
+                if (matchingPrincipal instanceof AuthnContextDeclRefPrincipal
+                        && authnContextDeclRef
+                                .getAuthnContextDeclRef()
+                                .equals(((AuthnContextDeclRefPrincipal) matchingPrincipal)
+                                        .getAuthnContextDeclRef()
+                                        .getAuthnContextDeclRef())) {
+                    log.debug("stepup trusted {}",authnContextDeclRef
+                            .getAuthnContextDeclRef());
+                    log.trace("leaving");
+                    return true;
+                }
+
+            }
+        }
+        log.trace("Leaving");
+        return false;
+    }
+
 }
