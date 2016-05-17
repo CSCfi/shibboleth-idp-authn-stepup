@@ -188,16 +188,15 @@ public class CheckProvidedAuthenticationContext extends
             log.trace("Leaving");
             return;
         }
-        String providerId = shibbolethContext.getHeaders().get(
-                "Shib-Identity-Provider");
-        if (providerId == null){
+        
+        if (shibbolethContext.getIdp() == null){
             log.debug("{} Could not get provider entitytid ", getLogPrefix());
             ActionSupport.buildEvent(profileRequestContext,
                     EventIds.INVALID_PROFILE_CTX);
             log.trace("Leaving");
             return;
         }
-        if (!trustedStepupProviders.containsKey(providerId)){
+        if (!trustedStepupProviders.containsKey(shibbolethContext.getIdp())){
             //We continue with stepup as the idp is not trusted
             ActionSupport.buildEvent(profileRequestContext,
                     StepUpEventIds.EVENTID_CONTINUE_STEPUP);
@@ -205,7 +204,7 @@ public class CheckProvidedAuthenticationContext extends
             return;
         }
         // NOW TRY TO MATCH REQUESTED TO PROVIDED 
-        if(isTrusted(requestedCtx,trustedStepupProviders.get(providerId))){
+        if(isTrusted(requestedCtx,trustedStepupProviders.get(shibbolethContext.getIdp()))){
             log.debug("authentication method satisfactory");
             ActionSupport.buildEvent(profileRequestContext,
                     StepUpEventIds.EVENTID_AUTHNCONTEXT_STEPUP);
