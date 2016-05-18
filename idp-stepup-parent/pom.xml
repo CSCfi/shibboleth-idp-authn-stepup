@@ -106,13 +106,30 @@
                 <version>3.8.1</version>
                 <scope>test</scope>
             </dependency>
-
+            <dependency>
+              <groupId>org.mockito</groupId>
+              <artifactId>mockito-all</artifactId>
+              <version>1.10.19</version>
+              <scope>test</scope>
+            </dependency>
+	    <dependency>
+    	      <groupId>com.icegreen</groupId>
+              <artifactId>greenmail</artifactId>
+              <version>1.5.0</version>
+              <scope>test</scope>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
     <build>
         <pluginManagement>
             <plugins>
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>cobertura-maven-plugin</artifactId>
+                    <version>2.7</version>
+                </plugin>
+
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-checkstyle-plugin</artifactId>
@@ -122,6 +139,10 @@
         </pluginManagement>
         
         <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>cobertura-maven-plugin</artifactId>
+           </plugin>
             <!--
                 Checkstyle configuration for checkstyle:* goals called directly
                 from the command line.
@@ -153,6 +174,10 @@
     </build>
     <reporting>
         <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>cobertura-maven-plugin</artifactId>
+            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-checkstyle-plugin</artifactId>
