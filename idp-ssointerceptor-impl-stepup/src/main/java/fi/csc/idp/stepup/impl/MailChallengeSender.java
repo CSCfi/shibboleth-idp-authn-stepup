@@ -80,6 +80,7 @@ public class MailChallengeSender implements ChallengeSender {
     /** body of the email. */
     private String body;
     
+    
     /**
      * Sets the Sender field of email.
      * @param fromField the value of the sender
