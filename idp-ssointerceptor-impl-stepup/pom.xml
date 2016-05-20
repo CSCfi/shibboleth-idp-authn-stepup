@@ -50,9 +50,9 @@
 			<artifactId>idp-saml-api</artifactId>
 		</dependency>
 		<dependency>
-            <groupId>net.shibboleth.idp</groupId>
-            <artifactId>idp-saml-impl</artifactId>
-        </dependency>
+			<groupId>net.shibboleth.idp</groupId>
+			<artifactId>idp-saml-impl</artifactId>
+		</dependency>
 		<dependency>
 			<groupId>fi.csc.idp.stepup</groupId>
 			<artifactId>idp-ssointerceptor-api-stepup</artifactId>
@@ -63,22 +63,29 @@
 			<version>1.7</version>
 		</dependency>
 		<dependency>
-               <groupId>fi.okm.mpass</groupId>
-               <artifactId>idp-authn-api-shibsp</artifactId>
-        </dependency>
-		
+			<groupId>fi.okm.mpass</groupId>
+			<artifactId>idp-authn-api-shibsp</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>${opensaml.groupId}</groupId>
+			<artifactId>opensaml-core</artifactId>
+			<version>${opensaml.version}</version>
+			<type>test-jar</type>
+		</dependency>
 
 		<!-- Test Dependencies, add to parent POM -->
-         <dependency>
-              <groupId>org.mockito</groupId>
-              <artifactId>mockito-all</artifactId>
-              <scope>test</scope>
-         </dependency>
-         <dependency>
-              <groupId>com.icegreen</groupId>
-              <artifactId>greenmail</artifactId>
-              <scope>test</scope>
-            </dependency>
+		<dependency>
+			<groupId>net.shibboleth.idp</groupId>
+			<artifactId>idp-profile-api</artifactId>
+			<version>${shib.idp.version}</version>
+			<scope>test</scope>
+			<type>test-jar</type>
+		</dependency>
+		<dependency>
+			<groupId>com.icegreen</groupId>
+			<artifactId>greenmail</artifactId>
+			<scope>test</scope>
+		</dependency>
 	</dependencies>
 	<build>
 		<plugins>
