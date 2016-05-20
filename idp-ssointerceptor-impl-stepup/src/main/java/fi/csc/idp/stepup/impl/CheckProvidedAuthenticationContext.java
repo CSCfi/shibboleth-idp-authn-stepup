@@ -55,7 +55,7 @@ import com.google.common.base.Function;
 import com.google.common.base.Functions;
 
 import fi.csc.idp.stepup.api.StepUpEventIds;
-import fi.okm.mpass.shibboleth.authn.context.ShibbolethAuthnContext;
+import fi.okm.mpass.shibboleth.authn.context.ShibbolethSpAuthenticationContext;
 
 /**
  * An action that sets the requested authentication context value
@@ -179,8 +179,8 @@ public class CheckProvidedAuthenticationContext extends
             log.trace("Leaving");
             return;
         }
-        final ShibbolethAuthnContext shibbolethContext = authenticationContext
-                .getSubcontext(ShibbolethAuthnContext.class);
+        final ShibbolethSpAuthenticationContext shibbolethContext = authenticationContext
+                .getSubcontext(ShibbolethSpAuthenticationContext.class);
         if (shibbolethContext == null) {
             log.debug("{} Could not get shib proxy context", getLogPrefix());
             ActionSupport.buildEvent(profileRequestContext,
