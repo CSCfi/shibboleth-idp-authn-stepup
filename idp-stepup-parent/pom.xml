@@ -14,7 +14,7 @@
     <parent>
         <groupId>net.shibboleth.idp</groupId>
         <artifactId>idp-parent</artifactId>
-        <version>3.2.0</version>
+        <version>3.2.1</version>
     </parent>
     <groupId>fi.csc.idp.stepup</groupId>
     <artifactId>idp-stepup-parent</artifactId>
@@ -73,6 +73,11 @@
             <dependency>
 	        <groupId>net.shibboleth.idp</groupId>
 		<artifactId>idp-saml-api</artifactId>
+                <version>${shib.idp.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>net.shibboleth.idp</groupId>
+                <artifactId>idp-profile-api</artifactId>
                 <version>${shib.idp.version}</version>
             </dependency>
             <dependency>
