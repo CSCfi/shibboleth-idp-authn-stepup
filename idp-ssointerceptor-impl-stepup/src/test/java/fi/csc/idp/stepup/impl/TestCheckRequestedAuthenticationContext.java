@@ -35,7 +35,6 @@ public class TestCheckRequestedAuthenticationContext {
         action.initialize();
     }
     
-   
     /**  Test that action copes with no authentication context being present */
     @Test public void testUninitiailizedContext() throws ComponentInitializationException {
         final Event event = action.execute(src);
@@ -49,7 +48,7 @@ public class TestCheckRequestedAuthenticationContext {
         ActionTestingSupport.assertEvent(event, StepUpEventIds.EXCEPTION);
     }
     
-    /**  Test that action copes with partial shibboleth context present */
+    /**  Test that action copes with shibboleth context having no initial requested principals list present */
     @Test public void testPartialShibbolethContext() throws ComponentInitializationException {
         AuthenticationContext ctx=(AuthenticationContext)prc.addSubcontext(new AuthenticationContext(), true);
         ctx.addSubcontext(new ShibbolethSpAuthenticationContext(),true);
@@ -57,7 +56,7 @@ public class TestCheckRequestedAuthenticationContext {
         ActionTestingSupport.assertEvent(event, StepUpEventIds.EVENTID_AUTHNCONTEXT_NOT_STEPUP);
     }
     
-    /**  Test that action copes with partial shibboleth context having no requested methods */
+    /**  Test that action copes with partial shibboleth context having empty requested principals */
     @Test public void testNoRequested() throws ComponentInitializationException {
         AuthenticationContext ctx=(AuthenticationContext)prc.addSubcontext(new AuthenticationContext(), true);
         ShibbolethSpAuthenticationContext shibspCtx=(ShibbolethSpAuthenticationContext)ctx.addSubcontext(new ShibbolethSpAuthenticationContext(),true);
