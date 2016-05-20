@@ -112,7 +112,7 @@ public class CheckRequestedAuthenticationContext extends
         if (shibbolethContext == null) {
             log.debug("{} Could not get shib proxy context", getLogPrefix());
             ActionSupport.buildEvent(profileRequestContext,
-                    EventIds.INVALID_PROFILE_CTX);
+                    StepUpEventIds.EXCEPTION);
             log.trace("Leaving");
             return;
         }
