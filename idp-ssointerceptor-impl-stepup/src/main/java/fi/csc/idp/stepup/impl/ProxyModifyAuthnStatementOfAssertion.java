@@ -65,7 +65,7 @@ import com.google.common.base.Functions;
 import com.google.common.base.Predicates;
 import com.google.common.collect.Collections2;
 
-import fi.okm.mpass.shibboleth.authn.context.ShibbolethAuthnContext;
+import fi.okm.mpass.shibboleth.authn.context.ShibbolethSpAuthenticationContext;
 
 /**
  * Action that modifies {@link Assertion} of a {@link AuthnStatement}. This
@@ -248,8 +248,7 @@ public class ProxyModifyAuthnStatementOfAssertion extends
             log.trace("Leaving");
             return;
         }
-        final ShibbolethAuthnContext shibbolethContext = authenticationContext
-                .getSubcontext(ShibbolethAuthnContext.class);
+        final ShibbolethSpAuthenticationContext shibbolethContext = authenticationContext.getSubcontext(ShibbolethSpAuthenticationContext.class);
         if (shibbolethContext == null) {
             log.debug("{} Could not get shib proxy context", getLogPrefix());
             ActionSupport.buildEvent(profileRequestContext,
