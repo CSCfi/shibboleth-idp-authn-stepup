@@ -39,7 +39,6 @@ import net.shibboleth.utilities.java.support.component.ComponentSupport;
 import net.shibboleth.utilities.java.support.logic.Constraint;
 
 import org.opensaml.profile.action.ActionSupport;
-import org.opensaml.profile.action.EventIds;
 import org.opensaml.profile.context.ProfileRequestContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,6 +48,7 @@ import com.google.common.collect.Collections2;
 
 import fi.csc.idp.stepup.api.StepUpEventIds;
 import fi.okm.mpass.shibboleth.authn.context.ShibbolethSpAuthenticationContext;
+
 
 /**
  * An action that checks if step up authentication is requested.
@@ -139,13 +139,13 @@ public class CheckRequestedAuthenticationContext extends
      * Method checks if any of the requested authentication methods is listed as step up.
      * 
      * @param requestedPrincipals  requested methods
-     * @param stepupPrincipals stepup methods
+     * @param stPrincipals stepup methods
      * @return true if the requested method requires step up.
      */
-    private boolean stepupRequested(List<Principal> requestedPrincipals, Subject stepupPrincipals){
+    private boolean stepupRequested(List<Principal> requestedPrincipals, Subject stPrincipals){
         log.trace("Entering");
         for (Principal requestedPrincipal : requestedPrincipals) {
-            if (stepupPrincipals.getPrincipals().contains(requestedPrincipal)){
+            if (stPrincipals.getPrincipals().contains(requestedPrincipal)){
                 log.trace("Leaving");
                 return true;
             }
