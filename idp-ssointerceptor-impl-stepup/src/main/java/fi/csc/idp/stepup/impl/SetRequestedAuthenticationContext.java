@@ -35,10 +35,9 @@ import javax.annotation.Nullable;
 import net.shibboleth.idp.authn.AbstractAuthenticationAction;
 import net.shibboleth.idp.authn.context.AuthenticationContext;
 import net.shibboleth.idp.authn.context.RequestedPrincipalContext;
+import net.shibboleth.idp.profile.context.RelyingPartyContext;
 import net.shibboleth.idp.saml.authn.principal.AuthnContextClassRefPrincipal;
 import net.shibboleth.idp.saml.authn.principal.AuthnContextDeclRefPrincipal;
-import net.shibboleth.utilities.java.support.component.ComponentSupport;
-import net.shibboleth.utilities.java.support.logic.Constraint;
 
 import org.opensaml.messaging.context.navigate.MessageLookup;
 import org.opensaml.profile.action.ActionSupport;
@@ -51,7 +50,6 @@ import org.slf4j.LoggerFactory;
 import com.google.common.base.Function;
 import com.google.common.base.Functions;
 
-import fi.csc.idp.stepup.api.ChallengeGenerator;
 import fi.csc.idp.stepup.api.StepUpEventIds;
 import fi.okm.mpass.shibboleth.authn.context.ShibbolethSpAuthenticationContext;
 
@@ -107,7 +105,6 @@ public class SetRequestedAuthenticationContext extends
     /** The request message to read from. */
     @Nullable
     private AuthnRequest authnRequest;
-    
 
     /** Constructor. */
     public SetRequestedAuthenticationContext() {
@@ -117,25 +114,9 @@ public class SetRequestedAuthenticationContext extends
         log.trace("Leaving");
     }
 
-    /**
-     * Set the strategy used to locate the {@link AuthnRequest} to read from.
-     * 
-     * @param strategy
-     *            lookup strategy
-     */
 
-    public void setAuthnRequestLookupStrategy(
-            @Nonnull final Function<ProfileRequestContext, AuthnRequest> strategy) {
-        log.trace("Entering");
-        ComponentSupport
-                .ifInitializedThrowUnmodifiabledComponentException(this);
-        authnRequestLookupStrategy = Constraint.isNotNull(strategy,
-                "AuthnRequest lookup strategy cannot be null");
-        log.trace("Leaving");
-    }
-
-    public void setPassThruuEntityLists(Map<String, List<String>> defaultValueMap) {
-        this.defaultValueMap = defaultValueMap;
+    public void setPassThruuEntityLists(Map<String, List<String>> map) {
+        this.defaultValueMap = map;
     }
 
     @SuppressWarnings("unchecked")
@@ -165,66 +146,31 @@ public class SetRequestedAuthenticationContext extends
     }
 
     
-    /** {@inheritDoc} */
-    @SuppressWarnings("unchecked")
-    @Override
-    protected boolean doPreExecute(
-            @Nonnull final ProfileRequestContext profileRequestContext,
-            @Nonnull final AuthenticationContext authenticationContext) {
-
-        log.trace("Entering");
-        if (!super.doPreExecute(profileRequestContext, authenticationContext)) {
-            log.trace("Leaving");
-            return false;
-        }
-        
-        authnRequest = authnRequestLookupStrategy.apply(profileRequestContext);
-        if (authnRequest == null) {
-            log.debug(
-                    "{} AuthnRequest message was not returned by lookup strategy",
-                    getLogPrefix());
-            ActionSupport.buildEvent(profileRequestContext,
-                    StepUpEventIds.EXCEPTION);
-            log.trace("Leaving");
-            return false;
-        }
-        return true;
-    }
-    
-    
    
     /** {@inheritDoc} */
     @Override
     protected void doExecute(
             @Nonnull final ProfileRequestContext profileRequestContext,
-            @Nonnull final AuthenticationContext authenticationContext) {
+            @Nonnull final AuthenticationContext authenticationContext){
         
         log.trace("Entering");
         final ShibbolethSpAuthenticationContext shibbolethContext = authenticationContext
                 .getSubcontext(ShibbolethSpAuthenticationContext.class);
-        if (shibbolethContext == null) {
-            log.debug("{} Could not get shib proxy context", getLogPrefix());
+        if (shibbolethContext == null || shibbolethContext.getIdp() == null) {
+            log.debug("{} Could not get shib proxy context and provider id", getLogPrefix());
             ActionSupport.buildEvent(profileRequestContext,
                     StepUpEventIds.EXCEPTION);
             log.trace("Leaving");
             return;
         }
-        if (shibbolethContext.getIdp() == null){
-            log.debug("{} Could not get provider entitytid ", getLogPrefix());
+        RelyingPartyContext rpCtx=profileRequestContext.getSubcontext(RelyingPartyContext.class,false);
+        if (rpCtx == null || rpCtx.getRelyingPartyId() == null){
+            log.debug("{} Could not get relying party context and sp entity id ", getLogPrefix());
             ActionSupport.buildEvent(profileRequestContext,
                     StepUpEventIds.EXCEPTION);
             log.trace("Leaving");
             return;
         }
-        String sp=authnRequest.getIssuer().getSPProvidedID();
-        if (sp == null){
-            log.debug("{} Could not get client entitytid ", getLogPrefix());
-            ActionSupport.buildEvent(profileRequestContext,
-                    StepUpEventIds.EXCEPTION);
-            log.trace("Leaving");
-            return;
-        }
-        
         
         Principal providedMethod=null;
         if (shibbolethContext.getContextClass() != null){
@@ -239,13 +185,17 @@ public class SetRequestedAuthenticationContext extends
             log.trace("Leaving");
             return;
         }
-        Principal mappedMethod=getDefaultMapping(shibbolethContext.getIdp(), sp, providedMethod);
-        mappedMethod=getExactMapping(shibbolethContext.getIdp(), sp, providedMethod);
+        
+        Principal mappedMethod=getExactMapping(shibbolethContext.getIdp(), rpCtx.getRelyingPartyId(), providedMethod);
+        if (mappedMethod == null){
+            mappedMethod=getDefaultMapping(shibbolethContext.getIdp(), rpCtx.getRelyingPartyId(), providedMethod);
+        }
         if (mappedMethod != null){
             log.debug("Setting matching principal to {}",mappedMethod.getName());
             RequestedPrincipalContext reqPrincipalContext=authenticationContext.getSubcontext(RequestedPrincipalContext.class,true);
             reqPrincipalContext.setMatchingPrincipal(mappedMethod);
         }
+        
         ActionSupport.buildEvent(profileRequestContext,
                 StepUpEventIds.EVENTID_CONTINUE_STEPUP);
         log.trace("Leaving");
@@ -253,6 +203,10 @@ public class SetRequestedAuthenticationContext extends
     
     private Principal getExactMapping(String idp, String sp, Principal method){
         log.trace("Entering");
+        if (idp == null || sp == null || method == null || authMethodMap==null){
+            log.trace("Leaving");
+            return null;
+        }
         log.debug("Searching a match for triplet {},{} and {}",idp,sp,method.getName());
         if (authMethodMap.containsKey(idp) &&
                 authMethodMap.get(idp) != null &&
@@ -266,8 +220,11 @@ public class SetRequestedAuthenticationContext extends
         return null;
     }
     
-    private Principal getDefaultMapping(String idp, String sp, Principal method){
+    private Principal getDefaultMapping(String idp, String sp, Principal method) {
         log.trace("Entering");
+        if (idp == null || sp == null || method == null || defaultValueMap == null){
+            return null;
+        }
         log.debug("Searching a match for pair {} and {}, provided method is {}",idp,sp,method.getName());
         if (defaultValueMap.containsKey(idp) && 
                 defaultValueMap.get(idp)!= null &&
