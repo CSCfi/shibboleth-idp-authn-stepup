@@ -1,6 +1,7 @@
 package fi.csc.idp.stepup.impl;
 
 
+import java.security.Principal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -133,13 +134,41 @@ public class TestSetRequestedAuthenticationContext {
         return defaults;
     }
     
-    /**  test action with basic success case, initialized but only with empty default map  */
+    private Map<String, Map<String, Map<Principal, Principal>>> getEmptyMethodMap(){
+        Map<String, Map<String, Map<Principal, Principal>>> methods=new HashMap<String, Map<String, Map<Principal, Principal>>>(); 
+        return methods;
+    }
     
+    private Map<String, Map<String, Map<Principal, Principal>>> getBroken1MethodMap(){
+        Map<String, Map<String, Map<Principal, Principal>>> methods=new HashMap<String, Map<String, Map<Principal, Principal>>>(); 
+        methods.put("idp1", null);
+        return methods;
+    }
+    
+    private Map<String, Map<String, Map<Principal, Principal>>> getBroken2MethodMap(){
+        Map<String, Map<String, Map<Principal, Principal>>> methods=new HashMap<String, Map<String, Map<Principal, Principal>>>(); 
+        Map<String, Map<Principal, Principal>> methods2=new HashMap<String, Map<Principal, Principal>>();
+        methods2.put("sp1",null);
+        methods.put("idp1", methods2);
+        return methods;
+    }
+    
+    private Map<String, Map<String, Map<Principal, Principal>>> getMethodMap1(){
+        Map<String, Map<String, Map<Principal, Principal>>> methods=new HashMap<String, Map<String, Map<Principal, Principal>>>(); 
+        Map<String, Map<Principal, Principal>> methods2=new HashMap<String, Map<Principal, Principal>>();
+        Map<Principal, Principal> methods3=new HashMap<Principal, Principal>();
+        methods3.put(new AuthnContextClassRefPrincipal("IdPResponse"),new AuthnContextClassRefPrincipal("IdPResponse2"));
+        methods2.put("sp1",methods3);
+        methods.put("idp1", methods2);
+        return methods;
+    }
+  
+    /**  test action with basic success case, initialized but only with empty default map  */
     @Test public void basicSuccessEmptyMap() throws ComponentInitializationException {
         AuthenticationContext ctx=(AuthenticationContext)prc.addSubcontext(new AuthenticationContext(), true);
         ShibbolethSpAuthenticationContext sCtx=new ShibbolethSpAuthenticationContext();
-        sCtx.setIdp("identityProvider");
-        sCtx.setContextClass("test");
+        sCtx.setIdp("idp1");
+        sCtx.setContextClass("IdPResponse");
         ctx.addSubcontext(sCtx,true);
         action.setPassThruuEntityLists(getEmptyDefaultMap());
         action.initialize();
@@ -157,7 +186,7 @@ public class TestSetRequestedAuthenticationContext {
         AuthenticationContext ctx=(AuthenticationContext)prc.addSubcontext(new AuthenticationContext(), true);
         ShibbolethSpAuthenticationContext sCtx=new ShibbolethSpAuthenticationContext();
         sCtx.setIdp("idp1");
-        sCtx.setContextClass("test");
+        sCtx.setContextClass("IdPResponse");
         ctx.addSubcontext(sCtx,true);
         action.setPassThruuEntityLists(getEmptyNullListDefaultMap());
         action.initialize();
@@ -185,6 +214,66 @@ public class TestSetRequestedAuthenticationContext {
         reqPrincipalContext.setMatchingPrincipal(initialRef);
         final Event event=action.execute(src);
         Assert.assertEquals(sCtx.getContextClass(),reqPrincipalContext.getMatchingPrincipal().getName());      
+        ActionTestingSupport.assertEvent(event, StepUpEventIds.EVENTID_CONTINUE_STEPUP);
+    }
+    
+    /**  test action with basic success case, method mapping is empty but default is valid  */
+    @Test public void basicSuccessEmptyMethodMap() throws ComponentInitializationException {
+        AuthenticationContext ctx=(AuthenticationContext)prc.addSubcontext(new AuthenticationContext(), true);
+        ShibbolethSpAuthenticationContext sCtx=new ShibbolethSpAuthenticationContext();
+        sCtx.setIdp("idp1");
+        sCtx.setContextClass("IdPResponse");
+        ctx.addSubcontext(sCtx,true);
+        action.setPassThruuEntityLists(getDefaultMap1());
+        action.setAuthenticationMethodMapping(getEmptyMethodMap());
+        action.initialize();
+        RelyingPartyContext rpCtx=prc.getSubcontext(RelyingPartyContext.class,false);
+        rpCtx.setRelyingPartyId("sp1");
+        RequestedPrincipalContext reqPrincipalContext=ctx.getSubcontext(RequestedPrincipalContext.class,true);
+        AuthnContextClassRefPrincipal initialRef=new AuthnContextClassRefPrincipal("InitialRequest");
+        reqPrincipalContext.setMatchingPrincipal(initialRef);
+        final Event event=action.execute(src);
+        Assert.assertEquals(sCtx.getContextClass(),reqPrincipalContext.getMatchingPrincipal().getName());      
+        ActionTestingSupport.assertEvent(event, StepUpEventIds.EVENTID_CONTINUE_STEPUP);
+    }
+    
+    /**  test action with basic success case, method mapping is empty but default is valid  */
+    @Test public void basicSuccessBrokenMethodMap() throws ComponentInitializationException {
+        AuthenticationContext ctx=(AuthenticationContext)prc.addSubcontext(new AuthenticationContext(), true);
+        ShibbolethSpAuthenticationContext sCtx=new ShibbolethSpAuthenticationContext();
+        sCtx.setIdp("idp1");
+        sCtx.setContextClass("IdPResponse");
+        ctx.addSubcontext(sCtx,true);
+        action.setPassThruuEntityLists(getDefaultMap1());
+        action.setAuthenticationMethodMapping(getBroken1MethodMap());
+        action.initialize();
+        RelyingPartyContext rpCtx=prc.getSubcontext(RelyingPartyContext.class,false);
+        rpCtx.setRelyingPartyId("sp1");
+        RequestedPrincipalContext reqPrincipalContext=ctx.getSubcontext(RequestedPrincipalContext.class,true);
+        AuthnContextClassRefPrincipal initialRef=new AuthnContextClassRefPrincipal("InitialRequest");
+        reqPrincipalContext.setMatchingPrincipal(initialRef);
+        final Event event=action.execute(src);
+        Assert.assertEquals(sCtx.getContextClass(),reqPrincipalContext.getMatchingPrincipal().getName());      
+        ActionTestingSupport.assertEvent(event, StepUpEventIds.EVENTID_CONTINUE_STEPUP);
+    }
+    
+    /**  test action with success case, method mapping and default exist and are valid  */
+    @Test public void basicSuccessBroken2MethodMap() throws ComponentInitializationException {
+        AuthenticationContext ctx=(AuthenticationContext)prc.addSubcontext(new AuthenticationContext(), true);
+        ShibbolethSpAuthenticationContext sCtx=new ShibbolethSpAuthenticationContext();
+        sCtx.setIdp("idp1");
+        sCtx.setContextClass("IdPResponse");
+        ctx.addSubcontext(sCtx,true);
+        action.setPassThruuEntityLists(getDefaultMap1());
+        action.setAuthenticationMethodMapping(getMethodMap1());
+        action.initialize();
+        RelyingPartyContext rpCtx=prc.getSubcontext(RelyingPartyContext.class,false);
+        rpCtx.setRelyingPartyId("sp1");
+        RequestedPrincipalContext reqPrincipalContext=ctx.getSubcontext(RequestedPrincipalContext.class,true);
+        AuthnContextClassRefPrincipal initialRef=new AuthnContextClassRefPrincipal("InitialRequest");
+        reqPrincipalContext.setMatchingPrincipal(initialRef);
+        final Event event=action.execute(src);
+        Assert.assertEquals("IdPResponse2",reqPrincipalContext.getMatchingPrincipal().getName());      
         ActionTestingSupport.assertEvent(event, StepUpEventIds.EVENTID_CONTINUE_STEPUP);
     }
 }
