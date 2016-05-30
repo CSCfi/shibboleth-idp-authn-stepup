@@ -23,7 +23,6 @@
 
 package fi.csc.idp.stepup.impl;
 
-
 import java.security.Principal;
 import java.util.HashMap;
 import java.util.List;
@@ -54,49 +53,41 @@ import fi.csc.idp.stepup.api.StepUpEventIds;
 import fi.okm.mpass.shibboleth.authn.context.ShibbolethSpAuthenticationContext;
 
 /**
- * An action that sets the requested authentication context value
- * to match what the provider has given.
+ * An action that sets the requested authentication context value to match what
+ * the provider has given or to a new mapping. This is done only if there is a configuration
+ * allowing this.
  * 
- * Normally a matching requested prinvipal is returned if it exists, otherwise
- * a weighted map is used. For proxy case we make following exemption:
- * 
- * If there is a mapping defined for idp,sp, retuned method we set that value to response.
- * Mapping indicates the intention to modify the value. 
- * 
- *
  * 
  */
 
 @SuppressWarnings("rawtypes")
-public class SetRequestedAuthenticationContext extends
-        AbstractAuthenticationAction {
-    
-    /** Mapping of authentication methods.
+public class SetRequestedAuthenticationContext extends AbstractAuthenticationAction {
+
+    /**
+     * Mapping of authentication methods.
      *
      * idp->sp->method->new method
      * 
      * For matching entry a new value is used
-     *  
-     * */
-    private  Map<String, Map<String, Map<Principal, Principal>>> authMethodMap;
-
-    /** Mapping of default methods.
      * 
-     *  idp->sp
-     *  
-     *  For matching entry a value provided by idp is used.
-     *  If there is match in authMethodMap, default mapping is not used.
-     *  
-     *  
      * */
-    private  Map<String,List<String>> defaultValueMap;
-    
+    private Map<String, Map<String, Map<Principal, Principal>>> authMethodMap;
 
-    
+    /**
+     * Mapping of default methods.
+     * 
+     * idp->sp
+     * 
+     * For matching entry a value provided by idp is used. If there is match in
+     * authMethodMap, default mapping is not used.
+     * 
+     * 
+     * */
+    private Map<String, List<String>> defaultValueMap;
+
     /** Class logger. */
     @Nonnull
-    private final Logger log = LoggerFactory
-            .getLogger(SetRequestedAuthenticationContext.class);
+    private final Logger log = LoggerFactory.getLogger(SetRequestedAuthenticationContext.class);
 
     /** Lookup strategy function for obtaining {@link AuthnRequest}. */
     @Nonnull
@@ -109,130 +100,153 @@ public class SetRequestedAuthenticationContext extends
     /** Constructor. */
     public SetRequestedAuthenticationContext() {
         log.trace("Entering");
-        authnRequestLookupStrategy = Functions.compose(new MessageLookup<>(
-                AuthnRequest.class), new InboundMessageContextLookup());
+        authnRequestLookupStrategy = Functions.compose(new MessageLookup<>(AuthnRequest.class),
+                new InboundMessageContextLookup());
         log.trace("Leaving");
     }
 
-
+    /**
+     * Set the idp<->sp pairs for which the original authentication method of
+     * idp is used for constructing the assertion to sp. If specific mapping
+     * exists the value is not set.
+     * 
+     * @param map
+     *            of idp's pointing to list of sp's
+     */
     public void setPassThruuEntityLists(Map<String, List<String>> map) {
         this.defaultValueMap = map;
     }
 
-    @SuppressWarnings("unchecked")
+    /**
+     * Sets a mapping from triplet idp,sp,authentication method to a new method.
+     * if mapped idp provides a mapped value to mapped sp, the new value
+     * provided by this mapping is used for constructing the assertion to sp.
+     * 
+     * @param map
+     *            is mapping from triple idp, sp, method to an new method
+     * @param <T>
+     *            Principal
+     */
     public <T extends Principal> void setAuthenticationMethodMapping(@Nonnull Map<String, Map<String, Map<T, T>>> map) {
         log.trace("Entering");
-        if (this.authMethodMap == null){
-            this.authMethodMap=new HashMap<String, Map<String, Map<Principal, Principal>>>();
+        if (this.authMethodMap == null) {
+            this.authMethodMap = new HashMap<String, Map<String, Map<Principal, Principal>>>();
         }
-        for ( Map.Entry<String, Map<String, Map<T, T>>> entry:map.entrySet()){
-          //new item
-           if (!this.authMethodMap.containsKey(entry.getKey())){
+        for (Map.Entry<String, Map<String, Map<T, T>>> entry : map.entrySet()) {
+            // new item
+            if (!this.authMethodMap.containsKey(entry.getKey())) {
                 this.authMethodMap.put(entry.getKey(), new HashMap<String, Map<Principal, Principal>>());
-           }
-           for (Map.Entry<String, Map<T, T>> entry2:entry.getValue().entrySet()){
-               if (!this.authMethodMap.get(entry.getKey()).containsKey(entry2)){
-                   this.authMethodMap.get(entry.getKey()).put(entry2.getKey(), new HashMap<Principal, Principal>());
-               }
-               for (Map.Entry<T, T> entry3:entry2.getValue().entrySet()){
-                   if (!this.authMethodMap.get(entry.getKey()).get(entry2.getKey()).containsKey(entry3.getKey())){
-                       this.authMethodMap.get(entry.getKey()).get(entry2.getKey()).put(entry3.getKey(), entry3.getValue());   
-                   }
-                   
-               }
-           }
+            }
+            for (Map.Entry<String, Map<T, T>> entry2 : entry.getValue().entrySet()) {
+                if (!this.authMethodMap.get(entry.getKey()).containsKey(entry2)) {
+                    this.authMethodMap.get(entry.getKey()).put(entry2.getKey(), new HashMap<Principal, Principal>());
+                }
+                for (Map.Entry<T, T> entry3 : entry2.getValue().entrySet()) {
+                    if (!this.authMethodMap.get(entry.getKey()).get(entry2.getKey()).containsKey(entry3.getKey())) {
+                        this.authMethodMap.get(entry.getKey()).get(entry2.getKey())
+                                .put(entry3.getKey(), entry3.getValue());
+                    }
+
+                }
+            }
         }
         log.trace("Leaving");
     }
 
-    
-   
     /** {@inheritDoc} */
     @Override
-    protected void doExecute(
-            @Nonnull final ProfileRequestContext profileRequestContext,
-            @Nonnull final AuthenticationContext authenticationContext){
-        
+    protected void doExecute(@Nonnull final ProfileRequestContext profileRequestContext,
+            @Nonnull final AuthenticationContext authenticationContext) {
+
         log.trace("Entering");
         final ShibbolethSpAuthenticationContext shibbolethContext = authenticationContext
                 .getSubcontext(ShibbolethSpAuthenticationContext.class);
         if (shibbolethContext == null || shibbolethContext.getIdp() == null) {
             log.debug("{} Could not get shib proxy context and provider id", getLogPrefix());
-            ActionSupport.buildEvent(profileRequestContext,
-                    StepUpEventIds.EXCEPTION);
+            ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EXCEPTION);
             log.trace("Leaving");
             return;
         }
-        RelyingPartyContext rpCtx=profileRequestContext.getSubcontext(RelyingPartyContext.class,false);
-        if (rpCtx == null || rpCtx.getRelyingPartyId() == null){
+        RelyingPartyContext rpCtx = profileRequestContext.getSubcontext(RelyingPartyContext.class, false);
+        if (rpCtx == null || rpCtx.getRelyingPartyId() == null) {
             log.debug("{} Could not get relying party context and sp entity id ", getLogPrefix());
-            ActionSupport.buildEvent(profileRequestContext,
-                    StepUpEventIds.EXCEPTION);
+            ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EXCEPTION);
             log.trace("Leaving");
             return;
         }
-        
-        Principal providedMethod=null;
-        if (shibbolethContext.getContextClass() != null){
-            providedMethod=new AuthnContextClassRefPrincipal(shibbolethContext.getContextClass()); 
-        }else if (shibbolethContext.getContextDecl() != null){
-            providedMethod=new AuthnContextDeclRefPrincipal(shibbolethContext.getContextDecl()); 
+
+        Principal providedMethod = null;
+        if (shibbolethContext.getContextClass() != null) {
+            providedMethod = new AuthnContextClassRefPrincipal(shibbolethContext.getContextClass());
+        } else if (shibbolethContext.getContextDecl() != null) {
+            providedMethod = new AuthnContextDeclRefPrincipal(shibbolethContext.getContextDecl());
         }
-        if (providedMethod == null){
+        if (providedMethod == null) {
             log.debug("{} Could not get authentication method ", getLogPrefix());
-            ActionSupport.buildEvent(profileRequestContext,
-                    StepUpEventIds.EXCEPTION);
+            ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EXCEPTION);
             log.trace("Leaving");
             return;
         }
-        
-        Principal mappedMethod=getExactMapping(shibbolethContext.getIdp(), rpCtx.getRelyingPartyId(), providedMethod);
-        if (mappedMethod == null){
-            mappedMethod=getDefaultMapping(shibbolethContext.getIdp(), rpCtx.getRelyingPartyId(), providedMethod);
+
+        Principal mappedMethod = getExactMapping(shibbolethContext.getIdp(), rpCtx.getRelyingPartyId(), providedMethod);
+        if (mappedMethod == null) {
+            mappedMethod = getDefaultMapping(shibbolethContext.getIdp(), rpCtx.getRelyingPartyId(), providedMethod);
         }
-        if (mappedMethod != null){
-            log.debug("Setting matching principal to {}",mappedMethod.getName());
-            RequestedPrincipalContext reqPrincipalContext=authenticationContext.getSubcontext(RequestedPrincipalContext.class,true);
+        if (mappedMethod != null) {
+            log.debug("Setting matching principal to {}", mappedMethod.getName());
+            RequestedPrincipalContext reqPrincipalContext = authenticationContext.getSubcontext(
+                    RequestedPrincipalContext.class, true);
             reqPrincipalContext.setMatchingPrincipal(mappedMethod);
         }
-        
-        ActionSupport.buildEvent(profileRequestContext,
-                StepUpEventIds.EVENTID_CONTINUE_STEPUP);
+
+        ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EVENTID_CONTINUE_STEPUP);
         log.trace("Leaving");
     }
-    
-    private Principal getExactMapping(String idp, String sp, Principal method){
+
+    /**
+     * Method returns the new authentication method value for mapping.
+     * 
+     * @param idp is the provider entity id
+     * @param sp is the client sp entity id
+     * @param method is the value provided by provider
+     * @return The new mapped value if it exists. If not, null.
+     */
+    private Principal getExactMapping(String idp, String sp, Principal method) {
         log.trace("Entering");
-        if (idp == null || sp == null || method == null || authMethodMap==null){
+        if (idp == null || sp == null || method == null || authMethodMap == null) {
             log.trace("Leaving");
             return null;
         }
-        log.debug("Searching a match for triplet {},{} and {}",idp,sp,method.getName());
-        if (authMethodMap.containsKey(idp) &&
-                authMethodMap.get(idp) != null &&
-                authMethodMap.get(idp).containsKey(sp) &&
-                authMethodMap.get(idp).get(sp) != null &&
-                authMethodMap.get(idp).get(sp).containsKey(method)){
+        log.debug("Searching a match for triplet {},{} and {}", idp, sp, method.getName());
+        if (authMethodMap.containsKey(idp) && authMethodMap.get(idp) != null && authMethodMap.get(idp).containsKey(sp)
+                && authMethodMap.get(idp).get(sp) != null && authMethodMap.get(idp).get(sp).containsKey(method)) {
             log.trace("Leaving");
             return authMethodMap.get(idp).get(sp).get(method);
         }
         log.trace("Leaving");
         return null;
     }
-    
+
+    /**
+     * If there is a mapping from idp to sp, the value of method is returned.
+     * 
+     * @param idp is the provider entity id
+     * @param sp is the client sp entity id
+     * @param method is the method value
+     * @return method if there is a mapping, otherwise a null.
+     */
     private Principal getDefaultMapping(String idp, String sp, Principal method) {
         log.trace("Entering");
-        if (idp == null || sp == null || method == null || defaultValueMap == null){
+        if (idp == null || sp == null || method == null || defaultValueMap == null) {
             return null;
         }
-        log.debug("Searching a match for pair {} and {}, provided method is {}",idp,sp,method.getName());
-        if (defaultValueMap.containsKey(idp) && 
-                defaultValueMap.get(idp)!= null &&
-                defaultValueMap.get(idp).contains(sp)){
+        log.debug("Searching a match for pair {} and {}, provided method is {}", idp, sp, method.getName());
+        if (defaultValueMap.containsKey(idp) && defaultValueMap.get(idp) != null
+                && defaultValueMap.get(idp).contains(sp)) {
             return method;
         }
         log.trace("Leaving");
         return null;
     }
-   
+
 }

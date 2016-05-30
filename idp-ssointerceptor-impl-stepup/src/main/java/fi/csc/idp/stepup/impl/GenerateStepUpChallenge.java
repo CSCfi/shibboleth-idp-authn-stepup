@@ -123,9 +123,11 @@ public class GenerateStepUpChallenge extends AbstractProfileInterceptorAction {
     /**
      * Set the challenge senders keyed by requested authentication context.
      * 
-     * @param sender
+     * @param senders
      *            implementations of challenge sender in a map
+     * @param <T> Principal     
      */
+    
     public <T extends Principal> void  setChallengeSenders(@Nonnull Map<T, ChallengeSender> senders) {
         log.trace("Entering");
         this.challengeSenders=new HashMap<Principal, ChallengeSender>();
@@ -136,10 +138,11 @@ public class GenerateStepUpChallenge extends AbstractProfileInterceptorAction {
     }
 
     /**
-     * Set the attribute IDs keyed by requested authentication context
+     * Set the attribute IDs keyed by requested authentication context.
      * 
      * @param ids
      *            attribute IDs to look for in a map
+     * @param <T> Principal           
      */
 
     public <T extends Principal> void setAttributeIds(@Nonnull Map<T, String> ids) {
@@ -154,8 +157,9 @@ public class GenerateStepUpChallenge extends AbstractProfileInterceptorAction {
     /**
      * Set the challenge generators keyed by requested authentication context.
      * 
-     * @param generator
+     * @param generators
      *            implementations of challenge generators in a map
+     * @param <T> Principal
      */
     public <T extends Principal> void setChallengeGenerators(@Nonnull Map<T, ChallengeGenerator> generators) {
         log.trace("Entering");
@@ -334,7 +338,7 @@ public class GenerateStepUpChallenge extends AbstractProfileInterceptorAction {
     }
     
     /**
-     * Method tries to locate requested method from the configured set of methods
+     * Method tries to locate requested method from the configured set of methods.
      * 
      * @param requestedCtx contains the requested methods
      * @param configuredCtxs configured requested methods

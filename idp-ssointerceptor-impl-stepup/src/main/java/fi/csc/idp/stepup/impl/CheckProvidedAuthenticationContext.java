@@ -48,9 +48,9 @@ import fi.okm.mpass.shibboleth.authn.context.ShibbolethSpAuthenticationContext;
  * This action is performed always in a phase where need for step up
  * has already been established.
  * 
- * Action checks if the originally provided authentication context class
- * value matches a whitelist of idp,method - values. If there is a match,  
- * stepup is regarded as already performed.
+ * Action checks if the originally provided authentication method
+ * value matches a whitelist map of idp,method - values. If there is a match,  
+ * further actions to perform stepup are not seen as necessary.
  * 
  * 
  */
@@ -65,10 +65,15 @@ public class CheckProvidedAuthenticationContext extends
             .getLogger(CheckProvidedAuthenticationContext.class);
 
      
-    /** Trusted providers and their stepup methods */
+    /** Trusted providers and their stepup methods. */
     private  Map<String, List<Principal>> trustedStepupProviders;
     
-     
+    /**
+     * Method sets the map of trusted providers and their methods.
+     *  
+     * @param stepupProviders map of trusted providers and methods.
+     * @param <T> Principal
+     */
     @SuppressWarnings("unchecked")
     public <T extends Principal> void setTrustedStepupProviders(@Nonnull Map<String, List<T>> stepupProviders) {
         log.trace("Entering");
@@ -119,8 +124,6 @@ public class CheckProvidedAuthenticationContext extends
             return;
         }
         if (trustedStepupProviders == null || !trustedStepupProviders.containsKey(shibbolethContext.getIdp())){
-            //We continue with stepup as the idp is not trusted
-            //to provide stepup
             ActionSupport.buildEvent(profileRequestContext,
                     StepUpEventIds.EVENTID_CONTINUE_STEPUP);
             log.trace("Leaving");
@@ -132,7 +135,6 @@ public class CheckProvidedAuthenticationContext extends
                     StepUpEventIds.EVENTID_AUTHNCONTEXT_STEPUP);
             return;   
         }
-        //Continue with stepup
         ActionSupport.buildEvent(profileRequestContext,
                 StepUpEventIds.EVENTID_CONTINUE_STEPUP);
         log.trace("Leaving");
