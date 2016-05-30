@@ -133,15 +133,23 @@ public class SetRequestedAuthenticationContext extends AbstractAuthenticationAct
             this.authMethodMap = new HashMap<String, Map<String, Map<Principal, Principal>>>();
         }
         for (Map.Entry<String, Map<String, Map<T, T>>> entry : map.entrySet()) {
-            // new item
+            if (entry.getValue() == null){
+                continue;
+            }
             if (!this.authMethodMap.containsKey(entry.getKey())) {
                 this.authMethodMap.put(entry.getKey(), new HashMap<String, Map<Principal, Principal>>());
             }
             for (Map.Entry<String, Map<T, T>> entry2 : entry.getValue().entrySet()) {
+                if (entry2.getValue() == null){
+                    continue;
+                }
                 if (!this.authMethodMap.get(entry.getKey()).containsKey(entry2)) {
                     this.authMethodMap.get(entry.getKey()).put(entry2.getKey(), new HashMap<Principal, Principal>());
                 }
                 for (Map.Entry<T, T> entry3 : entry2.getValue().entrySet()) {
+                    if (entry3.getValue() == null){
+                        continue;
+                    }
                     if (!this.authMethodMap.get(entry.getKey()).get(entry2.getKey()).containsKey(entry3.getKey())) {
                         this.authMethodMap.get(entry.getKey()).get(entry2.getKey())
                                 .put(entry3.getKey(), entry3.getValue());
