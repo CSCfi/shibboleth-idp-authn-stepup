@@ -25,114 +25,97 @@ package fi.csc.idp.stepup.impl;
 
 import java.security.Principal;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import javax.servlet.http.HttpServletRequest;
 
 import net.shibboleth.idp.attribute.IdPAttribute;
 import net.shibboleth.idp.attribute.IdPAttributeValue;
 import net.shibboleth.idp.attribute.StringAttributeValue;
 import net.shibboleth.idp.attribute.context.AttributeContext;
-import net.shibboleth.idp.profile.interceptor.AbstractProfileInterceptorAction;
+import net.shibboleth.idp.authn.AbstractAuthenticationAction;
+import net.shibboleth.idp.authn.context.AuthenticationContext;
 import net.shibboleth.utilities.java.support.logic.Constraint;
 
 import org.opensaml.messaging.context.navigate.ChildContextLookup;
-import org.opensaml.messaging.context.navigate.MessageLookup;
 import org.opensaml.profile.action.ActionSupport;
 import org.opensaml.profile.context.ProfileRequestContext;
-import org.opensaml.profile.context.navigate.InboundMessageContextLookup;
-import org.opensaml.saml.saml2.core.AuthnContextClassRef;
-import org.opensaml.saml.saml2.core.AuthnContextDeclRef;
-import org.opensaml.saml.saml2.core.AuthnRequest;
-import org.opensaml.saml.saml2.core.RequestedAuthnContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import net.shibboleth.idp.profile.context.ProfileInterceptorContext;
 import net.shibboleth.idp.profile.context.RelyingPartyContext;
-import net.shibboleth.idp.saml.authn.principal.AuthnContextClassRefPrincipal;
-import net.shibboleth.idp.saml.authn.principal.AuthnContextDeclRefPrincipal;
 
 import com.google.common.base.Function;
 import com.google.common.base.Functions;
 
 import fi.csc.idp.stepup.api.ChallengeGenerator;
 import fi.csc.idp.stepup.api.ChallengeSender;
+import fi.csc.idp.stepup.api.StepUpContext;
 import fi.csc.idp.stepup.api.StepUpEventIds;
+import fi.okm.mpass.shibboleth.authn.context.ShibbolethSpAuthenticationContext;
 
 /**
  * An action that create step up challenge. The action selects attribute id,
- * challenge generator and sender implementations on the basis of requested 
- * authentication context. Attribute value, if defined, is passed to challenge 
- * generator, challenge is stored and passed with attribute value to challenge 
- * sender. 
+ * challenge generator and sender implementations on the basis of requested
+ * authentication context. Attribute value, if defined, is passed to challenge
+ * generator, challenge is stored and passed with attribute value to challenge
+ * sender.
  * 
  */
 
 @SuppressWarnings("rawtypes")
-public class GenerateStepUpChallenge extends AbstractProfileInterceptorAction {
+public class GenerateStepUpChallenge extends AbstractAuthenticationAction {
 
     /** Class logger. */
     @Nonnull
-    private final Logger log = LoggerFactory
-            .getLogger(GenerateStepUpChallenge.class);
+    private final Logger log = LoggerFactory.getLogger(GenerateStepUpChallenge.class);
 
     /** Context to look attributes for. */
     @Nonnull
     private Function<ProfileRequestContext, AttributeContext> attributeContextLookupStrategy;
-    
-    /** Lookup strategy function for obtaining {@link AuthnRequest}. */
-    @Nonnull
-    private Function<ProfileRequestContext, AuthnRequest> authnRequestLookupStrategy;
-    
-    /** The request message to read from. */
-    @Nullable
-    private AuthnRequest authnRequest;
 
     /** The attribute ID to look for. */
     @Nullable
-    private  Map<Principal, String> attributeIds;
-    
+    private Map<Principal, String> attributeIds;
+
     /** AttributeContext to filter. */
     @Nullable
     private AttributeContext attributeContext;
 
+    /* proxy authentication context */
+    private ShibbolethSpAuthenticationContext shibbolethContext;
+
     /** Challenge Generators. */
-    private  Map<Principal, ChallengeGenerator> challengeGenerators;
-    
+    private Map<Principal, ChallengeGenerator> challengeGenerators;
+
     /** Challenge Senders. */
-    private  Map<Principal, ChallengeSender> challengeSenders;
- 
+    private Map<Principal, ChallengeSender> challengeSenders;
+
     /** Constructor. */
     public GenerateStepUpChallenge() {
         log.trace("Entering");
-        attributeContextLookupStrategy = Functions
-                .compose(
-                        new ChildContextLookup<>(AttributeContext.class),
-                        new ChildContextLookup<ProfileRequestContext, RelyingPartyContext>(
-                                RelyingPartyContext.class));
-        authnRequestLookupStrategy = Functions.compose(new MessageLookup<>(
-                AuthnRequest.class), new InboundMessageContextLookup());
+        attributeContextLookupStrategy = Functions.compose(new ChildContextLookup<>(AttributeContext.class),
+                new ChildContextLookup<ProfileRequestContext, RelyingPartyContext>(RelyingPartyContext.class));
         log.trace("Leaving");
     }
-    
-  
+
     /**
      * Set the challenge senders keyed by requested authentication context.
      * 
      * @param senders
      *            implementations of challenge sender in a map
-     * @param <T> Principal     
+     * @param <T>
+     *            Principal
      */
-    
-    public <T extends Principal> void  setChallengeSenders(@Nonnull Map<T, ChallengeSender> senders) {
+
+    public <T extends Principal> void setChallengeSenders(@Nonnull Map<T, ChallengeSender> senders) {
         log.trace("Entering");
-        this.challengeSenders=new HashMap<Principal, ChallengeSender>();
-        for ( Map.Entry<T, ChallengeSender>entry:senders.entrySet()){
-            this.challengeSenders.put(entry.getKey(), entry.getValue());   
+        this.challengeSenders = new HashMap<Principal, ChallengeSender>();
+        for (Map.Entry<T, ChallengeSender> entry : senders.entrySet()) {
+            this.challengeSenders.put(entry.getKey(), entry.getValue());
         }
         log.trace("Leaving");
     }
@@ -142,35 +125,36 @@ public class GenerateStepUpChallenge extends AbstractProfileInterceptorAction {
      * 
      * @param ids
      *            attribute IDs to look for in a map
-     * @param <T> Principal           
+     * @param <T>
+     *            Principal
      */
 
     public <T extends Principal> void setAttributeIds(@Nonnull Map<T, String> ids) {
         log.trace("Entering");
-        this.attributeIds=new HashMap<Principal, String>();
-        for ( Map.Entry<T, String>entry:ids.entrySet()){
-            this.attributeIds.put(entry.getKey(), entry.getValue());   
+        this.attributeIds = new HashMap<Principal, String>();
+        for (Map.Entry<T, String> entry : ids.entrySet()) {
+            this.attributeIds.put(entry.getKey(), entry.getValue());
         }
         log.trace("Leaving");
     }
-    
+
     /**
      * Set the challenge generators keyed by requested authentication context.
      * 
      * @param generators
      *            implementations of challenge generators in a map
-     * @param <T> Principal
+     * @param <T>
+     *            Principal
      */
     public <T extends Principal> void setChallengeGenerators(@Nonnull Map<T, ChallengeGenerator> generators) {
         log.trace("Entering");
-        this.challengeGenerators=new HashMap<Principal, ChallengeGenerator>();
-        for ( Map.Entry<T, ChallengeGenerator>entry:generators.entrySet()){
-            this.challengeGenerators.put(entry.getKey(), entry.getValue());   
+        this.challengeGenerators = new HashMap<Principal, ChallengeGenerator>();
+        for (Map.Entry<T, ChallengeGenerator> entry : generators.entrySet()) {
+            this.challengeGenerators.put(entry.getKey(), entry.getValue());
         }
         log.trace("Leaving");
     }
 
-    
     /**
      * Set the lookup strategy for the {@link AttributeContext}.
      * 
@@ -186,90 +170,61 @@ public class GenerateStepUpChallenge extends AbstractProfileInterceptorAction {
         log.trace("Leaving");
     }
 
-   
-
-    /** {@inheritDoc} */
-
     /** {@inheritDoc} */
     @SuppressWarnings("unchecked")
+    /** {@inheritDoc} */
     @Override
-    protected boolean doPreExecute(
-            @Nonnull final ProfileRequestContext profileRequestContext,
-            @Nonnull final ProfileInterceptorContext interceptorContext) {
+    protected boolean doPreExecute(@Nonnull final ProfileRequestContext profileRequestContext,
+            @Nonnull final AuthenticationContext authenticationContext) {
 
         log.trace("Entering");
-        attributeContext = attributeContextLookupStrategy
-                .apply(profileRequestContext);
+        attributeContext = attributeContextLookupStrategy.apply(profileRequestContext);
         if (attributeContext == null) {
             log.error("{} Unable to locate attribute context", getLogPrefix());
-            ActionSupport.buildEvent(profileRequestContext,
-                    StepUpEventIds.EXCEPTION);
+            ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EXCEPTION);
             log.trace("Leaving");
             return false;
         }
-        log.debug("{} Found attributeContext '{}'", getLogPrefix(),
-                attributeContext);
-        authnRequest = authnRequestLookupStrategy.apply(profileRequestContext);
-        if (authnRequest == null) {
-            log.debug(
-                    "{} AuthnRequest message was not returned by lookup strategy",
-                    getLogPrefix());
-            ActionSupport.buildEvent(profileRequestContext,
-                    StepUpEventIds.EXCEPTION);
+
+        shibbolethContext = authenticationContext.getSubcontext(ShibbolethSpAuthenticationContext.class);
+        if (shibbolethContext == null) {
+            log.debug("{} Could not get shib proxy context", getLogPrefix());
+            ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EXCEPTION);
             log.trace("Leaving");
             return false;
         }
-        return super.doPreExecute(profileRequestContext, interceptorContext);
+        return super.doPreExecute(profileRequestContext, authenticationContext);
     }
 
     /** {@inheritDoc} */
     @Override
-    protected void doExecute(
-            @Nonnull final ProfileRequestContext profileRequestContext,
-            @Nonnull final ProfileInterceptorContext interceptorContext) {
+    protected void doExecute(@Nonnull final ProfileRequestContext profileRequestContext,
+            @Nonnull final AuthenticationContext authenticationContext) {
         log.trace("Entering");
-
-        final HttpServletRequest request = getHttpServletRequest();
-        if (request == null) {
-            log.debug(
-                    "{} Profile action does not contain an HttpServletRequest",
-                    getLogPrefix());
-            ActionSupport.buildEvent(profileRequestContext,
-                    StepUpEventIds.EXCEPTION);
+        StepUpContext stepUpContext = (StepUpContext) authenticationContext.addSubcontext(new StepUpContext(), true);
+        if (stepUpContext == null) {
+            log.debug("{} Could not add stepup context", getLogPrefix());
+            ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EXCEPTION);
             log.trace("Leaving");
             return;
         }
-        final RequestedAuthnContext requestedCtx = authnRequest
-                .getRequestedAuthnContext();
-        
-        if (requestedCtx == null){
-            log.debug(
-                    "There should be requested context for stepup");
-            ActionSupport.buildEvent(profileRequestContext,
-                    StepUpEventIds.EXCEPTION);
-            log.trace("Leaving");
-            return;
-        }
-        
-        //Resolve attribute value
+        // Resolve attribute value
         String attributeId = null;
         Principal key = null;
-        if (attributeIds != null){
-            key=findKey(requestedCtx,attributeIds.keySet());
+        if (attributeIds != null) {
+            key = findKey(shibbolethContext.getInitialRequestedContext(), attributeIds.keySet());
         }
-        if (key != null){
-            attributeId=attributeIds.get(key);   
+        if (key != null) {
+            attributeId = attributeIds.get(key);
         }
         String target = null;
-        if (attributeId != null){
-            //As attributeId is defined we expect to resolve a string value for target
-            IdPAttribute attribute = attributeContext.getIdPAttributes().get(
-                    attributeId);
-            if (attribute == null){
-                log.debug("Attributes do not contain value for " + attributeId,
-                        getLogPrefix());
-                ActionSupport.buildEvent(profileRequestContext,
-                        StepUpEventIds.EVENTID_INVALID_USER);
+        if (attributeId != null) {
+            // As attributeId is defined we expect to resolve a string value for
+            // target
+            IdPAttribute attribute = attributeContext.getIdPAttributes().get(attributeId);
+            if (attribute == null) {
+                log.debug("Attributes do not contain value for " + attributeId, getLogPrefix());
+                ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EVENTID_INVALID_USER);
                 log.trace("Leaving");
                 return;
             }
@@ -279,114 +234,79 @@ public class GenerateStepUpChallenge extends AbstractProfileInterceptorAction {
                 }
             }
             if (target == null) {
-                log.debug("Attributes did not contain String value for "
-                        + attributeId, getLogPrefix());
-                ActionSupport.buildEvent(profileRequestContext,
-                        StepUpEventIds.EVENTID_INVALID_USER);
+                log.debug("Attributes did not contain String value for " + attributeId, getLogPrefix());
+                ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EVENTID_INVALID_USER);
                 log.trace("Leaving");
                 return;
             }
         }
-        //Resolve challenge generator
+        stepUpContext.setTarget(target);
+        // Resolve challenge generator
         ChallengeGenerator challengeGenerator = null;
-        if (challengeGenerators != null){
-            challengeGenerator=challengeGenerators.get(findKey(requestedCtx,challengeGenerators.keySet()));
+        if (challengeGenerators != null) {
+            challengeGenerator = challengeGenerators.get(findKey(shibbolethContext.getInitialRequestedContext(),
+                    challengeGenerators.keySet()));
         }
-        if (challengeGenerator == null){
+        if (challengeGenerator == null) {
             log.debug("no challenge generator defined for requested context");
-            ActionSupport.buildEvent(profileRequestContext,
-                    StepUpEventIds.EVENTID_AUTHNCONTEXT_NOT_STEPUP);
+            ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EVENTID_AUTHNCONTEXT_NOT_STEPUP);
             log.trace("Leaving");
             return;
         }
-        //Resolve challenge sender
+        // Resolve challenge sender
         ChallengeSender challengeSender = null;
-        if (challengeSenders != null){
-            challengeSender =challengeSenders.get(findKey(requestedCtx,challengeSenders.keySet()));
+        if (challengeSenders != null) {
+            challengeSender = challengeSenders.get(findKey(shibbolethContext.getInitialRequestedContext(),
+                    challengeSenders.keySet()));
         }
-        if (challengeSender == null){
+        if (challengeSender == null) {
             log.debug("no challenge sender defined for requested context");
-            ActionSupport.buildEvent(profileRequestContext,
-                    StepUpEventIds.EVENTID_AUTHNCONTEXT_NOT_STEPUP);
+            ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EVENTID_AUTHNCONTEXT_NOT_STEPUP);
             log.trace("Leaving");
             return;
         }
-        
-        String challenge;
+
         try {
-            challenge = challengeGenerator.generate(target);
-            //TODO: Store the challenge value to context, not session .
-            request.getSession().setAttribute(
-                    "fi.csc.idp.stepup.impl.GenerateStepUpChallenge.challenge", challenge);
-            //TODO: Store the challenge value to context, not session .
-            request.getSession().setAttribute(
-                    "fi.csc.idp.stepup.impl.GenerateStepUpChallenge.target", target);
-            challengeSender.send(challenge, target);
+            stepUpContext.setChallenge(challengeGenerator.generate(target));
+            challengeSender.send(stepUpContext.getChallenge(), stepUpContext.getTarget());
         } catch (Exception e) {
             log.error(e.getMessage());
             log.debug("Unable to generate/pass challenge", getLogPrefix());
-            ActionSupport.buildEvent(profileRequestContext,
-                    StepUpEventIds.EXCEPTION);
+            ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EXCEPTION);
             log.trace("Leaving");
             return;
         }
-       
-        ActionSupport.buildEvent(profileRequestContext,
-                StepUpEventIds.EVENTID_CONTINUE_STEPUP);
+
+        ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EVENTID_CONTINUE_STEPUP);
         log.trace("Leaving");
 
     }
-    
+
     /**
-     * Method tries to locate requested method from the configured set of methods.
+     * Method tries to locate requested method from the configured set of
+     * methods.
      * 
-     * @param requestedCtx contains the requested methods
-     * @param configuredCtxs configured requested methods
+     * @param requestedCtx
+     *            contains the requested methods
+     * @param configuredCtxs
+     *            configured requested methods
      * @return null or the matching item in the set
      */
-    private Principal findKey(RequestedAuthnContext requestedCtx, Set<Principal> configuredCtxs){
+    private Principal findKey(List<Principal> requestedPrincipals, Set<Principal> configuredCtxs) {
         log.trace("Entering");
-        if (configuredCtxs == null){
+        if (configuredCtxs == null || requestedPrincipals == null) {
             log.trace("Leaving");
             return null;
         }
-        for (AuthnContextClassRef authnContextClassRef : requestedCtx
-                .getAuthnContextClassRefs()) {
-            for (Principal matchingPrincipal : configuredCtxs) {
-                if (matchingPrincipal instanceof AuthnContextClassRefPrincipal
-                        && authnContextClassRef
-                                .getAuthnContextClassRef()
-                                .equals(((AuthnContextClassRefPrincipal) matchingPrincipal)
-                                        .getAuthnContextClassRef()
-                                        .getAuthnContextClassRef())) {
-                    log.debug("stepup requested {}",authnContextClassRef
-                                .getAuthnContextClassRef());
-                    log.trace("leaving");
-                    return matchingPrincipal;
-                }
-
-            }
-        }
-        for (AuthnContextDeclRef authnContextDeclRef : requestedCtx
-                .getAuthnContextDeclRefs()) {
-            for (Principal matchingPrincipal : configuredCtxs) {
-                if (matchingPrincipal instanceof AuthnContextDeclRefPrincipal
-                        && authnContextDeclRef
-                                .getAuthnContextDeclRef()
-                                .equals(((AuthnContextDeclRefPrincipal) matchingPrincipal)
-                                        .getAuthnContextDeclRef()
-                                        .getAuthnContextDeclRef())) {
-                    log.debug("stepup requested {}",authnContextDeclRef
-                            .getAuthnContextDeclRef());
-                    log.trace("leaving");
-                    return matchingPrincipal;
-                }
-
+        for (Principal requestedPrincipal : requestedPrincipals) {
+            if (configuredCtxs.contains(requestedPrincipal)) {
+                log.trace("Leaving");
+                return requestedPrincipal;
             }
         }
         log.trace("Leaving");
         return null;
-    }
 
+    }
 
 }

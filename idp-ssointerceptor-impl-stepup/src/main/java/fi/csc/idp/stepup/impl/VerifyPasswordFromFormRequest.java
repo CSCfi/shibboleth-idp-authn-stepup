@@ -23,11 +23,18 @@
 
 package fi.csc.idp.stepup.impl;
 
+import java.security.Principal;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import javax.annotation.Nonnull;
 import javax.servlet.http.HttpServletRequest;
 
 import net.shibboleth.idp.authn.AbstractExtractionAction;
 import net.shibboleth.idp.authn.context.AuthenticationContext;
+import net.shibboleth.utilities.java.support.annotation.constraint.NotEmpty;
 
 import org.opensaml.profile.action.ActionSupport;
 import org.opensaml.profile.context.ProfileRequestContext;
@@ -35,7 +42,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import fi.csc.idp.stepup.api.ChallengeVerifier;
+import fi.csc.idp.stepup.api.StepUpContext;
 import fi.csc.idp.stepup.api.StepUpEventIds;
+import fi.okm.mpass.shibboleth.authn.context.ShibbolethSpAuthenticationContext;
 
 /**
  * An action that verifies user challenge response.
@@ -46,78 +55,136 @@ public class VerifyPasswordFromFormRequest extends AbstractExtractionAction {
 
     /** Class logger. */
     @Nonnull
-    private final Logger log = LoggerFactory
-            .getLogger(VerifyPasswordFromFormRequest.class);
-    
-    /** Challenge Verifier. */
-    private ChallengeVerifier challengeVerifier;
+    private final Logger log = LoggerFactory.getLogger(VerifyPasswordFromFormRequest.class);
+
+    /** Challenge Verifiers. */
+    private Map<Principal, ChallengeVerifier> challengeVerifiers;
+
+    /** proxy authentication context. */
+    private ShibbolethSpAuthenticationContext shibbolethContext;
+
+    /** stepup context. */
+    private StepUpContext stepUpContext;
+
+    /** Challenge response parameter. */
+    private String challengeResponseParameter = "j_challengeResponse";
+
+    /** Sets the parameter the response is read from. */
+    public void setChallengeResponseParameter(@Nonnull @NotEmpty String challengeResponseParameter) {
+        this.challengeResponseParameter = challengeResponseParameter;
+    }
 
     /**
-     * Set the challenge verifier.
+     * Set the challenge verifiers.
      * 
-     * @param verifier
+     * @param verifiers
      *            for verifying the challenge
+     * @param <T>
+     *            Principal
      */
-    public void setChallengeVerifier(@Nonnull ChallengeVerifier verifier) {
+    public <T extends Principal> void setChallengeVerifiers(@Nonnull Map<T, ChallengeVerifier> verifiers) {
         log.trace("Entering");
-        challengeVerifier = verifier;
+        this.challengeVerifiers = new HashMap<Principal, ChallengeVerifier>();
+        for (Map.Entry<T, ChallengeVerifier> entry : verifiers.entrySet()) {
+            this.challengeVerifiers.put(entry.getKey(), entry.getValue());
+        }
         log.trace("Leaving");
     }
-    
+
+    /** {@inheritDoc} */
+    @SuppressWarnings("unchecked")
     /** {@inheritDoc} */
     @Override
-    protected void doExecute(
-            @Nonnull final ProfileRequestContext profileRequestContext,
+    protected boolean doPreExecute(@Nonnull final ProfileRequestContext profileRequestContext,
             @Nonnull final AuthenticationContext authenticationContext) {
 
         log.trace("Entering");
-        // TODO: Move this to PreExecute, maybe we should return false already
-        // from there?
+        shibbolethContext = authenticationContext.getSubcontext(ShibbolethSpAuthenticationContext.class);
+        if (shibbolethContext == null) {
+            log.debug("{} Could not get shib proxy context", getLogPrefix());
+            ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EXCEPTION);
+            log.trace("Leaving");
+            return false;
+        }
+        stepUpContext = authenticationContext.getSubcontext(StepUpContext.class);
+        if (stepUpContext == null) {
+            log.debug("{} Could not get stepup context", getLogPrefix());
+            ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EXCEPTION);
+            log.trace("Leaving");
+            return false;
+        }
+        return super.doPreExecute(profileRequestContext, authenticationContext);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    protected void doExecute(@Nonnull final ProfileRequestContext profileRequestContext,
+            @Nonnull final AuthenticationContext authenticationContext) {
+
+        log.trace("Entering");
+
         final HttpServletRequest request = getHttpServletRequest();
         if (request == null) {
-            // Add StepUpEventIds.EXCEPTION to supported errors, map it?
-            log.debug(
-                    "{} Profile action does not contain an HttpServletRequest",
-                    getLogPrefix());
-            ActionSupport.buildEvent(profileRequestContext,
-                    StepUpEventIds.EXCEPTION);
+            log.debug("{} Profile action does not contain an HttpServletRequest", getLogPrefix());
+            ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EXCEPTION);
             log.trace("Leaving");
             return;
         }
-        // TODO: parameter name to as init value
-        final String challengeResponse = request
-                .getParameter("j_challengeResponse");
+        final String challengeResponse = request.getParameter(challengeResponseParameter);
         if (challengeResponse == null || challengeResponse.isEmpty()) {
-            // TODO: This is a case that should result in SAML error right from here
-            // make it and verify
-            // Add StepUpEventIds.EXCEPTION to supported errors, map it?
-            log.debug("User did not present response to challenge",
-                    getLogPrefix());
-            ActionSupport.buildEvent(profileRequestContext,
-                    StepUpEventIds.EVENTID_INVALID_RESPONSE);
+            log.debug("User did not present response to challenge", getLogPrefix());
+            ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EVENTID_INVALID_RESPONSE);
+            log.trace("Leaving");
+            return;
+        }
+        // Resolve challenge sender
+        ChallengeVerifier challengeVerifier = null;
+        if (challengeVerifiers != null) {
+            challengeVerifier = challengeVerifiers.get(findKey(shibbolethContext.getInitialRequestedContext(),
+                    challengeVerifiers.keySet()));
+        }
+        if (challengeVerifier == null) {
+            log.debug("no challenge sender defined for requested context");
+            ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EVENTID_AUTHNCONTEXT_NOT_STEPUP);
             log.trace("Leaving");
             return;
         }
         log.debug("User challenge response was " + challengeResponse);
-        //TODO: Read following from context once supported.
-        String challenge = (String) request.getSession().getAttribute(
-                "fi.csc.idp.stepup.impl.GenerateStepUpChallenge.challenge");
-        String target = (String) request.getSession().getAttribute(
-                "fi.csc.idp.stepup.impl.GenerateStepUpChallenge.target");
-        if (!challengeVerifier.verify(challenge, challengeResponse, target)){
-            // This is a case that should result in SAML error right from here
-            // make it and verify
-            // Add StepUpEventIds.EXCEPTION to supported errors, map it?
-            log.debug("User presented wrong response to  challenge",
-                    getLogPrefix());
-            ActionSupport.buildEvent(profileRequestContext,
-                    StepUpEventIds.EVENTID_INVALID_RESPONSE);
+        if (!challengeVerifier.verify(stepUpContext.getChallenge(), challengeResponse, stepUpContext.getTarget())) {
+            log.debug("User presented wrong response to  challenge", getLogPrefix());
+            ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EVENTID_INVALID_RESPONSE);
             log.trace("Leaving");
             return;
         }
-        ActionSupport.buildEvent(profileRequestContext,
-                StepUpEventIds.EVENTID_CONTINUE_STEPUP);
+        ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EVENTID_CONTINUE_STEPUP);
         log.trace("Leaving");
+
+    }
+
+    /**
+     * Method tries to locate requested method from the configured set of
+     * methods.
+     * 
+     * @param requestedCtx
+     *            contains the requested methods
+     * @param configuredCtxs
+     *            configured requested methods
+     * @return null or the matching item in the set
+     */
+    private Principal findKey(List<Principal> requestedPrincipals, Set<Principal> configuredCtxs) {
+        log.trace("Entering");
+        if (configuredCtxs == null || requestedPrincipals == null) {
+            log.trace("Leaving");
+            return null;
+        }
+        for (Principal requestedPrincipal : requestedPrincipals) {
+            if (configuredCtxs.contains(requestedPrincipal)) {
+                log.trace("Leaving");
+                return requestedPrincipal;
+            }
+        }
+        log.trace("Leaving");
+        return null;
 
     }
 
