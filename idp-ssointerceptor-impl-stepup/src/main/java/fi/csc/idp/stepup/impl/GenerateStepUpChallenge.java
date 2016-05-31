@@ -201,13 +201,6 @@ public class GenerateStepUpChallenge extends AbstractAuthenticationAction {
     protected void doExecute(@Nonnull final ProfileRequestContext profileRequestContext,
             @Nonnull final AuthenticationContext authenticationContext) {
         log.trace("Entering");
-        StepUpContext stepUpContext = (StepUpContext) authenticationContext.addSubcontext(new StepUpContext(), true);
-        if (stepUpContext == null) {
-            log.debug("{} Could not add stepup context", getLogPrefix());
-            ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EXCEPTION);
-            log.trace("Leaving");
-            return;
-        }
         // Resolve attribute value
         String attributeId = null;
         Principal key = null;
@@ -240,6 +233,7 @@ public class GenerateStepUpChallenge extends AbstractAuthenticationAction {
                 return;
             }
         }
+        StepUpContext stepUpContext = (StepUpContext) authenticationContext.addSubcontext(new StepUpContext(), true);
         stepUpContext.setTarget(target);
         // Resolve challenge generator
         ChallengeGenerator challengeGenerator = null;
