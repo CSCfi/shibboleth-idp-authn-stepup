@@ -122,7 +122,6 @@ public class VerifyPasswordFromFormRequest extends AbstractExtractionAction {
             @Nonnull final AuthenticationContext authenticationContext) {
 
         log.trace("Entering");
-
         final HttpServletRequest request = getHttpServletRequest();
         if (request == null) {
             log.debug("{} Profile action does not contain an HttpServletRequest", getLogPrefix());
