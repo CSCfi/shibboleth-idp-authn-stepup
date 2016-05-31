@@ -17,7 +17,6 @@ import org.testng.annotations.Test;
 
 import fi.csc.idp.stepup.api.ChallengeGenerator;
 import fi.csc.idp.stepup.api.ChallengeSender;
-import fi.csc.idp.stepup.api.StepUpContext;
 import fi.csc.idp.stepup.api.StepUpEventIds;
 import fi.okm.mpass.shibboleth.authn.context.ShibbolethSpAuthenticationContext;
 import net.shibboleth.idp.attribute.ByteAttributeValue;
@@ -163,6 +162,7 @@ public class TestGenerateStepUpChallenge {
     @Test public void testInvalidSender() throws ComponentInitializationException  {
         baseInit();
         Map<Principal, String> ids = new HashMap<Principal, String>();
+        ids.put(class2, "attr1");
         Map<Principal, ChallengeGenerator> generators = new HashMap<Principal, ChallengeGenerator>();
         generators.put(class1, new DigestChallengeGenerator());
         Map<Principal, ChallengeSender> senders = new HashMap<Principal, ChallengeSender>();
