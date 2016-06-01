@@ -37,6 +37,22 @@ public final class StepUpEventIds {
     @NotEmpty
     public static final String EXCEPTION = "StepUpException";
     
+    
+    /** event id for case of missing sender implementation. */
+    @Nonnull
+    @NotEmpty
+    public static final String EVENTID_MISSING_SENDERIMPL = "MissingSenderImpl";
+    
+    /** event id for case of missing generator implementation. */
+    @Nonnull
+    @NotEmpty
+    public static final String EVENTID_MISSING_GENERATORIMPL = "MissingGeneratorImpl";
+    
+    /** event id for case of missing attribute context. */
+    @Nonnull
+    @NotEmpty
+    public static final String EVENTID_MISSING_ATTRIBUTECONTEXT = "MissingAttributeContext";
+    
     /** event id for case of missing shibboleth sp context. */
     @Nonnull
     @NotEmpty
