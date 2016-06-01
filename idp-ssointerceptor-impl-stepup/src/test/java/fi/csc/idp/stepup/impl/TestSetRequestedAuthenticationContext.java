@@ -81,7 +81,7 @@ public class TestSetRequestedAuthenticationContext {
         rpCtx.setRelyingPartyId(null);
         action.initialize();
         final Event event=action.execute(src);
-        ActionTestingSupport.assertEvent(event, StepUpEventIds.EXCEPTION);
+        ActionTestingSupport.assertEvent(event, StepUpEventIds.EVENTID_INVALID_RPCONTEXT);
     }
     
     /**  Test that action copes with having idp nut no method is shib context */
@@ -94,7 +94,7 @@ public class TestSetRequestedAuthenticationContext {
         ctx.addSubcontext(sCtx,true);
         action.initialize();
         final Event event=action.execute(src);
-        ActionTestingSupport.assertEvent(event, StepUpEventIds.EXCEPTION);
+        ActionTestingSupport.assertEvent(event, StepUpEventIds.EVENTID_INVALID_SHIBSPCONTEXT);
     }
     
     /**  test action with basic success case, initialized but no data to match to  */
