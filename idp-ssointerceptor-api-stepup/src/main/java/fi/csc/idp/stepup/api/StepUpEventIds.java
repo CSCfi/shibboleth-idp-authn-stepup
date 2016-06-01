@@ -42,6 +42,11 @@ public final class StepUpEventIds {
     @NotEmpty
     public static final String EVENTID_MISSING_SHIBSPCONTEXT = "MissingShibSPContext";
 
+    /** event id for case of invalid shibboleth sp context. */
+    @Nonnull
+    @NotEmpty
+    public static final String EVENTID_INVALID_SHIBSPCONTEXT = "InvalidShibSPContext";
+
     /** event id for case of missing requested authentication context. */
     @Nonnull
     @NotEmpty
