@@ -178,7 +178,7 @@ public class SetRequestedAuthenticationContext extends AbstractAuthenticationAct
         RelyingPartyContext rpCtx = profileRequestContext.getSubcontext(RelyingPartyContext.class, false);
         if (rpCtx == null || rpCtx.getRelyingPartyId() == null) {
             log.debug("{} Could not get relying party context and sp entity id ", getLogPrefix());
-            ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EXCEPTION);
+            ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EVENTID_INVALID_RPCONTEXT);
             log.trace("Leaving");
             return;
         }
@@ -191,7 +191,7 @@ public class SetRequestedAuthenticationContext extends AbstractAuthenticationAct
         }
         if (providedMethod == null) {
             log.debug("{} Could not get authentication method ", getLogPrefix());
-            ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EXCEPTION);
+            ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EVENTID_INVALID_SHIBSPCONTEXT);
             log.trace("Leaving");
             return;
         }
