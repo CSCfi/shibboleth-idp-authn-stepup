@@ -21,5 +21,5 @@
  * THE SOFTWARE.
  */
 
-/** stepup api interfaces.*/
+/** stepup api interfaces, stepup context and event ids.*/
 package fi.csc.idp.stepup.api;

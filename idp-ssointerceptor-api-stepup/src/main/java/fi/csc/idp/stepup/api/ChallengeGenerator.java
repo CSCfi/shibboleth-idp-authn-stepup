@@ -34,7 +34,7 @@ public interface ChallengeGenerator {
      * 
      * @return challenge
      * @throws Exception
-     *             if the sending of the challenge has failed.
+     *             if generating of the challenge has failed.
      */
     String generate(final String target) throws Exception;
 }
