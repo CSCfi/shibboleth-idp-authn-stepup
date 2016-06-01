@@ -59,7 +59,7 @@ public class TestVerifyPasswordFromFormRequest {
         prc.addSubcontext(new AuthenticationContext(), true);
         action.initialize();
         final Event event=action.execute(src);
-        ActionTestingSupport.assertEvent(event, StepUpEventIds.EXCEPTION);
+        ActionTestingSupport.assertEvent(event, StepUpEventIds.EVENTID_MISSING_SHIBSPCONTEXT);
     }
     
     /**  Test that action copes with no stepup context present */

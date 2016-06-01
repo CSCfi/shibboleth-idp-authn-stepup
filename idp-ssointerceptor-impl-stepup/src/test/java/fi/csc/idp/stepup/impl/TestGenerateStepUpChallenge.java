@@ -82,7 +82,7 @@ public class TestGenerateStepUpChallenge {
         rpCtx.addSubcontext(attribCtx);
         action.initialize();
         final Event event=action.execute(src);
-        ActionTestingSupport.assertEvent(event, StepUpEventIds.EXCEPTION);
+        ActionTestingSupport.assertEvent(event, StepUpEventIds.EVENTID_MISSING_SHIBSPCONTEXT);
     }
     
     

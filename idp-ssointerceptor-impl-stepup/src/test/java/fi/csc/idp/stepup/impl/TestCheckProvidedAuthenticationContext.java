@@ -53,7 +53,7 @@ public class TestCheckProvidedAuthenticationContext {
         prc.addSubcontext(new AuthenticationContext(), true);
         action.initialize();
         final Event event=action.execute(src);
-        ActionTestingSupport.assertEvent(event, StepUpEventIds.EXCEPTION);
+        ActionTestingSupport.assertEvent(event, StepUpEventIds.EVENTID_MISSING_SHIBSPCONTEXT);
     }
     
     /**  Test that action copes with shibboleth context having no idp parameter */
@@ -62,7 +62,7 @@ public class TestCheckProvidedAuthenticationContext {
         ctx.addSubcontext(new ShibbolethSpAuthenticationContext(),true);
         action.initialize();
         final Event event=action.execute(src);
-        ActionTestingSupport.assertEvent(event, StepUpEventIds.EXCEPTION);
+        ActionTestingSupport.assertEvent(event, StepUpEventIds.EVENTID_MISSING_SHIBSPCONTEXT);
     }
     
     /**  Test that action copes with shibboleth context having idp parameter but nothing else */

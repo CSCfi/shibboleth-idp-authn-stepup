@@ -63,7 +63,7 @@ public class TestCheckRequestedAuthenticationContext {
         prc.addSubcontext(new AuthenticationContext(), true);
         action.initialize();
         final Event event=action.execute(src);
-        ActionTestingSupport.assertEvent(event, StepUpEventIds.EXCEPTION);
+        ActionTestingSupport.assertEvent(event, StepUpEventIds.EVENTID_MISSING_SHIBSPCONTEXT);
     }
     
     /**  Test that action copes with shibboleth context having no initial requested principals list present */

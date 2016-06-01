@@ -58,7 +58,7 @@ public class TestSetRequestedAuthenticationContext {
         prc.addSubcontext(new AuthenticationContext(), true);
         action.initialize();
         final Event event=action.execute(src);
-        ActionTestingSupport.assertEvent(event, StepUpEventIds.EXCEPTION);
+        ActionTestingSupport.assertEvent(event, StepUpEventIds.EVENTID_MISSING_SHIBSPCONTEXT);
     }
     
     
@@ -68,7 +68,7 @@ public class TestSetRequestedAuthenticationContext {
         ctx.addSubcontext(new ShibbolethSpAuthenticationContext(),true);
         action.initialize();
         final Event event=action.execute(src);
-        ActionTestingSupport.assertEvent(event, StepUpEventIds.EXCEPTION);
+        ActionTestingSupport.assertEvent(event, StepUpEventIds.EVENTID_MISSING_SHIBSPCONTEXT);
     }
     
     /**  Test that action copes with having auth contexct and shibboleth context  but no id in relying party context */
