@@ -31,7 +31,7 @@
         <maven.compiler.version>3.2</maven.compiler.version>
         <maven.compiler.source>1.7</maven.compiler.source>
         <maven.compiler.target>1.7</maven.compiler.target>
-        <shib.idp.version>3.2.0</shib.idp.version>
+        <shib.idp.version>3.2.1</shib.idp.version>
         <checkstyle.configLocation>
             conf/checkstyle.xml
         </checkstyle.configLocation>
