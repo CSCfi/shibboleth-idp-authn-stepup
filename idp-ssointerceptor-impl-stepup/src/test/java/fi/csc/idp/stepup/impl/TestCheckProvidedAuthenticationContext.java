@@ -73,7 +73,7 @@ public class TestCheckProvidedAuthenticationContext {
         ctx.addSubcontext(sCtx,true);
         action.initialize();
         final Event event=action.execute(src);
-        ActionTestingSupport.assertEvent(event, StepUpEventIds.EXCEPTION);
+        ActionTestingSupport.assertEvent(event, StepUpEventIds.EVENTID_INVALID_SHIBSPCONTEXT);
     }
     
     /**  Test that action copes with shibboleth context being initialized but no trusted parties */
