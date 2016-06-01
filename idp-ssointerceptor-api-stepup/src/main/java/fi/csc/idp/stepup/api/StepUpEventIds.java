@@ -37,7 +37,6 @@ public final class StepUpEventIds {
     @NotEmpty
     public static final String EXCEPTION = "StepUpException";
     
-    
     /** event id for case of missing or invalid relying party context. */
     @Nonnull
     @NotEmpty
@@ -77,12 +76,7 @@ public final class StepUpEventIds {
     @Nonnull
     @NotEmpty
     public static final String EVENTID_INVALID_SHIBSPCONTEXT = "InvalidShibSPContext";
-
-    /** event id for case of missing requested authentication context. */
-    @Nonnull
-    @NotEmpty
-    public static final String EVENTID_AUTHNCONTEXT_NOT_REQUESTED = "AuthnContextNotRequested";
-
+    
     /**
      * event id for case of requested authentication context that is not step
      * up.
