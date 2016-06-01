@@ -16,6 +16,50 @@
 	<bean class="net.shibboleth.idp.profile.impl.ProfileActionBeanPostProcessor" />
 	<bean class="net.shibboleth.ext.spring.config.IdentifiableBeanPostProcessor" />
 
+	<!-- REPLACE THESE DUMMIES WITH REAL VALUES -->
+	<bean id="stepup" parent="shibboleth.SAML2AuthnContextClassRef"
+		c:classRef="urn:test:stepup" />
+	<bean id="stepup2" parent="shibboleth.SAML2AuthnContextClassRef"
+		c:classRef="urn:test:stepup2" />
+	<bean id="password" parent="shibboleth.SAML2AuthnContextClassRef"
+		c:classRef="urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport" />
+	<bean id="password2" parent="shibboleth.SAML2AuthnContextClassRef"
+		c:classRef="urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport2" />
+
+	<bean id="CheckRequestedAuthenticationContext"
+		class="fi.csc.idp.stepup.impl.CheckRequestedAuthenticationContext"
+		scope="prototype" p:httpServletRequest-ref="shibboleth.HttpServletRequest">
+		<property name="stepupMethods">
+			<list>
+				<bean parent="shibboleth.SAML2AuthnContextClassRef" c:classRef="urn:test:stepup" />
+			</list>
+		</property>
+	</bean>
+
+	<bean id="CheckProvidedAuthenticationContext"
+		class="fi.csc.idp.stepup.impl.CheckProvidedAuthenticationContext"
+		scope="prototype"
+   	
+		
+		<property name="trustedStepupMethods">
+			<map>
+				<entry>
+					<key>
+						<value>idpentity1t</value>
+					</key>
+					<value>
+						<list>
+							<ref bean="stepup" />
+							<ref bean="stepup2" />
+						</list>
+					</value>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+
+
 	<bean id="GenerateStepUpChallenge" class="fi.csc.idp.stepup.impl.GenerateStepUpChallenge"
 		scope="prototype" p:httpServletRequest-ref="shibboleth.HttpServletRequest">
 		<property name="attributeIds">
@@ -41,6 +85,8 @@
 		class="fi.csc.idp.stepup.impl.SetRequestedAuthenticationContext"
 		scope="prototype" p:httpServletRequest-ref="shibboleth.HttpServletRequest">
 		<property name="PassThruuEntityLists">
+			<!-- Example of case where we use the method provided by idp if the idp 
+				is idp.localdomain and the client so is sp1 or sp.localdomain -->
 			<map>
 				<entry>
 					<key>
@@ -54,6 +100,8 @@
 			</map>
 		</property>
 		<property name="AuthenticationMethodMapping">
+			<!-- Example of case where set password2 as method if we receive from 
+				idp.localdomain method password and the client is sp.localdomain -->
 			<map>
 				<entry>
 					<key>
@@ -74,70 +122,15 @@
 		</property>
 	</bean>
 
-
-	<bean id="stepup" parent="shibboleth.SAML2AuthnContextClassRef"
-		c:classRef="urn:test:stepup" />
-	<bean id="stepup2" parent="shibboleth.SAML2AuthnContextClassRef"
-		c:classRef="urn:test:stepup2" />
-	<bean id="password" parent="shibboleth.SAML2AuthnContextClassRef"
-		c:classRef="urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport" />
-	<bean id="password2" parent="shibboleth.SAML2AuthnContextClassRef"
-		c:classRef="urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport2" />
-
-
-
-
-	<bean id="CheckRequestedAuthenticationContext"
-		class="fi.csc.idp.stepup.impl.CheckRequestedAuthenticationContext"
+	<bean id="VerifyPasswordFromFormRequest" class="fi.csc.idp.stepup.impl.VerifyPasswordFromFormRequest"
 		scope="prototype" p:httpServletRequest-ref="shibboleth.HttpServletRequest">
-		<property name="stepupMethods">
-			<list>
-				<bean parent="shibboleth.SAML2AuthnContextClassRef" c:classRef="urn:test:stepup" />
-			</list>
-		</property>
-	</bean>
-
-	<!-- string is a key -->
-	<!-- value is a list of beans -->
-	<bean id="CheckProvidedAuthenticationContext"
-		class="fi.csc.idp.stepup.impl.CheckProvidedAuthenticationContext"
-		scope="prototype"
-        
-		<property name="trustedStepupMethods">
+		<property name="challengeVerifiers">
 			<map>
-				<entry>
-					<key>
-						<value>idpentity1t</value>
-					</key>
-					<value>
-						<list>
-							<ref bean="stepup" />
-							<ref bean="stepup2" />
-						</list>
-					</value>
-				</entry>
+				<entry key-ref="stepup2" value-ref="EqualVerifier" />
+				<entry key-ref="stepup" value-ref="EqualVerifier" />
 			</map>
 		</property>
 	</bean>
-
-	<bean id="CheckProvidedAuthenticationContext"
-		class="fi.csc.idp.stepup.impl.CheckProvidedAuthenticationContext"
-		scope="prototype">
-		<property name="trustedStepupProviders">
-			<map>
-				<entry>
-					<key>
-						<value>idpentity1t</value>
-					</key>
-					<list>
-						<ref bean="stepup" />
-						<ref bean="stepup2" />
-					</list>
-				</entry>
-			</map>
-		</property>
-	</bean>
-
 
 	<bean id="LogChallengeSender" class="fi.csc.idp.stepup.impl.LogChallengeSender"
 		scope="prototype">
@@ -147,10 +140,6 @@
 		scope="prototype">
 	</bean>
 
-	<bean id="VerifyPasswordFromFormRequest" class="fi.csc.idp.stepup.impl.VerifyPasswordFromFormRequest"
-		scope="prototype" p:httpServletRequest-ref="shibboleth.HttpServletRequest"
-		p:challengeVerifier-ref="EqualVerifier">
-	</bean>
 
 	<bean id="EqualVerifier" class="fi.csc.idp.stepup.impl.EqualChallengeResponseVerifier"
 		scope="prototype">
