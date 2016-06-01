@@ -72,7 +72,7 @@ If requested method is determined to require stepup, this bean is configured for
 
 ####GenerateStepUpChallenge
 
-This bean needs to be configured for all stepup methods perfomed by proxy. There are challenge creation, challenge sending and challenge verification implementations that need to be mapped for each of the supported methods. This can be used to control for instance wheter the challenge is send by sms or email to client depending on requested method.
+This bean needs to be configured for all stepup methods perfomed by proxy. There are challenge creation, challenge sending and challenge verification implementations that need to be mapped for each of the supported methods. This can be used to control for instance whether the challenge is send by sms or email to client depending on requested method.
 
 ####VerifyPasswordFromFormRequest
 This bean needs to be configured for all stepup methods perfomed by proxy. Bean needs to be instructed which verification implementation is used for which method.
@@ -81,8 +81,8 @@ This bean needs to be configured for all stepup methods perfomed by proxy. Bean 
 ####SetRequestedAuthenticationContext
 
 This bean is used for configuring which authentication method is sent to client SP in assertion. There are two maps, a specific and default map.
-If there is a mapping of Idp,Sp,Method->new Method, the specified new Method is used in assertion. If there is no such mapping but there is default
-mapping of Idp,SP, the method received from IdP is used in the new assertion. If there is no mappings, normal IdP logic takes place.
+If there is a mapping of Idp, Sp, Method->new Method, the specified new Method is used in assertion. If there is no such mapping but there is default
+mapping of Idp and SP, the method received from IdP is used in the new assertion. If there are no mappings at all, normal IdP logic takes place.
 
 The idea here is to allow proxy to deliver the actual used method provided by originating Idp and also to translate between incompatible SP & IdP pairs that have different understanding of methods.
 
