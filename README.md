@@ -68,7 +68,7 @@ This bean is used to configure which requested authentication methods are consid
 
 ####CheckProvidedAuthenticationContext
 
-If requested method is determined to require stepup, this bean is configured for a list of acceptable idp,sp,method triplets for stepup. This is for a case IdP and method is explicitly whitelisted for SP to be accepted as stepup. Use case for this would be a Idp having support for stronger authentication than others (the others requiring stepup performed by proxy). To make this work sensibly request method mapping feature of [MPASS Shibboleth SP Authentication](https://github.com/Digipalvelutehdas/MPASS-proxy/tree/master/idp-authn-impl-shibsp) is propably needed. 
+If requested method is determined to require stepup, this bean is configured for a list of acceptable idp, sp and method triplets for stepup. This is for a case IdP and method is explicitly whitelisted for SP to be accepted as stepup. Use case for this would be a Idp having support for stronger authentication than others (the others requiring stepup performed by proxy). To make this work sensibly request method mapping feature of [MPASS Shibboleth SP Authentication](https://github.com/Digipalvelutehdas/MPASS-proxy/tree/master/idp-authn-impl-shibsp) is propably needed. 
 
 ####GenerateStepUpChallenge
 
