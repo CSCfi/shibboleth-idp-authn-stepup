@@ -38,6 +38,11 @@ public final class StepUpEventIds {
     public static final String EXCEPTION = "StepUpException";
     
     
+    /** event id for case of missing or invalid relying party context. */
+    @Nonnull
+    @NotEmpty
+    public static final String EVENTID_INVALID_RPCONTEXT = "InvalidRPContext";
+    
     /** event id for case of missing sender implementation. */
     @Nonnull
     @NotEmpty
