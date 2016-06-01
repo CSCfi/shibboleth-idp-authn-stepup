@@ -85,7 +85,7 @@ public class GenerateStepUpChallenge extends AbstractAuthenticationAction {
     @Nullable
     private AttributeContext attributeContext;
 
-    /* proxy authentication context */
+    /** proxy authentication context. */
     private ShibbolethSpAuthenticationContext shibbolethContext;
 
     /** Challenge Generators. */
@@ -181,7 +181,7 @@ public class GenerateStepUpChallenge extends AbstractAuthenticationAction {
         attributeContext = attributeContextLookupStrategy.apply(profileRequestContext);
         if (attributeContext == null) {
             log.error("{} Unable to locate attribute context", getLogPrefix());
-            ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EXCEPTION);
+            ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EVENTID_MISSING_ATTRIBUTECONTEXT);
             log.trace("Leaving");
             return false;
         }
@@ -201,7 +201,6 @@ public class GenerateStepUpChallenge extends AbstractAuthenticationAction {
     protected void doExecute(@Nonnull final ProfileRequestContext profileRequestContext,
             @Nonnull final AuthenticationContext authenticationContext) {
         log.trace("Entering");
-        // Resolve attribute value
         String attributeId = null;
         Principal key = null;
         if (attributeIds != null) {
@@ -212,8 +211,6 @@ public class GenerateStepUpChallenge extends AbstractAuthenticationAction {
         }
         String target = null;
         if (attributeId != null) {
-            // As attributeId is defined we expect to resolve a string value for
-            // target
             IdPAttribute attribute = attributeContext.getIdPAttributes().get(attributeId);
             if (attribute == null) {
                 log.debug("Attributes do not contain value for " + attributeId, getLogPrefix());
@@ -235,7 +232,6 @@ public class GenerateStepUpChallenge extends AbstractAuthenticationAction {
         }
         StepUpContext stepUpContext = (StepUpContext) authenticationContext.addSubcontext(new StepUpContext(), true);
         stepUpContext.setTarget(target);
-        // Resolve challenge generator
         ChallengeGenerator challengeGenerator = null;
         if (challengeGenerators != null) {
             challengeGenerator = challengeGenerators.get(findKey(shibbolethContext.getInitialRequestedContext(),
@@ -243,11 +239,10 @@ public class GenerateStepUpChallenge extends AbstractAuthenticationAction {
         }
         if (challengeGenerator == null) {
             log.debug("no challenge generator defined for requested context");
-            ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EVENTID_AUTHNCONTEXT_NOT_STEPUP);
+            ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EVENTID_MISSING_GENERATORIMPL);
             log.trace("Leaving");
             return;
         }
-        // Resolve challenge sender
         ChallengeSender challengeSender = null;
         if (challengeSenders != null) {
             challengeSender = challengeSenders.get(findKey(shibbolethContext.getInitialRequestedContext(),
@@ -255,11 +250,10 @@ public class GenerateStepUpChallenge extends AbstractAuthenticationAction {
         }
         if (challengeSender == null) {
             log.debug("no challenge sender defined for requested context");
-            ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EVENTID_AUTHNCONTEXT_NOT_STEPUP);
+            ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EVENTID_MISSING_SENDERIMPL);
             log.trace("Leaving");
             return;
         }
-
         try {
             stepUpContext.setChallenge(challengeGenerator.generate(target));
             challengeSender.send(stepUpContext.getChallenge(), stepUpContext.getTarget());
@@ -270,17 +264,15 @@ public class GenerateStepUpChallenge extends AbstractAuthenticationAction {
             log.trace("Leaving");
             return;
         }
-
         ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EVENTID_CONTINUE_STEPUP);
         log.trace("Leaving");
-
     }
 
     /**
      * Method tries to locate requested method from the configured set of
      * methods.
      * 
-     * @param requestedCtx
+     * @param requestedPrincipals
      *            contains the requested methods
      * @param configuredCtxs
      *            configured requested methods
