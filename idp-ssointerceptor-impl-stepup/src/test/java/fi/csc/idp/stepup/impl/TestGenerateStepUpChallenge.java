@@ -71,7 +71,7 @@ public class TestGenerateStepUpChallenge {
         prc.addSubcontext(new AuthenticationContext(), true);
         action.initialize();
         final Event event=action.execute(src);
-        ActionTestingSupport.assertEvent(event, StepUpEventIds.EXCEPTION);
+        ActionTestingSupport.assertEvent(event, StepUpEventIds.EVENTID_MISSING_ATTRIBUTECONTEXT);
     }
     
     /**  Test that action copes with attribute context but no shib context present */
@@ -140,7 +140,7 @@ public class TestGenerateStepUpChallenge {
         action.setAttributeIds(ids);
         action.initialize();
         final Event event=action.execute(src);
-        ActionTestingSupport.assertEvent(event, StepUpEventIds.EVENTID_AUTHNCONTEXT_NOT_STEPUP);
+        ActionTestingSupport.assertEvent(event, StepUpEventIds.EVENTID_MISSING_GENERATORIMPL);
     }
     
     /**  Test that action copes with no challenge sender implementation 
@@ -154,7 +154,7 @@ public class TestGenerateStepUpChallenge {
         action.setAttributeIds(ids);
         action.initialize();
         final Event event=action.execute(src);
-        ActionTestingSupport.assertEvent(event, StepUpEventIds.EVENTID_AUTHNCONTEXT_NOT_STEPUP);
+        ActionTestingSupport.assertEvent(event, StepUpEventIds.EVENTID_MISSING_SENDERIMPL);
     }
     
     /**  Test that action copes with challenge sender implementation failure 
