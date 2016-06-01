@@ -36,3 +36,28 @@ sh bin/build.sh
 The final command will rebuild the _war_-package for the IdP application. Please note that products of [MPASS Shibboleth SP Authentication](https://github.com/Digipalvelutehdas/MPASS-proxy/tree/master/idp-authn-impl-shibsp) are expected to be in the directory _/opt/shibboleth-idp/edit-webapp/WEB-INF/lib/_ (Deployment prerequisite).
 
 ##Configuration 
+
+Note! These Configuration instructions are yet not final. The contents of the flows and views will change before release still. 
+
+###Views
+Copy the necessary views to place. Create the directories if needed. 
+
+```
+cp ../idp-ssointerceptor-impl-stepup/src/main/resources/views/* /opt/shibboleth-idp/views/intercept/.
+```
+###Flows
+Copy the flow to it's correct place. Create the directories if needed.
+```
+cp ../idp-ssointerceptor-impl-stepup/src/main/resources/flows/intercept/stepup/stepup/stepup-flow.xml /opt/shibboleth-idp/flows/intercept/stepup/.
+```
+
+###Beans
+Copy the bean definition to it's correct place. Create the directories if needed.
+```
+cp ../idp-ssointerceptor-impl-stepup/src/main/resources/flows/intercept/stepup/stepup/stepup-beans.xml /opt/shibboleth-idp/flows/intercept/stepup/.
+```
+
+####Configuring the beans
+
+###Enable interceptor
+Note! It is essential to configure the beans before enabling the interceptor. The provided configuration will not match your use case (and at the time of the writing, the definitions are not sane yet anyway).
