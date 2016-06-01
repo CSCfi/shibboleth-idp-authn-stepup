@@ -69,7 +69,7 @@ public class TestVerifyPasswordFromFormRequest {
         ctx.addSubcontext(sCtx,true);
         action.initialize();
         final Event event=action.execute(src);
-        ActionTestingSupport.assertEvent(event, StepUpEventIds.EXCEPTION);
+        ActionTestingSupport.assertEvent(event, StepUpEventIds.EVENTID_MISSING_STEPUPCONTEXT);
     }
     
     /**  Test that action copes with no servlet request present */
@@ -114,7 +114,7 @@ public class TestVerifyPasswordFromFormRequest {
         action.setChallengeResponseParameter("parameter_key");
         action.initialize();
         final Event event=action.execute(src);
-        ActionTestingSupport.assertEvent(event, StepUpEventIds.EVENTID_AUTHNCONTEXT_NOT_STEPUP);
+        ActionTestingSupport.assertEvent(event, StepUpEventIds.EVENTID_MISSING_VERIFIERIMPL);
     }
     
     /**  Test that action copes with user entering wrong response */
