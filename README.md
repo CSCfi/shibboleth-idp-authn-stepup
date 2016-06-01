@@ -60,5 +60,5 @@ Note! These Configuration instructions are yet not final. The contents of the fl
 
 ###Configuring the beans
 
-##Enable interceptor
+###Enable interceptor
 Note! It is essential to configure the beans before enabling the interceptor. The provided configuration will not match your use case (and at the time of the writing, the definitions are not sane yet anyway).
