@@ -112,7 +112,7 @@ public class CheckRequestedAuthenticationContext extends
         if (shibbolethContext == null) {
             log.debug("{} Could not get shib proxy context", getLogPrefix());
             ActionSupport.buildEvent(profileRequestContext,
-                    StepUpEventIds.EXCEPTION);
+                    StepUpEventIds.EVENTID_MISSING_SHIBSPCONTEXT);
             log.trace("Leaving");
             return;
         }

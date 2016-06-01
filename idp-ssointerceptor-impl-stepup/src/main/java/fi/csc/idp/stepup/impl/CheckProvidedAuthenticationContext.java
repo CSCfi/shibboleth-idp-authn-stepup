@@ -96,17 +96,10 @@ public class CheckProvidedAuthenticationContext extends
         
         final ShibbolethSpAuthenticationContext shibbolethContext = authenticationContext
                 .getSubcontext(ShibbolethSpAuthenticationContext.class);
-        if (shibbolethContext == null) {
+        if (shibbolethContext == null || shibbolethContext.getIdp() == null) {
             log.debug("{} Could not get shib proxy context", getLogPrefix());
             ActionSupport.buildEvent(profileRequestContext,
-                    StepUpEventIds.EXCEPTION);
-            log.trace("Leaving");
-            return;
-        }
-        if (shibbolethContext.getIdp() == null){
-            log.debug("{} Could not get provider entitytid ", getLogPrefix());
-            ActionSupport.buildEvent(profileRequestContext,
-                    StepUpEventIds.EXCEPTION);
+                    StepUpEventIds.EVENTID_MISSING_SHIBSPCONTEXT);
             log.trace("Leaving");
             return;
         }

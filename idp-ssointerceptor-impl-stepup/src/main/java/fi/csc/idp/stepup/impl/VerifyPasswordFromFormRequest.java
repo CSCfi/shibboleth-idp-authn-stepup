@@ -102,7 +102,7 @@ public class VerifyPasswordFromFormRequest extends AbstractExtractionAction {
         shibbolethContext = authenticationContext.getSubcontext(ShibbolethSpAuthenticationContext.class);
         if (shibbolethContext == null) {
             log.debug("{} Could not get shib proxy context", getLogPrefix());
-            ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EXCEPTION);
+            ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EVENTID_MISSING_SHIBSPCONTEXT);
             log.trace("Leaving");
             return false;
         }

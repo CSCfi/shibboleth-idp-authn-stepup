@@ -171,7 +171,7 @@ public class SetRequestedAuthenticationContext extends AbstractAuthenticationAct
                 .getSubcontext(ShibbolethSpAuthenticationContext.class);
         if (shibbolethContext == null || shibbolethContext.getIdp() == null) {
             log.debug("{} Could not get shib proxy context and provider id", getLogPrefix());
-            ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EXCEPTION);
+            ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EVENTID_MISSING_SHIBSPCONTEXT);
             log.trace("Leaving");
             return;
         }
