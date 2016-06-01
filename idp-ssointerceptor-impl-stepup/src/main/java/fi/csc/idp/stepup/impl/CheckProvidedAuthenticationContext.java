@@ -112,7 +112,7 @@ public class CheckProvidedAuthenticationContext extends
         if (providedMethod == null){
             log.debug("{} Could not get authentication method ", getLogPrefix());
             ActionSupport.buildEvent(profileRequestContext,
-                    StepUpEventIds.EXCEPTION);
+                    StepUpEventIds.EVENTID_INVALID_SHIBSPCONTEXT);
             log.trace("Leaving");
             return;
         }
