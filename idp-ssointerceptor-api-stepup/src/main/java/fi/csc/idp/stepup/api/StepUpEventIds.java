@@ -43,6 +43,11 @@ public final class StepUpEventIds {
     @NotEmpty
     public static final String EVENTID_INVALID_RPCONTEXT = "InvalidRPContext";
     
+    /** event id for case of missing verifier implementation. */
+    @Nonnull
+    @NotEmpty
+    public static final String EVENTID_MISSING_VERIFIERIMPL = "MissingVerifierImpl";
+    
     /** event id for case of missing sender implementation. */
     @Nonnull
     @NotEmpty
@@ -62,6 +67,11 @@ public final class StepUpEventIds {
     @Nonnull
     @NotEmpty
     public static final String EVENTID_MISSING_SHIBSPCONTEXT = "MissingShibSPContext";
+    
+    /** event id for case of missing stepup context. */
+    @Nonnull
+    @NotEmpty
+    public static final String EVENTID_MISSING_STEPUPCONTEXT = "MissingStepUpContext";
 
     /** event id for case of invalid shibboleth sp context. */
     @Nonnull
