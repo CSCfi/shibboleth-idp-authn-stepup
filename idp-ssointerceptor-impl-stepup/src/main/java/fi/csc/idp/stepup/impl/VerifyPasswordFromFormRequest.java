@@ -69,9 +69,13 @@ public class VerifyPasswordFromFormRequest extends AbstractExtractionAction {
     /** Challenge response parameter. */
     private String challengeResponseParameter = "j_challengeResponse";
 
-    /** Sets the parameter the response is read from. */
-    public void setChallengeResponseParameter(@Nonnull @NotEmpty String challengeResponseParameter) {
-        this.challengeResponseParameter = challengeResponseParameter;
+    /**
+     * Sets the parameter the response is read from.
+     * 
+     * @param parameter name for response
+     */
+    public void setChallengeResponseParameter(@Nonnull @NotEmpty String parameter) {
+        this.challengeResponseParameter = parameter;
     }
 
     /**
@@ -109,7 +113,7 @@ public class VerifyPasswordFromFormRequest extends AbstractExtractionAction {
         stepUpContext = authenticationContext.getSubcontext(StepUpContext.class);
         if (stepUpContext == null) {
             log.debug("{} Could not get stepup context", getLogPrefix());
-            ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EXCEPTION);
+            ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EVENTID_MISSING_STEPUPCONTEXT);
             log.trace("Leaving");
             return false;
         }
@@ -143,8 +147,8 @@ public class VerifyPasswordFromFormRequest extends AbstractExtractionAction {
                     challengeVerifiers.keySet()));
         }
         if (challengeVerifier == null) {
-            log.debug("no challenge sender defined for requested context");
-            ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EVENTID_AUTHNCONTEXT_NOT_STEPUP);
+            log.debug("no challenge verifier defined for requested context");
+            ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EVENTID_MISSING_VERIFIERIMPL);
             log.trace("Leaving");
             return;
         }
@@ -164,7 +168,7 @@ public class VerifyPasswordFromFormRequest extends AbstractExtractionAction {
      * Method tries to locate requested method from the configured set of
      * methods.
      * 
-     * @param requestedCtx
+     * @param requestedPrincipals
      *            contains the requested methods
      * @param configuredCtxs
      *            configured requested methods
