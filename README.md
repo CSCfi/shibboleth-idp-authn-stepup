@@ -87,6 +87,26 @@ mapping of Idp and SP, the method received from IdP is used in the new assertion
 The idea here is to allow proxy to deliver the actual used method provided by originating Idp and also to translate between incompatible SP & IdP pairs that have different understanding of methods.
 
 ###Enable interceptor
-Note! It is essential to configure the beans before enabling the interceptor. The provided configuration will not match your use case (and at the time of the writing, the definitions are not sane yet anyway).
+You need to add the new flow to list of avalable intercept flows in file _/opt/shibboleth-idp/conf/intercept/profile-intercept.xml_
 
-...
+```
+<bean id="shibboleth.AvailableInterceptFlows" parent="shibboleth.DefaultInterceptFlows" lazy-init="true">
+        <property name="sourceList">
+            <list merge="true">
+            
+            ...
+            
+            <bean id="intercept/stepup" parent="shibboleth.InterceptFlow" /> 
+            
+            ...
+```
+Then you need to also define the intercept point. Open file _/opt/shibboleth-idp/conf/relying-party.xml_ and add _stepup_ as post authentication intercept flow.
+```
+ <bean id="shibboleth.DefaultRelyingParty" parent="RelyingParty">
+        <property name="profileConfigurations">
+            <list>
+            ...
+            <bean parent="SAML2.SSO" p:postAuthenticationFlows="stepup" />
+            ...
+```
+Please consult [Shibboleth documentation](https://wiki.shibboleth.net/confluence/display/IDP30/ProfileInterceptConfiguration#ProfileInterceptConfiguration-EnablingIntercepts) on details.
