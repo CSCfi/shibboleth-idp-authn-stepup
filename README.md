@@ -27,8 +27,8 @@ mvn package
 After compilation, the _../idp-ssointerceptor-impl-stepup/target/idp-ssointerceptor-impl-stepup-\<version\>.jar_  and it's dependencies must be deployed to the IdP Web application and it must be configured. Depending on the IdP installation, the module deployment may be achieved for instance with the following sequence:
 
 ```
-cp ./idp-ssointerceptor-impl-stepup/target/idp-ssointerceptor-impl-stepup-\<version\>.jar /opt/shibboleth-idp/edit-webapp/WEB-INF/lib/.
-cp ./idp-ssointerceptor-impl-stepup/target/dependency/idp-ssointerceptor-api-stepup-\<version\>.jar /opt/shibboleth-idp/edit-webapp/WEB-INF/lib/.
+cp ../idp-ssointerceptor-impl-stepup/target/idp-ssointerceptor-impl-stepup-\<version\>.jar /opt/shibboleth-idp/edit-webapp/WEB-INF/lib/.
+cp ../idp-ssointerceptor-impl-stepup/target/dependency/idp-ssointerceptor-api-stepup-\<version\>.jar /opt/shibboleth-idp/edit-webapp/WEB-INF/lib/.
 cd /opt/shibboleth-idp
 sh bin/build.sh
 ```
@@ -39,7 +39,7 @@ The final command will rebuild the _war_-package for the IdP application. Please
 Copy the necessary views to place. Create the directories if needed. 
 
 ```
-cp ../idp-ssointerceptor-impl-stepup/src/main/resources/views/* /opt/shibboleth-idp/views/intercept/.
+cp ../idp-ssointerceptor-impl-stepup/src/main/resources/views/intercept/stepup/* /opt/shibboleth-idp/views/intercept/.
 ```
 ###Flows
 Copy the flow to it's correct place. Create the directories if needed.
