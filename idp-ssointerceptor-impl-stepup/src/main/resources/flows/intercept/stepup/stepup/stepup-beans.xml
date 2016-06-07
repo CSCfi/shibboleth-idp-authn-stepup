@@ -28,10 +28,10 @@
 
 	<bean id="CheckRequestedAuthenticationContext"
 		class="fi.csc.idp.stepup.impl.CheckRequestedAuthenticationContext"
-		scope="prototype" p:httpServletRequest-ref="shibboleth.HttpServletRequest">
+		scope="prototype" >
 		<property name="stepupMethods">
 			<list>
-				<bean parent="shibboleth.SAML2AuthnContextClassRef" c:classRef="urn:test:stepup" />
+				<ref bean="stepup" />
 			</list>
 		</property>
 	</bean>
@@ -61,7 +61,7 @@
 
 
 	<bean id="GenerateStepUpChallenge" class="fi.csc.idp.stepup.impl.GenerateStepUpChallenge"
-		scope="prototype" p:httpServletRequest-ref="shibboleth.HttpServletRequest">
+		scope="prototype" >
 		<property name="attributeIds">
 			<map>
 				<entry key-ref="stepup" value="mail" />
@@ -83,7 +83,7 @@
 
 	<bean id="SetRequestedAuthenticationContext"
 		class="fi.csc.idp.stepup.impl.SetRequestedAuthenticationContext"
-		scope="prototype" p:httpServletRequest-ref="shibboleth.HttpServletRequest">
+		scope="prototype" >
 		<property name="PassThruuEntityLists">
 			<!-- Example of case where we use the method provided by idp if the idp 
 				is idp.localdomain and the client so is sp1 or sp.localdomain -->
@@ -135,6 +135,17 @@
 	<bean id="LogChallengeSender" class="fi.csc.idp.stepup.impl.LogChallengeSender"
 		scope="prototype">
 	</bean>
+	
+	<bean id="MailChallengeSender"
+        class="fi.csc.idp.stepup.impl.MailChallengeSender" scope="prototype"
+        p:subjectField="step-up code"
+        p:fromField="foo@bar"
+        p:host="foo.bar"
+        p:port="25"
+        p:sMTPAuth="false"
+        p:sMTPTtls="true">
+     </bean>
+	
 
 	<bean id="ChallengeGenerator" class="fi.csc.idp.stepup.impl.DigestChallengeGenerator"
 		scope="prototype">
