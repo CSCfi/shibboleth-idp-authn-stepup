@@ -2,26 +2,26 @@
 <html>
   <head>
     <meta charset="utf-8">
-    <title>#springMessageText("idp.title", "Web Login Service")</title>
+    <title>#springMessageText("stepup.title", "Web Stepup Service")</title>
     <link rel="stylesheet" type="text/css" href="$request.getContextPath()/css/main.css">
   </head>
   <body>
     <div class="wrapper">
       <div class="container">
         <header>
-          <img src="$request.getContextPath()#springMessage("idp.logo")" alt="#springMessageText("idp.logo.alt-text", "logo")">
+          <img src="$request.getContextPath()#springMessage("stepup.logo")" alt="#springMessageText("stepup.logo.alt-text", "logo")">
         </header>
         <div class="content">
 
           <form action="$flowExecutionUrl" method="post">
 
             <div class="form-element-wrapper">
-              <label for="loginhint">#springMessageText("idp.stepup.response", "Password")</label>
+              <label for="loginhint">#springMessageText("stepup.stepup.response", "Password")</label>
               <input class="form-element form-field" id="loginhint" name="j_challengeResponse" type="text" value="">
             </div>
 
             <div class="form-element-wrapper">
-              <button class="form-element form-button" type="submit" name="_eventId_proceed">#springMessageText("idp.stepup.login", "Login")</button>
+              <button class="form-element form-button" type="submit" name="_eventId_proceed">#springMessageText("stepup.stepup.login", "Login")</button>
             </div>
 
           </form>
@@ -30,7 +30,7 @@
       </div>
       <footer>
         <div class="container container-footer">
-          <p class="footer-text">#springMessageText("idp.footer", "Insert your footer text here.")</p>
+          <p class="footer-text">#springMessageText("stepup.footer", "Insert your footer text here.")</p>
         </div>
       </footer>
     </div>
