@@ -206,7 +206,7 @@ public class MailChallengeSender implements ChallengeSender {
      */
     public void setTemplatePath(String path) {
         log.trace("Entering");
-        log.debug("setting path to template files" + path);
+        log.debug("setting path to template files " + path);
         this.templateFilePath = path;
         log.trace("Leaving");
     }
