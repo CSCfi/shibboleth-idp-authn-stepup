@@ -63,23 +63,16 @@ public class MailChallengeSender implements ChallengeSender {
     private String userName;
     /** password of the email account. */
     private String password;
-    /** SMTP authentication property. */
-    private String smtpAuth;
-    /** Start TLS property. */
-    private String smtpTtls;
-    /** mail host. */
-    private String host;
-    /** port of the mail host. */
-    private String port;
     /** email template used to override the default. */
     private String templateFileName;
     /** email template path used to override the default. */
     private String templateFilePath;
-
-    /** email address. */
-    private String to;
-    /** body of the email. */
-    private String body;
+    /** Velocity template. */
+    private Template template;
+    /** Properties for email. */
+    private Properties props = new Properties();
+    /** Session information. */
+    private Session session;
 
     /**
      * Sets the Sender field of email.
@@ -142,7 +135,7 @@ public class MailChallengeSender implements ChallengeSender {
     public void setSMTPAuth(String serverSMTPAuth) {
         log.trace("Entering");
         log.debug("setting SMTP Auth to " + serverSMTPAuth);
-        this.smtpAuth = serverSMTPAuth;
+        props.put("mail.smtp.auth", serverSMTPAuth);
         log.trace("Leaving");
     }
 
@@ -155,7 +148,7 @@ public class MailChallengeSender implements ChallengeSender {
     public void setSMTPTtls(String serverSMTPTtls) {
         log.trace("Entering");
         log.debug("setting SMTP Start TLS to " + serverSMTPTtls);
-        this.smtpTtls = serverSMTPTtls;
+        props.put("mail.smtp.starttls.enable", serverSMTPTtls);
         log.trace("Leaving");
     }
 
@@ -168,7 +161,7 @@ public class MailChallengeSender implements ChallengeSender {
     public void setHost(String hostName) {
         log.trace("Entering");
         log.debug("setting host to " + hostName);
-        this.host = hostName;
+        props.put("mail.smtp.host", hostName);
         log.trace("Leaving");
     }
 
@@ -181,7 +174,7 @@ public class MailChallengeSender implements ChallengeSender {
     public void setPort(String serverPort) {
         log.trace("Entering");
         log.debug("setting port to " + serverPort);
-        this.port = serverPort;
+        props.put("mail.smtp.port", serverPort);
         log.trace("Leaving");
     }
 
@@ -199,10 +192,10 @@ public class MailChallengeSender implements ChallengeSender {
     }
 
     /**
-     * Sets a path to a file replacing the default template.
+     * Sets a loader path to a template file replacing the default template.
      * 
-     * @param fileName
-     *            template file replacing the default one
+     * @param path
+     *            loader path to template file replacing the default one
      */
     public void setTemplatePath(String path) {
         log.trace("Entering");
@@ -235,49 +228,48 @@ public class MailChallengeSender implements ChallengeSender {
 
     }
 
-    // TODO: Make use of parameters and methods sane.. this is now
-    // a mess. What values are static and same for all, what is per
-    // execution..
+    /**
+     * Initializes velocity template and mail session if not initialized yet.
+     */
+    private synchronized void init() {
+        log.trace("Entering");
+        if (template == null) {
+            template = getVelocityTemplate();
+        }
+        if (session == null) {
+            if (userName != null && password != null) {
+                session = Session.getInstance(props, new javax.mail.Authenticator() {
+                    protected PasswordAuthentication getPasswordAuthentication() {
+                        return new PasswordAuthentication(userName, password);
+                    }
+                });
+            } else {
+                session = Session.getInstance(props);
+            }
+        }
+        log.trace("Leaving");
+    }
 
     @Override
     public void send(String challenge, String target) throws AddressException, MessagingException {
         log.trace("Entering");
         log.debug("Sending challenge " + challenge + " to " + target);
-        to = target;
-        Template template = getVelocityTemplate();
+        init();
         final VelocityContext velocityContext = new VelocityContext();
         velocityContext.put("otp", challenge);
         StringWriter writer = new StringWriter();
         template.merge(velocityContext, writer);
-        body = writer.toString();
-        Properties props = new Properties();
-        props.put("mail.smtp.auth", smtpAuth);
-        props.put("mail.smtp.starttls.enable", smtpTtls);
-        props.put("mail.smtp.host", host);
-        props.put("mail.smtp.port", port);
-        Session session = null;
-        if (userName != null && password != null) {
-            session = Session.getInstance(props, new javax.mail.Authenticator() {
-                protected PasswordAuthentication getPasswordAuthentication() {
-                    return new PasswordAuthentication(userName, password);
-                }
-            });
-        } else {
-            session = Session.getInstance(props);
-        }
         Message message = new MimeMessage(session);
         try {
             message.setFrom(new InternetAddress(from));
-            message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(to));
+            message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(target));
             message.setSubject(subject);
-            message.setText(body);
+            message.setText(writer.toString());
             Transport.send(message);
-
         } catch (MessagingException e) {
             StringWriter sw = new StringWriter();
             e.printStackTrace(new PrintWriter(sw));
-            String exceptionAsString = sw.toString();
-            log.error(exceptionAsString);
+            log.error(sw.toString());
             throw e;
         }
         log.debug("Challenge sending triggered");
