@@ -132,12 +132,11 @@
 		</property>
 	</bean>
 
-	<bean id="LogChallengeSender" class="fi.csc.idp.stepup.impl.LogChallengeSender"
-		scope="prototype">
+	<bean id="LogChallengeSender" class="fi.csc.idp.stepup.impl.LogChallengeSender">
 	</bean>
 	
 	<bean id="MailChallengeSender"
-        class="fi.csc.idp.stepup.impl.MailChallengeSender" scope="prototype"
+        class="fi.csc.idp.stepup.impl.MailChallengeSender" 
         p:subjectField="step-up code"
         p:fromField="foo@bar"
         p:host="foo.bar"
@@ -147,13 +146,11 @@
      </bean>
 	
 
-	<bean id="ChallengeGenerator" class="fi.csc.idp.stepup.impl.DigestChallengeGenerator"
-		scope="prototype">
+	<bean id="ChallengeGenerator" class="fi.csc.idp.stepup.impl.DigestChallengeGenerator">
 	</bean>
 
 
-	<bean id="EqualVerifier" class="fi.csc.idp.stepup.impl.EqualChallengeResponseVerifier"
-		scope="prototype">
+	<bean id="EqualVerifier" class="fi.csc.idp.stepup.impl.EqualChallengeResponseVerifier">
 	</bean>
 
 </beans>
