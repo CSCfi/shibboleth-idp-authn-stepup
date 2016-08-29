@@ -1,6 +1,7 @@
 package fi.csc.idp.stepup.impl;
 
 
+import org.apache.commons.lang.StringUtils;
 import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -42,6 +43,14 @@ public class TestDigestChallengeGenerator {
         Assert.assertNotNull(digest);
         //SHA-1 output length
         Assert.assertEquals(digest.length(),40);
+    }
+    
+    @Test
+    public void testDecimalOutput() throws Exception  {
+        digestChallengeGenerator.setDecimal(true);
+        digestChallengeGenerator.setMaxLength(100);
+        String digest=digestChallengeGenerator.generate(null);
+        Assert.assertTrue(StringUtils.isNumeric(digest));
     }
  
     @Test
