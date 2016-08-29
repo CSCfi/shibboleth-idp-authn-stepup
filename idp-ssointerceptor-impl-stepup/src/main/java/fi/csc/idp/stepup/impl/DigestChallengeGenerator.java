@@ -36,13 +36,12 @@ import fi.csc.idp.stepup.api.ChallengeGenerator;
 
 import org.apache.commons.codec.binary.Hex;
 
-/** class implementing challenge generation based on digest.*/
+/** class implementing challenge generation based on digest. */
 public class DigestChallengeGenerator implements ChallengeGenerator {
 
     /** Class logger. */
     @Nonnull
-    private final Logger log = LoggerFactory
-            .getLogger(DigestChallengeGenerator.class);
+    private final Logger log = LoggerFactory.getLogger(DigestChallengeGenerator.class);
 
     /** The salt for digest. */
     @Nullable
@@ -55,6 +54,10 @@ public class DigestChallengeGenerator implements ChallengeGenerator {
     /** The digest. */
     @Nullable
     private String digest = "SHA-256";
+
+    /** Use decimal instead of default hex. */
+    @Nullable
+    private boolean useDecimal;
 
     /**
      * Set the salt.
@@ -95,30 +98,51 @@ public class DigestChallengeGenerator implements ChallengeGenerator {
         log.trace("Leaving");
     }
 
+    /**
+     * Created a decimal string instead of default hex.
+     * 
+     * @param use
+     *            decimal instead of default hex
+     */
+    public void setDecimal(@Nonnull boolean use) {
+        log.trace("Entering");
+        useDecimal = use;
+        log.trace("Leaving");
+    }
+
     @Override
     public String generate(String target) throws Exception {
         log.trace("Entering");
-        String challenge = null;
+        String challenge = "";
         try {
             String time = "" + System.currentTimeMillis();
             MessageDigest md = MessageDigest.getInstance(digest);
             // to make challenge user specific
-            if (target != null){
+            if (target != null) {
                 md.update(target.getBytes());
             }
             // to make challenge installation specific
             md.update(salt.getBytes());
             // to make challenge time specific
             md.update(time.getBytes());
-            challenge = Hex.encodeHexString(md.digest());
+            byte[] buffer = md.digest();
+            if (useDecimal) {
+                // output a decimal string
+                for (byte data : buffer) {
+                    // operation reduces unpredictability a bit
+                    challenge += (int) data & 0xFF;
+                }
+            } else {
+                // ouput a hexstring
+                challenge = Hex.encodeHexString(buffer);
+            }
+
         } catch (NoSuchAlgorithmException e) {
             log.error("unable to generate challenge " + e.getMessage());
             return null;
         }
         log.trace("Leaving");
-        return challenge
-                .substring(0, challenge.length() > maxLength ? maxLength
-                        : challenge.length());
+        return challenge.substring(0, challenge.length() > maxLength ? maxLength : challenge.length());
     }
 
 }
