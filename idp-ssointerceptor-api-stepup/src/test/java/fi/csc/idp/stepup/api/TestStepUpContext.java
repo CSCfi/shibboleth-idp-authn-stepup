@@ -12,8 +12,10 @@ public class TestStepUpContext {
         Assert.assertNull(ctx.getTarget());
         ctx.setChallenge("challenge");
         ctx.setTarget("target");
+        ctx.setSharedSecret("sharedSecretValue");
         Assert.assertEquals("challenge", ctx.getChallenge());
         Assert.assertEquals("target", ctx.getTarget());
+        Assert.assertEquals("sharedSecretValue", ctx.getSharedSecret());
         
     }
     
