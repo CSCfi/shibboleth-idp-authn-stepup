@@ -125,7 +125,7 @@ public class StoreSharedSecret extends AbstractAuthenticationAction {
      * @param <T>
      *            Principal
      */
-    public <T extends Principal> void setChallengeGenerators(@Nonnull Map<T, SharedSecretStorage> generators) {
+    public <T extends Principal> void setSharedSecretStorages(@Nonnull Map<T, SharedSecretStorage> generators) {
         log.trace("Entering");
         this.secretStorages = new HashMap<Principal, SharedSecretStorage>();
         for (Map.Entry<T, SharedSecretStorage> entry : generators.entrySet()) {
