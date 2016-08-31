@@ -210,7 +210,7 @@ public class GenerateSharedSecret extends AbstractAuthenticationAction {
                 return;
             }
         }
-        StepUpContext stepUpContext = (StepUpContext) authenticationContext.addSubcontext(new StepUpContext(), true);
+        StepUpContext stepUpContext = authenticationContext.getSubcontext(StepUpContext.class);
         stepUpContext.setTarget(target);
         ChallengeGenerator challengeGenerator = null;
         if (challengeGenerators != null) {
