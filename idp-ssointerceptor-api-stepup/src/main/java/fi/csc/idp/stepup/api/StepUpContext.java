@@ -31,6 +31,30 @@ public class StepUpContext extends BaseContext{
     private String challenge;
     /** Challenge target representing the user. */
     private String target;
+    /** Challenge for the user. Stored to context only for
+     * presenting it to user */
+    private String sharedSecret;
+    
+
+    /**
+     * For presenting the secret to user 
+     * in registration phase.
+     * 
+     * @return shared secret.
+     */
+    public String getSharedSecret() {
+        return sharedSecret;
+    }
+
+    /**
+     * For setting the secret to 
+     * context.
+     * 
+     * @param sharedSecret
+     */
+    public void setSharedSecret(String sharedSecretValue) {
+        this.sharedSecret = sharedSecretValue;
+    }
 
     /**
      * Getter for target parameter.
