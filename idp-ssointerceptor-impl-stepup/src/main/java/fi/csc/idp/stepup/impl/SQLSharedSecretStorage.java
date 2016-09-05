@@ -57,6 +57,10 @@ public class SQLSharedSecretStorage implements SharedSecretStorage {
         SQLSharedSecretStorage.password = password;
     }
 
+    public static void setUserName(String userName) {
+        SQLSharedSecretStorage.userName = userName;
+    }
+
     public static void setPoolSize(int poolSize) {
         SQLSharedSecretStorage.poolSize = poolSize;
     }
