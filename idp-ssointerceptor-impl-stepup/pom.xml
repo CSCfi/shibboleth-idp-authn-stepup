@@ -72,6 +72,11 @@
 			<version>${opensaml.version}</version>
 			<type>test-jar</type>
 		</dependency>
+		<dependency>
+    	<groupId>com.zaxxer</groupId>
+    		<artifactId>HikariCP</artifactId>
+    		<version>2.4.7</version>
+		</dependency>
 
 		<!-- Test Dependencies, add to parent POM -->
 		<dependency>
