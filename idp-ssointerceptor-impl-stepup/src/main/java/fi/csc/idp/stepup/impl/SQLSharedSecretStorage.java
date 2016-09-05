@@ -49,23 +49,23 @@ public class SQLSharedSecretStorage implements SharedSecretStorage {
     private static int poolSize;
     private static String insertStatement;
 
-    public static void setJdbcUrl(String jdbcUrl) {
+    public void setJdbcUrl(String jdbcUrl) {
         SQLSharedSecretStorage.jdbcUrl = jdbcUrl;
     }
 
-    public static void setPassword(String password) {
+    public void setPassword(String password) {
         SQLSharedSecretStorage.password = password;
     }
 
-    public static void setUserName(String userName) {
+    public void setUserName(String userName) {
         SQLSharedSecretStorage.userName = userName;
     }
 
-    public static void setPoolSize(int poolSize) {
+    public void setPoolSize(int poolSize) {
         SQLSharedSecretStorage.poolSize = poolSize;
     }
 
-    public static void setInsertStatement(String insertStatement) {
+    public void setInsertStatement(String insertStatement) {
         SQLSharedSecretStorage.insertStatement = insertStatement;
     }
 
@@ -90,7 +90,7 @@ public class SQLSharedSecretStorage implements SharedSecretStorage {
         /**
          * To this point we setup a encrypter
          */
-        getDataSource().getConnection().createStatement().executeUpdate(String.format(insertStatement, secret, id));
+        getDataSource().getConnection().createStatement().executeUpdate(String.format(insertStatement, id, secret));
         log.trace("Leaving");
     }
 
