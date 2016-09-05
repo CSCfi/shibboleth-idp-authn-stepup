@@ -24,28 +24,70 @@
 package fi.csc.idp.stepup.impl;
 
 import javax.annotation.Nonnull;
+import javax.sql.DataSource;
+
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import fi.csc.idp.stepup.api.SharedSecretStorage;
 
-/** class implementing challenge sending by writing it to log.*/
+/** class implementing challenge sending by writing it to log. */
 public class SQLSharedSecretStorage implements SharedSecretStorage {
 
     /** Class logger. */
     @Nonnull
-    private final Logger log = LoggerFactory
-            .getLogger(SQLSharedSecretStorage.class);
+    private final Logger log = LoggerFactory.getLogger(SQLSharedSecretStorage.class);
+
+    private static DataSource datasource;
+
+    private static String jdbcUrl;
+    private static String userName;
+    private static String password;
+    private static int poolSize;
+    private static String insertStatement;
+
+    public static void setJdbcUrl(String jdbcUrl) {
+        SQLSharedSecretStorage.jdbcUrl = jdbcUrl;
+    }
+
+    public static void setPassword(String password) {
+        SQLSharedSecretStorage.password = password;
+    }
+
+    public static void setPoolSize(int poolSize) {
+        SQLSharedSecretStorage.poolSize = poolSize;
+    }
+
+    public static void setInsertStatement(String insertStatement) {
+        SQLSharedSecretStorage.insertStatement = insertStatement;
+    }
+
+    public static DataSource getDataSource() {
+
+        if (datasource == null) {
+            HikariConfig config = new HikariConfig();
+            config.setJdbcUrl(jdbcUrl);
+            config.setUsername(userName);
+            config.setPassword(password);
+            config.setMaximumPoolSize(poolSize);
+            config.setAutoCommit(true);
+            datasource = new HikariDataSource(config);
+        }
+        return datasource;
+    }
 
     @Override
     public void store(String secret, String id) throws Exception {
         log.trace("Entering");
-        log.info("Storing secret " + secret + " by key " + id);
+        log.debug("Storing secret " + secret + " by key " + id);
+        /**
+         * To this point we setup a encrypter
+         */
+        getDataSource().getConnection().createStatement().executeUpdate(String.format(insertStatement, secret, id));
         log.trace("Leaving");
-        
     }
-
-    
 
 }
