@@ -90,6 +90,8 @@ public class SQLSharedSecretStorage implements SharedSecretStorage {
         /**
          * To this point we setup a encrypter
          */
+        //TODO: check SQL syntax to be correct
+        //TODO: Use prepared statement
         getDataSource().getConnection().createStatement().executeUpdate(String.format(insertStatement, id, secret));
         log.trace("Leaving");
     }
