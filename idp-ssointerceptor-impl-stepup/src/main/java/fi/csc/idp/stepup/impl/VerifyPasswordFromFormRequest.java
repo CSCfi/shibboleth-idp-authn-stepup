@@ -23,11 +23,6 @@
 
 package fi.csc.idp.stepup.impl;
 
-import java.security.Principal;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 import javax.annotation.Nonnull;
 import javax.servlet.http.HttpServletRequest;
@@ -41,10 +36,8 @@ import org.opensaml.profile.context.ProfileRequestContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import fi.csc.idp.stepup.api.ChallengeVerifier;
-import fi.csc.idp.stepup.api.StepUpContext;
 import fi.csc.idp.stepup.api.StepUpEventIds;
-import fi.okm.mpass.shibboleth.authn.context.ShibbolethSpAuthenticationContext;
+import fi.csc.idp.stepup.api.StepUpMethodContext;
 
 /**
  * An action that verifies user challenge response.
@@ -57,17 +50,12 @@ public class VerifyPasswordFromFormRequest extends AbstractExtractionAction {
     @Nonnull
     private final Logger log = LoggerFactory.getLogger(VerifyPasswordFromFormRequest.class);
 
-    /** Challenge Verifiers. */
-    private Map<Principal, ChallengeVerifier> challengeVerifiers;
-
-    /** proxy authentication context. */
-    private ShibbolethSpAuthenticationContext shibbolethContext;
-
-    /** stepup context. */
-    private StepUpContext stepUpContext;
-
+    
     /** Challenge response parameter. */
     private String challengeResponseParameter = "j_challengeResponse";
+    
+    /** proxy StepUp Context. */
+    private StepUpMethodContext stepUpMethodContext;
 
     /**
      * Sets the parameter the response is read from.
@@ -78,23 +66,7 @@ public class VerifyPasswordFromFormRequest extends AbstractExtractionAction {
         this.challengeResponseParameter = parameter;
     }
 
-    /**
-     * Set the challenge verifiers.
-     * 
-     * @param verifiers
-     *            for verifying the challenge
-     * @param <T>
-     *            Principal
-     */
-    public <T extends Principal> void setChallengeVerifiers(@Nonnull Map<T, ChallengeVerifier> verifiers) {
-        log.trace("Entering");
-        this.challengeVerifiers = new HashMap<Principal, ChallengeVerifier>();
-        for (Map.Entry<T, ChallengeVerifier> entry : verifiers.entrySet()) {
-            this.challengeVerifiers.put(entry.getKey(), entry.getValue());
-        }
-        log.trace("Leaving");
-    }
-
+    
     /** {@inheritDoc} */
     @SuppressWarnings("unchecked")
     /** {@inheritDoc} */
@@ -103,17 +75,11 @@ public class VerifyPasswordFromFormRequest extends AbstractExtractionAction {
             @Nonnull final AuthenticationContext authenticationContext) {
 
         log.trace("Entering");
-        shibbolethContext = authenticationContext.getSubcontext(ShibbolethSpAuthenticationContext.class);
-        if (shibbolethContext == null) {
+        //TODO: fix error
+        stepUpMethodContext = authenticationContext.getSubcontext(StepUpMethodContext.class);
+        if (stepUpMethodContext == null) {
             log.debug("{} Could not get shib proxy context", getLogPrefix());
             ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EVENTID_MISSING_SHIBSPCONTEXT);
-            log.trace("Leaving");
-            return false;
-        }
-        stepUpContext = authenticationContext.getSubcontext(StepUpContext.class);
-        if (stepUpContext == null) {
-            log.debug("{} Could not get stepup context", getLogPrefix());
-            ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EVENTID_MISSING_STEPUPCONTEXT);
             log.trace("Leaving");
             return false;
         }
@@ -140,21 +106,16 @@ public class VerifyPasswordFromFormRequest extends AbstractExtractionAction {
             log.trace("Leaving");
             return;
         }
-        // Resolve challenge sender
-        ChallengeVerifier challengeVerifier = null;
-        if (challengeVerifiers != null) {
-            challengeVerifier = challengeVerifiers.get(findKey(shibbolethContext.getInitialRequestedContext(),
-                    challengeVerifiers.keySet()));
-        }
-        if (challengeVerifier == null) {
-            log.debug("no challenge verifier defined for requested context");
-            ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EVENTID_MISSING_VERIFIERIMPL);
-            log.trace("Leaving");
-            return;
-        }
         log.debug("User challenge response was " + challengeResponse);
-        if (!challengeVerifier.verify(stepUpContext.getChallenge(), challengeResponse, stepUpContext.getTarget())) {
-            log.debug("User presented wrong response to  challenge", getLogPrefix());
+        try {
+            if (!stepUpMethodContext.getStepUpAccount().verifyResponse(challengeResponse)) {
+                log.debug("User presented wrong response to  challenge", getLogPrefix());
+                ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EVENTID_INVALID_RESPONSE);
+                log.trace("Leaving");
+                return;
+            }
+        } catch (Exception e) {
+            log.debug("User response evaluation failed", getLogPrefix());
             ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EVENTID_INVALID_RESPONSE);
             log.trace("Leaving");
             return;
@@ -164,31 +125,5 @@ public class VerifyPasswordFromFormRequest extends AbstractExtractionAction {
 
     }
 
-    /**
-     * Method tries to locate requested method from the configured set of
-     * methods.
-     * 
-     * @param requestedPrincipals
-     *            contains the requested methods
-     * @param configuredCtxs
-     *            configured requested methods
-     * @return null or the matching item in the set
-     */
-    private Principal findKey(List<Principal> requestedPrincipals, Set<Principal> configuredCtxs) {
-        log.trace("Entering");
-        if (configuredCtxs == null || requestedPrincipals == null) {
-            log.trace("Leaving");
-            return null;
-        }
-        for (Principal requestedPrincipal : requestedPrincipals) {
-            if (configuredCtxs.contains(requestedPrincipal)) {
-                log.trace("Leaving");
-                return requestedPrincipal;
-            }
-        }
-        log.trace("Leaving");
-        return null;
-
-    }
 
 }
