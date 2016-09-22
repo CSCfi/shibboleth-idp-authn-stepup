@@ -90,7 +90,7 @@ public class AbstractStepUpAccountManager implements StepUpMethod {
     }
 
     @Override
-    public StepUpAccount addAccount() {
+    public StepUpAccount addAccount() throws Exception{
         log.trace("Entering & Leaving");
         log.debug("Method not supported");
         return null;

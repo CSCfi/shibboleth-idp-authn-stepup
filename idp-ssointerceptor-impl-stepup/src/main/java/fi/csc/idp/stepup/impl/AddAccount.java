@@ -87,7 +87,15 @@ public class AddAccount extends AbstractAuthenticationAction {
             return;
         }
         log.debug("Adding a stepup account of type " + stepUpMethodContext.getStepUpMethod().getName());
-        StepUpAccount account = stepUpMethodContext.getStepUpMethod().addAccount();
+        StepUpAccount account;
+        try {
+            account = stepUpMethodContext.getStepUpMethod().addAccount();
+        } catch (Exception e) {
+            log.debug("Account creation failed for unexpected reason", getLogPrefix());
+            ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EVENTID_INVALID_USER);
+            log.trace("Leaving");
+            return;
+        }
         if (account == null) {
             log.debug("Could not create new stepup account for user", getLogPrefix());
             ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EVENTID_INVALID_USER);
