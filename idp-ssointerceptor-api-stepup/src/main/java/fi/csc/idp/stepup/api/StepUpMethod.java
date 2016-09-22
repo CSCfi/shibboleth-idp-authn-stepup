@@ -40,7 +40,7 @@ public interface StepUpMethod {
      * 
      * @return new account.
      */
-    public StepUpAccount addAccount();
+    public StepUpAccount addAccount() throws Exception;
 
     /**
      * Remove a account.
