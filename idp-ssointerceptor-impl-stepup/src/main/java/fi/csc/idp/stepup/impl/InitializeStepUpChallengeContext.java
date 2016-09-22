@@ -71,7 +71,7 @@ public class InitializeStepUpChallengeContext extends AbstractAuthenticationActi
     /** Context to look attributes for. */
     @Nonnull
     private Function<ProfileRequestContext, AttributeContext> attributeContextLookupStrategy;
-   
+
     /** AttributeContext to filter. */
     @Nullable
     private AttributeContext attributeContext;
@@ -79,10 +79,15 @@ public class InitializeStepUpChallengeContext extends AbstractAuthenticationActi
     /** proxy authentication context. */
     private ShibbolethSpAuthenticationContext shibbolethContext;
 
+    // TODO: CLASS->METH MAP IS WRONG WAY
+    // IT MAY LEAD TO HAVING SAME METHS SEVERAL TIMES IF WE HAVE
+    // SEVERAL AUTH METHS HAVING SAME STEPUP METHS
+    // THINK BETTER
+
+    // HAS TO BE METHOD->LIST OF AUTH CLASSES
     /** StepUp Methods. */
     private Map<Principal, StepUpMethod> stepUpMethods;
 
-    
     /** Constructor. */
     public InitializeStepUpChallengeContext() {
         log.trace("Entering");
@@ -92,7 +97,8 @@ public class InitializeStepUpChallengeContext extends AbstractAuthenticationActi
     }
 
     /**
-     * Set the possible stepup methods keyed by requested authentication context.
+     * Set the possible stepup methods keyed by requested authentication
+     * context.
      * 
      * @param senders
      *            implementations of challenge sender in a map
@@ -109,8 +115,6 @@ public class InitializeStepUpChallengeContext extends AbstractAuthenticationActi
         log.trace("Leaving");
     }
 
-    
-    
     /**
      * Set the lookup strategy for the {@link AttributeContext}.
      * 
@@ -158,38 +162,50 @@ public class InitializeStepUpChallengeContext extends AbstractAuthenticationActi
     protected void doExecute(@Nonnull final ProfileRequestContext profileRequestContext,
             @Nonnull final AuthenticationContext authenticationContext) {
         log.trace("Entering");
-        StepUpMethodContext stepUpMethodContext = (StepUpMethodContext) authenticationContext.addSubcontext(new StepUpMethodContext(), true);
-        //We have all possible methods in a map
-        //Initialize all for this user.. so they can be fetched from context later for instance for maintenance
+        StepUpMethodContext stepUpMethodContext = (StepUpMethodContext) authenticationContext.addSubcontext(
+                new StepUpMethodContext(), true);
+        // We have all possible methods in a map
+        // Initialize all for this user.. so they can be fetched from context
+        // later for instance for maintenance
+        // The methods that cannot be initialized are dropped.
         for (StepUpMethod stepupMethod : stepUpMethods.values()) {
-            // the methods and their accounts are initialized for current  attribute context
+            // the methods and their accounts are initialized for current
+            // attribute context
             // accounts may need attribute information
-            log.debug("Initializing StepUp method and accounts for " +stepupMethod.getName());
-            stepupMethod.Initialize(attributeContext);
+            log.debug("Initializing StepUp method and accounts for " + stepupMethod.getName());
+            if (!stepupMethod.Initialize(attributeContext)) {
+                log.debug("Not able to initialize method " + stepupMethod.getName() + " removed from available methods");
+                stepUpMethods.values().remove(stepupMethod);
+            }
         }
+        // Set all available initializable methods to context
+        log.debug("Setting " + stepUpMethods.size() + " stepup methods to context");
         stepUpMethodContext.setStepUpMethods(stepUpMethods);
         // Pick any non disabled account as the account to be used
         for (Principal authMethod : stepUpMethods.keySet()) {
-            //If user has a method configured for requested context
-            if (shibbolethContext.getInitialRequestedContext().contains(authMethod) &&
-                stepUpMethods.get(authMethod).getAccounts() != null){
-                //That method has accounts
-                for (StepUpAccount account:stepUpMethods.get(authMethod).getAccounts()){
-                    //and the account is enabled
-                    if (account.isEnabled()){
-                        log.debug("Setting a default stepup account");
-                        log.debug("Account type is "+stepUpMethods.get(authMethod).getName());
-                        log.debug("Account name is "+account.getName()==null?"":account.getName());
-                        stepUpMethodContext.setStepUpAccount(account);
-                        log.trace("Leaving");
-                        ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EVENTID_CONTINUE_STEPUP);
-                        return;
+            // If user has a method configured for requested context
+            if (shibbolethContext.getInitialRequestedContext().contains(authMethod)) {
+                // We set the last iterated method as the method
+                log.debug("Setting method " + stepUpMethods.get(authMethod).getName() + " as default method");
+                stepUpMethodContext.setStepUpMethod(stepUpMethods.get(authMethod));
+                // That method has accounts
+                if (stepUpMethods.get(authMethod).getAccounts() != null)
+                    for (StepUpAccount account : stepUpMethods.get(authMethod).getAccounts()) {
+                        // and the account is enabled
+                        if (account.isEnabled()) {
+                            log.debug("Setting a default stepup account");
+                            log.debug("Account type is " + stepUpMethods.get(authMethod).getName());
+                            log.debug("Account name is " + account.getName() == null ? "" : account.getName());
+                            stepUpMethodContext.setStepUpAccount(account);
+                            log.trace("Leaving");
+                            ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EVENTID_CONTINUE_STEPUP);
+                            return;
+                        }
                     }
-                }
             }
-            
+
         }
-        //No default account automatically chosen
+        // No default account automatically chosen
         log.trace("Leaving");
         ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EVENTID_CONTINUE_STEPUP);
     }

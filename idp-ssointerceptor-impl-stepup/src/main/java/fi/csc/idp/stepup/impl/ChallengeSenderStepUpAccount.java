@@ -34,7 +34,7 @@ public class ChallengeSenderStepUpAccount extends AbstractStepUpAccount {
 
     /** Class logger. */
     @Nonnull
-    private final Logger log = LoggerFactory.getLogger(LogfileStepUpAccount.class);
+    private final Logger log = LoggerFactory.getLogger(ChallengeSenderStepUpAccount.class);
 
     private ChallengeSender challengeSender;
 

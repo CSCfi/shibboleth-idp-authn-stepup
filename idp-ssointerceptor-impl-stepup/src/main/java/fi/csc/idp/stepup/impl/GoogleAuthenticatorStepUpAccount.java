@@ -28,25 +28,41 @@ import javax.annotation.Nonnull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import fi.csc.idp.stepup.api.ChallengeGenerator;
+import com.warrenstrange.googleauth.GoogleAuthenticator;
+import com.warrenstrange.googleauth.GoogleAuthenticatorKey;
 
-/**
- * class creating a challenge for Google Authenticator case
- * 
- * The challenge as the flow understands it is actually the shared secret. This
- * dummy method takes the shared secret as input and returns it back as
- * challenge
- * */
-public class GoogleAuthenticatorChallengeGenerator implements ChallengeGenerator {
+public class GoogleAuthenticatorStepUpAccount extends AbstractStepUpAccount {
 
     /** Class logger. */
     @Nonnull
-    private final Logger log = LoggerFactory.getLogger(GoogleAuthenticatorChallengeGenerator.class);
+    private final Logger log = LoggerFactory.getLogger(GoogleAuthenticatorStepUpAccount.class);
+
+    /**
+     * If the account does not have shared secret yet we create it.
+     */
 
     @Override
-    public String generate(String target) throws Exception {
-        log.trace("Entering & Leaving");
-        return target;
+    public String getTarget() {
+        log.trace("Entering");
+        if (super.getTarget() == null) {
+            GoogleAuthenticator gAuth = new GoogleAuthenticator();
+            final GoogleAuthenticatorKey key = gAuth.createCredentials();
+            log.debug("Secret key with value " + key.getKey() + " created");
+            setTarget(key.getKey());
+        }
+        log.trace("Leaving");
+        return super.getTarget();
+    }
+
+    /**
+     * GA does not send challenge.
+     * 
+     */
+    @Override
+    public void sendChallenge() throws Exception {
+        log.trace("Entering");
+        log.debug("not supported");
+        log.trace("Leaving");
     }
 
 }

@@ -50,10 +50,9 @@ public class SQLStepUpAccountStorage implements StepUpAccountStorage {
     private static String userName;
     private static String password;
     private static int poolSize;
-    
-    
+
     private static String insertStatement;
-    
+
     private static String addStatement;
     private static String updateStatement;
     private static String removeStatement;
@@ -78,7 +77,7 @@ public class SQLStepUpAccountStorage implements StepUpAccountStorage {
     public void setInsertStatement(String insertStatement) {
         SQLStepUpAccountStorage.insertStatement = insertStatement;
     }
-    
+
     public static void setAddStatement(String addStatement) {
         SQLStepUpAccountStorage.addStatement = addStatement;
     }
@@ -94,7 +93,6 @@ public class SQLStepUpAccountStorage implements StepUpAccountStorage {
     public static void setListStatement(String listStatement) {
         SQLStepUpAccountStorage.listStatement = listStatement;
     }
-
 
     public static DataSource getDataSource() {
 
@@ -117,8 +115,8 @@ public class SQLStepUpAccountStorage implements StepUpAccountStorage {
         /**
          * To this point we setup a encrypter
          */
-        //TODO: check SQL syntax to be correct
-        //TODO: Use prepared statement
+        // TODO: check SQL syntax to be correct
+        // TODO: Use prepared statement
         getDataSource().getConnection().createStatement().executeUpdate(String.format(insertStatement, id, secret));
         log.trace("Leaving");
     }
@@ -126,24 +124,24 @@ public class SQLStepUpAccountStorage implements StepUpAccountStorage {
     @Override
     public void add(StepUpAccount account, String key) throws Exception {
         // TODO Auto-generated method stub
-        //ADD ACCOUNT STORE NAME, STATUS AND TARGET by KEY
+        // ADD ACCOUNT STORE NAME, STATUS AND TARGET by KEY
         account.getName();
         account.isEnabled();
         account.getTarget();
         account.getId();
-        
+
     }
 
     @Override
     public void remove(StepUpAccount account, String key) throws Exception {
         // TODO Auto-generated method stub
-        
+
     }
 
     @Override
     public void update(StepUpAccount account, String key) throws Exception {
         // TODO Auto-generated method stub
-        
+
     }
 
     @Override

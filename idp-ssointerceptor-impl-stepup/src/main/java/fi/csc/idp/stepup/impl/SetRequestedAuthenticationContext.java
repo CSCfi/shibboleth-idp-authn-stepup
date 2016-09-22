@@ -54,8 +54,8 @@ import fi.okm.mpass.shibboleth.authn.context.ShibbolethSpAuthenticationContext;
 
 /**
  * An action that sets the requested authentication context value to match what
- * the provider has given or to a new mapping. This is done only if there is a configuration
- * allowing this.
+ * the provider has given or to a new mapping. This is done only if there is a
+ * configuration allowing this.
  * 
  * 
  */
@@ -133,21 +133,21 @@ public class SetRequestedAuthenticationContext extends AbstractAuthenticationAct
             this.authMethodMap = new HashMap<String, Map<String, Map<Principal, Principal>>>();
         }
         for (Map.Entry<String, Map<String, Map<T, T>>> entry : map.entrySet()) {
-            if (entry.getValue() == null){
+            if (entry.getValue() == null) {
                 continue;
             }
             if (!this.authMethodMap.containsKey(entry.getKey())) {
                 this.authMethodMap.put(entry.getKey(), new HashMap<String, Map<Principal, Principal>>());
             }
             for (Map.Entry<String, Map<T, T>> entry2 : entry.getValue().entrySet()) {
-                if (entry2.getValue() == null){
+                if (entry2.getValue() == null) {
                     continue;
                 }
                 if (!this.authMethodMap.get(entry.getKey()).containsKey(entry2)) {
                     this.authMethodMap.get(entry.getKey()).put(entry2.getKey(), new HashMap<Principal, Principal>());
                 }
                 for (Map.Entry<T, T> entry3 : entry2.getValue().entrySet()) {
-                    if (entry3.getValue() == null){
+                    if (entry3.getValue() == null) {
                         continue;
                     }
                     if (!this.authMethodMap.get(entry.getKey()).get(entry2.getKey()).containsKey(entry3.getKey())) {
@@ -214,9 +214,12 @@ public class SetRequestedAuthenticationContext extends AbstractAuthenticationAct
     /**
      * Method returns the new authentication method value for mapping.
      * 
-     * @param idp is the provider entity id
-     * @param sp is the client sp entity id
-     * @param method is the value provided by provider
+     * @param idp
+     *            is the provider entity id
+     * @param sp
+     *            is the client sp entity id
+     * @param method
+     *            is the value provided by provider
      * @return The new mapped value if it exists. If not, null.
      */
     private Principal getExactMapping(String idp, String sp, Principal method) {
@@ -238,9 +241,12 @@ public class SetRequestedAuthenticationContext extends AbstractAuthenticationAct
     /**
      * If there is a mapping from idp to sp, the value of method is returned.
      * 
-     * @param idp is the provider entity id
-     * @param sp is the client sp entity id
-     * @param method is the method value
+     * @param idp
+     *            is the provider entity id
+     * @param sp
+     *            is the client sp entity id
+     * @param method
+     *            is the method value
      * @return method if there is a mapping, otherwise a null.
      */
     private Principal getDefaultMapping(String idp, String sp, Principal method) {

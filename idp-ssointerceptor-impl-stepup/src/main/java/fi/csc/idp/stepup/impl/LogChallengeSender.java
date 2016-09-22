@@ -30,13 +30,12 @@ import org.slf4j.LoggerFactory;
 
 import fi.csc.idp.stepup.api.ChallengeSender;
 
-/** class implementing challenge sending by writing it to log.*/
+/** class implementing challenge sending by writing it to log. */
 public class LogChallengeSender implements ChallengeSender {
 
     /** Class logger. */
     @Nonnull
-    private final Logger log = LoggerFactory
-            .getLogger(LogChallengeSender.class);
+    private final Logger log = LoggerFactory.getLogger(LogChallengeSender.class);
 
     @Override
     public void send(String challenge, String target) {

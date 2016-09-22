@@ -23,7 +23,6 @@
 
 package fi.csc.idp.stepup.impl;
 
-
 import javax.annotation.Nonnull;
 
 import net.shibboleth.idp.authn.AbstractAuthenticationAction;
@@ -34,16 +33,15 @@ import org.opensaml.profile.context.ProfileRequestContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
 import fi.csc.idp.stepup.api.StepUpEventIds;
 import fi.csc.idp.stepup.api.StepUpMethodContext;
 import fi.csc.idp.stepup.api.StepUpAccount;
 
 /**
  * An action that generates a shared secret.The action selects attribute id and
- * challenge generator on the basis of requested
- * authentication context. Attribute value, if defined, is passed to challenge
- * generator. Secret is stored to context.
+ * challenge generator on the basis of requested authentication context.
+ * Attribute value, if defined, is passed to challenge generator. Secret is
+ * stored to context.
  * 
  * 
  */
@@ -55,11 +53,10 @@ public class AddAccount extends AbstractAuthenticationAction {
     @Nonnull
     private final Logger log = LoggerFactory.getLogger(AddAccount.class);
 
-
     /** proxy StepUp Context. */
     private StepUpMethodContext stepUpMethodContext;
- 
-     /** {@inheritDoc} */
+
+    /** {@inheritDoc} */
     @SuppressWarnings("unchecked")
     /** {@inheritDoc} */
     @Override
@@ -67,7 +64,7 @@ public class AddAccount extends AbstractAuthenticationAction {
             @Nonnull final AuthenticationContext authenticationContext) {
 
         log.trace("Entering");
-        //TODO: FIX ERROR
+        // TODO: FIX ERROR
         stepUpMethodContext = authenticationContext.getSubcontext(StepUpMethodContext.class);
         if (stepUpMethodContext == null) {
             log.debug("{} Could not get shib proxy context", getLogPrefix());
@@ -83,25 +80,24 @@ public class AddAccount extends AbstractAuthenticationAction {
     protected void doExecute(@Nonnull final ProfileRequestContext profileRequestContext,
             @Nonnull final AuthenticationContext authenticationContext) {
         log.trace("Entering");
-        if (stepUpMethodContext.getStepUpMethod() == null){
+        if (stepUpMethodContext.getStepUpMethod() == null) {
             log.debug("No default stepup method available", getLogPrefix());
             ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EVENTID_INVALID_USER);
             log.trace("Leaving");
             return;
         }
-        log.debug("Adding a stepup account of type "+stepUpMethodContext.getStepUpMethod().getName());
-        StepUpAccount account=stepUpMethodContext.getStepUpMethod().addAccount();
-        if (account == null){
+        log.debug("Adding a stepup account of type " + stepUpMethodContext.getStepUpMethod().getName());
+        StepUpAccount account = stepUpMethodContext.getStepUpMethod().addAccount();
+        if (account == null) {
             log.debug("Could not create new stepup account for user", getLogPrefix());
             ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EVENTID_INVALID_USER);
             log.trace("Leaving");
             return;
         }
-        //We set the account as active
+        // We set the account as active
         stepUpMethodContext.setStepUpAccount(account);
         ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EVENTID_CONTINUE_STEPUP);
         log.trace("Leaving");
     }
-  
 
 }

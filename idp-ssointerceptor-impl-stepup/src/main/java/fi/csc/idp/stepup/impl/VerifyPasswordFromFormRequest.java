@@ -23,7 +23,6 @@
 
 package fi.csc.idp.stepup.impl;
 
-
 import javax.annotation.Nonnull;
 import javax.servlet.http.HttpServletRequest;
 
@@ -50,23 +49,22 @@ public class VerifyPasswordFromFormRequest extends AbstractExtractionAction {
     @Nonnull
     private final Logger log = LoggerFactory.getLogger(VerifyPasswordFromFormRequest.class);
 
-    
     /** Challenge response parameter. */
     private String challengeResponseParameter = "j_challengeResponse";
-    
+
     /** proxy StepUp Context. */
     private StepUpMethodContext stepUpMethodContext;
 
     /**
      * Sets the parameter the response is read from.
      * 
-     * @param parameter name for response
+     * @param parameter
+     *            name for response
      */
     public void setChallengeResponseParameter(@Nonnull @NotEmpty String parameter) {
         this.challengeResponseParameter = parameter;
     }
 
-    
     /** {@inheritDoc} */
     @SuppressWarnings("unchecked")
     /** {@inheritDoc} */
@@ -75,7 +73,7 @@ public class VerifyPasswordFromFormRequest extends AbstractExtractionAction {
             @Nonnull final AuthenticationContext authenticationContext) {
 
         log.trace("Entering");
-        //TODO: fix error
+        // TODO: fix error
         stepUpMethodContext = authenticationContext.getSubcontext(StepUpMethodContext.class);
         if (stepUpMethodContext == null) {
             log.debug("{} Could not get shib proxy context", getLogPrefix());
@@ -124,6 +122,5 @@ public class VerifyPasswordFromFormRequest extends AbstractExtractionAction {
         log.trace("Leaving");
 
     }
-
 
 }

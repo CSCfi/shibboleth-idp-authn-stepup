@@ -23,7 +23,6 @@
 
 package fi.csc.idp.stepup.impl;
 
-
 import javax.annotation.Nonnull;
 import net.shibboleth.idp.authn.AbstractAuthenticationAction;
 import net.shibboleth.idp.authn.context.AuthenticationContext;
@@ -35,7 +34,7 @@ import fi.csc.idp.stepup.api.StepUpEventIds;
 import fi.csc.idp.stepup.api.StepUpMethodContext;
 
 /**
- * An action that creates step-up challenge. 
+ * An action that creates step-up challenge.
  * 
  */
 
@@ -45,11 +44,11 @@ public class GenerateStepUpChallenge extends AbstractAuthenticationAction {
     /** Class logger. */
     @Nonnull
     private final Logger log = LoggerFactory.getLogger(GenerateStepUpChallenge.class);
-    
+
     /** proxy StepUp Context. */
     private StepUpMethodContext stepUpMethodContext;
- 
-     /** {@inheritDoc} */
+
+    /** {@inheritDoc} */
     @SuppressWarnings("unchecked")
     /** {@inheritDoc} */
     @Override
@@ -57,7 +56,7 @@ public class GenerateStepUpChallenge extends AbstractAuthenticationAction {
             @Nonnull final AuthenticationContext authenticationContext) {
 
         log.trace("Entering");
-        //TODO: FIX ERROR
+        // TODO: FIX ERROR
         stepUpMethodContext = authenticationContext.getSubcontext(StepUpMethodContext.class);
         if (stepUpMethodContext == null) {
             log.debug("{} Could not get shib proxy context", getLogPrefix());
@@ -73,14 +72,14 @@ public class GenerateStepUpChallenge extends AbstractAuthenticationAction {
     protected void doExecute(@Nonnull final ProfileRequestContext profileRequestContext,
             @Nonnull final AuthenticationContext authenticationContext) {
         log.trace("Entering");
-        if (stepUpMethodContext.getStepUpAccount() == null){
+        if (stepUpMethodContext.getStepUpAccount() == null) {
             log.debug("There is no chosen stepup account for user", getLogPrefix());
             ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EVENTID_INVALID_USER);
             log.trace("Leaving");
             return;
         }
         try {
-            //StepUp account is instructed to send challenge to user
+            // StepUp account is instructed to send challenge to user
             stepUpMethodContext.getStepUpAccount().sendChallenge();
         } catch (Exception e) {
             log.error(e.getMessage());

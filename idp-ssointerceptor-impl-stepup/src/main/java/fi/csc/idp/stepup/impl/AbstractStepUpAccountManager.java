@@ -103,10 +103,11 @@ public class AbstractStepUpAccountManager implements StepUpMethod {
     }
 
     @Override
-    public void Initialize(AttributeContext attributeContext) {
+    public boolean Initialize(AttributeContext attributeContext) {
         log.trace("Entering");
         getAccounts().add((StepUpAccount) getAppContext().getBean(getAccountID()));
         log.trace("Leaving");
+        return true;
     }
 
 }

@@ -52,15 +52,14 @@ import com.google.common.base.Function;
 import com.google.common.base.Functions;
 
 import fi.csc.idp.stepup.api.ChallengeGenerator;
-import fi.csc.idp.stepup.api.SharedSecretStorage;
+import fi.csc.idp.stepup.api.StepUpAccountStorage;
 import fi.csc.idp.stepup.api.StepUpContext;
 import fi.csc.idp.stepup.api.StepUpEventIds;
 import fi.okm.mpass.shibboleth.authn.context.ShibbolethSpAuthenticationContext;
 
 /**
  * An action that stores a shared secret.The action selects attribute id and
- * storage implementation on the basis of requested
- * authentication context. 
+ * storage implementation on the basis of requested authentication context.
  * 
  */
 
@@ -87,8 +86,7 @@ public class StoreSharedSecret extends AbstractAuthenticationAction {
     private ShibbolethSpAuthenticationContext shibbolethContext;
 
     /** Challenge Generators. */
-    private Map<Principal, SharedSecretStorage> secretStorages;
-
+    private Map<Principal, StepUpAccountStorage> secretStorages;
 
     /** Constructor. */
     public StoreSharedSecret() {
@@ -98,7 +96,6 @@ public class StoreSharedSecret extends AbstractAuthenticationAction {
         log.trace("Leaving");
     }
 
-   
     /**
      * Set the attribute IDs keyed by requested authentication context.
      * 
@@ -125,10 +122,10 @@ public class StoreSharedSecret extends AbstractAuthenticationAction {
      * @param <T>
      *            Principal
      */
-    public <T extends Principal> void setSharedSecretStorages(@Nonnull Map<T, SharedSecretStorage> generators) {
+    public <T extends Principal> void setSharedSecretStorages(@Nonnull Map<T, StepUpAccountStorage> generators) {
         log.trace("Entering");
-        this.secretStorages = new HashMap<Principal, SharedSecretStorage>();
-        for (Map.Entry<T, SharedSecretStorage> entry : generators.entrySet()) {
+        this.secretStorages = new HashMap<Principal, StepUpAccountStorage>();
+        for (Map.Entry<T, StepUpAccountStorage> entry : generators.entrySet()) {
             this.secretStorages.put(entry.getKey(), entry.getValue());
         }
         log.trace("Leaving");
@@ -211,7 +208,7 @@ public class StoreSharedSecret extends AbstractAuthenticationAction {
         }
         StepUpContext stepUpContext = authenticationContext.getSubcontext(StepUpContext.class);
         stepUpContext.setTarget(target);
-        SharedSecretStorage secretStorage = null;
+        StepUpAccountStorage secretStorage = null;
         if (secretStorages != null) {
             secretStorage = secretStorages.get(findKey(shibbolethContext.getInitialRequestedContext(),
                     secretStorages.keySet()));
@@ -223,8 +220,8 @@ public class StoreSharedSecret extends AbstractAuthenticationAction {
             return;
         }
         try {
-            //TODO: precheck getSharedSecret() is null
-            secretStorage.store(stepUpContext.getSharedSecret(),target);
+            // TODO: precheck getSharedSecret() is null
+            secretStorage.store(stepUpContext.getSharedSecret(), target);
         } catch (Exception e) {
             log.error(e.getMessage());
             log.debug("Unable to store shared secret", getLogPrefix());

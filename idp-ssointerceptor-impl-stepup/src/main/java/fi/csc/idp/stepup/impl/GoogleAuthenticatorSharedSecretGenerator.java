@@ -23,7 +23,6 @@
 
 package fi.csc.idp.stepup.impl;
 
-
 import javax.annotation.Nonnull;
 
 import org.slf4j.Logger;
@@ -33,7 +32,11 @@ import fi.csc.idp.stepup.api.ChallengeGenerator;
 
 import com.warrenstrange.googleauth.GoogleAuthenticator;
 import com.warrenstrange.googleauth.GoogleAuthenticatorKey;
-/** class implementing shared secret generation for google authenticator (RFC6238). */
+
+/**
+ * class implementing shared secret generation for google authenticator
+ * (RFC6238).
+ */
 public class GoogleAuthenticatorSharedSecretGenerator implements ChallengeGenerator {
 
     /** Class logger. */
@@ -45,10 +48,10 @@ public class GoogleAuthenticatorSharedSecretGenerator implements ChallengeGenera
         log.trace("Entering");
         GoogleAuthenticator gAuth = new GoogleAuthenticator();
         final GoogleAuthenticatorKey key = gAuth.createCredentials();
-        log.debug("Secret key with value "+key.getKey()+" created");
+        log.debug("Secret key with value " + key.getKey() + " created");
         log.trace("Leaving");
-        //We might want to start returning whole object
-        //..that means we need to change return type here and in context.
+        // We might want to start returning whole object
+        // ..that means we need to change return type here and in context.
         return key.getKey();
     }
 

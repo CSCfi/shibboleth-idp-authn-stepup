@@ -46,6 +46,19 @@ abstract public class AbstractStepUpAccount implements StepUpAccount {
     /** Target parameter for challenge **/
     private String target;
 
+    private String id;
+
+    @Override
+    public String getId() {
+        return id;
+    }
+
+    @Override
+    public void setId(String id) {
+        this.id = id;
+
+    }
+
     public String getChallenge() {
         return challenge;
     }
@@ -127,6 +140,7 @@ abstract public class AbstractStepUpAccount implements StepUpAccount {
         this.target = target;
     }
 
+    @Override
     public String getTarget() {
         return target;
     }

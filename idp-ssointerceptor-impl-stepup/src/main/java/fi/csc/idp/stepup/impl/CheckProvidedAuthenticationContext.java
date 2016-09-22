@@ -23,7 +23,6 @@
 
 package fi.csc.idp.stepup.impl;
 
-
 import java.security.Principal;
 import java.util.HashMap;
 import java.util.List;
@@ -45,94 +44,81 @@ import fi.csc.idp.stepup.api.StepUpEventIds;
 import fi.okm.mpass.shibboleth.authn.context.ShibbolethSpAuthenticationContext;
 
 /**
- * This action is performed always in a phase where need for step up
- * has already been established.
+ * This action is performed always in a phase where need for step up has already
+ * been established.
  * 
- * Action checks if the originally provided authentication method
- * value matches a whitelist map of idp,method - values. If there is a match,  
- * further actions to perform stepup are not seen as necessary.
+ * Action checks if the originally provided authentication method value matches
+ * a whitelist map of idp,method - values. If there is a match, further actions
+ * to perform stepup are not seen as necessary.
  * 
  * 
  */
 @SuppressWarnings("rawtypes")
-public class CheckProvidedAuthenticationContext extends
-        AbstractAuthenticationAction {
-    
-    
+public class CheckProvidedAuthenticationContext extends AbstractAuthenticationAction {
+
     /** Class logger. */
     @Nonnull
-    private final Logger log = LoggerFactory
-            .getLogger(CheckProvidedAuthenticationContext.class);
+    private final Logger log = LoggerFactory.getLogger(CheckProvidedAuthenticationContext.class);
 
-     
     /** Trusted providers and their stepup methods. */
-    private  Map<String, List<Principal>> trustedStepupProviders;
-    
+    private Map<String, List<Principal>> trustedStepupProviders;
+
     /**
      * Method sets the map of trusted providers and their methods.
-     *  
-     * @param stepupProviders map of trusted providers and methods.
-     * @param <T> Principal
+     * 
+     * @param stepupProviders
+     *            map of trusted providers and methods.
+     * @param <T>
+     *            Principal
      */
     @SuppressWarnings("unchecked")
     public <T extends Principal> void setTrustedStepupProviders(@Nonnull Map<String, List<T>> stepupProviders) {
         log.trace("Entering");
         this.trustedStepupProviders = new HashMap<String, List<Principal>>();
-        for ( Map.Entry<String, List<T>>entry:stepupProviders.entrySet()){
-            this.trustedStepupProviders.put(entry.getKey(), (List<Principal>) entry.getValue());   
+        for (Map.Entry<String, List<T>> entry : stepupProviders.entrySet()) {
+            this.trustedStepupProviders.put(entry.getKey(), (List<Principal>) entry.getValue());
         }
         log.trace("Leaving");
     }
-    
 
-        
-   
     /** {@inheritDoc} */
     @Override
-    protected void doExecute(
-            @Nonnull final ProfileRequestContext profileRequestContext,
+    protected void doExecute(@Nonnull final ProfileRequestContext profileRequestContext,
             @Nonnull final AuthenticationContext authenticationContext) {
         log.trace("Entering");
-        
+
         final ShibbolethSpAuthenticationContext shibbolethContext = authenticationContext
                 .getSubcontext(ShibbolethSpAuthenticationContext.class);
         if (shibbolethContext == null || shibbolethContext.getIdp() == null) {
             log.debug("{} Could not get shib proxy context", getLogPrefix());
-            ActionSupport.buildEvent(profileRequestContext,
-                    StepUpEventIds.EVENTID_MISSING_SHIBSPCONTEXT);
+            ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EVENTID_MISSING_SHIBSPCONTEXT);
             log.trace("Leaving");
             return;
         }
-        Principal providedMethod=null;
-        if (shibbolethContext.getContextClass() != null){
-            providedMethod=new AuthnContextClassRefPrincipal(shibbolethContext.getContextClass()); 
-        }else if (shibbolethContext.getContextDecl() != null){
-            providedMethod=new AuthnContextDeclRefPrincipal(shibbolethContext.getContextDecl()); 
+        Principal providedMethod = null;
+        if (shibbolethContext.getContextClass() != null) {
+            providedMethod = new AuthnContextClassRefPrincipal(shibbolethContext.getContextClass());
+        } else if (shibbolethContext.getContextDecl() != null) {
+            providedMethod = new AuthnContextDeclRefPrincipal(shibbolethContext.getContextDecl());
         }
-        if (providedMethod == null){
+        if (providedMethod == null) {
             log.debug("{} Could not get authentication method ", getLogPrefix());
-            ActionSupport.buildEvent(profileRequestContext,
-                    StepUpEventIds.EVENTID_INVALID_SHIBSPCONTEXT);
+            ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EVENTID_INVALID_SHIBSPCONTEXT);
             log.trace("Leaving");
             return;
         }
-        if (trustedStepupProviders == null || !trustedStepupProviders.containsKey(shibbolethContext.getIdp())){
-            ActionSupport.buildEvent(profileRequestContext,
-                    StepUpEventIds.EVENTID_CONTINUE_STEPUP);
+        if (trustedStepupProviders == null || !trustedStepupProviders.containsKey(shibbolethContext.getIdp())) {
+            ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EVENTID_CONTINUE_STEPUP);
             log.trace("Leaving");
             return;
         }
-        if (trustedStepupProviders.get(shibbolethContext.getIdp()).contains(providedMethod)){
-            //The provided value is treated as step up, step up not performed
-            ActionSupport.buildEvent(profileRequestContext,
-                    StepUpEventIds.EVENTID_AUTHNCONTEXT_STEPUP);
-            return;   
+        if (trustedStepupProviders.get(shibbolethContext.getIdp()).contains(providedMethod)) {
+            // The provided value is treated as step up, step up not performed
+            ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EVENTID_AUTHNCONTEXT_STEPUP);
+            return;
         }
-        ActionSupport.buildEvent(profileRequestContext,
-                StepUpEventIds.EVENTID_CONTINUE_STEPUP);
+        ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EVENTID_CONTINUE_STEPUP);
         log.trace("Leaving");
     }
-    
-    
 
 }

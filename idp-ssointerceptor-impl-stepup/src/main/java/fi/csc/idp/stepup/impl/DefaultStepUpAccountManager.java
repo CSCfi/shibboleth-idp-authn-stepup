@@ -9,12 +9,10 @@ import org.slf4j.LoggerFactory;
 
 import fi.csc.idp.stepup.api.StepUpAccount;
 
-
-public class DefaultStepUpAccountManager extends AbstractStepUpAccountManager  {
+public class DefaultStepUpAccountManager extends AbstractStepUpAccountManager {
 
     /** Class logger. */
     @Nonnull
     private final Logger log = LoggerFactory.getLogger(DefaultStepUpAccountManager.class);
-    
-   
+
 }

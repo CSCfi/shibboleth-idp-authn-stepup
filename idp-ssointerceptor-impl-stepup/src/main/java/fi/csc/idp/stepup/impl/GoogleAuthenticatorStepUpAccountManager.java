@@ -34,11 +34,11 @@ import net.shibboleth.idp.attribute.IdPAttributeValue;
 import net.shibboleth.idp.attribute.StringAttributeValue;
 import net.shibboleth.idp.attribute.context.AttributeContext;
 
-public class AttributeTargetBasedStepUpAccountManager extends AbstractStepUpAccountManager {
+public class GoogleAuthenticatorStepUpAccountManager extends AbstractStepUpAccountManager {
 
     /** Class logger. */
     @Nonnull
-    private final Logger log = LoggerFactory.getLogger(AttributeTargetBasedStepUpAccountManager.class);
+    private final Logger log = LoggerFactory.getLogger(GoogleAuthenticatorStepUpAccountManager.class);
 
     /** The attribute ID to look for. */
     private String attributeId;
@@ -47,11 +47,28 @@ public class AttributeTargetBasedStepUpAccountManager extends AbstractStepUpAcco
         this.attributeId = attributeId;
     }
 
+    /**
+     * We add a new GA account to list of accounts.
+     * 
+     * TODO: ACCOUNT IS NOT STORED TO STORAGE YET
+     */
+    @Override
+    public StepUpAccount addAccount() {
+        log.trace("Entering & Leaving");
+        StepUpAccount account = (StepUpAccount) getAppContext().getBean(getAccountID());
+        getAccounts().add(account);
+        return account;
+    }
+
     @Override
     public boolean Initialize(AttributeContext attributeContext) {
+
+        // STORE THE KEY..HAS TO BE STORED FOR ACCOUNT CREATION
+
         log.trace("Entering & Leaving");
         String target = null;
         log.debug("Adding accounts of type " + getName());
+
         IdPAttribute attribute = attributeContext.getIdPAttributes().get(attributeId);
         if (attribute == null) {
             log.debug("Not able to create accounts, Attributes do not contain value for " + attributeId);
@@ -64,11 +81,14 @@ public class AttributeTargetBasedStepUpAccountManager extends AbstractStepUpAcco
                 target = ((StringAttributeValue) value).getValue();
                 if (target != null) {
                     log.debug("Adding account with target value " + target);
-                    StepUpAccount account = (StepUpAccount) getAppContext().getBean(getAccountID());
-                    account.setTarget(target);
-                    getAccounts().add(account);
+                    /*
+                     * StepUpAccount account = (StepUpAccount)
+                     * getAppContext().getBean(getAccountID());
+                     * account.setTarget(target); getAccounts().add(account);
+                     */
                 }
             }
+
         }
         log.trace("Leaving");
         return true;

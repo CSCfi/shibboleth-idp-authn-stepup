@@ -33,28 +33,26 @@ import com.warrenstrange.googleauth.GoogleAuthenticator;
 import fi.csc.idp.stepup.api.ChallengeVerifier;
 
 // GENERATE STEPUP is performed before!!
-    //CHECKS AND SETS THE KEY BY CHECKING A ATTRIBUTE
-    //CREATES A CHALLENGE, DUMMY IN THIS CASE
-    //CALLS SEND METHOD, DUMMY IN THIS CASE
+//CHECKS AND SETS THE KEY BY CHECKING A ATTRIBUTE
+//CREATES A CHALLENGE, DUMMY IN THIS CASE
+//CALLS SEND METHOD, DUMMY IN THIS CASE
 //ALL WE NEED IS THE KEY PROVIDED BY FIRST PHASE??
 
-
-
-/** class implementing challenge response verification based on equality.*/
+/** class implementing challenge response verification based on equality. */
 public class GoogleAuthenticatorResponseVerifier implements ChallengeVerifier {
 
     /** Class logger. */
     @Nonnull
-    private final Logger log = LoggerFactory
-            .getLogger(GoogleAuthenticatorResponseVerifier.class);
+    private final Logger log = LoggerFactory.getLogger(GoogleAuthenticatorResponseVerifier.class);
+
     @Override
-    public boolean verify(String key, String response, String target){
+    public boolean verify(String key, String response, String target) {
         log.trace("Entering");
-        log.debug("Verificating response "+response+" against key"+key);
+        log.debug("Verificating response " + response + " against key" + key);
         GoogleAuthenticator gAuth = new GoogleAuthenticator();
-        int code=Integer.parseInt(response);
-        log.trace("Leaving");    
-        //TODO: key must be decrypted
+        int code = Integer.parseInt(response);
+        log.trace("Leaving");
+        // TODO: key must be decrypted
         return gAuth.authorize(key, code);
     }
 
