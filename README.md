@@ -1,5 +1,8 @@
 # Shibboleth IdP Stepup Proxy
 
+# NOTE
+Module is now under heavy modification and git used for daily commits for that. Project amy compile but that's about it. I will remove this note once refactoring is complete.
+
 ## Overview
 These modules contain extensions to achieve stepup authentication in a proxy based on Shibboleth IdP 3 and Shibboleth SP. You may want to read overall [description](https://confluence.csc.fi/display/HAKA/Description+of+SAML2+Proxy+capable+of+elevating+authentication) of the whole proxy before going forward.
 
