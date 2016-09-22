@@ -33,6 +33,10 @@
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>net.shibboleth.idp</groupId>
+			<artifactId>idp-authn-api</artifactId>
+		</dependency>
 	</dependencies>
 	<build>
 		<plugins>
