@@ -36,37 +36,37 @@ public final class StepUpEventIds {
     @Nonnull
     @NotEmpty
     public static final String EXCEPTION = "StepUpException";
-    
+
     /** event id for case of missing or invalid relying party context. */
     @Nonnull
     @NotEmpty
     public static final String EVENTID_INVALID_RPCONTEXT = "InvalidRPContext";
-    
+
     /** event id for case of missing verifier implementation. */
     @Nonnull
     @NotEmpty
     public static final String EVENTID_MISSING_VERIFIERIMPL = "MissingVerifierImpl";
-    
+
     /** event id for case of missing sender implementation. */
     @Nonnull
     @NotEmpty
     public static final String EVENTID_MISSING_SENDERIMPL = "MissingSenderImpl";
-    
+
     /** event id for case of missing generator implementation. */
     @Nonnull
     @NotEmpty
     public static final String EVENTID_MISSING_GENERATORIMPL = "MissingGeneratorImpl";
-    
+
     /** event id for case of missing attribute context. */
     @Nonnull
     @NotEmpty
     public static final String EVENTID_MISSING_ATTRIBUTECONTEXT = "MissingAttributeContext";
-    
+
     /** event id for case of missing shibboleth sp context. */
     @Nonnull
     @NotEmpty
     public static final String EVENTID_MISSING_SHIBSPCONTEXT = "MissingShibSPContext";
-    
+
     /** event id for case of missing stepup context. */
     @Nonnull
     @NotEmpty
@@ -76,7 +76,7 @@ public final class StepUpEventIds {
     @Nonnull
     @NotEmpty
     public static final String EVENTID_INVALID_SHIBSPCONTEXT = "InvalidShibSPContext";
-    
+
     /**
      * event id for case of requested authentication context that is not step
      * up.
@@ -84,10 +84,9 @@ public final class StepUpEventIds {
     @Nonnull
     @NotEmpty
     public static final String EVENTID_AUTHNCONTEXT_NOT_STEPUP = "AuthnContextNotStepUp";
-    
+
     /**
-     * event id for case of provider already offering step up level
-     * up.
+     * event id for case of provider already offering step up level up.
      */
     @Nonnull
     @NotEmpty

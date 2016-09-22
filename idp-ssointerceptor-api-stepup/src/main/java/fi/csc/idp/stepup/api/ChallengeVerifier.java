@@ -39,7 +39,6 @@ public interface ChallengeVerifier {
      *            responding to challenge.
      * @return boolean true if the response was acceptable.
      */
-    boolean verify(final String challenge, final String response,
-            final String target);
+    boolean verify(final String challenge, final String response, final String target);
 
 }

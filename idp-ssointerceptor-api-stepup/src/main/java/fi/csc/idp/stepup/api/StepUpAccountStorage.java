@@ -40,8 +40,7 @@ public interface StepUpAccountStorage {
      * 
      */
     void store(final String secret, final String id) throws Exception;
-   
-   
+
     /**
      * Add a account.
      * 
@@ -49,27 +48,26 @@ public interface StepUpAccountStorage {
      * @throws Exception
      */
     void add(final StepUpAccount account, String key) throws Exception;
-    
+
     /**
-     * Remove a  account.
+     * Remove a account.
      * 
      * @param account
      * @throws Exception
      */
     void remove(final StepUpAccount account, String key) throws Exception;
-    
-    
+
     /**
-     * update a  account.
+     * update a account.
      * 
      * @param account
      * @throws Exception
      */
     void update(final StepUpAccount account, String key) throws Exception;
-    
-    
+
     /**
      * Return all accounts of given key value
+     * 
      * @param key
      * @return
      */

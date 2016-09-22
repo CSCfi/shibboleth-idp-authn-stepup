@@ -25,20 +25,19 @@ package fi.csc.idp.stepup.api;
 import org.opensaml.messaging.context.BaseContext;
 
 /** Context for passing challenge and target between actions. */
-public class StepUpContext extends BaseContext{
-    
+public class StepUpContext extends BaseContext {
+
     /** Challenge for the user. */
     private String challenge;
     /** Challenge target representing the user. */
     private String target;
-    /** Challenge for the user. Stored to context only for
-     * presenting it to user */
+    /**
+     * Challenge for the user. Stored to context only for presenting it to user
+     */
     private String sharedSecret;
-    
 
     /**
-     * For presenting the secret to user 
-     * in registration phase.
+     * For presenting the secret to user in registration phase.
      * 
      * @return shared secret.
      */
@@ -47,8 +46,7 @@ public class StepUpContext extends BaseContext{
     }
 
     /**
-     * For setting the secret to 
-     * context.
+     * For setting the secret to context.
      * 
      * @param sharedSecret
      */
@@ -68,7 +66,8 @@ public class StepUpContext extends BaseContext{
     /**
      * Setter for target parameter.
      * 
-     * @param targetValue represents the user
+     * @param targetValue
+     *            represents the user
      */
     public void setTarget(String targetValue) {
         this.target = targetValue;
@@ -86,7 +85,8 @@ public class StepUpContext extends BaseContext{
     /**
      * Setter for challenge parameter.
      * 
-     * @param challengeValue presented to user
+     * @param challengeValue
+     *            presented to user
      */
     public void setChallenge(String challengeValue) {
         this.challenge = challengeValue;
