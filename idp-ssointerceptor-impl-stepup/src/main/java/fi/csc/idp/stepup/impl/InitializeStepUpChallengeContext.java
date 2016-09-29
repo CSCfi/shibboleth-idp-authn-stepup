@@ -79,12 +79,9 @@ public class InitializeStepUpChallengeContext extends AbstractAuthenticationActi
     /** proxy authentication context. */
     private ShibbolethSpAuthenticationContext shibbolethContext;
 
-    // TODO: CLASS->METH MAP IS WRONG WAY
-    // IT MAY LEAD TO HAVING SAME METHS SEVERAL TIMES IF WE HAVE
-    // SEVERAL AUTH METHS HAVING SAME STEPUP METHS
-    // THINK BETTER
-
-    // HAS TO BE METHOD->LIST OF AUTH CLASSES
+    // TODO: CLASS->2nd fac meth map is not feasible when more auth classes added.
+    // It will lead to possibly having same methods listed multiple times
+    // Change to 2nd fac meth map->LIST OF AUTH CLASSES
     /** StepUp Methods. */
     private Map<Principal, StepUpMethod> stepUpMethods;
 
@@ -173,9 +170,17 @@ public class InitializeStepUpChallengeContext extends AbstractAuthenticationActi
             // attribute context
             // accounts may need attribute information
             log.debug("Initializing StepUp method and accounts for " + stepupMethod.getName());
-            if (!stepupMethod.Initialize(attributeContext)) {
-                log.debug("Not able to initialize method " + stepupMethod.getName() + " removed from available methods");
-                stepUpMethods.values().remove(stepupMethod);
+            try {
+                if (!stepupMethod.Initialize(attributeContext)) {
+                    log.debug("Not able to initialize method " + stepupMethod.getName() + " removed from available methods");
+                    stepUpMethods.values().remove(stepupMethod);
+                }
+            } catch (Exception e) {
+                log.debug("Something unexpected happened", getLogPrefix());
+                log.error(e.getMessage());
+                ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EXCEPTION);
+                log.trace("Leaving");
+                return;
             }
         }
         // Set all available initializable methods to context
@@ -189,19 +194,27 @@ public class InitializeStepUpChallengeContext extends AbstractAuthenticationActi
                 log.debug("Setting method " + stepUpMethods.get(authMethod).getName() + " as default method");
                 stepUpMethodContext.setStepUpMethod(stepUpMethods.get(authMethod));
                 // That method has accounts
-                if (stepUpMethods.get(authMethod).getAccounts() != null)
-                    for (StepUpAccount account : stepUpMethods.get(authMethod).getAccounts()) {
-                        // and the account is enabled
-                        if (account.isEnabled()) {
-                            log.debug("Setting a default stepup account");
-                            log.debug("Account type is " + stepUpMethods.get(authMethod).getName());
-                            log.debug("Account name is " + account.getName() == null ? "" : account.getName());
-                            stepUpMethodContext.setStepUpAccount(account);
-                            log.trace("Leaving");
-                            ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EVENTID_CONTINUE_STEPUP);
-                            return;
+                try {
+                    if (stepUpMethods.get(authMethod).getAccounts() != null)
+                        for (StepUpAccount account : stepUpMethods.get(authMethod).getAccounts()) {
+                            // and the account is enabled
+                            if (account.isEnabled()) {
+                                log.debug("Setting a default stepup account");
+                                log.debug("Account type is " + stepUpMethods.get(authMethod).getName());
+                                log.debug("Account name is " + account.getName() == null ? "" : account.getName());
+                                stepUpMethodContext.setStepUpAccount(account);
+                                log.trace("Leaving");
+                                ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EVENTID_CONTINUE_STEPUP);
+                                return;
+                            }
                         }
-                    }
+                } catch (Exception e) {
+                    log.debug("Something unexpected happened", getLogPrefix());
+                    log.error(e.getMessage());
+                    ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EXCEPTION);
+                    log.trace("Leaving");
+                    return;
+                }
             }
 
         }

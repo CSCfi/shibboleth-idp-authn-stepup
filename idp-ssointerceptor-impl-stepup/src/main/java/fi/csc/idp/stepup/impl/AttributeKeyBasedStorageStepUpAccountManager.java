@@ -26,6 +26,9 @@ package fi.csc.idp.stepup.impl;
 import java.util.List;
 
 import javax.annotation.Nonnull;
+//import javax.sql.DataSource;
+
+
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,6 +39,7 @@ import net.shibboleth.idp.attribute.IdPAttribute;
 import net.shibboleth.idp.attribute.IdPAttributeValue;
 import net.shibboleth.idp.attribute.StringAttributeValue;
 import net.shibboleth.idp.attribute.context.AttributeContext;
+
 
 public class AttributeKeyBasedStorageStepUpAccountManager extends AbstractStepUpAccountManager {
 
@@ -65,33 +69,33 @@ public class AttributeKeyBasedStorageStepUpAccountManager extends AbstractStepUp
     /**
      * We add a new GA account to list of accounts.
      * 
-     * TODO: ACCOUNT IS NOT STORED TO STORAGE YET
      * @throws Exception 
      */
     @Override
     public StepUpAccount addAccount() throws Exception {
         log.trace("Entering");
+        
         if (stepUpAccountStorage == null) {
             log.error("Storage implementation not set, cannot add accounts");
             log.trace("Leaving");
             return null;
         }
-        //Creates a account that is hopefully wired right
         StepUpAccount account = (StepUpAccount) getAppContext().getBean(getAccountID());
+        account.setEnabled(true);
         getAccounts().add(account);
         stepUpAccountStorage.add(account, key);
         return account;
     }
 
     @Override
-    public boolean Initialize(AttributeContext attributeContext) {
+    public boolean Initialize(AttributeContext attributeContext) throws Exception {
 
         log.trace("Entering");
         log.debug("Adding accounts of type " + getName());
         key = null;
         getAccounts().clear();
         if (stepUpAccountStorage == null) {
-            log.error("Storage implementation not set, cannot add accounts");
+            log.error("repository implementation not set, cannot add accounts");
             log.trace("Leaving");
             return false;
         }
@@ -112,7 +116,7 @@ public class AttributeKeyBasedStorageStepUpAccountManager extends AbstractStepUp
                     continue;
                 }
                 log.debug("Adding accounts with key value " + key);
-                List<StepUpAccount> accounts=stepUpAccountStorage.getAccounts(key);
+                List<StepUpAccount> accounts=stepUpAccountStorage.getAccounts(key,getAppContext().getBean(getAccountID()).getClass());
                 if (accounts!=null && accounts.size()>0){
                     log.debug("Adding "+accounts.size()+" accounts with key value " + key);
                     getAccounts().addAll(accounts);

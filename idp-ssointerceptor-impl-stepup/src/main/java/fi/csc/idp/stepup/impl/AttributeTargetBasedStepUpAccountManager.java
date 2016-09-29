@@ -66,7 +66,16 @@ public class AttributeTargetBasedStepUpAccountManager extends AbstractStepUpAcco
                     log.debug("Adding account with target value " + target);
                     StepUpAccount account = (StepUpAccount) getAppContext().getBean(getAccountID());
                     account.setTarget(target);
-                    getAccounts().add(account);
+                    account.setEnabled(true);
+                    //Accounts cannot be stored and therefore also not edited  
+                    account.setEditable(false);
+                    try {
+                        getAccounts().add(account);
+                    } catch (Exception e) {
+                        log.debug("Not able to add account during initialization");
+                        log.trace("Leaving");
+                        return false;
+                    }
                 }
             }
         }

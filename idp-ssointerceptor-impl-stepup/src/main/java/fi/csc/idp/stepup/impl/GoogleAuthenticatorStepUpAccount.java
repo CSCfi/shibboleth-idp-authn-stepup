@@ -36,11 +36,7 @@ public class GoogleAuthenticatorStepUpAccount extends AbstractStepUpAccount {
     /** Class logger. */
     @Nonnull
     private final Logger log = LoggerFactory.getLogger(GoogleAuthenticatorStepUpAccount.class);
-
-    /**
-     * If the account does not have shared secret yet we create it.
-     */
-
+    
     @Override
     public String getTarget() {
         log.trace("Entering");
@@ -65,4 +61,5 @@ public class GoogleAuthenticatorStepUpAccount extends AbstractStepUpAccount {
         log.trace("Leaving");
     }
 
+    
 }

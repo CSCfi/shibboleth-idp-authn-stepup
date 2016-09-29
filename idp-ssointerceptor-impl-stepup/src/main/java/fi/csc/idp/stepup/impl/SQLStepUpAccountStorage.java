@@ -23,6 +23,9 @@
 
 package fi.csc.idp.stepup.impl;
 
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.annotation.Nonnull;
@@ -50,52 +53,54 @@ public class SQLStepUpAccountStorage implements StepUpAccountStorage {
     private static String userName;
     private static String password;
     private static int poolSize;
-
-    private static String insertStatement;
-
     private static String addStatement;
     private static String updateStatement;
     private static String removeStatement;
     private static String listStatement;
 
     public void setJdbcUrl(String jdbcUrl) {
+        log.trace("Entering & Leaving");
         SQLStepUpAccountStorage.jdbcUrl = jdbcUrl;
     }
 
     public void setPassword(String password) {
+        log.trace("Entering & Leaving");
         SQLStepUpAccountStorage.password = password;
     }
 
     public void setUserName(String userName) {
+        log.trace("Entering & Leaving");
         SQLStepUpAccountStorage.userName = userName;
     }
 
     public void setPoolSize(int poolSize) {
+        log.trace("Entering & Leaving");
         SQLStepUpAccountStorage.poolSize = poolSize;
     }
 
-    public void setInsertStatement(String insertStatement) {
-        SQLStepUpAccountStorage.insertStatement = insertStatement;
-    }
-
-    public static void setAddStatement(String addStatement) {
+    
+    public void setAddStatement(String addStatement) {
+        log.trace("Entering & Leaving");
         SQLStepUpAccountStorage.addStatement = addStatement;
     }
 
-    public static void setUpdateStatement(String updateStatement) {
+    public void setUpdateStatement(String updateStatement) {
+        log.trace("Entering & Leaving");
         SQLStepUpAccountStorage.updateStatement = updateStatement;
     }
 
-    public static void setRemoveStatement(String removeStatement) {
+    public void setRemoveStatement(String removeStatement) {
+        log.trace("Entering & Leaving");
         SQLStepUpAccountStorage.removeStatement = removeStatement;
     }
 
-    public static void setListStatement(String listStatement) {
+    public void setListStatement(String listStatement) {
+        log.trace("Entering & Leaving");
         SQLStepUpAccountStorage.listStatement = listStatement;
     }
 
-    public static DataSource getDataSource() {
-
+    public DataSource getDataSource() {
+        log.trace("Entering");
         if (datasource == null) {
             HikariConfig config = new HikariConfig();
             config.setJdbcUrl(jdbcUrl);
@@ -105,49 +110,75 @@ public class SQLStepUpAccountStorage implements StepUpAccountStorage {
             config.setAutoCommit(true);
             datasource = new HikariDataSource(config);
         }
+        log.trace("Leaving");
         return datasource;
     }
 
+   
     @Override
-    public void store(String secret, String id) throws Exception {
+    public void add(StepUpAccount account, String key) throws Exception {
         log.trace("Entering");
-        log.debug("Storing secret " + secret + " by key " + id);
-        /**
-         * To this point we setup a encrypter
-         */
-        // TODO: check SQL syntax to be correct
-        // TODO: Use prepared statement
-        getDataSource().getConnection().createStatement().executeUpdate(String.format(insertStatement, id, secret));
+        PreparedStatement add=getDataSource().getConnection().prepareStatement(addStatement);
+        add.setString(1, account.getName());
+        add.setBoolean(2, account.isEnabled());
+        add.setBoolean(3, account.isEditable());
+        add.setString(4, account.getTarget());
+        add.setString(5, key);
+        add.executeUpdate();
+        getDataSource().getConnection().commit();
         log.trace("Leaving");
     }
 
     @Override
-    public void add(StepUpAccount account, String key) throws Exception {
-        // TODO Auto-generated method stub
-        // ADD ACCOUNT STORE NAME, STATUS AND TARGET by KEY
-        account.getName();
-        account.isEnabled();
-        account.getTarget();
-        account.getId();
-
-    }
-
-    @Override
     public void remove(StepUpAccount account, String key) throws Exception {
-        // TODO Auto-generated method stub
+        log.trace("Entering");
+        PreparedStatement add=getDataSource().getConnection().prepareStatement(removeStatement);
+        add.setLong(1, account.getId());
+        add.executeUpdate();
+        getDataSource().getConnection().commit();
+        log.trace("Leaving");
 
     }
 
     @Override
     public void update(StepUpAccount account, String key) throws Exception {
-        // TODO Auto-generated method stub
-
+        log.trace("Entering");
+        PreparedStatement add=getDataSource().getConnection().prepareStatement(updateStatement);
+        add.setString(1, account.getName());
+        add.setBoolean(2, account.isEnabled());
+        add.setBoolean(3, account.isEditable());
+        add.setString(4, account.getTarget());
+        add.setString(5, key);
+        add.setLong(1, account.getId());
+        add.executeUpdate();
+        getDataSource().getConnection().commit();
+        log.trace("Leaving");
     }
 
     @Override
-    public List<StepUpAccount> getAccounts(String key) {
-        // TODO Auto-generated method stub
-        return null;
+    public <T> List<StepUpAccount> getAccounts(String key, Class<T> aClass) throws Exception {
+        log.trace("Entering");
+        log.debug("About to read accounts for "+key);
+        List<StepUpAccount> accounts= new ArrayList<StepUpAccount>();
+        PreparedStatement list=getDataSource().getConnection().prepareStatement(listStatement);
+        list.setString(1, key);
+        ResultSet rs=list.executeQuery();
+        while(rs.next()){
+            Object obj=aClass.newInstance();
+            if (! (obj instanceof StepUpAccount)){
+                throw new Exception("Unable to instantiate StepUpAccount");
+            }
+            StepUpAccount stepUpAccount=(StepUpAccount)obj;
+            stepUpAccount.setId(rs.getInt("id"));
+            stepUpAccount.setName(rs.getString("name"));
+            stepUpAccount.setEnabled(rs.getBoolean("enabled"));
+            stepUpAccount.setTarget(rs.getString("target"));
+            //This is set last 
+            stepUpAccount.setEditable(rs.getBoolean("editable"));
+            accounts.add(stepUpAccount);
+        }
+        log.trace("Leaving");
+        return accounts;
     }
 
 }

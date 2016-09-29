@@ -46,15 +46,24 @@ abstract public class AbstractStepUpAccount implements StepUpAccount {
     /** Target parameter for challenge **/
     private String target;
 
-    private String id;
+    private long id;
+    /** Challenge Generator. */
+    private ChallengeGenerator challengeGenerator;
+    private boolean editable;
+    private boolean enabled;
+    
+    public AbstractStepUpAccount() {
+        super();
+        this.editable=true;
+    }
 
     @Override
-    public String getId() {
+    public long getId() {
         return id;
     }
 
     @Override
-    public void setId(String id) {
+    public void setId(long id) {
         this.id = id;
 
     }
@@ -63,12 +72,7 @@ abstract public class AbstractStepUpAccount implements StepUpAccount {
         return challenge;
     }
 
-    /** Challenge Generator. */
-    private ChallengeGenerator challengeGenerator;
-
-    public AbstractStepUpAccount() {
-        super();
-    }
+    
 
     public void setChallengeGenerator(ChallengeGenerator challengeGenerator) {
         log.trace("Entering & Leaving");
@@ -94,20 +98,36 @@ abstract public class AbstractStepUpAccount implements StepUpAccount {
     @Override
     public boolean isEditable() {
         log.trace("Entering & Leaving");
-        return false;
+        return this.editable;
     }
+    
+    @Override
+    public void setEditable(boolean isEditable) {
+        log.trace("Entering");
+        if (this.editable){
+            this.editable=isEditable;
+        }else{
+            log.warn("not supported");
+        }
+        log.trace("Leaving");
+    }
+
 
     @Override
     public void setEnabled(boolean isEnabled) {
         log.trace("Entering");
-        log.debug("Method not supported");
+        if (this.editable){
+            this.enabled=isEnabled;
+        }else{
+            log.warn("not supported");
+        }
         log.trace("Leaving");
     }
 
     @Override
     public boolean isEnabled() {
         log.trace("Entering & Leaving");
-        return true;
+        return this.enabled;
     }
 
     @Override
@@ -137,12 +157,18 @@ abstract public class AbstractStepUpAccount implements StepUpAccount {
 
     @Override
     public void setTarget(String target) {
-        this.target = target;
+        log.trace("Entering");
+        if (this.editable){
+            this.target = target;
+        }else{
+            log.warn("not supported");
+        }
+        log.trace("Leaving");
     }
 
     @Override
     public String getTarget() {
-        return target;
+        return this.target;
     }
 
 }

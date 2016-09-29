@@ -84,7 +84,7 @@ public class AbstractStepUpAccountManager implements StepUpMethod {
     }
 
     @Override
-    public List<StepUpAccount> getAccounts() {
+    public List<StepUpAccount> getAccounts() throws Exception{
         log.trace("Entering & Leaving");
         return accounts;
     }
@@ -103,7 +103,7 @@ public class AbstractStepUpAccountManager implements StepUpMethod {
     }
 
     @Override
-    public boolean Initialize(AttributeContext attributeContext) {
+    public boolean Initialize(AttributeContext attributeContext) throws Exception {
         log.trace("Entering");
         getAccounts().add((StepUpAccount) getAppContext().getBean(getAccountID()));
         log.trace("Leaving");
