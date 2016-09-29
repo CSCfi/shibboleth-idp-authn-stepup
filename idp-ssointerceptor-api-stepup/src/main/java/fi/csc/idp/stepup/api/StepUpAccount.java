@@ -7,7 +7,7 @@ public interface StepUpAccount {
      * 
      * @return id
      */
-    public String getId();
+    public long getId();
 
     /**
      * Set id of the account.
@@ -15,7 +15,7 @@ public interface StepUpAccount {
      * @param id
      *            of account
      */
-    public void setId(String id);
+    public void setId(long id);
 
     /**
      * Name of the account.
@@ -38,6 +38,14 @@ public interface StepUpAccount {
      * @return true if accounts can be modified
      */
     public boolean isEditable();
+    
+    /**
+     * If account can be modified.
+     * 
+     * @return true if accounts can be modified
+     */
+    public void setEditable(boolean isEditable);
+    
 
     /**
      * Set the account enabled/disabled.
@@ -73,11 +81,11 @@ public interface StepUpAccount {
     public boolean verifyResponse(String response) throws Exception;
 
     /**
-     * Target parameter for the challenge sending. Not applicable for all
-     * implementations.
+     * Target parameter for stepup operations. May be sms number, email address, shared secret or what
+     * ever is applicable for the implementation. 
      * 
      * @param target
-     *            to send challenge to
+     *            to send challenge to or form of.
      */
     public void setTarget(String target);
 

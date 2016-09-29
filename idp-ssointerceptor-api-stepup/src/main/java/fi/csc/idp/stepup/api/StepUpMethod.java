@@ -12,7 +12,7 @@ public interface StepUpMethod {
      * @param attributeContext
      */
 
-    public boolean Initialize(AttributeContext attributeContext);
+    public boolean Initialize(AttributeContext attributeContext) throws Exception;
 
     /**
      * Name of the stepup method.
@@ -33,7 +33,7 @@ public interface StepUpMethod {
      * 
      * @return list of accounts
      */
-    public List<StepUpAccount> getAccounts();
+    public List<StepUpAccount> getAccounts() throws Exception;
 
     /**
      * Adds a new account.

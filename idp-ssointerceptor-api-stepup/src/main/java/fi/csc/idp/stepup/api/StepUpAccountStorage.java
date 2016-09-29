@@ -28,19 +28,7 @@ import java.util.List;
 /** interface for passing the challenge to target. */
 public interface StepUpAccountStorage {
 
-    /**
-     * Stores the shared secret.
-     * 
-     * @param secret
-     *            to be stored.
-     * @param id
-     *            to identify the secret. Represents the user in most cases.
-     * @throws Exception
-     *             if the storing of the key has failed.
-     * 
-     */
-    void store(final String secret, final String id) throws Exception;
-
+   
     /**
      * Add a account.
      * 
@@ -71,5 +59,5 @@ public interface StepUpAccountStorage {
      * @param key
      * @return
      */
-    List<StepUpAccount> getAccounts(String key);
+     <T> List<StepUpAccount> getAccounts(String key, Class<T> aClass) throws Exception;
 }
