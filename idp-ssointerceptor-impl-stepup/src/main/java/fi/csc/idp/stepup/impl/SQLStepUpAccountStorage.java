@@ -46,28 +46,30 @@ public class SQLStepUpAccountStorage implements StepUpAccountStorage {
     /** Class logger. */
     @Nonnull
     private static final Logger log = LoggerFactory.getLogger(SQLStepUpAccountStorage.class);
-    /** datasource constructed.*/
-    private static  DataSource datasource;
-    /** url for the database connection.*/
+    /** datasource constructed. */
+    private static DataSource datasource;
+    /** url for the database connection. */
     private static String jdbcUrl;
-    /** username for database connection.*/
+    /** username for database connection. */
     private static String userName;
-    /** password for database connection.*/
+    /** password for database connection. */
     private static String password;
-    /** pool size for database connection.*/
+    /** pool size for database connection. */
     private static int poolSize;
-    /** statement for adding items.*/
+    /** statement for adding items. */
     private static String addStatement;
-    /** statement for updating items.*/
+    /** statement for updating items. */
     private static String updateStatement;
-    /** statement for removing items.*/
+    /** statement for removing items. */
     private static String removeStatement;
-    /** statement for listing items.*/
+    /** statement for listing items. */
     private static String listStatement;
 
     /**
      * Setter for database connection url.
-     * @param url for connection
+     * 
+     * @param url
+     *            for connection
      */
     public void setJdbcUrl(String url) {
         log.trace("Entering & Leaving");
@@ -76,7 +78,9 @@ public class SQLStepUpAccountStorage implements StepUpAccountStorage {
 
     /**
      * Setter for database connection password.
-     * @param psswd for connection
+     * 
+     * @param psswd
+     *            for connection
      */
     public void setPassword(String psswd) {
         log.trace("Entering & Leaving");
@@ -85,7 +89,9 @@ public class SQLStepUpAccountStorage implements StepUpAccountStorage {
 
     /**
      * Setter for database connection user name.
-     * @param name user name for connection
+     * 
+     * @param name
+     *            user name for connection
      */
     public void setUserName(String name) {
         log.trace("Entering & Leaving");
@@ -94,7 +100,9 @@ public class SQLStepUpAccountStorage implements StepUpAccountStorage {
 
     /**
      * Setter for database connection pool size.
-     * @param size pool size for database connection
+     * 
+     * @param size
+     *            pool size for database connection
      */
     public void setPoolSize(int size) {
         log.trace("Entering & Leaving");
@@ -103,7 +111,9 @@ public class SQLStepUpAccountStorage implements StepUpAccountStorage {
 
     /**
      * Setter for add statement.
-     * @param statement add statement.
+     * 
+     * @param statement
+     *            add statement.
      */
     public void setAddStatement(String statement) {
         log.trace("Entering & Leaving");
@@ -112,7 +122,9 @@ public class SQLStepUpAccountStorage implements StepUpAccountStorage {
 
     /**
      * Setter for update statement.
-     * @param statement update statement.
+     * 
+     * @param statement
+     *            update statement.
      */
     public void setUpdateStatement(String statement) {
         log.trace("Entering & Leaving");
@@ -121,7 +133,9 @@ public class SQLStepUpAccountStorage implements StepUpAccountStorage {
 
     /**
      * Setter for remove statement.
-     * @param statement remove statement.
+     * 
+     * @param statement
+     *            remove statement.
      */
     public void setRemoveStatement(String statement) {
         log.trace("Entering & Leaving");
@@ -130,7 +144,9 @@ public class SQLStepUpAccountStorage implements StepUpAccountStorage {
 
     /**
      * Setter for list statement.
-     * @param statement list statement.
+     * 
+     * @param statement
+     *            list statement.
      */
     public void setListStatement(String statement) {
         log.trace("Entering & Leaving");
@@ -160,7 +176,7 @@ public class SQLStepUpAccountStorage implements StepUpAccountStorage {
     @Override
     public void add(StepUpAccount account, String key) throws Exception {
         log.trace("Entering");
-        PreparedStatement add=getDataSource().getConnection().prepareStatement(addStatement);
+        PreparedStatement add = getDataSource().getConnection().prepareStatement(addStatement);
         add.setString(1, account.getName());
         add.setBoolean(2, account.isEnabled());
         add.setBoolean(3, account.isEditable());
@@ -174,7 +190,7 @@ public class SQLStepUpAccountStorage implements StepUpAccountStorage {
     @Override
     public void remove(StepUpAccount account, String key) throws Exception {
         log.trace("Entering");
-        PreparedStatement add=getDataSource().getConnection().prepareStatement(removeStatement);
+        PreparedStatement add = getDataSource().getConnection().prepareStatement(removeStatement);
         add.setLong(1, account.getId());
         add.executeUpdate();
         getDataSource().getConnection().commit();
@@ -185,7 +201,7 @@ public class SQLStepUpAccountStorage implements StepUpAccountStorage {
     @Override
     public void update(StepUpAccount account, String key) throws Exception {
         log.trace("Entering");
-        PreparedStatement add=getDataSource().getConnection().prepareStatement(updateStatement);
+        PreparedStatement add = getDataSource().getConnection().prepareStatement(updateStatement);
         add.setString(1, account.getName());
         add.setBoolean(2, account.isEnabled());
         add.setBoolean(3, account.isEditable());
@@ -200,22 +216,22 @@ public class SQLStepUpAccountStorage implements StepUpAccountStorage {
     @Override
     public <T> List<StepUpAccount> getAccounts(String key, Class<T> aClass) throws Exception {
         log.trace("Entering");
-        log.debug("About to read accounts for "+key);
-        List<StepUpAccount> accounts= new ArrayList<StepUpAccount>();
-        PreparedStatement list=getDataSource().getConnection().prepareStatement(listStatement);
+        log.debug("About to read accounts for " + key);
+        List<StepUpAccount> accounts = new ArrayList<StepUpAccount>();
+        PreparedStatement list = getDataSource().getConnection().prepareStatement(listStatement);
         list.setString(1, key);
-        ResultSet rs=list.executeQuery();
-        while(rs.next()){
-            Object obj=aClass.newInstance();
-            if (! (obj instanceof StepUpAccount)){
+        ResultSet rs = list.executeQuery();
+        while (rs.next()) {
+            Object obj = aClass.newInstance();
+            if (!(obj instanceof StepUpAccount)) {
                 throw new Exception("Unable to instantiate StepUpAccount");
             }
-            StepUpAccount stepUpAccount=(StepUpAccount)obj;
+            StepUpAccount stepUpAccount = (StepUpAccount) obj;
             stepUpAccount.setId(rs.getInt("id"));
             stepUpAccount.setName(rs.getString("name"));
             stepUpAccount.setEnabled(rs.getBoolean("enabled"));
             stepUpAccount.setTarget(rs.getString("target"));
-            //This is set last 
+            // This is set last
             stepUpAccount.setEditable(rs.getBoolean("editable"));
             accounts.add(stepUpAccount);
         }
