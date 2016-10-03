@@ -30,18 +30,35 @@ import org.slf4j.LoggerFactory;
 
 import fi.csc.idp.stepup.api.ChallengeSender;
 
+/**
+ * Class implementing Step Up Account of type Challenge Sender. This includes
+ * types like SMS, Email etc.
+ */
 public class ChallengeSenderStepUpAccount extends AbstractStepUpAccount {
 
     /** Class logger. */
     @Nonnull
     private final Logger log = LoggerFactory.getLogger(ChallengeSenderStepUpAccount.class);
 
+    /** Challenge Sender implementation. */
     private ChallengeSender challengeSender;
 
-    public void setChallengeSender(ChallengeSender mailChallengeSender) {
-        this.challengeSender = mailChallengeSender;
+    /**
+     * Set the Challenge Sender implementation.
+     * 
+     * @param sender
+     *            Challenge Sender implementation
+     */
+    public void setChallengeSender(ChallengeSender sender) {
+        this.challengeSender = sender;
     }
 
+    /**
+     * Send Challenge using the configured implementation.
+     * 
+     * @throws Exception
+     *             if something unexpected occurred.
+     */
     @Override
     public void sendChallenge() throws Exception {
         log.trace("Entering");
