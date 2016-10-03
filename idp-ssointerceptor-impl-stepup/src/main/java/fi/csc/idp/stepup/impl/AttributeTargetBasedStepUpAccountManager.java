@@ -34,6 +34,10 @@ import net.shibboleth.idp.attribute.IdPAttributeValue;
 import net.shibboleth.idp.attribute.StringAttributeValue;
 import net.shibboleth.idp.attribute.context.AttributeContext;
 
+/**
+ * Class implementing Step Up Account manager for accounts initialized by key
+ * found in attribute values.
+ * */
 public class AttributeTargetBasedStepUpAccountManager extends AbstractStepUpAccountManager {
 
     /** Class logger. */
@@ -43,12 +47,25 @@ public class AttributeTargetBasedStepUpAccountManager extends AbstractStepUpAcco
     /** The attribute ID to look for. */
     private String attributeId;
 
-    public void setAttributeId(String attributeId) {
-        this.attributeId = attributeId;
+    /**
+     * Set the attribute id containing the value for the key.
+     * 
+     * @param id
+     *            of the attribute containing the value of key
+     */
+    public void setAttributeId(String id) {
+        this.attributeId = id;
     }
 
+    /**
+     * Initializes accounts by reading the value for key, using that to
+     * instantiate non editable accounts.
+     * 
+     * @param attributeContext
+     *            to look for the key value
+     */
     @Override
-    public boolean Initialize(AttributeContext attributeContext) {
+    public boolean initialize(AttributeContext attributeContext) {
         log.trace("Entering & Leaving");
         String target = null;
         log.debug("Adding accounts of type " + getName());
@@ -67,7 +84,7 @@ public class AttributeTargetBasedStepUpAccountManager extends AbstractStepUpAcco
                     StepUpAccount account = (StepUpAccount) getAppContext().getBean(getAccountID());
                     account.setTarget(target);
                     account.setEnabled(true);
-                    //Accounts cannot be stored and therefore also not edited  
+                    // Accounts cannot be stored and therefore also not edited
                     account.setEditable(false);
                     try {
                         getAccounts().add(account);
