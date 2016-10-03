@@ -40,65 +40,108 @@ import org.slf4j.LoggerFactory;
 import fi.csc.idp.stepup.api.StepUpAccount;
 import fi.csc.idp.stepup.api.StepUpAccountStorage;
 
-/** class implementing challenge sending by writing it to log. */
+/** SQL implementation of Step Up Account storage. */
 public class SQLStepUpAccountStorage implements StepUpAccountStorage {
 
     /** Class logger. */
     @Nonnull
-    private final Logger log = LoggerFactory.getLogger(SQLStepUpAccountStorage.class);
-
-    private static DataSource datasource;
-
+    private static final Logger log = LoggerFactory.getLogger(SQLStepUpAccountStorage.class);
+    /** datasource constructed.*/
+    private static  DataSource datasource;
+    /** url for the database connection.*/
     private static String jdbcUrl;
+    /** username for database connection.*/
     private static String userName;
+    /** password for database connection.*/
     private static String password;
+    /** pool size for database connection.*/
     private static int poolSize;
+    /** statement for adding items.*/
     private static String addStatement;
+    /** statement for updating items.*/
     private static String updateStatement;
+    /** statement for removing items.*/
     private static String removeStatement;
+    /** statement for listing items.*/
     private static String listStatement;
 
-    public void setJdbcUrl(String jdbcUrl) {
+    /**
+     * Setter for database connection url.
+     * @param url for connection
+     */
+    public void setJdbcUrl(String url) {
         log.trace("Entering & Leaving");
-        SQLStepUpAccountStorage.jdbcUrl = jdbcUrl;
+        SQLStepUpAccountStorage.jdbcUrl = url;
     }
 
-    public void setPassword(String password) {
+    /**
+     * Setter for database connection password.
+     * @param psswd for connection
+     */
+    public void setPassword(String psswd) {
         log.trace("Entering & Leaving");
-        SQLStepUpAccountStorage.password = password;
+        SQLStepUpAccountStorage.password = psswd;
     }
 
-    public void setUserName(String userName) {
+    /**
+     * Setter for database connection user name.
+     * @param name user name for connection
+     */
+    public void setUserName(String name) {
         log.trace("Entering & Leaving");
-        SQLStepUpAccountStorage.userName = userName;
+        SQLStepUpAccountStorage.userName = name;
     }
 
-    public void setPoolSize(int poolSize) {
+    /**
+     * Setter for database connection pool size.
+     * @param size pool size for database connection
+     */
+    public void setPoolSize(int size) {
         log.trace("Entering & Leaving");
-        SQLStepUpAccountStorage.poolSize = poolSize;
+        SQLStepUpAccountStorage.poolSize = size;
     }
 
-    
-    public void setAddStatement(String addStatement) {
+    /**
+     * Setter for add statement.
+     * @param statement add statement.
+     */
+    public void setAddStatement(String statement) {
         log.trace("Entering & Leaving");
-        SQLStepUpAccountStorage.addStatement = addStatement;
+        SQLStepUpAccountStorage.addStatement = statement;
     }
 
-    public void setUpdateStatement(String updateStatement) {
+    /**
+     * Setter for update statement.
+     * @param statement update statement.
+     */
+    public void setUpdateStatement(String statement) {
         log.trace("Entering & Leaving");
-        SQLStepUpAccountStorage.updateStatement = updateStatement;
+        SQLStepUpAccountStorage.updateStatement = statement;
     }
 
-    public void setRemoveStatement(String removeStatement) {
+    /**
+     * Setter for remove statement.
+     * @param statement remove statement.
+     */
+    public void setRemoveStatement(String statement) {
         log.trace("Entering & Leaving");
-        SQLStepUpAccountStorage.removeStatement = removeStatement;
+        SQLStepUpAccountStorage.removeStatement = statement;
     }
 
-    public void setListStatement(String listStatement) {
+    /**
+     * Setter for list statement.
+     * @param statement list statement.
+     */
+    public void setListStatement(String statement) {
         log.trace("Entering & Leaving");
-        SQLStepUpAccountStorage.listStatement = listStatement;
+        SQLStepUpAccountStorage.listStatement = statement;
     }
 
+    /**
+     * Get the datasource.
+     * 
+     * @return datasource
+     */
     public DataSource getDataSource() {
         log.trace("Entering");
         if (datasource == null) {
@@ -114,7 +157,6 @@ public class SQLStepUpAccountStorage implements StepUpAccountStorage {
         return datasource;
     }
 
-   
     @Override
     public void add(StepUpAccount account, String key) throws Exception {
         log.trace("Entering");
