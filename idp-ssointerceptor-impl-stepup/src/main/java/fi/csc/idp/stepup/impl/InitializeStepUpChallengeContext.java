@@ -53,11 +53,11 @@ import fi.csc.idp.stepup.api.StepUpMethodContext;
 import fi.okm.mpass.shibboleth.authn.context.ShibbolethSpAuthenticationContext;
 
 /**
- * An action that create step up challenge. The action selects attribute id,
- * challenge generator and sender implementations on the basis of requested
- * authentication context. Attribute value, if defined, is passed to challenge
- * generator, challenge is stored and passed with attribute value to challenge
- * sender.
+ * An action that initializes step up methods and accounts. Each of the
+ * configured methods are initialized. Among the initialized methods a suitable
+ * account and methods are chosen as defaults based on requested authentication
+ * context. If there is no suitable account any of the suitable methods is
+ * chosen as default method.
  * 
  */
 
@@ -79,7 +79,8 @@ public class InitializeStepUpChallengeContext extends AbstractAuthenticationActi
     /** proxy authentication context. */
     private ShibbolethSpAuthenticationContext shibbolethContext;
 
-    // TODO: CLASS->2nd fac meth map is not feasible when more auth classes added.
+    // TODO: CLASS->2nd fac meth map is not feasible when more auth classes
+    // added.
     // It will lead to possibly having same methods listed multiple times
     // Change to 2nd fac meth map->LIST OF AUTH CLASSES
     /** StepUp Methods. */
@@ -97,8 +98,8 @@ public class InitializeStepUpChallengeContext extends AbstractAuthenticationActi
      * Set the possible stepup methods keyed by requested authentication
      * context.
      * 
-     * @param senders
-     *            implementations of challenge sender in a map
+     * @param methods
+     *            stepup methods in a map
      * @param <T>
      *            Principal
      */
@@ -127,6 +128,7 @@ public class InitializeStepUpChallengeContext extends AbstractAuthenticationActi
         log.trace("Leaving");
     }
 
+ // Checkstyle: CyclomaticComplexity OFF
     /** {@inheritDoc} */
     @SuppressWarnings("unchecked")
     /** {@inheritDoc} */
@@ -171,8 +173,9 @@ public class InitializeStepUpChallengeContext extends AbstractAuthenticationActi
             // accounts may need attribute information
             log.debug("Initializing StepUp method and accounts for " + stepupMethod.getName());
             try {
-                if (!stepupMethod.Initialize(attributeContext)) {
-                    log.debug("Not able to initialize method " + stepupMethod.getName() + " removed from available methods");
+                if (!stepupMethod.initialize(attributeContext)) {
+                    log.debug("Not able to initialize method " + stepupMethod.getName()
+                            + " removed from available methods");
                     stepUpMethods.values().remove(stepupMethod);
                 }
             } catch (Exception e) {
@@ -195,7 +198,7 @@ public class InitializeStepUpChallengeContext extends AbstractAuthenticationActi
                 stepUpMethodContext.setStepUpMethod(stepUpMethods.get(authMethod));
                 // That method has accounts
                 try {
-                    if (stepUpMethods.get(authMethod).getAccounts() != null)
+                    if (stepUpMethods.get(authMethod).getAccounts() != null) {
                         for (StepUpAccount account : stepUpMethods.get(authMethod).getAccounts()) {
                             // and the account is enabled
                             if (account.isEnabled()) {
@@ -208,6 +211,7 @@ public class InitializeStepUpChallengeContext extends AbstractAuthenticationActi
                                 return;
                             }
                         }
+                    }
                 } catch (Exception e) {
                     log.debug("Something unexpected happened", getLogPrefix());
                     log.error(e.getMessage());
@@ -222,4 +226,5 @@ public class InitializeStepUpChallengeContext extends AbstractAuthenticationActi
         log.trace("Leaving");
         ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EVENTID_CONTINUE_STEPUP);
     }
+ // Checkstyle: CyclomaticComplexity ON
 }
