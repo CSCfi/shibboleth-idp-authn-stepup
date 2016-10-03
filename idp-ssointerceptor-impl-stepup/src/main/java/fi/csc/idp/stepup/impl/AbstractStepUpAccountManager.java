@@ -38,72 +38,134 @@ import org.springframework.context.ApplicationContext;
 import fi.csc.idp.stepup.api.StepUpAccount;
 import fi.csc.idp.stepup.api.StepUpMethod;
 
+/** Helper class for Step Up Method implementations. */
 public class AbstractStepUpAccountManager implements StepUpMethod {
 
     /** Class logger. */
     @Nonnull
     private final Logger log = LoggerFactory.getLogger(AbstractStepUpAccountManager.class);
+    /** Name for the method. */
     private String name;
+    /** Accounts of the method. */
     private List<StepUpAccount> accounts = new ArrayList<StepUpAccount>();
+    /** bean id of account bean. */
     private String accountID;
-
+    /** Application context. */
     @Autowired
     private ApplicationContext appContext;
 
-    public String getAccountID() {
-        return accountID;
-    }
-
-    public void setAccountID(String accountID) {
-        this.accountID = accountID;
-    }
-
-    public ApplicationContext getAppContext() {
-        return appContext;
-    }
-
+    /**
+     * Default constructor.
+     */
     public AbstractStepUpAccountManager() {
         super();
     }
 
-    public void setName(String name) {
-        log.trace("Entering & Leaving");
-        this.name = name;
+    /**
+     * Get the bean id of the class implementing the account.
+     * 
+     * @return bean id
+     */
+    public String getAccountID() {
+        return accountID;
     }
 
+    /**
+     * Set the bean id of the class implementing the account.
+     * 
+     * @param id
+     *            is bean id
+     */
+    public void setAccountID(String id) {
+        this.accountID = id;
+    }
+
+    /**
+     * Get the application context.
+     * 
+     * @return application context
+     */
+    public ApplicationContext getAppContext() {
+        return appContext;
+    }
+
+    /**
+     * Set the name of the method.
+     * 
+     * @param methodName
+     *            is method name
+     */
+    public void setName(String methodName) {
+        log.trace("Entering & Leaving");
+        this.name = methodName;
+    }
+
+    /**
+     * Get the name of the method.
+     * 
+     * @return name of the method.
+     */
     @Override
     public String getName() {
         log.trace("Entering & Leaving");
         return name;
     }
 
+    /**
+     * Get the editable status.
+     * 
+     * @return false
+     */
     @Override
     public boolean isEditable() {
         log.trace("Entering & Leaving");
         return false;
     }
 
+    /**
+     * Get the accounts.
+     * 
+     * @return the accounts
+     */
     @Override
-    public List<StepUpAccount> getAccounts() throws Exception{
+    public List<StepUpAccount> getAccounts() throws Exception {
         log.trace("Entering & Leaving");
         return accounts;
     }
 
+    /**
+     * Add account.
+     * 
+     * @return null, adding not supported.
+     */
     @Override
-    public StepUpAccount addAccount() throws Exception{
+    public StepUpAccount addAccount() throws Exception {
         log.trace("Entering & Leaving");
         log.debug("Method not supported");
         return null;
     }
 
+    /**
+     * Remove account. Not supported.
+     * 
+     * @param account
+     *            to be removed.
+     */
     @Override
     public void removeAccount(StepUpAccount account) {
         log.trace("Entering & Leaving");
         log.debug("Method not supported");
     }
 
+    /**
+     * Add a one default account.
+     * 
+     * @param attributeContext
+     *            , not used.
+     * @return true if successful
+     */
     @Override
-    public boolean Initialize(AttributeContext attributeContext) throws Exception {
+    public boolean initialize(AttributeContext attributeContext) throws Exception {
         log.trace("Entering");
         getAccounts().add((StepUpAccount) getAppContext().getBean(getAccountID()));
         log.trace("Leaving");
