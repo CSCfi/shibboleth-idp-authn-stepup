@@ -25,39 +25,59 @@ package fi.csc.idp.stepup.api;
 
 import java.util.List;
 
-/** interface for passing the challenge to target. */
+/** interface for managing storable accounts. */
 public interface StepUpAccountStorage {
 
-   
     /**
-     * Add a account.
+     * Add new account to storage, store it by key.
      * 
      * @param account
+     *            to be stored.
+     * @param key
+     *            the account belongs to.
      * @throws Exception
+     *             if something unexpected occurs.
      */
+
     void add(final StepUpAccount account, String key) throws Exception;
 
     /**
-     * Remove a account.
+     * Remove account stored by key.
      * 
      * @param account
+     *            to be removed.
+     * @param key
+     *            the account has been stored by.
      * @throws Exception
+     *             if something unexpected occurs.
      */
     void remove(final StepUpAccount account, String key) throws Exception;
 
     /**
-     * update a account.
+     * Update account stored by key.
      * 
      * @param account
+     *            that has been modified.
+     * @param key
+     *            the account has been stored by.
      * @throws Exception
+     *             if something unexpected occurs.
      */
     void update(final StepUpAccount account, String key) throws Exception;
 
     /**
-     * Return all accounts of given key value
+     * Get a list of accounts stored by key.
      * 
      * @param key
-     * @return
+     *            the account has been stored by
+     * @param aClass
+     *            The account implementation expected. Must implement
+     *            StepUpAccount.
+     * @param <T>
+     *            Template for the implementation expected.
+     * @return list of accounts
+     * @throws Exception
+     *             if something unexpected occurs.
      */
-     <T> List<StepUpAccount> getAccounts(String key, Class<T> aClass) throws Exception;
+    <T> List<StepUpAccount> getAccounts(String key, Class<T> aClass) throws Exception;
 }
