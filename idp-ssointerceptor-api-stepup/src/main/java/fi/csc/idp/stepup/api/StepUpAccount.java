@@ -1,5 +1,27 @@
+/*
+ * The MIT License
+ * Copyright (c) 2015 CSC - IT Center for Science, http://www.csc.fi
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
 package fi.csc.idp.stepup.api;
-
+/** Interface implemented by accounts. */
 public interface StepUpAccount {
 
     /**
@@ -38,14 +60,13 @@ public interface StepUpAccount {
      * @return true if accounts can be modified
      */
     public boolean isEditable();
-    
+
     /**
-     * If account can be modified.
+     * Set account to be editable or not.
      * 
-     * @return true if accounts can be modified
+     * @param isEditable true if editable.
      */
     public void setEditable(boolean isEditable);
-    
 
     /**
      * Set the account enabled/disabled.
@@ -56,7 +77,7 @@ public interface StepUpAccount {
     public void setEnabled(boolean isEnabled);
 
     /**
-     * Status of the account
+     * Status of the account.
      * 
      * @return true if enabled
      */
@@ -65,24 +86,25 @@ public interface StepUpAccount {
 
     /**
      * Invoked when a new fresh challenge should be sent. Not relevant to all
-     * implementations .
-     * 
+     * implementations.
+     *  
+     * @throws Exception if something unexpected has occurred.
      */
     public void sendChallenge() throws Exception;
 
     /**
-     * Invoked when user has response to challenge. Not applicable for all
-     * implementations.
+     * Invoked when user has response to challenge.
      * 
      * @param response
      *            to challenge
      * @return true if user has entered a valid response
+     * @throws Exception if something unexpected has occurred.
      */
     public boolean verifyResponse(String response) throws Exception;
 
     /**
-     * Target parameter for stepup operations. May be sms number, email address, shared secret or what
-     * ever is applicable for the implementation. 
+     * Target parameter for stepup operations. May be sms number, email address,
+     * shared secret or what ever is applicable for the implementation.
      * 
      * @param target
      *            to send challenge to or form of.
@@ -90,9 +112,9 @@ public interface StepUpAccount {
     public void setTarget(String target);
 
     /**
-     * Return target parameter
+     * Return target parameter.
      * 
-     * @return target
+     * @return target parameter.
      */
     public String getTarget();
 
