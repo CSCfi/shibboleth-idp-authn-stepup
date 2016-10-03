@@ -128,7 +128,7 @@ public class InitializeStepUpChallengeContext extends AbstractAuthenticationActi
         log.trace("Leaving");
     }
 
- // Checkstyle: CyclomaticComplexity OFF
+    // Checkstyle: CyclomaticComplexity OFF
     /** {@inheritDoc} */
     @SuppressWarnings("unchecked")
     /** {@inheritDoc} */
