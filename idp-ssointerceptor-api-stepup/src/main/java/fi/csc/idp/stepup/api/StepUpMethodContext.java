@@ -30,7 +30,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Context for passing information of available stepup methods and activated
+ * Context for passing information of available Step Up Methods and activated
  * accounts.
  */
 public class StepUpMethodContext extends BaseContext {
@@ -48,31 +48,64 @@ public class StepUpMethodContext extends BaseContext {
     /** Active StepUp method. */
     private StepUpMethod stepUpMethod;
 
+    /**
+     * Get active step up method.
+     * 
+     * @return active method.
+     */
     public StepUpMethod getStepUpMethod() {
         log.trace("Entering & Leaving");
         return stepUpMethod;
     }
 
-    public void setStepUpMethod(StepUpMethod stepUpMethod) {
+    /**
+     * Set active step up method.
+     * 
+     * @param method
+     *            active step up method.
+     */
+    public void setStepUpMethod(StepUpMethod method) {
         log.trace("Entering & Leaving");
-        this.stepUpMethod = stepUpMethod;
+        this.stepUpMethod = method;
     }
 
+    /**
+     * Get active step up account.
+     * 
+     * @return active step up account.
+     */
     public StepUpAccount getStepUpAccount() {
         log.trace("Entering & Leaving");
         return stepUpAccount;
     }
 
-    public void setStepUpAccount(StepUpAccount stepUpAccount) {
+    /**
+     * Set active step up account.
+     * 
+     * @param account
+     *            active stepup account
+     */
+    public void setStepUpAccount(StepUpAccount account) {
         log.trace("Entering & Leaving");
-        this.stepUpAccount = stepUpAccount;
+        this.stepUpAccount = account;
     }
 
+    /**
+     * Get all step up methods by the supported authentication contexts.
+     * 
+     * @return map of step up methods keyed by authentication contexts
+     */
     public Map<Principal, StepUpMethod> getStepUpMethods() {
         log.trace("Entering & Leaving");
         return stepupMethods;
     }
 
+    /**
+     * Set all step up methods by the supported authentication contexts.
+     * 
+     * @param stepUpMethods
+     *            map of step up methods keyed by authentication contexts.
+     */
     public void setStepUpMethods(Map<Principal, StepUpMethod> stepUpMethods) {
         log.trace("Entering & Leaving");
         this.stepupMethods = stepUpMethods;
