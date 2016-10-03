@@ -127,6 +127,7 @@ public class SetRequestedAuthenticationContext extends AbstractAuthenticationAct
      * @param <T>
      *            Principal
      */
+    // Checkstyle: CyclomaticComplexity OFF
     public <T extends Principal> void setAuthenticationMethodMapping(@Nonnull Map<String, Map<String, Map<T, T>>> map) {
         log.trace("Entering");
         if (this.authMethodMap == null) {
@@ -160,6 +161,8 @@ public class SetRequestedAuthenticationContext extends AbstractAuthenticationAct
         }
         log.trace("Leaving");
     }
+
+    // Checkstyle: CyclomaticComplexity ON
 
     /** {@inheritDoc} */
     @Override
