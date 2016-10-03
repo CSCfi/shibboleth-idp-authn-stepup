@@ -31,6 +31,7 @@ import org.slf4j.LoggerFactory;
 import com.warrenstrange.googleauth.GoogleAuthenticator;
 import com.warrenstrange.googleauth.GoogleAuthenticatorKey;
 
+/** Step Up Account implementation for GA.*/
 public class GoogleAuthenticatorStepUpAccount extends AbstractStepUpAccount {
 
     /** Class logger. */
@@ -51,7 +52,7 @@ public class GoogleAuthenticatorStepUpAccount extends AbstractStepUpAccount {
     }
 
     /**
-     * GA does not send challenge.
+     * GA does not send challenge as it is totp.
      * 
      */
     @Override
@@ -60,6 +61,23 @@ public class GoogleAuthenticatorStepUpAccount extends AbstractStepUpAccount {
         log.debug("not supported");
         log.trace("Leaving");
     }
+    
+    /**
+     *Verify users response to totp challenge.
+     *
+     *@param response to totp challenge.
+     *@return true if response was verified successfully
+     *@throws Exception if something unexpected occurred
+     */
+    @Override
+    public boolean verifyResponse(String response) throws Exception {
+        log.trace("Entering");
+        log.debug("Verificating totp response " + response);
+        GoogleAuthenticator gAuth = new GoogleAuthenticator();
+        int code = Integer.parseInt(response);
+        log.trace("Leaving");
+        return gAuth.authorize(getTarget(), code);
+      }
 
     
 }
