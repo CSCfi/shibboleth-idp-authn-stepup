@@ -28,8 +28,6 @@ import java.util.List;
 import javax.annotation.Nonnull;
 //import javax.sql.DataSource;
 
-
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,7 +38,10 @@ import net.shibboleth.idp.attribute.IdPAttributeValue;
 import net.shibboleth.idp.attribute.StringAttributeValue;
 import net.shibboleth.idp.attribute.context.AttributeContext;
 
-
+/**
+ * Class implementing Step Up Account manager for accounts stored by key found
+ * in attribute values.
+ * */
 public class AttributeKeyBasedStorageStepUpAccountManager extends AbstractStepUpAccountManager {
 
     /** Class logger. */
@@ -49,32 +50,43 @@ public class AttributeKeyBasedStorageStepUpAccountManager extends AbstractStepUp
 
     /** The attribute ID to look for. */
     private String attributeId;
-    
-    /** The account key */
+
+    /** The account key. */
     private String key;
 
-    
+    /** implements the storage functionality. */
     private StepUpAccountStorage stepUpAccountStorage;
 
-    
-    public void setStepUpAccountStorage(StepUpAccountStorage stepUpAccountStorage) {
-        this.stepUpAccountStorage = stepUpAccountStorage;
+    /**
+     * Set the implementation of storage functionality.
+     * 
+     * @param storage
+     *            functionality
+     */
+    public void setStepUpAccountStorage(StepUpAccountStorage storage) {
+        this.stepUpAccountStorage = storage;
     }
 
-    public void setAttributeId(String attributeId) {
-        this.attributeId = attributeId;
-    }
-    
-    
     /**
-     * We add a new GA account to list of accounts.
+     * Set the attribute id containing the value for the key.
      * 
-     * @throws Exception 
+     * @param id
+     *            of the attribute containing the value of key
+     */
+    public void setAttributeId(String id) {
+        this.attributeId = id;
+    }
+
+    /**
+     * Add a new editable account. Store it.
+     * 
+     * @throws Exception
+     *             if something unexpected occurred.
      */
     @Override
     public StepUpAccount addAccount() throws Exception {
         log.trace("Entering");
-        
+
         if (stepUpAccountStorage == null) {
             log.error("Storage implementation not set, cannot add accounts");
             log.trace("Leaving");
@@ -87,8 +99,15 @@ public class AttributeKeyBasedStorageStepUpAccountManager extends AbstractStepUp
         return account;
     }
 
+    /**
+     * Initializes accounts by reading the value for key, using that to read
+     * accounts from storage.
+     * 
+     * @param attributeContext
+     *            to look for the key value
+     */
     @Override
-    public boolean Initialize(AttributeContext attributeContext) throws Exception {
+    public boolean initialize(AttributeContext attributeContext) throws Exception {
 
         log.trace("Entering");
         log.debug("Adding accounts of type " + getName());
@@ -108,17 +127,19 @@ public class AttributeKeyBasedStorageStepUpAccountManager extends AbstractStepUp
         for (@SuppressWarnings("rawtypes")
         final IdPAttributeValue value : attribute.getValues()) {
             if (value instanceof StringAttributeValue) {
-                //We process only the first non null string type attribute value found
-                //Key is expected to be a single value string attribute
+                // We process only the first non null string type attribute
+                // value found
+                // Key is expected to be a single value string attribute
                 key = ((StringAttributeValue) value).getValue();
-                if (key==null){
+                if (key == null) {
                     log.warn("No attribute value for " + attributeId);
                     continue;
                 }
                 log.debug("Adding accounts with key value " + key);
-                List<StepUpAccount> accounts=stepUpAccountStorage.getAccounts(key,getAppContext().getBean(getAccountID()).getClass());
-                if (accounts!=null && accounts.size()>0){
-                    log.debug("Adding "+accounts.size()+" accounts with key value " + key);
+                List<StepUpAccount> accounts = stepUpAccountStorage.getAccounts(key,
+                        getAppContext().getBean(getAccountID()).getClass());
+                if (accounts != null && accounts.size() > 0) {
+                    log.debug("Adding " + accounts.size() + " accounts with key value " + key);
                     getAccounts().addAll(accounts);
                 }
             }
