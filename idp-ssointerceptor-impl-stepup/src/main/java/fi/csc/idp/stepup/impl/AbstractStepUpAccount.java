@@ -32,104 +32,186 @@ import fi.csc.idp.stepup.api.ChallengeGenerator;
 import fi.csc.idp.stepup.api.ChallengeVerifier;
 import fi.csc.idp.stepup.api.StepUpAccount;
 
-abstract public class AbstractStepUpAccount implements StepUpAccount {
+/** Helper class for StepUpAccount implementations. */
+public abstract class AbstractStepUpAccount implements StepUpAccount {
 
     /** Class logger. */
     @Nonnull
     private final Logger log = LoggerFactory.getLogger(AbstractStepUpAccount.class);
-    /** Name of the account */
+    /** Name of the account. */
     private String name;
     /** Challenge Verifier. */
     private ChallengeVerifier challengeVerifier;
     /** Challenge created. */
     private String challenge;
-    /** Target parameter for challenge **/
+    /** Target parameter for challenge. **/
     private String target;
 
+    /** id of the account. */
     private long id;
     /** Challenge Generator. */
     private ChallengeGenerator challengeGenerator;
+    /** account is editable. */
     private boolean editable;
+    /** account is enabled. */
     private boolean enabled;
-    
+
+    /** default constructor. */
     public AbstractStepUpAccount() {
         super();
-        this.editable=true;
+        log.trace("Entering & Leaving");
+        this.editable = true;
     }
 
+    /**
+     * Get the id of the account.
+     * 
+     * @return id of the account
+     */
     @Override
     public long getId() {
+        log.trace("Entering & Leaving");
         return id;
     }
 
+    /**
+     * Set the id of the account. Non editable account cannot be modified.
+     * 
+     * @param idValue
+     *            of the account.
+     */
     @Override
-    public void setId(long id) {
-        this.id = id;
-
+    public void setId(long idValue) {
+        log.trace("Entering");
+        if (this.editable) {
+            this.id = idValue;
+        } else {
+            log.warn("not supported");
+        }
+        log.trace("Leaving");
     }
 
+    /**
+     * Get the challenge created.
+     * 
+     * @return challenge created
+     */
     public String getChallenge() {
         return challenge;
     }
 
-    
-
-    public void setChallengeGenerator(ChallengeGenerator challengeGenerator) {
+    /**
+     * Set the challenge generator implementation.
+     * 
+     * @param generator
+     *            implementation
+     */
+    public void setChallengeGenerator(ChallengeGenerator generator) {
         log.trace("Entering & Leaving");
-        this.challengeGenerator = challengeGenerator;
+        this.challengeGenerator = generator;
     }
 
-    public void setChallengeVerifier(ChallengeVerifier challengeVerifier) {
+    /**
+     * Set the challenge verifier implementation.
+     * 
+     * @param verifier
+     *            implementation
+     */
+    public void setChallengeVerifier(ChallengeVerifier verifier) {
         log.trace("Entering & Leaving");
-        this.challengeVerifier = challengeVerifier;
+        this.challengeVerifier = verifier;
     }
 
-    public void setName(String name) {
-        log.trace("Entering & Leaving");
-        this.name = name;
+    /**
+     * Set the name of the account. Non editable account cannot be modified.
+     * 
+     * @param accountName
+     *            name of the account
+     */
+    public void setName(String accountName) {
+        log.trace("Entering");
+        if (this.editable) {
+            this.name = accountName;
+        } else {
+            log.warn("not supported");
+        }
+        log.trace("Leaving");
     }
 
+    /**
+     * Get the name of the account.
+     * 
+     * @return name of the account
+     */
     @Override
     public String getName() {
         log.trace("Entering & Leaving");
         return name;
     }
 
+    /**
+     * Is the account editable.
+     * 
+     * @return true if editable
+     */
     @Override
     public boolean isEditable() {
         log.trace("Entering & Leaving");
         return this.editable;
     }
-    
+
+    /**
+     * Set the account editable/non editable. Non editable account cannot be
+     * modified.
+     * 
+     * @param isEditable
+     *            true if editable.
+     */
     @Override
     public void setEditable(boolean isEditable) {
         log.trace("Entering");
-        if (this.editable){
-            this.editable=isEditable;
-        }else{
+        if (this.editable) {
+            this.editable = isEditable;
+        } else {
             log.warn("not supported");
         }
         log.trace("Leaving");
     }
 
-
+    /**
+     * Set account enabled/disabled. Non editable account cannot be modified.
+     * 
+     * @param isEnabled
+     *            true if enabled
+     */
     @Override
     public void setEnabled(boolean isEnabled) {
         log.trace("Entering");
-        if (this.editable){
-            this.enabled=isEnabled;
-        }else{
+        if (this.editable) {
+            this.enabled = isEnabled;
+        } else {
             log.warn("not supported");
         }
         log.trace("Leaving");
     }
 
+    /**
+     * Get the account enabled status.
+     * 
+     * @return true if the account is enabled
+     */
     @Override
     public boolean isEnabled() {
         log.trace("Entering & Leaving");
         return this.enabled;
     }
 
+    /**
+     * Send the challenge.
+     * 
+     * @throws Exception
+     *             if something unexpected occurred
+     */
     @Override
     public void sendChallenge() throws Exception {
         log.trace("Entering");
@@ -141,6 +223,12 @@ abstract public class AbstractStepUpAccount implements StepUpAccount {
         log.trace("Leaving");
     }
 
+    /**
+     * Verify the response to challenge.
+     * 
+     * @throws Exception
+     *             if something unexpected occurred
+     */
     @Override
     public boolean verifyResponse(String response) throws Exception {
         log.trace("Entering");
@@ -155,17 +243,28 @@ abstract public class AbstractStepUpAccount implements StepUpAccount {
         return challengeVerifier.verify(challenge, response, null);
     }
 
+    /**
+     * Set the target parameter. Non editable account cannot be modified.
+     * 
+     * @param accountTarget
+     *            representing the Target
+     */
     @Override
-    public void setTarget(String target) {
+    public void setTarget(String accountTarget) {
         log.trace("Entering");
-        if (this.editable){
-            this.target = target;
-        }else{
+        if (this.editable) {
+            this.target = accountTarget;
+        } else {
             log.warn("not supported");
         }
         log.trace("Leaving");
     }
 
+    /**
+     * Get the target.
+     * 
+     * @return target
+     */
     @Override
     public String getTarget() {
         return this.target;
