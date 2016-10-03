@@ -1,6 +1,5 @@
 package fi.csc.idp.stepup.api;
 
-
 import java.security.Principal;
 import java.util.HashMap;
 import java.util.List;
@@ -14,24 +13,24 @@ import org.testng.annotations.Test;
 
 public class TestStepUpMethodContext {
 
-    private StepUpMethodContext stepUpMethodContext;  
-    
+    private StepUpMethodContext stepUpMethodContext;
+
     @BeforeMethod
-    public void setUp()  {
+    public void setUp() {
         stepUpMethodContext = new StepUpMethodContext();
     }
 
     @Test
-    public void testAllNull()  {
+    public void testAllNull() {
         Assert.assertNull(stepUpMethodContext.getStepUpAccount());
         Assert.assertNull(stepUpMethodContext.getStepUpMethod());
         Assert.assertNull(stepUpMethodContext.getStepUpMethods());
     }
 
     @Test
-    public void testNotNull()  {
-        Account account=new Account();
-        Method method=new Method();
+    public void testNotNull() {
+        Account account = new Account();
+        Method method = new Method();
         stepUpMethodContext.setStepUpAccount(account);
         stepUpMethodContext.setStepUpMethod(method);
         Map<Principal, StepUpMethod> methods = new HashMap<Principal, StepUpMethod>();
@@ -40,8 +39,8 @@ public class TestStepUpMethodContext {
         Assert.assertEquals(method, stepUpMethodContext.getStepUpMethod());
         Assert.assertEquals(methods, stepUpMethodContext.getStepUpMethods());
     }
-    
-    class Method implements StepUpMethod{
+
+    class Method implements StepUpMethod {
 
         @Override
         public boolean initialize(AttributeContext attributeContext) throws Exception {
@@ -76,11 +75,12 @@ public class TestStepUpMethodContext {
         @Override
         public void removeAccount(StepUpAccount account) {
             // TODO Auto-generated method stub
-            
+
         }
-        
+
     }
-    class Account implements StepUpAccount{
+
+    class Account implements StepUpAccount {
 
         @Override
         public long getId() {
@@ -91,7 +91,7 @@ public class TestStepUpMethodContext {
         @Override
         public void setId(long id) {
             // TODO Auto-generated method stub
-            
+
         }
 
         @Override
@@ -103,7 +103,7 @@ public class TestStepUpMethodContext {
         @Override
         public void setName(String name) {
             // TODO Auto-generated method stub
-            
+
         }
 
         @Override
@@ -115,13 +115,13 @@ public class TestStepUpMethodContext {
         @Override
         public void setEditable(boolean isEditable) {
             // TODO Auto-generated method stub
-            
+
         }
 
         @Override
         public void setEnabled(boolean isEnabled) {
             // TODO Auto-generated method stub
-            
+
         }
 
         @Override
@@ -133,7 +133,7 @@ public class TestStepUpMethodContext {
         @Override
         public void sendChallenge() throws Exception {
             // TODO Auto-generated method stub
-            
+
         }
 
         @Override
@@ -145,7 +145,7 @@ public class TestStepUpMethodContext {
         @Override
         public void setTarget(String target) {
             // TODO Auto-generated method stub
-            
+
         }
 
         @Override
@@ -153,7 +153,7 @@ public class TestStepUpMethodContext {
             // TODO Auto-generated method stub
             return null;
         }
-        
+
     }
- 
+
 }
