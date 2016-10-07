@@ -1,6 +1,5 @@
 package fi.csc.idp.stepup.impl;
 
-
 import net.shibboleth.utilities.java.support.component.ComponentInitializationException;
 
 import org.opensaml.profile.context.ProfileRequestContext;
@@ -20,7 +19,6 @@ import net.shibboleth.idp.profile.ActionTestingSupport;
 import net.shibboleth.idp.profile.RequestContextBuilder;
 import net.shibboleth.idp.profile.context.navigate.WebflowRequestContextProfileRequestContextLookup;
 
-
 public class TestGenerateStepUpChallenge {
 
     private GenerateStepUpChallenge action;
@@ -28,22 +26,22 @@ public class TestGenerateStepUpChallenge {
     protected RequestContext src;
     @SuppressWarnings("rawtypes")
     protected ProfileRequestContext prc;
-   
-    
-    @BeforeMethod public void setUp() throws Exception {        
+
+    @BeforeMethod
+    public void setUp() throws Exception {
         src = new RequestContextBuilder().buildRequestContext();
         prc = new WebflowRequestContextProfileRequestContextLookup().apply(src);
         action = new GenerateStepUpChallenge();
     }
-    
-    
-    /**  Test that action copes with no authentication context being present */
-    @Test public void testUninitiailizedContext() throws ComponentInitializationException {
+
+    /** Test that action copes with no authentication context being present */
+    @Test
+    public void testUninitiailizedContext() throws ComponentInitializationException {
         action.initialize();
         final Event event = action.execute(src);
         ActionTestingSupport.assertEvent(event, AuthnEventIds.INVALID_AUTHN_CTX);
     }
-    
+
     /** Test that action copes with no Step Up Method context being present */
     @Test
     public void testNoStepUpMethodContext() throws ComponentInitializationException {
@@ -52,7 +50,7 @@ public class TestGenerateStepUpChallenge {
         final Event event = action.execute(src);
         ActionTestingSupport.assertEvent(event, StepUpEventIds.EVENTID_MISSING_STEPUPMETHODCONTEXT);
     }
-    
+
     /** Test that action copes with no chosen Step Up Account being present */
     @Test
     public void testNoStepUpAccount() throws ComponentInitializationException {
@@ -63,7 +61,7 @@ public class TestGenerateStepUpChallenge {
         final Event event = action.execute(src);
         ActionTestingSupport.assertEvent(event, StepUpEventIds.EVENTID_INVALID_USER);
     }
-    
+
     /** Test that action copes with invalid Step Up Account being present */
     @Test
     public void testInvalidStepUpAccount() throws ComponentInitializationException {
@@ -74,12 +72,12 @@ public class TestGenerateStepUpChallenge {
         final Event event = action.execute(src);
         ActionTestingSupport.assertEvent(event, StepUpEventIds.EXCEPTION);
     }
-    
+
     @Test
     public void testSuccess() throws ComponentInitializationException {
         AuthenticationContext ctx = (AuthenticationContext) prc.addSubcontext(new AuthenticationContext(), true);
         StepUpMethodContext sumCtx = (StepUpMethodContext) ctx.addSubcontext(new StepUpMethodContext(), true);
-        ChallengeSenderStepUpAccount challengeSenderStepUpAccount=new ChallengeSenderStepUpAccount();
+        ChallengeSenderStepUpAccount challengeSenderStepUpAccount = new ChallengeSenderStepUpAccount();
         challengeSenderStepUpAccount.setChallengeGenerator(new ChallengeGen());
         challengeSenderStepUpAccount.setChallengeSender(new ChallengeSen());
         sumCtx.setStepUpAccount(challengeSenderStepUpAccount);
@@ -88,7 +86,7 @@ public class TestGenerateStepUpChallenge {
         Assert.assertEquals("challengeGenerated", sentChallenge);
         ActionTestingSupport.assertEvent(event, StepUpEventIds.EVENTID_CONTINUE_STEPUP);
     }
-    
+
     class ChallengeGen implements ChallengeGenerator {
 
         @Override
@@ -106,6 +104,5 @@ public class TestGenerateStepUpChallenge {
         }
 
     }
-    
-          
+
 }
