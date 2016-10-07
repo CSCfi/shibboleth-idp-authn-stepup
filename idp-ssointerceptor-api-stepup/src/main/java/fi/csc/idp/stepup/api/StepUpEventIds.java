@@ -70,7 +70,7 @@ public final class StepUpEventIds {
     /** event id for case of missing stepup context. */
     @Nonnull
     @NotEmpty
-    public static final String EVENTID_MISSING_STEPUPCONTEXT = "MissingStepUpContext";
+    public static final String EVENTID_MISSING_STEPUPMETHODCONTEXT = "MissingStepUpMethodContext";
 
     /** event id for case of invalid shibboleth sp context. */
     @Nonnull
