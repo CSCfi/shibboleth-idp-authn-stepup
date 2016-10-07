@@ -60,15 +60,16 @@ public class AbstractStepUpAccountManager implements StepUpMethod {
     public AbstractStepUpAccountManager() {
         super();
     }
-    
+
     /**
      * Set application context for test cases.
-     * @param appContext application context
+     * 
+     * @param appContext
+     *            application context
      */
-    public void setAppContext(ApplicationContext appContext) {
-        this.appContext = appContext;
+    public void setAppContext(ApplicationContext ctx) {
+        this.appContext = ctx;
     }
-
 
     /**
      * Get the bean id of the class implementing the account.
