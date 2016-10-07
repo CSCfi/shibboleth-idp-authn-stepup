@@ -64,11 +64,10 @@ public class AddAccount extends AbstractAuthenticationAction {
             @Nonnull final AuthenticationContext authenticationContext) {
 
         log.trace("Entering");
-        // TODO: FIX ERROR
         stepUpMethodContext = authenticationContext.getSubcontext(StepUpMethodContext.class);
         if (stepUpMethodContext == null) {
             log.debug("{} Could not get shib proxy context", getLogPrefix());
-            ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EVENTID_MISSING_SHIBSPCONTEXT);
+            ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EVENTID_MISSING_STEPUPMETHODCONTEXT);
             log.trace("Leaving");
             return false;
         }
