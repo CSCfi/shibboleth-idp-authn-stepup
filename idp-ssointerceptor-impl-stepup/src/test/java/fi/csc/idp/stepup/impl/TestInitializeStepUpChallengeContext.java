@@ -132,6 +132,7 @@ public class TestInitializeStepUpChallengeContext {
         Assert.assertNotNull(sumCtx.getStepUpAccount());
     }
 
+    /** helper classes for testing -> */
     class method implements StepUpMethod {
 
         List<StepUpAccount> accounts = new ArrayList<StepUpAccount>();
