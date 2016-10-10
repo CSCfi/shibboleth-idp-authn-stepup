@@ -73,11 +73,16 @@ public class VerifyPasswordFromFormRequest extends AbstractExtractionAction {
             @Nonnull final AuthenticationContext authenticationContext) {
 
         log.trace("Entering");
-        // TODO: fix error
         stepUpMethodContext = authenticationContext.getSubcontext(StepUpMethodContext.class);
         if (stepUpMethodContext == null) {
             log.debug("{} Could not get shib proxy context", getLogPrefix());
-            ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EVENTID_MISSING_SHIBSPCONTEXT);
+            ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EVENTID_MISSING_STEPUPMETHODCONTEXT);
+            log.trace("Leaving");
+            return false;
+        }
+        if (stepUpMethodContext.getStepUpAccount() == null) {
+            log.debug("There is no chosen stepup account for user", getLogPrefix());
+            ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EVENTID_INVALID_USER);
             log.trace("Leaving");
             return false;
         }
