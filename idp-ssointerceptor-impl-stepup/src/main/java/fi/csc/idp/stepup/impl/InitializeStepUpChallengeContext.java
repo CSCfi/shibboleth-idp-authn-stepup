@@ -152,6 +152,12 @@ public class InitializeStepUpChallengeContext extends AbstractAuthenticationActi
             log.trace("Leaving");
             return false;
         }
+        if (stepUpMethods == null) {
+            log.debug("{} Bean not configured correctly, step up methods not set", getLogPrefix());
+            ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EXCEPTION);
+            log.trace("Leaving");
+            return false;
+        }
         log.trace("Leaving");
         return super.doPreExecute(profileRequestContext, authenticationContext);
     }
@@ -226,5 +232,5 @@ public class InitializeStepUpChallengeContext extends AbstractAuthenticationActi
         log.trace("Leaving");
         ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EVENTID_CONTINUE_STEPUP);
     }
- // Checkstyle: CyclomaticComplexity ON
+    // Checkstyle: CyclomaticComplexity ON
 }
