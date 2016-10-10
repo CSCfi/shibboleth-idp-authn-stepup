@@ -1,5 +1,8 @@
 package fi.csc.idp.stepup.impl;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import net.shibboleth.utilities.java.support.component.ComponentInitializationException;
 
 import org.opensaml.profile.context.ProfileRequestContext;
@@ -8,16 +11,16 @@ import org.springframework.webflow.execution.RequestContext;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
+import fi.csc.idp.stepup.api.StepUpAccount;
 import fi.csc.idp.stepup.api.StepUpEventIds;
+import fi.csc.idp.stepup.api.StepUpMethod;
 import fi.csc.idp.stepup.api.StepUpMethodContext;
-import fi.okm.mpass.shibboleth.authn.context.ShibbolethSpAuthenticationContext;
+import net.shibboleth.idp.attribute.context.AttributeContext;
 import net.shibboleth.idp.authn.AuthnEventIds;
 import net.shibboleth.idp.authn.context.AuthenticationContext;
 import net.shibboleth.idp.profile.ActionTestingSupport;
 import net.shibboleth.idp.profile.RequestContextBuilder;
 import net.shibboleth.idp.profile.context.navigate.WebflowRequestContextProfileRequestContextLookup;
-//import net.shibboleth.idp.saml.authn.principal.AuthnContextClassRefPrincipal;
-//import net.shibboleth.idp.saml.authn.principal.AuthnContextDeclRefPrincipal;
 
 public class TestAddAccount {
 
@@ -63,8 +66,149 @@ public class TestAddAccount {
         ActionTestingSupport.assertEvent(event, StepUpEventIds.EVENTID_INVALID_USER);
     }
 
-    // TODO: Create first initializestepupchallengecontext testscases, after
-    // that
-    // add rest of the cases here
+    /** Test that action copes with account creation failing */
+    @Test
+    public void testAccountCreationFails() throws ComponentInitializationException {
+        AuthenticationContext ctx = (AuthenticationContext) prc.addSubcontext(new AuthenticationContext(), true);
+        StepUpMethodContext sumCtx = (StepUpMethodContext) ctx.addSubcontext(new StepUpMethodContext(), true);
+        sumCtx.setStepUpMethod(new method());
+        action.initialize();
+        final Event event = action.execute(src);
+        ActionTestingSupport.assertEvent(event, StepUpEventIds.EVENTID_INVALID_USER);
+    }
+
+    /** Test that action copes with account creation throwing error */
+    @Test
+    public void testAccountThrowsError() throws ComponentInitializationException {
+        AuthenticationContext ctx = (AuthenticationContext) prc.addSubcontext(new AuthenticationContext(), true);
+        StepUpMethodContext sumCtx = (StepUpMethodContext) ctx.addSubcontext(new StepUpMethodContext(), true);
+        sumCtx.setStepUpMethod(new method2());
+        action.initialize();
+        final Event event = action.execute(src);
+        ActionTestingSupport.assertEvent(event, StepUpEventIds.EVENTID_INVALID_USER);
+    }
+
+    /** Test that action is able to succeed */
+    @Test
+    public void testAccountCreationSucceeds() throws ComponentInitializationException {
+        AuthenticationContext ctx = (AuthenticationContext) prc.addSubcontext(new AuthenticationContext(), true);
+        StepUpMethodContext sumCtx = (StepUpMethodContext) ctx.addSubcontext(new StepUpMethodContext(), true);
+        sumCtx.setStepUpMethod(new method3());
+        action.initialize();
+        final Event event = action.execute(src);
+        ActionTestingSupport.assertEvent(event, StepUpEventIds.EVENTID_CONTINUE_STEPUP);
+    }
+
+    /** helper classes for testing -> */
+    class method3 extends method {
+        @Override
+        public StepUpAccount addAccount() throws Exception {
+            return new account();
+        }
+    }
+
+    class method2 extends method {
+        @Override
+        public StepUpAccount addAccount() throws Exception {
+            throw new Exception("terrible");
+        }
+    }
+
+    class method implements StepUpMethod {
+
+        List<StepUpAccount> accounts = new ArrayList<StepUpAccount>();
+
+        @Override
+        public boolean initialize(AttributeContext attributeContext) throws Exception {
+            return true;
+        }
+
+        @Override
+        public String getName() {
+            return null;
+        }
+
+        @Override
+        public boolean isEditable() {
+            return false;
+        }
+
+        @Override
+        public List<StepUpAccount> getAccounts() throws Exception {
+            if (accounts.isEmpty()) {
+                accounts.add(new account());
+            }
+            return accounts;
+        }
+
+        @Override
+        public StepUpAccount addAccount() throws Exception {
+            return null;
+        }
+
+        @Override
+        public void removeAccount(StepUpAccount account) {
+
+        }
+
+        class account implements StepUpAccount {
+
+            @Override
+            public long getId() {
+                return 0;
+            }
+
+            @Override
+            public void setId(long id) {
+            }
+
+            @Override
+            public String getName() {
+                return null;
+            }
+
+            @Override
+            public void setName(String name) {
+            }
+
+            @Override
+            public boolean isEditable() {
+                return false;
+            }
+
+            @Override
+            public void setEditable(boolean isEditable) {
+            }
+
+            @Override
+            public void setEnabled(boolean isEnabled) {
+            }
+
+            @Override
+            public boolean isEnabled() {
+                return true;
+            }
+
+            @Override
+            public void sendChallenge() throws Exception {
+            }
+
+            @Override
+            public boolean verifyResponse(String response) throws Exception {
+                return false;
+            }
+
+            @Override
+            public void setTarget(String target) {
+            }
+
+            @Override
+            public String getTarget() {
+                return null;
+            }
+
+        }
+
+    }
 
 }
