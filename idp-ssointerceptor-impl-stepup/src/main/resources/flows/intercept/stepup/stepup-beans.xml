@@ -16,7 +16,13 @@
 	<bean class="net.shibboleth.idp.profile.impl.ProfileActionBeanPostProcessor" />
 	<bean class="net.shibboleth.ext.spring.config.IdentifiableBeanPostProcessor" />
 
-	<!-- REPLACE THESE DUMMIES WITH REAL VALUES -->
+	<!-- This is example configuration, not guaranteed to work (if so, purely 
+		a coincidence) -->
+
+	<!-- There are still unnecessary prototype definitions all over -->
+
+	<!-- Authentication Contextes the example configuration is referring to -->
+
 	<bean id="stepup" parent="shibboleth.SAML2AuthnContextClassRef"
 		c:classRef="urn:test:stepup" />
 	<bean id="stepup2" parent="shibboleth.SAML2AuthnContextClassRef"
@@ -24,84 +30,114 @@
 	<bean id="password" parent="shibboleth.SAML2AuthnContextClassRef"
 		c:classRef="urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport" />
 	<bean id="password2" parent="shibboleth.SAML2AuthnContextClassRef"
-		c:classRef="urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport2" />
+		c:classRef="urn:test:PasswordProtectedTransport2" />
 
+	<!-- Action configurations -->
+
+	<!-- Configuration of this action determines which requested authentication 
+		methods require additional authentication steps performed by stepup proxy -->
 	<bean id="CheckRequestedAuthenticationContext"
 		class="fi.csc.idp.stepup.impl.CheckRequestedAuthenticationContext"
-		scope="prototype" >
+		scope="prototype" p:httpServletRequest-ref="shibboleth.HttpServletRequest">
 		<property name="stepupMethods">
 			<list>
 				<ref bean="stepup" />
+				<ref bean="stepup2" />
 			</list>
 		</property>
 	</bean>
 
+	<!-- Action that checks if home organization is providing already a value 
+		requiring additional authentication. If idp is listed as trusted no additional 
+		authentication by proxy is needed -->
 	<bean id="CheckProvidedAuthenticationContext"
 		class="fi.csc.idp.stepup.impl.CheckProvidedAuthenticationContext"
-		scope="prototype"
-   	
-		
-		<property name="trustedStepupMethods">
+		scope="prototype">
+		<property name="trustedStepupProviders">
 			<map>
 				<entry>
 					<key>
 						<value>idpentity1t</value>
 					</key>
-					<value>
-						<list>
-							<ref bean="stepup" />
-							<ref bean="stepup2" />
-						</list>
-					</value>
+					<list>
+						<ref bean="stepup" />
+						<ref bean="stepup2" />
+					</list>
 				</entry>
 			</map>
 		</property>
 	</bean>
 
-
-
-	<bean id="GenerateStepUpChallenge" class="fi.csc.idp.stepup.impl.GenerateStepUpChallenge"
-		scope="prototype" >
-		<property name="attributeIds">
+	<!-- Configuration of this action determines the additional authentication 
+		methods required by account registration -->
+	<bean id="InitializeRegistrationStepUpChallengeContext" class="fi.csc.idp.stepup.impl.InitializeStepUpChallengeContext"
+		scope="prototype" p:httpServletRequest-ref="shibboleth.HttpServletRequest">
+		<property name="stepUpMethods">
 			<map>
-				<entry key-ref="stepup" value="mail" />
-			</map>
-		</property>
-		<property name="challengeSenders">
-			<map>
-				<entry key-ref="stepup" value-ref="MailChallengeSender" />
-				<entry key-ref="stepup2" value-ref="LogChallengeSender" />
-			</map>
-		</property>
-		<property name="challengeGenerators">
-			<map>
-				<entry key-ref="stepup" value-ref="ChallengeGenerator" />
-				<entry key-ref="stepup2" value-ref="ChallengeGenerator" />
+				<entry key-ref="stepup" value-ref="SMSStepUpManager" />
+				<entry key-ref="stepup2" value-ref="MailStepUpManager" />
 			</map>
 		</property>
 	</bean>
 
+
+	<!-- Configuration of this action determines the additional authentication 
+		methods required by step up -->
+	<bean id="InitializeStepUpChallengeContext" class="fi.csc.idp.stepup.impl.InitializeStepUpChallengeContext"
+		scope="prototype" p:httpServletRequest-ref="shibboleth.HttpServletRequest">
+		<property name="stepUpMethods">
+			<map>
+				<entry key-ref="stepup" value-ref="GoogleAuthStepUpManager" />
+				<entry key-ref="stepup2" value-ref="GoogleAuthStepUpManager" />
+			</map>
+		</property>
+	</bean>
+
+	<!-- Actions that adds a new account of chosen method -->
+	<bean id="AddAccount" class="fi.csc.idp.stepup.impl.AddAccount"
+		scope="prototype" p:httpServletRequest-ref="shibboleth.HttpServletRequest">
+	</bean>
+
+	<!-- Actions that creates a challenge by chosen account -->
+	<bean id="GenerateStepUpChallenge" class="fi.csc.idp.stepup.impl.GenerateStepUpChallenge"
+		scope="prototype" p:httpServletRequest-ref="shibboleth.HttpServletRequest">
+	</bean>
+
+	<!-- Action that checks the challenge response by the user can be verified -->
+	<bean id="VerifyPasswordFromFormRequest" class="fi.csc.idp.stepup.impl.VerifyPasswordFromFormRequest"
+		scope="prototype" p:httpServletRequest-ref="shibboleth.HttpServletRequest">
+	</bean>
+
+	<!-- Actions that manipulates the authentication method used. -->
 	<bean id="SetRequestedAuthenticationContext"
 		class="fi.csc.idp.stepup.impl.SetRequestedAuthenticationContext"
-		scope="prototype" >
+		scope="prototype" p:httpServletRequest-ref="shibboleth.HttpServletRequest">
+		<!-- for matching key(idp) value(sp) pairs the value provided by idp is 
+			used instead of the one set by proxy as default -->
 		<property name="PassThruuEntityLists">
-			<!-- Example of case where we use the method provided by idp if the idp 
-				is idp.localdomain and the client so is sp1 or sp.localdomain -->
 			<map>
 				<entry>
 					<key>
 						<value>idp.localdomain</value>
 					</key>
 					<list>
-						<value>sp1</value>
+						<value>sp.localdomain</value>
+					</list>
+				</entry>
+				<entry>
+					<key>
+						<value>https://testidp.funet.fi/idp/shibboleth</value>
+					</key>
+					<list>
+						<value>https://testsp.funet.fi/shibboleth</value>
 						<value>sp.localdomain</value>
 					</list>
 				</entry>
 			</map>
 		</property>
+		<!-- for matching key(idp) value(sp) pairs AND for matching value provided 
+			by idp a new mapped value is used instead of the one set by proxy as default -->
 		<property name="AuthenticationMethodMapping">
-			<!-- Example of case where set password2 as method if we receive from 
-				idp.localdomain method password and the client is sp.localdomain -->
 			<map>
 				<entry>
 					<key>
@@ -113,7 +149,7 @@
 								<value>sp.localdomain</value>
 							</key>
 							<map>
-								<entry key-ref="password" value-ref="password2" />
+								<entry key-ref="password2" value-ref="password2" />
 							</map>
 						</entry>
 					</map>
@@ -122,34 +158,109 @@
 		</property>
 	</bean>
 
-	<bean id="VerifyPasswordFromFormRequest" class="fi.csc.idp.stepup.impl.VerifyPasswordFromFormRequest"
-		scope="prototype" p:httpServletRequest-ref="shibboleth.HttpServletRequest">
-		<property name="challengeVerifiers">
-			<map>
-				<entry key-ref="stepup2" value-ref="EqualVerifier" />
-				<entry key-ref="stepup" value-ref="EqualVerifier" />
-			</map>
+
+	<!-- Stepup Method Managers -->
+
+	<!-- Configuration of GA stepup method Manager -->
+	<bean id="GoogleAuthStepUpManager"
+		class="fi.csc.idp.stepup.impl.AttributeKeyBasedStorageStepUpAccountManager"
+		scope="prototype" p:name="GoogleAuthenticator" p:AttributeId="INTeppn"
+		p:stepUpAccountStorage-ref="StepUpAccountStorage" p:AccountID="GoogleAuthenticatorStepUpAccount">
+	</bean>
+
+
+	<!-- Configuration of Log stepup method. This is a dummy method writing 
+		challenge to log -->
+	<bean id="LogStepUpManager" class="fi.csc.idp.stepup.impl.DefaultStepUpAccountManager"
+		scope="prototype" p:name="Logfile" p:AccountID="LogStepUpAccount">
+	</bean>
+
+	<!-- Configuration of Mail stepup method Manager. -->
+	<bean id="MailStepUpManager"
+		class="fi.csc.idp.stepup.impl.AttributeTargetBasedStepUpAccountManager"
+		scope="prototype" p:name="Email" p:AttributeId="INTmail" p:AccountID="EmailStepUpAccount">
+	</bean>
+
+	<!-- Configuration of SMS stepup method Manager. -->
+	<bean id="SMSStepUpManager"
+		class="fi.csc.idp.stepup.impl.AttributeTargetBasedStepUpAccountManager"
+		scope="prototype" p:name="SMS" p:AttributeId="INTmobile" p:AccountID="SMSStepUpAccount">
+	</bean>
+
+	<!-- Stepup Accounts -->
+
+	<!-- Configuration of log stepup account -->
+	<bean id="LogStepUpAccount" class="fi.csc.idp.stepup.impl.ChallengeSenderStepUpAccount"
+		scope="prototype" p:ChallengeGenerator-ref="ChallengeGenerator"
+		p:ChallengeVerifier-ref="EqualVerifier" p:ChallengeSender-ref="LogChallengeSender">
+	</bean>
+
+	<!-- Configuration of email stepup account -->
+	<bean id="EmailStepUpAccount" class="fi.csc.idp.stepup.impl.ChallengeSenderStepUpAccount"
+		scope="prototype" p:ChallengeGenerator-ref="ChallengeGenerator"
+		p:ChallengeVerifier-ref="EqualVerifier" p:ChallengeSender-ref="MailChallengeSender">
+	</bean>
+
+	<!-- Configuration of sms stepup account -->
+	<bean id="SMSStepUpAccount" class="fi.csc.idp.stepup.impl.ChallengeSenderStepUpAccount"
+		scope="prototype" p:ChallengeGenerator-ref="ChallengeGenerator"
+		p:ChallengeVerifier-ref="EqualVerifier" p:ChallengeSender-ref="SMSChallengeSender">
+	</bean>
+
+	<!-- Configuration of GA stepup account -->
+	<bean id="GoogleAuthenticatorStepUpAccount" class="fi.csc.idp.stepup.impl.GoogleAuthenticatorStepUpAccount"
+		scope="prototype">
+	</bean>
+
+
+	<!-- Configuration of Storage used by GA method Manager -->
+	<bean id="StepUpAccountStorage" class="fi.csc.idp.stepup.impl.SQLStepUpAccountStorage"
+		scope="prototype" p:jdbcUrl="jdbc:mysql://localhost:3306/totp"
+		p:poolSize="10" p:userName="proxy" p:password="password">
+		<property name="listStatement">
+			<value>
+          <![CDATA[
+                SELECT * FROM totp.ga WHERE user=?
+          ]]>
+			</value>
+		</property>
+		<property name="addStatement">
+			<value>
+          <![CDATA[
+                INSERT INTO totp.ga (name,enabled,editable,target,user) VALUES(?,?,?,?,?)
+          ]]>
+			</value>
 		</property>
 	</bean>
 
-	<bean id="LogChallengeSender" class="fi.csc.idp.stepup.impl.LogChallengeSender">
-	</bean>
-	
-	<bean id="MailChallengeSender"
-        class="fi.csc.idp.stepup.impl.MailChallengeSender" 
-        p:subjectField="step-up code"
-        p:fromField="foo@bar"
-        p:host="foo.bar"
-        p:port="25"
-        p:sMTPAuth="false"
-        p:sMTPTtls="true">
-     </bean>
-	
 
-	<bean id="ChallengeGenerator" class="fi.csc.idp.stepup.impl.DigestChallengeGenerator">
+	<!-- Challenge Senders -->
+
+
+	<!-- Challenge Sender that writes the challenge to log -->
+	<bean id="LogChallengeSender" class="fi.csc.idp.stepup.impl.LogChallengeSender"
+		scope="prototype">
 	</bean>
 
+	<!-- Challenge Sender that sends the challenge by email -->
+	<bean id="MailChallengeSender" class="fi.csc.idp.stepup.impl.MailChallengeSender"
+		p:subjectField="mailsubject" p:fromField="foo@bar" p:host="foo.bar"
+		p:port="25" p:templatePath="/mails" p:templateFile="certia.vm"
+		p:sMTPAuth="false" p:sMTPTtls="true">
+	</bean>
 
+	<!-- Challenge Sender that sends the challenge by tvilio sms service -->
+	<bean id="SMSChallengeSender" class="fi.csc.idp.stepup.impl.TvilioSMSChallengeSender"
+		p:senderNumber="+555.." p:accountSid="foobar" p:authToken="foobar"
+		p:message="The code to access the service is %s, enter the code to your browser">
+	</bean>
+
+	<!-- Challenge Generator. Uses digest to generate the challenge. -->
+	<bean id="ChallengeGenerator" class="fi.csc.idp.stepup.impl.DigestChallengeGenerator"
+		p:salt="foobar" p:maxLength="5" p:digest="SHA-256" p:decimal="true">
+	</bean>
+
+	<!-- Challenge Verifier. Compares that the provided strings are equal. -->
 	<bean id="EqualVerifier" class="fi.csc.idp.stepup.impl.EqualChallengeResponseVerifier">
 	</bean>
 
