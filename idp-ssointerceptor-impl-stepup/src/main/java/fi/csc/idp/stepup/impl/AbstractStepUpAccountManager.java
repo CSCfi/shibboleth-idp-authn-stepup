@@ -64,7 +64,7 @@ public class AbstractStepUpAccountManager implements StepUpMethod {
     /**
      * Set application context for test cases.
      * 
-     * @param appContext
+     * @param ctx
      *            application context
      */
     public void setAppContext(ApplicationContext ctx) {
