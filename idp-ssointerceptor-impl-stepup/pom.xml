@@ -93,6 +93,12 @@
 			<artifactId>greenmail</artifactId>
 			<scope>test</scope>
 		</dependency>
+		<!-- https://mvnrepository.com/artifact/com.twilio.sdk/twilio -->
+		<dependency>
+			<groupId>com.twilio.sdk</groupId>
+			<artifactId>twilio</artifactId>
+		</dependency>
+
 	</dependencies>
 	<build>
 		<plugins>
