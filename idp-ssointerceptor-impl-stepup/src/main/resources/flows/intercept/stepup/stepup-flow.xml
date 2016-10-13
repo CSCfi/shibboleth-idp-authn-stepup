@@ -7,6 +7,8 @@
 	<!-- Rudimentary impediment to direct execution of subflow. -->
 	<input name="calledAsSubflow" type="boolean" required="true" />
 
+	<!-- Development phase example flows.. cannot be assumed to work out of 
+		the box -->
 
 	<action-state id="CheckNeed">
 		<evaluate expression="CheckRequestedAuthenticationContext" />
@@ -33,28 +35,165 @@
 			as step up -->
 		<transition on="AuthnContextStepUp" to="proceed" />
 		<!-- provided value cannot be regarded as stepup, move to stepuup -->
-		<transition on="ContinueStepUp" to="StepUp" />
+		<transition on="ContinueStepUp" to="InitializeStepUp" />
 		<!-- internal eventid mapping error -->
 		<transition to="DisplayCondolences" />
 	</action-state>
 
+
+	<action-state id="InitializeStepUp">
+		<evaluate expression="InitializeStepUpChallengeContext" />
+		<transition on="ContinueStepUp" to="StepUp" />
+		<!-- internal eventid mapping error -->
+		<transition to="DisplayCondolences" />
+	</action-state>
 	<action-state id="StepUp">
 		<evaluate expression="GenerateStepUpChallenge" />
-		<!-- user does not have approbriate attribute value for challange -->
-		<!-- ..or user does have approbriate set of attributes to be eligible -->
-		<transition on="InvalidUser" to="DisplayCondolences" />
-		<transition on="ContinueStepUp" to="DisplayStepUpChallenge" />
+		<!-- user does not meet preconditions to perform stepup -->
+		<transition on="InvalidUser" to="InitializeRegistration" />
+		<transition on="ContinueStepUp" to="DisplayChallenge">
+			<set name="flowScope.viewName" value="flowRequestContext.activeFlow.id"
+				type="string" />
+			<set name="flowScope.proceedAction" value="'VerifyPasswordFromFormRequest'"
+				type="string" />
+		</transition>
+		<!-- REPLACE WITH GENERIC ERROR DISPLAY -->
 		<transition to="DisplayCondolences" />
 	</action-state>
 
+
+	<action-state id="InitializeRegistration">
+		<evaluate expression="InitializeRegistrationStepUpChallengeContext" />
+		<transition on="ContinueStepUp" to="RegistrationStepUp" />
+		<!-- internal eventid mapping error -->
+		<transition to="DisplayCondolences" />
+	</action-state>
+	<action-state id="RegistrationStepUp">
+		<evaluate expression="GenerateStepUpChallenge" />
+		<!-- user does not meet preconditions to perform stepup -->
+		<transition on="InvalidUser" to="DisplayCondolences" />
+		<transition on="ContinueStepUp" to="DisplayChallenge">
+			<set name="flowScope.viewName" value="flowRequestContext.activeFlow.id+'-register'"
+				type="string" />
+			<set name="flowScope.proceedAction" value="'VerifyRegistrationPasswordFromFormRequest'"
+				type="string" />
+		</transition>
+		<!-- REPLACE WITH GENERIC ERROR DISPLAY -->
+		<transition to="DisplayCondolences" />
+	</action-state>
+
+	<action-state id="VerifyRegistrationPasswordFromFormRequest">
+		<!-- Extract password from form and compare it to stored one. If fails 
+			return authentication error? Or halt and display page? or both? -->
+		<!-- Add a new registration specific bean for this one if needed -->
+		<evaluate expression="VerifyPasswordFromFormRequest" />
+		<!-- Change to actual registration implementation..from there we will go 
+			back to stepup action -->
+		<transition on="ContinueStepUp" to="AddAccount" />
+		<transition to="DisplayWrongResponse" />
+	</action-state>
+
+	<!-- Following could be changed to support method disco if several methods 
+		available -->
+	<!-- having to call initilize is bit akward as it has to be called soon 
+		after -->
+	<!-- modify logic -->
+	<action-state id="AddAccount">
+		<on-entry>
+			<evaluate expression="InitializeStepUpChallengeContext" />
+		</on-entry>
+		<evaluate expression="AddAccount" />
+		<transition on="ContinueStepUp" to="DisplayEnd">
+			<set name="flowScope.viewName" value="flowRequestContext.activeFlow.id+'-performed'"
+				type="string" />
+		</transition>
+		<transition to="DisplayCondolences" />
+	</action-state>
+
+	<action-state id="StoreSharedSecret">
+		<!-- Stores a shared secret -->
+		<!-- initialized with attribute that used as storage key -->
+		<evaluate expression="StoreSharedSecret" />
+		<transition on="ContinueStepUp" to="DisplayEnd">
+			<set name="flowScope.viewName" value="flowRequestContext.activeFlow.id+'-performed'"
+				type="string" />
+		</transition>
+		<transition to="DisplayCondolences" />
+	</action-state>
+
+
+	<!-- First the basic to enable following listing -->
+	<action-state id="DisplayAccounts">
+		<!-- populate account contexts -->
+		<!-- internal eventid mapping error -->
+		<evaluate expression="'proceed'" />
+		<transition on="proceed" to="DisplayCondolences" />
+	</action-state>
+
+	<view-state id="DisplayChallenge" view="#{flowScope.viewName}">
+		<on-render>
+			<evaluate expression="environment" result="viewScope.environment" />
+			<evaluate expression="opensamlProfileRequestContext" result="viewScope.profileRequestContext" />
+			<evaluate
+				expression="opensamlProfileRequestContext.getSubcontext(T(net.shibboleth.idp.authn.context.AuthenticationContext))"
+				result="viewScope.authenticationContext" />
+			<evaluate
+				expression="authenticationContext.getSubcontext(T(net.shibboleth.idp.authn.context.AuthenticationErrorContext))"
+				result="viewScope.authenticationErrorContext" />
+			<evaluate
+				expression="authenticationContext.getSubcontext(T(net.shibboleth.idp.authn.context.AuthenticationWarningContext))"
+				result="viewScope.authenticationWarningContext" />
+			<evaluate
+				expression="T(net.shibboleth.utilities.java.support.codec.HTMLEncoder)"
+				result="viewScope.encoder" />
+			<evaluate
+				expression="flowRequestContext.getExternalContext().getNativeRequest()"
+				result="viewScope.request" />
+			<evaluate
+				expression="flowRequestContext.getExternalContext().getNativeResponse()"
+				result="viewScope.response" />
+		</on-render>
+		<transition on="proceed" to="#{flowScope.proceedAction}" />
+		<transition on="ManageAccounts" to="DisplayAccounts" />
+	</view-state>
+
+	<view-state id="DisplayEnd" view="#{flowScope.viewName}">
+		<on-render>
+			<evaluate expression="environment" result="viewScope.environment" />
+			<evaluate expression="opensamlProfileRequestContext" result="viewScope.profileRequestContext" />
+			<evaluate
+				expression="opensamlProfileRequestContext.getSubcontext(T(net.shibboleth.idp.authn.context.AuthenticationContext))"
+				result="viewScope.authenticationContext" />
+			<evaluate
+				expression="authenticationContext.getSubcontext(T(net.shibboleth.idp.authn.context.AuthenticationErrorContext))"
+				result="viewScope.authenticationErrorContext" />
+			<evaluate
+				expression="authenticationContext.getSubcontext(T(net.shibboleth.idp.authn.context.AuthenticationWarningContext))"
+				result="viewScope.authenticationWarningContext" />
+			<evaluate
+				expression="authenticationContext.getSubcontext(T(fi.csc.idp.stepup.api.StepUpMethodContext))"
+				result="viewScope.stepupMethodContext" />
+			<evaluate
+				expression="T(net.shibboleth.utilities.java.support.codec.HTMLEncoder)"
+				result="viewScope.encoder" />
+			<evaluate
+				expression="flowRequestContext.getExternalContext().getNativeRequest()"
+				result="viewScope.request" />
+			<evaluate
+				expression="flowRequestContext.getExternalContext().getNativeResponse()"
+				result="viewScope.response" />
+		</on-render>
+		<transition on="proceed" to="InitializeStepUp" />
+	</view-state>
 
 	<action-state id="VerifyPasswordFromFormRequest">
 		<!-- Extract password from form and compare it to stored one. If fails 
 			return authentication error? Or halt and display page? or both? -->
 		<evaluate expression="VerifyPasswordFromFormRequest" />
-		<transition on="ContinueStepUp" to="SetMethod" />
+		<transition on="ContinueStepUp" to="proceed" />
 		<transition to="DisplayWrongResponse" />
 	</action-state>
+
 
 	<view-state id="DisplayStepUpChallenge" view="#{flowRequestContext.activeFlow.id}">
 		<on-render>
@@ -81,7 +220,6 @@
 		</on-render>
 		<transition on="proceed" to="VerifyPasswordFromFormRequest" />
 	</view-state>
-
 	<view-state id="DisplayCondolences"
 		view="#{flowRequestContext.activeFlow.id}-condolences">
 		<on-render>
