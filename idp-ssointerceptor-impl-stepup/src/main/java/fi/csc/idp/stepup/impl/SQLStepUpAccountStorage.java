@@ -215,7 +215,7 @@ public class SQLStepUpAccountStorage implements StepUpAccountStorage {
         update.setBoolean(3, account.isEditable());
         update.setString(4, account.getTarget());
         update.setString(5, key);
-        update.setLong(1, account.getId());
+        update.setLong(6, account.getId());
         update.executeUpdate();
         conn.commit();
         update.close();
