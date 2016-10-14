@@ -79,7 +79,7 @@ public class TestVerifyPasswordFromFormRequest {
         ShibbolethSpAuthenticationContext sCtx = new ShibbolethSpAuthenticationContext();
         ctx.addSubcontext(sCtx, true);
         StepUpMethodContext stepUpContext = new StepUpMethodContext();
-        stepUpContext.setStepUpAccount(new account());
+        stepUpContext.setStepUpAccount(new MockAccount());
         ctx.addSubcontext(stepUpContext, true);
         action.initialize();
         final Event event = action.execute(src);
@@ -94,10 +94,10 @@ public class TestVerifyPasswordFromFormRequest {
         sCtx.setInitialRequestedContext(requested);
         ctx.addSubcontext(sCtx, true);
         StepUpMethodContext stepUpContext = new StepUpMethodContext();
-        stepUpContext.setStepUpAccount(new account());
+        stepUpContext.setStepUpAccount(new MockAccount());
         MockHttpServletRequest request = new MockHttpServletRequest();
-        request.addParameter("parameter_key", "parameter_value");
-        request.addParameter("parameter_key2", "parameter_value2");
+        request.addParameter("parameter_key", "response_failure");
+        request.addParameter("parameter_key2", "response_success");
         action.setHttpServletRequest(request);
         ctx.addSubcontext(stepUpContext, true);
     }
@@ -134,63 +134,6 @@ public class TestVerifyPasswordFromFormRequest {
         ActionTestingSupport.assertEvent(event, StepUpEventIds.EVENTID_CONTINUE_STEPUP);
     }
 
-    class account implements StepUpAccount {
-
-        @Override
-        public long getId() {
-            return 0;
-        }
-
-        @Override
-        public void setId(long id) {
-
-        }
-
-        @Override
-        public String getName() {
-            return null;
-        }
-
-        @Override
-        public void setName(String name) {
-
-        }
-
-        @Override
-        public boolean isEditable() {
-            return false;
-        }
-
-        @Override
-        public void setEditable(boolean isEditable) {
-        }
-
-        @Override
-        public void setEnabled(boolean isEnabled) {
-        }
-
-        @Override
-        public boolean isEnabled() {
-            return false;
-        }
-
-        @Override
-        public void sendChallenge() throws Exception {
-        }
-
-        @Override
-        public boolean verifyResponse(String response) throws Exception {
-            return "parameter_value2".equals(response);
-        }
-
-        @Override
-        public void setTarget(String target) {
-        }
-
-        @Override
-        public String getTarget() {
-            return null;
-        }
-
-    }
+   
+   
 }
