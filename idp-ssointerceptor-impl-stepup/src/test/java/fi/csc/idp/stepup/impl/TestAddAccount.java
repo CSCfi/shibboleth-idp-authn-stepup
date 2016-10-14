@@ -103,7 +103,7 @@ public class TestAddAccount {
     class method3 extends method {
         @Override
         public StepUpAccount addAccount() throws Exception {
-            return new account();
+            return new MockAccount();
         }
     }
 
@@ -136,7 +136,7 @@ public class TestAddAccount {
         @Override
         public List<StepUpAccount> getAccounts() throws Exception {
             if (accounts.isEmpty()) {
-                accounts.add(new account());
+                accounts.add(new MockAccount());
             }
             return accounts;
         }
@@ -151,63 +151,7 @@ public class TestAddAccount {
 
         }
 
-        class account implements StepUpAccount {
-
-            @Override
-            public long getId() {
-                return 0;
-            }
-
-            @Override
-            public void setId(long id) {
-            }
-
-            @Override
-            public String getName() {
-                return null;
-            }
-
-            @Override
-            public void setName(String name) {
-            }
-
-            @Override
-            public boolean isEditable() {
-                return false;
-            }
-
-            @Override
-            public void setEditable(boolean isEditable) {
-            }
-
-            @Override
-            public void setEnabled(boolean isEnabled) {
-            }
-
-            @Override
-            public boolean isEnabled() {
-                return true;
-            }
-
-            @Override
-            public void sendChallenge() throws Exception {
-            }
-
-            @Override
-            public boolean verifyResponse(String response) throws Exception {
-                return false;
-            }
-
-            @Override
-            public void setTarget(String target) {
-            }
-
-            @Override
-            public String getTarget() {
-                return null;
-            }
-
-        }
+        
 
     }
 
