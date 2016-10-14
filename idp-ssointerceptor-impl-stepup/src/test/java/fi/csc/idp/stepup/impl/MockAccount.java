@@ -4,22 +4,27 @@ import fi.csc.idp.stepup.api.StepUpAccount;
 
 public class MockAccount implements StepUpAccount {
 
+    long id=0;
+    String name;
+    
     @Override
     public long getId() {
-        return 0;
+        return id;
     }
 
     @Override
     public void setId(long id) {
+        this.id=id;
     }
 
     @Override
     public String getName() {
-        return null;
+        return name;
     }
 
     @Override
     public void setName(String name) {
+        this.name=name;
     }
 
     @Override
