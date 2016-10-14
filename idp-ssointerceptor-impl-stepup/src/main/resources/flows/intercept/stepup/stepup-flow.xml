@@ -40,13 +40,13 @@
 		<transition to="DisplayCondolences" />
 	</action-state>
 
-
 	<action-state id="InitializeStepUp">
 		<evaluate expression="InitializeStepUpChallengeContext" />
 		<transition on="ContinueStepUp" to="StepUp" />
 		<!-- internal eventid mapping error -->
 		<transition to="DisplayCondolences" />
 	</action-state>
+
 	<action-state id="StepUp">
 		<evaluate expression="GenerateStepUpChallenge" />
 		<!-- user does not meet preconditions to perform stepup -->
@@ -61,13 +61,13 @@
 		<transition to="DisplayCondolences" />
 	</action-state>
 
-
 	<action-state id="InitializeRegistration">
 		<evaluate expression="InitializeRegistrationStepUpChallengeContext" />
 		<transition on="ContinueStepUp" to="RegistrationStepUp" />
 		<!-- internal eventid mapping error -->
 		<transition to="DisplayCondolences" />
 	</action-state>
+
 	<action-state id="RegistrationStepUp">
 		<evaluate expression="GenerateStepUpChallenge" />
 		<!-- user does not meet preconditions to perform stepup -->
@@ -110,13 +110,20 @@
 		<transition to="DisplayCondolences" />
 	</action-state>
 
-	
 	<!-- First the basic to enable following listing -->
 	<action-state id="DisplayAccounts">
 		<!-- populate account contexts -->
 		<!-- internal eventid mapping error -->
 		<evaluate expression="'proceed'" />
 		<transition on="proceed" to="DisplayCondolences" />
+	</action-state>
+
+	<action-state id="VerifyPasswordFromFormRequest">
+		<!-- Extract password from form and compare it to stored one. If fails 
+			return authentication error? Or halt and display page? or both? -->
+		<evaluate expression="VerifyPasswordFromFormRequest" />
+		<transition on="ContinueStepUp" to="proceed" />
+		<transition to="DisplayWrongResponse" />
 	</action-state>
 
 	<view-state id="DisplayChallenge" view="#{flowScope.viewName}">
@@ -175,15 +182,6 @@
 		<transition on="proceed" to="InitializeStepUp" />
 	</view-state>
 
-	<action-state id="VerifyPasswordFromFormRequest">
-		<!-- Extract password from form and compare it to stored one. If fails 
-			return authentication error? Or halt and display page? or both? -->
-		<evaluate expression="VerifyPasswordFromFormRequest" />
-		<transition on="ContinueStepUp" to="proceed" />
-		<transition to="DisplayWrongResponse" />
-	</action-state>
-
-
 	<view-state id="DisplayStepUpChallenge" view="#{flowRequestContext.activeFlow.id}">
 		<on-render>
 			<evaluate expression="environment" result="viewScope.environment" />
@@ -209,6 +207,7 @@
 		</on-render>
 		<transition on="proceed" to="VerifyPasswordFromFormRequest" />
 	</view-state>
+
 	<view-state id="DisplayCondolences"
 		view="#{flowRequestContext.activeFlow.id}-condolences">
 		<on-render>
