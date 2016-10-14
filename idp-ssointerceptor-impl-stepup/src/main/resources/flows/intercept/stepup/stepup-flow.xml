@@ -110,18 +110,7 @@
 		<transition to="DisplayCondolences" />
 	</action-state>
 
-	<action-state id="StoreSharedSecret">
-		<!-- Stores a shared secret -->
-		<!-- initialized with attribute that used as storage key -->
-		<evaluate expression="StoreSharedSecret" />
-		<transition on="ContinueStepUp" to="DisplayEnd">
-			<set name="flowScope.viewName" value="flowRequestContext.activeFlow.id+'-performed'"
-				type="string" />
-		</transition>
-		<transition to="DisplayCondolences" />
-	</action-state>
-
-
+	
 	<!-- First the basic to enable following listing -->
 	<action-state id="DisplayAccounts">
 		<!-- populate account contexts -->
