@@ -23,6 +23,7 @@
 
 package fi.csc.idp.stepup.impl;
 
+import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
@@ -158,7 +159,7 @@ public class SQLStepUpAccountStorage implements StepUpAccountStorage {
      * 
      * @return datasource
      */
-    public DataSource getDataSource() {
+    private DataSource getDataSource() {
         log.trace("Entering");
         if (datasource == null) {
             HikariConfig config = new HikariConfig();
@@ -176,24 +177,30 @@ public class SQLStepUpAccountStorage implements StepUpAccountStorage {
     @Override
     public void add(StepUpAccount account, String key) throws Exception {
         log.trace("Entering");
-        PreparedStatement add = getDataSource().getConnection().prepareStatement(addStatement);
+        Connection conn=getDataSource().getConnection();
+        PreparedStatement add = conn.prepareStatement(addStatement);
         add.setString(1, account.getName());
         add.setBoolean(2, account.isEnabled());
         add.setBoolean(3, account.isEditable());
         add.setString(4, account.getTarget());
         add.setString(5, key);
         add.executeUpdate();
-        getDataSource().getConnection().commit();
+        conn.commit();
+        add.close();
+        conn.close();
         log.trace("Leaving");
     }
 
     @Override
     public void remove(StepUpAccount account, String key) throws Exception {
         log.trace("Entering");
-        PreparedStatement add = getDataSource().getConnection().prepareStatement(removeStatement);
-        add.setLong(1, account.getId());
-        add.executeUpdate();
-        getDataSource().getConnection().commit();
+        Connection conn=getDataSource().getConnection();
+        PreparedStatement remove = conn.prepareStatement(removeStatement);
+        remove.setLong(1, account.getId());
+        remove.executeUpdate();
+        conn.commit();
+        remove.close();
+        conn.close();
         log.trace("Leaving");
 
     }
@@ -201,15 +208,18 @@ public class SQLStepUpAccountStorage implements StepUpAccountStorage {
     @Override
     public void update(StepUpAccount account, String key) throws Exception {
         log.trace("Entering");
-        PreparedStatement add = getDataSource().getConnection().prepareStatement(updateStatement);
-        add.setString(1, account.getName());
-        add.setBoolean(2, account.isEnabled());
-        add.setBoolean(3, account.isEditable());
-        add.setString(4, account.getTarget());
-        add.setString(5, key);
-        add.setLong(1, account.getId());
-        add.executeUpdate();
-        getDataSource().getConnection().commit();
+        Connection conn=getDataSource().getConnection();
+        PreparedStatement update = conn.prepareStatement(updateStatement);
+        update.setString(1, account.getName());
+        update.setBoolean(2, account.isEnabled());
+        update.setBoolean(3, account.isEditable());
+        update.setString(4, account.getTarget());
+        update.setString(5, key);
+        update.setLong(1, account.getId());
+        update.executeUpdate();
+        conn.commit();
+        update.close();
+        conn.close();
         log.trace("Leaving");
     }
 
@@ -217,13 +227,15 @@ public class SQLStepUpAccountStorage implements StepUpAccountStorage {
     public <T> List<StepUpAccount> getAccounts(String key, Class<T> aClass) throws Exception {
         log.trace("Entering");
         log.debug("About to read accounts for " + key);
+        Connection conn=getDataSource().getConnection();
         List<StepUpAccount> accounts = new ArrayList<StepUpAccount>();
-        PreparedStatement list = getDataSource().getConnection().prepareStatement(listStatement);
+        PreparedStatement list = conn.prepareStatement(listStatement);
         list.setString(1, key);
         ResultSet rs = list.executeQuery();
         while (rs.next()) {
             Object obj = aClass.newInstance();
             if (!(obj instanceof StepUpAccount)) {
+                conn.close();
                 throw new Exception("Unable to instantiate StepUpAccount");
             }
             StepUpAccount stepUpAccount = (StepUpAccount) obj;
@@ -236,6 +248,9 @@ public class SQLStepUpAccountStorage implements StepUpAccountStorage {
             accounts.add(stepUpAccount);
         }
         log.trace("Leaving");
+        rs.close();
+        list.close();
+        conn.close();
         return accounts;
     }
 
