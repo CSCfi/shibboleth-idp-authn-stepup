@@ -41,6 +41,8 @@ import org.slf4j.LoggerFactory;
 import fi.csc.idp.stepup.api.StepUpAccount;
 import fi.csc.idp.stepup.api.StepUpAccountStorage;
 
+import org.springframework.security.crypto.encrypt.TextEncryptor;
+
 /** SQL implementation of Step Up Account storage. */
 public class SQLStepUpAccountStorage implements StepUpAccountStorage {
 
@@ -48,23 +50,71 @@ public class SQLStepUpAccountStorage implements StepUpAccountStorage {
     @Nonnull
     private static final Logger log = LoggerFactory.getLogger(SQLStepUpAccountStorage.class);
     /** datasource constructed. */
-    private static DataSource datasource;
+    private DataSource datasource;
     /** url for the database connection. */
-    private static String jdbcUrl;
+    private String jdbcUrl;
     /** username for database connection. */
-    private static String userName;
+    private String userName;
     /** password for database connection. */
-    private static String password;
+    private String password;
     /** pool size for database connection. */
-    private static int poolSize;
+    private int poolSize;
     /** statement for adding items. */
-    private static String addStatement;
+    private String addStatement;
     /** statement for updating items. */
-    private static String updateStatement;
+    private String updateStatement;
     /** statement for removing items. */
-    private static String removeStatement;
+    private String removeStatement;
     /** statement for listing items. */
-    private static String listStatement;
+    private String listStatement;
+    /** encryptor for the fields. */
+    private TextEncryptor encryptor;
+    /** if name parameter should be encrypted. */
+    private boolean encryptName;
+    /** if target parameter should be encrypted. */
+    private boolean encryptTarget;
+    /** if key parameter should be encrypted. */
+    private boolean encryptKey;
+
+    /**
+     * Setter for account field cryptor.
+     * 
+     * @param cryptor
+     *            TextEncryptor
+     */
+    public void setEncryptor(TextEncryptor cryptor) {
+        this.encryptor = cryptor;
+    }
+
+    /**
+     * Setter for name encryption option.
+     * 
+     * @param encrypt
+     *            parameter or not
+     */
+    public void setEncryptName(boolean encrypt) {
+        this.encryptName = encrypt;
+    }
+
+    /**
+     * Setter for target encryption option.
+     * 
+     * @param encrypt
+     *            parameter or not
+     */
+    public void setEncryptTarget(boolean encrypt) {
+        this.encryptTarget = encrypt;
+    }
+
+    /**
+     * Setter for key encryption option.
+     * 
+     * @param encrypt
+     *            parameter or not
+     */
+    public void setEncryptKey(boolean encrypt) {
+        this.encryptKey = encrypt;
+    }
 
     /**
      * Setter for database connection url.
@@ -74,7 +124,7 @@ public class SQLStepUpAccountStorage implements StepUpAccountStorage {
      */
     public void setJdbcUrl(String url) {
         log.trace("Entering & Leaving");
-        SQLStepUpAccountStorage.jdbcUrl = url;
+        this.jdbcUrl = url;
     }
 
     /**
@@ -85,7 +135,7 @@ public class SQLStepUpAccountStorage implements StepUpAccountStorage {
      */
     public void setPassword(String psswd) {
         log.trace("Entering & Leaving");
-        SQLStepUpAccountStorage.password = psswd;
+        this.password = psswd;
     }
 
     /**
@@ -96,7 +146,7 @@ public class SQLStepUpAccountStorage implements StepUpAccountStorage {
      */
     public void setUserName(String name) {
         log.trace("Entering & Leaving");
-        SQLStepUpAccountStorage.userName = name;
+        this.userName = name;
     }
 
     /**
@@ -107,7 +157,7 @@ public class SQLStepUpAccountStorage implements StepUpAccountStorage {
      */
     public void setPoolSize(int size) {
         log.trace("Entering & Leaving");
-        SQLStepUpAccountStorage.poolSize = size;
+        this.poolSize = size;
     }
 
     /**
@@ -118,7 +168,7 @@ public class SQLStepUpAccountStorage implements StepUpAccountStorage {
      */
     public void setAddStatement(String statement) {
         log.trace("Entering & Leaving");
-        SQLStepUpAccountStorage.addStatement = statement;
+        this.addStatement = statement;
     }
 
     /**
@@ -129,7 +179,7 @@ public class SQLStepUpAccountStorage implements StepUpAccountStorage {
      */
     public void setUpdateStatement(String statement) {
         log.trace("Entering & Leaving");
-        SQLStepUpAccountStorage.updateStatement = statement;
+        this.updateStatement = statement;
     }
 
     /**
@@ -140,7 +190,7 @@ public class SQLStepUpAccountStorage implements StepUpAccountStorage {
      */
     public void setRemoveStatement(String statement) {
         log.trace("Entering & Leaving");
-        SQLStepUpAccountStorage.removeStatement = statement;
+        this.removeStatement = statement;
     }
 
     /**
@@ -151,7 +201,7 @@ public class SQLStepUpAccountStorage implements StepUpAccountStorage {
      */
     public void setListStatement(String statement) {
         log.trace("Entering & Leaving");
-        SQLStepUpAccountStorage.listStatement = statement;
+        this.listStatement = statement;
     }
 
     /**
@@ -174,33 +224,180 @@ public class SQLStepUpAccountStorage implements StepUpAccountStorage {
         return datasource;
     }
 
+    /**
+     * Encrypts parameter with encryptor.
+     * 
+     * @param parameter
+     *            to be encrypted
+     * @return encrypted parameter
+     * @throws Exception
+     *             if something unexpected occurs
+     */
+    private String encrypt(String parameter) throws Exception {
+        log.trace("Entering");
+        if (encryptor == null) {
+            log.trace("Leaving");
+            throw new Exception("Encryptor not set");
+        }
+        if (parameter == null) {
+            log.trace("Leaving");
+            return null;
+        }
+        log.trace("Leaving");
+        return encryptor.encrypt(parameter);
+    }
+
+    /**
+     * Decrypts parameter with encryptor.
+     * 
+     * @param parameter
+     *            to be decrypted
+     * @return decrypted parameter
+     * @throws Exception
+     *             if something unexpected occurs
+     */
+    private String decrypt(String parameter) throws Exception {
+        log.trace("Entering");
+        if (encryptor == null) {
+            log.trace("Leaving");
+            throw new Exception("Encryptor not set");
+        }
+        if (parameter == null) {
+            log.trace("Leaving");
+            return null;
+        }
+        log.trace("Leaving");
+        return encryptor.decrypt(parameter);
+    }
+
+    /**
+     * Encrypts key if needed.
+     * 
+     * @param key
+     *            to be encrypted.
+     * @return encrypted key
+     * @throws Exception
+     *             if something unexpected occurs
+     */
+    private String encryptKey(String key) throws Exception {
+        log.trace("Entering");
+        if (!encryptKey) {
+            log.trace("Leaving");
+            return key;
+        }
+        log.trace("Leaving");
+        return encrypt(key);
+    }
+
+    /**
+     * Encrypts name if needed.
+     * 
+     * @param name
+     *            to be encrypted.
+     * @return encrypted name
+     * @throws Exception
+     *             if something unexpected occurs
+     */
+    private String encryptName(String name) throws Exception {
+        log.trace("Entering");
+        if (!encryptName) {
+            log.trace("Leaving");
+            return name;
+        }
+        log.trace("Leaving");
+        return encrypt(name);
+    }
+
+    /**
+     * Decrypts name if needed.
+     * 
+     * @param name
+     *            to be decrypted.
+     * @return decrypted name
+     * @throws Exception
+     *             if something unexpected occurs
+     */
+    private String decryptName(String name) throws Exception {
+        log.trace("Entering");
+        if (!encryptName) {
+            log.trace("Leaving");
+            return name;
+        }
+        log.trace("Leaving");
+        return decrypt(name);
+    }
+
+    /**
+     * Encrypts target if needed.
+     * 
+     * @param target
+     *            to be encrypted.
+     * @return encrypted target
+     * @throws Exception
+     *             if something unexpected occurs
+     */
+    private String encryptTarget(String target) throws Exception {
+        log.trace("Entering");
+        if (!encryptTarget) {
+            log.trace("Leaving");
+            return target;
+        }
+        log.trace("Leaving");
+        return encrypt(target);
+    }
+
+    /**
+     * Decrypts target if needed.
+     * 
+     * @param target
+     *            to be decrypted.
+     * @return decrypted target
+     * @throws Exception
+     *             if something unexpected occurs
+     */
+    private String decryptTarget(String target) throws Exception {
+        log.trace("Entering");
+        if (!encryptName) {
+            log.trace("Leaving");
+            return target;
+        }
+        log.trace("Leaving");
+        return decrypt(target);
+    }
+
     @Override
     public void add(StepUpAccount account, String key) throws Exception {
         log.trace("Entering");
-        Connection conn=getDataSource().getConnection();
+        Connection conn = getDataSource().getConnection();
         PreparedStatement add = conn.prepareStatement(addStatement);
-        add.setString(1, account.getName());
-        add.setBoolean(2, account.isEnabled());
-        add.setBoolean(3, account.isEditable());
-        add.setString(4, account.getTarget());
-        add.setString(5, key);
-        add.executeUpdate();
-        conn.commit();
-        add.close();
-        conn.close();
+        try {
+            add.setString(1, encryptName(account.getName()));
+            add.setBoolean(2, account.isEnabled());
+            add.setBoolean(3, account.isEditable());
+            add.setString(4, encryptTarget(account.getTarget()));
+            add.setString(5, encryptKey(key));
+            add.executeUpdate();
+            conn.commit();
+        } finally {
+            add.close();
+            conn.close();
+        }
         log.trace("Leaving");
     }
 
     @Override
     public void remove(StepUpAccount account, String key) throws Exception {
         log.trace("Entering");
-        Connection conn=getDataSource().getConnection();
+        Connection conn = getDataSource().getConnection();
         PreparedStatement remove = conn.prepareStatement(removeStatement);
-        remove.setLong(1, account.getId());
-        remove.executeUpdate();
-        conn.commit();
-        remove.close();
-        conn.close();
+        try {
+            remove.setLong(1, account.getId());
+            remove.executeUpdate();
+            conn.commit();
+        } finally {
+            remove.close();
+            conn.close();
+        }
         log.trace("Leaving");
 
     }
@@ -208,18 +405,21 @@ public class SQLStepUpAccountStorage implements StepUpAccountStorage {
     @Override
     public void update(StepUpAccount account, String key) throws Exception {
         log.trace("Entering");
-        Connection conn=getDataSource().getConnection();
+        Connection conn = getDataSource().getConnection();
         PreparedStatement update = conn.prepareStatement(updateStatement);
-        update.setString(1, account.getName());
-        update.setBoolean(2, account.isEnabled());
-        update.setBoolean(3, account.isEditable());
-        update.setString(4, account.getTarget());
-        update.setString(5, key);
-        update.setLong(6, account.getId());
-        update.executeUpdate();
-        conn.commit();
-        update.close();
-        conn.close();
+        try {
+            update.setString(1, encryptName(account.getName()));
+            update.setBoolean(2, account.isEnabled());
+            update.setBoolean(3, account.isEditable());
+            update.setString(4, encryptTarget(account.getTarget()));
+            update.setString(5, encryptKey(key));
+            update.setLong(6, account.getId());
+            update.executeUpdate();
+        } finally {
+            conn.commit();
+            update.close();
+            conn.close();
+        }
         log.trace("Leaving");
     }
 
@@ -227,30 +427,33 @@ public class SQLStepUpAccountStorage implements StepUpAccountStorage {
     public <T> List<StepUpAccount> getAccounts(String key, Class<T> aClass) throws Exception {
         log.trace("Entering");
         log.debug("About to read accounts for " + key);
-        Connection conn=getDataSource().getConnection();
+        Connection conn = getDataSource().getConnection();
         List<StepUpAccount> accounts = new ArrayList<StepUpAccount>();
         PreparedStatement list = conn.prepareStatement(listStatement);
-        list.setString(1, key);
-        ResultSet rs = list.executeQuery();
-        while (rs.next()) {
-            Object obj = aClass.newInstance();
-            if (!(obj instanceof StepUpAccount)) {
-                conn.close();
-                throw new Exception("Unable to instantiate StepUpAccount");
+        try {
+            list.setString(1, encryptKey(key));
+            ResultSet rs = list.executeQuery();
+            while (rs.next()) {
+                Object obj = aClass.newInstance();
+                if (!(obj instanceof StepUpAccount)) {
+                    conn.close();
+                    throw new Exception("Unable to instantiate StepUpAccount");
+                }
+                StepUpAccount stepUpAccount = (StepUpAccount) obj;
+                stepUpAccount.setId(rs.getInt("id"));
+                stepUpAccount.setName(decryptName(rs.getString("name")));
+                stepUpAccount.setEnabled(rs.getBoolean("enabled"));
+                stepUpAccount.setTarget(decryptTarget(rs.getString("target")));
+                // This is set last
+                stepUpAccount.setEditable(rs.getBoolean("editable"));
+                accounts.add(stepUpAccount);
             }
-            StepUpAccount stepUpAccount = (StepUpAccount) obj;
-            stepUpAccount.setId(rs.getInt("id"));
-            stepUpAccount.setName(rs.getString("name"));
-            stepUpAccount.setEnabled(rs.getBoolean("enabled"));
-            stepUpAccount.setTarget(rs.getString("target"));
-            // This is set last
-            stepUpAccount.setEditable(rs.getBoolean("editable"));
-            accounts.add(stepUpAccount);
+            log.trace("Leaving");
+            rs.close();
+        } finally {
+            list.close();
+            conn.close();
         }
-        log.trace("Leaving");
-        rs.close();
-        list.close();
-        conn.close();
         return accounts;
     }
 
