@@ -361,7 +361,7 @@ public class SQLStepUpAccountStorage implements StepUpAccountStorage {
      */
     private String decryptTarget(String target) throws Exception {
         log.trace("Entering");
-        if (!encryptName) {
+        if (!encryptTarget) {
             log.trace("Leaving");
             return target;
         }
