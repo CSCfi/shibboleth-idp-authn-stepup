@@ -66,7 +66,7 @@ public class AddAccount extends AbstractAuthenticationAction {
         log.trace("Entering");
         stepUpMethodContext = authenticationContext.getSubcontext(StepUpMethodContext.class);
         if (stepUpMethodContext == null) {
-            log.debug("{} Could not get shib proxy context", getLogPrefix());
+            log.error("{} Could not get shib proxy context", getLogPrefix());
             ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EVENTID_MISSING_STEPUPMETHODCONTEXT);
             log.trace("Leaving");
             return false;
@@ -80,7 +80,7 @@ public class AddAccount extends AbstractAuthenticationAction {
             @Nonnull final AuthenticationContext authenticationContext) {
         log.trace("Entering");
         if (stepUpMethodContext.getStepUpMethod() == null) {
-            log.debug("No default stepup method available", getLogPrefix());
+            log.error("No default stepup method available", getLogPrefix());
             ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EVENTID_INVALID_USER);
             log.trace("Leaving");
             return;
@@ -90,13 +90,13 @@ public class AddAccount extends AbstractAuthenticationAction {
         try {
             account = stepUpMethodContext.getStepUpMethod().addAccount();
         } catch (Exception e) {
-            log.debug("Account creation failed for unexpected reason", getLogPrefix());
+            log.error("Account creation failed for unexpected reason", getLogPrefix());
             ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EVENTID_INVALID_USER);
             log.trace("Leaving");
             return;
         }
         if (account == null) {
-            log.debug("Could not create new stepup account for user", getLogPrefix());
+            log.error("Could not create new stepup account for user", getLogPrefix());
             ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EVENTID_INVALID_USER);
             log.trace("Leaving");
             return;
