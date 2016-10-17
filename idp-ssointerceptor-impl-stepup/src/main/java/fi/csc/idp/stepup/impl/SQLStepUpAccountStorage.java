@@ -243,8 +243,10 @@ public class SQLStepUpAccountStorage implements StepUpAccountStorage {
             log.trace("Leaving");
             return null;
         }
+        String result = encryptor.encrypt(parameter);
+        log.debug("encrypt(" + parameter + ")=" + result);
         log.trace("Leaving");
-        return encryptor.encrypt(parameter);
+        return result;
     }
 
     /**
@@ -266,8 +268,10 @@ public class SQLStepUpAccountStorage implements StepUpAccountStorage {
             log.trace("Leaving");
             return null;
         }
+        String result = encryptor.decrypt(parameter);
+        log.debug("decrypt(" + parameter + ")=" + result);
         log.trace("Leaving");
-        return encryptor.decrypt(parameter);
+        return result;
     }
 
     /**
