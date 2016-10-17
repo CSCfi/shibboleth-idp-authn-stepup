@@ -3,13 +3,21 @@ package fi.csc.idp.stepup.impl;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.Statement;
+
+import org.springframework.security.crypto.encrypt.Encryptors;
+import org.springframework.security.crypto.encrypt.TextEncryptor;
 import org.testng.Assert;
+import org.testng.annotations.AfterClass;
 import org.testng.annotations.AfterMethod;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
+
 import java.util.List;
+
 import org.hsqldb.Server;
 import org.hsqldb.persist.HsqlProperties;
+
 import fi.csc.idp.stepup.api.StepUpAccount;
 
 public class TestSQLStepUpAccountStorage {
@@ -17,7 +25,7 @@ public class TestSQLStepUpAccountStorage {
     private SQLStepUpAccountStorage sqlStepUpAccountStorage;
     private Server server;
 
-    @BeforeMethod
+    @BeforeClass
     public void setUp() throws Exception {
 
         server = new Server();
@@ -29,7 +37,7 @@ public class TestSQLStepUpAccountStorage {
         props.setProperty("dialect", "org.hibernate.dialect.HSQLDialect");
         server.setProperties(props);
         server.start();
-        Thread.sleep(5000);
+        //Thread.sleep(5000);
         Connection conn = DriverManager.getConnection("jdbc:hsqldb:mem:test", "sa", "test");
         Statement stmt = conn.createStatement();
         stmt.executeUpdate("CREATE TABLE storage (test_id int IDENTITY PRIMARY KEY, test_user varchar(64), test_name varchar(64), test_enabled boolean, test_editable boolean, test_target varchar(64));");
@@ -39,11 +47,20 @@ public class TestSQLStepUpAccountStorage {
 
     }
 
-    @AfterMethod
+    @AfterClass
     public void close() {
         server.stop();
     }
-
+    
+    @AfterMethod
+    public void clearTable() throws Exception {
+        Connection conn = DriverManager.getConnection("jdbc:hsqldb:mem:test", "sa", "test");
+        Statement stmt = conn.createStatement();
+        stmt.executeUpdate("TRUNCATE TABLE storage;");
+        stmt.close();
+        conn.close();
+    }
+    
     private void initStepUpStorageConnection() {
         sqlStepUpAccountStorage.setJdbcUrl("jdbc:hsqldb:mem:test");
         sqlStepUpAccountStorage.setPoolSize(1);
@@ -60,11 +77,8 @@ public class TestSQLStepUpAccountStorage {
         sqlStepUpAccountStorage
                 .setListStatement("SELECT test_id id, test_user user, test_name name, test_enabled enabled, test_editable editable, test_target target FROM storage WHERE test_user=?");
     }
-
-    @Test
-    public void test() throws Exception {
-        initStepUpStorageConnection();
-        initStepUpStorageStatements();
+    
+    private void sequence() throws Exception{
         MockAccount ma1 = new MockAccount();
         ma1.setName("ma1");
         MockAccount ma2 = new MockAccount();
@@ -111,6 +125,56 @@ public class TestSQLStepUpAccountStorage {
         }
         Assert.assertTrue(!found);
 
+    }
+
+    @Test
+    public void testSequenceSuccessNoCrypto() throws Exception {
+        sqlStepUpAccountStorage.setEncryptKey(false);
+        sqlStepUpAccountStorage.setEncryptName(false);
+        sqlStepUpAccountStorage.setEncryptTarget(false);
+        initStepUpStorageConnection();
+        initStepUpStorageStatements();
+        sequence();
+    }
+    
+    private void encryptorException() {
+        boolean bException=false;
+        try{
+            sequence();
+        }catch (Exception e){
+            Assert.assertEquals("Encryptor not set",e.getMessage());
+            bException=true;
+        }
+        Assert.assertTrue(bException);
+    }
+    
+    @Test
+    public void testSequenceFailNoCryptoSet() throws Exception {
+        initStepUpStorageConnection();
+        initStepUpStorageStatements();
+        sqlStepUpAccountStorage.setEncryptKey(true);
+        sqlStepUpAccountStorage.setEncryptName(false);
+        sqlStepUpAccountStorage.setEncryptTarget(false);
+        encryptorException();
+        sqlStepUpAccountStorage.setEncryptKey(false);
+        sqlStepUpAccountStorage.setEncryptName(true);
+        sqlStepUpAccountStorage.setEncryptTarget(false);
+        encryptorException();
+        sqlStepUpAccountStorage.setEncryptKey(false);
+        sqlStepUpAccountStorage.setEncryptName(false);
+        sqlStepUpAccountStorage.setEncryptTarget(true);
+        encryptorException();
+    }
+    
+    @Test
+    public void testSequenceSuccessCrypto() throws Exception {
+        sqlStepUpAccountStorage.setEncryptor(Encryptors.queryableText("secret", "abcdef0123"));
+        sqlStepUpAccountStorage.setEncryptKey(true);
+        sqlStepUpAccountStorage.setEncryptName(true);
+        sqlStepUpAccountStorage.setEncryptTarget(true);
+        initStepUpStorageConnection();
+        initStepUpStorageStatements();
+        sequence();
     }
 
 }
