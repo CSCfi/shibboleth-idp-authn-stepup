@@ -165,7 +165,7 @@
 	<bean id="GoogleAuthStepUpManager"
 		class="fi.csc.idp.stepup.impl.AttributeKeyBasedStorageStepUpAccountManager"
 		scope="prototype" p:name="GoogleAuthenticator" p:AttributeId="INTeppn"
-		p:stepUpAccountStorage-ref="StepUpAccountStorage" p:AccountID="GoogleAuthenticatorStepUpAccount">
+		p:stepUpAccountStorage-ref="GAStepUpAccountStorage" p:AccountID="GoogleAuthenticatorStepUpAccount">
 	</bean>
 
 
@@ -214,9 +214,10 @@
 
 
 	<!-- Configuration of Storage used by GA method Manager -->
-	<bean id="StepUpAccountStorage" class="fi.csc.idp.stepup.impl.SQLStepUpAccountStorage"
+	<bean id="GAStepUpAccountStorage" class="fi.csc.idp.stepup.impl.SQLStepUpAccountStorage"
 		scope="prototype" p:jdbcUrl="jdbc:mysql://localhost:3306/totp"
-		p:poolSize="10" p:userName="proxy" p:password="password">
+		p:poolSize="10" p:userName="proxy" p:password="password" p:encryptKey="TRUE"
+		p:encryptTarget="TRUE" p:encryptor-ref="GAAccountEncryptor">
 		<property name="listStatement">
 			<value>
           <![CDATA[
@@ -231,6 +232,12 @@
           ]]>
 			</value>
 		</property>
+	</bean>
+
+	<bean id="GAAccountEncryptor" class="org.springframework.security.crypto.encrypt.Encryptors"
+		factory-method="queryableText">
+		<constructor-arg value="key" />
+		<constructor-arg value="aabbccddeeff1122" />
 	</bean>
 
 
