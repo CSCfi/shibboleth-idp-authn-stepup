@@ -31,7 +31,6 @@ import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.collect.Range;
 import com.twilio.Twilio;
 import com.twilio.base.ResourceSet;
 import com.twilio.rest.api.v2010.account.Message;
@@ -107,11 +106,11 @@ public class TvilioSMSReceiverStepUpAccount extends ChallengeSenderStepUpAccount
 
         // wait loop, just for testing this
         int rounds = Integer.parseInt(response);
-        // we accept sms'es starting from  currentime - eventWindow
-        DateTime rangeDateSentStart = new DateTime(new Date().getTime()-eventWindow);
+        // we accept sms'es starting from currentime - eventWindow
+        DateTime rangeDateSentStart = new DateTime(new Date().getTime() - eventWindow);
         for (int i = 0; i < rounds; i++) {
             log.debug("locating messages");
-            //filter messages by current time-1h
+            // filter messages by current time-1h
             ResourceSet<Message> messages = Message.reader().setFrom(new PhoneNumber(getTarget()))
                     .setDateSent(rangeDateSentStart).read();
             for (Message message : messages) {
@@ -131,7 +130,8 @@ public class TvilioSMSReceiverStepUpAccount extends ChallengeSenderStepUpAccount
                 long sent = message.getDateSent().toDate().getTime();
                 long current = new Date().getTime();
                 log.debug("message sent " + message.getDateSent().toDate());
-                //message has to have been sent no more that eventWindow time before check
+                // message has to have been sent no more that eventWindow time
+                // before check
                 if (current - sent > eventWindow) {
                     log.debug("message discarded, too old message");
                     continue;
@@ -139,9 +139,25 @@ public class TvilioSMSReceiverStepUpAccount extends ChallengeSenderStepUpAccount
 
                 log.trace("Leaving");
                 return true;
-                // TODO: add challenge to be configurable
-                // loose the lower limit from digestgenerator
-                // make it possible to have a null ch
+
+                // TODO: modify challenge generator to be more configurable
+                // loose the lower limit from digest generator
+                // make it possible to have a null or size 0 challenge.
+
+                // TODO: if challenge is not null (or size 0) check that
+                // received body
+                // contains challenge
+
+                // TODO: separate two uses of eventwindow to their own variables
+
+                // TODO: used SMS message list to prevent using same sms again
+
+                // TODO: new view to show information "respond to sms sent"
+                // use this view if you have specified method, otherwise the
+                // existing one. New window should have some nice waiting
+                // indication.
+
+                // TODO: new initializers for loop count and sleep
 
             }
             Thread.sleep(1000);
