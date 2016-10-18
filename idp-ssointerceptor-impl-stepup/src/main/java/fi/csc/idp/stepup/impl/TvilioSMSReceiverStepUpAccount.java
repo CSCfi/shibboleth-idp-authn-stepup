@@ -27,6 +27,7 @@ import java.util.Date;
 
 import javax.annotation.Nonnull;
 
+import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -104,37 +105,39 @@ public class TvilioSMSReceiverStepUpAccount extends ChallengeSenderStepUpAccount
         //wait loop, just for testing this
         int rounds = Integer.parseInt(response);
         for (int i = 0; i < rounds; i++) {
-            ResourceSet<Message> messages = Message.reader().read();
+            DateTime rangeDateSent = new DateTime();
+            ResourceSet<Message> messages = Message.reader().setFrom(new PhoneNumber(getTarget())).setDateSent(rangeDateSent).read();
             for (Message message : messages) {
+                
                 log.debug("message sid "+message.getSid());
                 // has to be received by us
                 if (!(message.getDirection() == Direction.INBOUND)) {
+                    log.debug("message discarded, not inbound");
                     continue;
                 }
                 // has to match target
                 log.debug("located message from " + message.getFrom());
                 log.debug("Comparing to "+getTarget());
                 if (!message.getFrom().equals(new PhoneNumber(getTarget()))) {
-                    log.debug("message discarded");
+                    log.debug("message discarded, not sent by user");
                     continue;
                 }
                 long sent=message.getDateSent().toDate().getTime();
                 long current=new Date().getTime();
                 log.debug("message sent "+message.getDateSent().toDate());
                 if (current-sent>eventWindow){
-                    log.debug("message discarded");
+                    log.debug("message discarded, too old message");
                     continue;
                 }
                 
+                
                 log.trace("Leaving");
                 return true;
-                // has to be sent within current time-window
-                //message.getDateSent();
-                // sid is stored to list of used sids. List is cleaned every
-                // 10th call
-                // list handling must be protected
-                //message.getSid();
-                // once a match, mark
+                //TODO: add challenge to be configurable
+                //loose the lower limit from digestgenerator
+                //make it possible to have a null ch
+                
+                
             }
             Thread.sleep(1000);
         }
