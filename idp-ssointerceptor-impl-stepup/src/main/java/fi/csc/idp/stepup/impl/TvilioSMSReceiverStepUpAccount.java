@@ -44,22 +44,23 @@ import com.twilio.type.PhoneNumber;
 public class TvilioSMSReceiverStepUpAccount extends ChallengeSenderStepUpAccount {
 
     /** Crude implementation just to test the approach */
-    
+
     /** Class logger. */
     @Nonnull
     private final Logger log = LoggerFactory.getLogger(TvilioSMSReceiverStepUpAccount.class);
-    
-    /** SID of the tvilio account.*/
+
+    /** SID of the tvilio account. */
     private String accountSid;
-    /** authentication token of the tvilio account.*/
+    /** authentication token of the tvilio account. */
     private String authToken;
     /** time window in ms for authentication event to be acceptable. */
-    private long eventWindow=30000;
-        
+    private long eventWindow = 30000;
+
     /**
      * Tvilio account SID.
      * 
-     * @param sid of the account
+     * @param sid
+     *            of the account
      */
     public void setAccountSid(String sid) {
         log.trace("Entering & Leaving");
@@ -69,17 +70,18 @@ public class TvilioSMSReceiverStepUpAccount extends ChallengeSenderStepUpAccount
     /**
      * Tvilio account authentication token.
      * 
-     * @param token authentication token.
+     * @param token
+     *            authentication token.
      */
     public void setAuthToken(String token) {
         this.authToken = token;
     }
 
     /**
-     * Set the event window for authentication response
-     * to be acceptable. 
+     * Set the event window for authentication response to be acceptable.
      * 
-     * @param eventWindow in ms
+     * @param eventWindow
+     *            in ms
      */
     public void setEventWindow(long eventWindow) {
         this.eventWindow = eventWindow;
@@ -101,43 +103,42 @@ public class TvilioSMSReceiverStepUpAccount extends ChallengeSenderStepUpAccount
         log.trace("Entering");
         log.debug("Verificating totp response " + response);
         Twilio.init(accountSid, authToken);
-        
-        //wait loop, just for testing this
+
+        // wait loop, just for testing this
         int rounds = Integer.parseInt(response);
+        DateTime rangeDateSent = new DateTime();
         for (int i = 0; i < rounds; i++) {
-            DateTime rangeDateSent = new DateTime();
-            ResourceSet<Message> messages = Message.reader().setFrom(new PhoneNumber(getTarget())).setDateSent(rangeDateSent).read();
+            log.debug("locating messages");
+            ResourceSet<Message> messages = Message.reader().setFrom(new PhoneNumber(getTarget()))
+                    .setDateSent(rangeDateSent).read();
             for (Message message : messages) {
-                
-                log.debug("message sid "+message.getSid());
-                // has to be received by us
+                log.debug("message sid " + message.getSid());
+                // has to be received by us, doublecheck
                 if (!(message.getDirection() == Direction.INBOUND)) {
                     log.debug("message discarded, not inbound");
                     continue;
                 }
-                // has to match target
+                // has to match target, doublecheck
                 log.debug("located message from " + message.getFrom());
-                log.debug("Comparing to "+getTarget());
+                log.debug("Comparing to " + getTarget());
                 if (!message.getFrom().equals(new PhoneNumber(getTarget()))) {
                     log.debug("message discarded, not sent by user");
                     continue;
                 }
-                long sent=message.getDateSent().toDate().getTime();
-                long current=new Date().getTime();
-                log.debug("message sent "+message.getDateSent().toDate());
-                if (current-sent>eventWindow){
+                long sent = message.getDateSent().toDate().getTime();
+                long current = new Date().getTime();
+                log.debug("message sent " + message.getDateSent().toDate());
+                if (current - sent > eventWindow) {
                     log.debug("message discarded, too old message");
                     continue;
                 }
-                
-                
+
                 log.trace("Leaving");
                 return true;
-                //TODO: add challenge to be configurable
-                //loose the lower limit from digestgenerator
-                //make it possible to have a null ch
-                
-                
+                // TODO: add challenge to be configurable
+                // loose the lower limit from digestgenerator
+                // make it possible to have a null ch
+
             }
             Thread.sleep(1000);
         }
