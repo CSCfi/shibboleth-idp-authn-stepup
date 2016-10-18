@@ -23,6 +23,8 @@
 
 package fi.csc.idp.stepup.impl;
 
+import java.util.Date;
+
 import javax.annotation.Nonnull;
 
 import org.slf4j.Logger;
@@ -50,6 +52,8 @@ public class TvilioSMSReceiverStepUpAccount extends ChallengeSenderStepUpAccount
     private String accountSid;
     /** authentication token of the tvilio account.*/
     private String authToken;
+    /** time window in ms for authentication event to be acceptable. */
+    private long eventWindow=30000;
         
     /**
      * Tvilio account SID.
@@ -68,6 +72,16 @@ public class TvilioSMSReceiverStepUpAccount extends ChallengeSenderStepUpAccount
      */
     public void setAuthToken(String token) {
         this.authToken = token;
+    }
+
+    /**
+     * Set the event window for authentication response
+     * to be acceptable. 
+     * 
+     * @param eventWindow in ms
+     */
+    public void setEventWindow(long eventWindow) {
+        this.eventWindow = eventWindow;
     }
 
     /**
@@ -98,11 +112,20 @@ public class TvilioSMSReceiverStepUpAccount extends ChallengeSenderStepUpAccount
                     continue;
                 }
                 // has to match target
-                log.debug("Sent from " + message.getFrom());
+                log.debug("located message from " + message.getFrom());
                 log.debug("Comparing to "+getTarget());
                 if (!message.getFrom().equals(new PhoneNumber(getTarget()))) {
+                    log.debug("message discarded");
                     continue;
                 }
+                long sent=message.getDateSent().toDate().getTime();
+                long current=new Date().getTime();
+                log.debug("message sent "+message.getDateSent().toDate());
+                if (current-sent>eventWindow){
+                    log.debug("message discarded");
+                    continue;
+                }
+                
                 log.trace("Leaving");
                 return true;
                 // has to be sent within current time-window
