@@ -45,6 +45,30 @@ public class TvilioSMSReceiverStepUpAccount extends AbstractStepUpAccount {
     /** Class logger. */
     @Nonnull
     private final Logger log = LoggerFactory.getLogger(TvilioSMSReceiverStepUpAccount.class);
+    
+    /** SID of the tvilio account.*/
+    private String accountSid;
+    /** authentication token of the tvilio account.*/
+    private String authToken;
+        
+    /**
+     * Tvilio account SID.
+     * 
+     * @param sid of the account
+     */
+    public void setAccountSid(String sid) {
+        log.trace("Entering & Leaving");
+        this.accountSid = sid;
+    }
+
+    /**
+     * Tvilio account authentication token.
+     * 
+     * @param token authentication token.
+     */
+    public void setAuthToken(String token) {
+        this.authToken = token;
+    }
 
     /**
      * Verify targets response can be found from tvilio. Response can be used
@@ -61,7 +85,7 @@ public class TvilioSMSReceiverStepUpAccount extends AbstractStepUpAccount {
     public boolean verifyResponse(String response) throws Exception {
         log.trace("Entering");
         log.debug("Verificating totp response " + response);
-        Twilio.init("ACCOUNT_SID", "AUTH_TOKEN");
+        Twilio.init(accountSid, authToken);
         
         //wait loop, just for testing this
         int rounds = Integer.parseInt(response);
