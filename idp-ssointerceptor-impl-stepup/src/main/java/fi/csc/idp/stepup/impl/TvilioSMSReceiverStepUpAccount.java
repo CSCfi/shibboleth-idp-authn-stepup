@@ -38,7 +38,7 @@ import com.twilio.type.PhoneNumber;
  * Step Up Account implementation expecting a SMS response from target to be
  * found in tvilio service.
  */
-public class TvilioSMSReceiverStepUpAccount extends AbstractStepUpAccount {
+public class TvilioSMSReceiverStepUpAccount extends ChallengeSenderStepUpAccount {
 
     /** Crude implementation just to test the approach */
     
