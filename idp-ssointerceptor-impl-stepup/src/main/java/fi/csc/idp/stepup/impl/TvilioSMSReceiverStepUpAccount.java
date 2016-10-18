@@ -31,6 +31,7 @@ import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.collect.Range;
 import com.twilio.Twilio;
 import com.twilio.base.ResourceSet;
 import com.twilio.rest.api.v2010.account.Message;
@@ -106,11 +107,13 @@ public class TvilioSMSReceiverStepUpAccount extends ChallengeSenderStepUpAccount
 
         // wait loop, just for testing this
         int rounds = Integer.parseInt(response);
-        DateTime rangeDateSent = new DateTime();
+        // we accept sms'es starting from  currentime - eventWindow
+        DateTime rangeDateSentStart = new DateTime(new Date().getTime()-eventWindow);
         for (int i = 0; i < rounds; i++) {
             log.debug("locating messages");
+            //filter messages by current time-1h
             ResourceSet<Message> messages = Message.reader().setFrom(new PhoneNumber(getTarget()))
-                    .setDateSent(rangeDateSent).read();
+                    .setDateSent(rangeDateSentStart).read();
             for (Message message : messages) {
                 log.debug("message sid " + message.getSid());
                 // has to be received by us, doublecheck
@@ -128,6 +131,7 @@ public class TvilioSMSReceiverStepUpAccount extends ChallengeSenderStepUpAccount
                 long sent = message.getDateSent().toDate().getTime();
                 long current = new Date().getTime();
                 log.debug("message sent " + message.getDateSent().toDate());
+                //message has to have been sent no more that eventWindow time before check
                 if (current - sent > eventWindow) {
                     log.debug("message discarded, too old message");
                     continue;
