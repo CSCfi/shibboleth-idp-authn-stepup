@@ -53,8 +53,16 @@ public class TvilioSMSReceiverStepUpAccount extends ChallengeSenderStepUpAccount
     private String accountSid;
     /** authentication token of the tvilio account. */
     private String authToken;
-    /** time window in ms for authentication event to be acceptable. */
+    /**
+     * time window in ms for authentication event to be acceptable. Value is
+     * used for filtering sms's and for checking the timestamp of a found
+     * message.
+     */
     private long eventWindow = 30000;
+    /** how many times sms are checked for successful match. */
+    private int numberOfChecks = 10;
+    /** interval in ms between sms checks. */
+    private int intervalOfChecks = 1000;
 
     /**
      * Tvilio account SID.
@@ -78,13 +86,33 @@ public class TvilioSMSReceiverStepUpAccount extends ChallengeSenderStepUpAccount
     }
 
     /**
-     * Set the event window for authentication response to be acceptable.
+     * Set the event window in ms for authentication response to be acceptable.
      * 
-     * @param eventWindow
+     * @param window
      *            in ms
      */
-    public void setEventWindow(long eventWindow) {
-        this.eventWindow = eventWindow;
+    public void setEventWindow(long window) {
+        this.eventWindow = window;
+    }
+
+    /**
+     * Set the number of times sms reply is searched for.
+     * 
+     * @param number
+     *            number of times sms is searched for
+     */
+    public void setNumberOfChecks(int number) {
+        this.numberOfChecks = number;
+    }
+
+    /**
+     * Set the interval between sms searches in milliseconds.
+     * 
+     * @param interval
+     *            interval is ms
+     */
+    public void setIntervalOfChecks(int interval) {
+        this.intervalOfChecks = interval;
     }
 
     /**
@@ -104,11 +132,9 @@ public class TvilioSMSReceiverStepUpAccount extends ChallengeSenderStepUpAccount
         log.debug("Verificating totp response " + response);
         Twilio.init(accountSid, authToken);
 
-        // wait loop, just for testing this
-        int rounds = Integer.parseInt(response);
         // we accept sms'es starting from currentime - eventWindow
         DateTime rangeDateSentStart = new DateTime(new Date().getTime() - eventWindow);
-        for (int i = 0; i < rounds; i++) {
+        for (int i = 0; i < numberOfChecks; i++) {
             log.debug("locating messages");
             // filter messages by current time-1h
             ResourceSet<Message> messages = Message.reader().setFrom(new PhoneNumber(getTarget()))
@@ -136,31 +162,20 @@ public class TvilioSMSReceiverStepUpAccount extends ChallengeSenderStepUpAccount
                     log.debug("message discarded, too old message");
                     continue;
                 }
-
+                if (getChallenge().length() > 0 && (!getChallenge().equals(message.getBody()))) {
+                    log.debug("message discarded, challenge not replied");
+                    continue;
+                }
                 log.trace("Leaving");
                 return true;
-
-                // TODO: modify challenge generator to be more configurable
-                // loose the lower limit from digest generator
-                // make it possible to have a null or size 0 challenge.
-
-                // TODO: if challenge is not null (or size 0) check that
-                // received body
-                // contains challenge
-
-                // TODO: separate two uses of eventwindow to their own variables
-
                 // TODO: used SMS message list to prevent using same sms again
-
                 // TODO: new view to show information "respond to sms sent"
                 // use this view if you have specified method, otherwise the
                 // existing one. New window should have some nice waiting
                 // indication.
 
-                // TODO: new initializers for loop count and sleep
-
             }
-            Thread.sleep(1000);
+            Thread.sleep(intervalOfChecks);
         }
         log.trace("Leaving");
         return false;
