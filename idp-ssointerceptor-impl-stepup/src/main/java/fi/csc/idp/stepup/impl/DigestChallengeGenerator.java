@@ -80,7 +80,7 @@ public class DigestChallengeGenerator implements ChallengeGenerator {
      */
     public void setMaxLength(int newMaxLength) {
         log.trace("Entering");
-        if (newMaxLength > 3) {
+        if (newMaxLength > -1) {
             maxLength = newMaxLength;
         }
         log.trace("Leaving");
@@ -114,6 +114,11 @@ public class DigestChallengeGenerator implements ChallengeGenerator {
     public String generate(String target) throws Exception {
         log.trace("Entering");
         String challenge = "";
+        //to explicitly support generating empty challenge
+        if (maxLength == 0){
+            log.trace("Leaving");
+            return challenge;
+        }
         try {
             String time = "" + System.currentTimeMillis();
             MessageDigest md = MessageDigest.getInstance(digest);
@@ -139,6 +144,7 @@ public class DigestChallengeGenerator implements ChallengeGenerator {
 
         } catch (NoSuchAlgorithmException e) {
             log.error("unable to generate challenge " + e.getMessage());
+            log.trace("Leaving");
             return null;
         }
         log.trace("Leaving");
