@@ -103,7 +103,7 @@ public class VerifyPasswordFromFormRequest extends AbstractExtractionAction {
             return;
         }
         final String challengeResponse = request.getParameter(challengeResponseParameter);
-        if (challengeResponse == null || challengeResponse.isEmpty()) {
+        if (challengeResponse == null) {
             log.debug("User did not present response to challenge", getLogPrefix());
             ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EVENTID_INVALID_RESPONSE);
             log.trace("Leaving");
