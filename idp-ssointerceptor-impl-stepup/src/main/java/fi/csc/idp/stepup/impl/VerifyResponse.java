@@ -37,7 +37,8 @@ import fi.csc.idp.stepup.api.StepUpEventIds;
 import fi.csc.idp.stepup.api.StepUpMethodContext;
 
 /**
- * An action that verifies user challenge response.
+ * An action that verifies user challenge response. This is for a case
+ * of verifying the response from backend. No direct user input is used. 
  * 
  */
 @SuppressWarnings("rawtypes")
