@@ -24,6 +24,11 @@
 package fi.csc.idp.stepup.impl;
 
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 import javax.annotation.Nonnull;
 
@@ -63,6 +68,10 @@ public class TvilioSMSReceiverStepUpAccount extends ChallengeSenderStepUpAccount
     private int numberOfChecks = 10;
     /** interval in ms between sms checks. */
     private int intervalOfChecks = 1000;
+    /** contains messages already used for verification. */
+    private Map<String, DateTime> usedMessages = new HashMap<String, DateTime>();
+    /** lock to access usedMessages. */
+    private Lock msgLock = new ReentrantLock();
 
     /**
      * Tvilio account SID.
@@ -113,6 +122,31 @@ public class TvilioSMSReceiverStepUpAccount extends ChallengeSenderStepUpAccount
      */
     public void setIntervalOfChecks(int interval) {
         this.intervalOfChecks = interval;
+    }
+
+    /**
+     * Cleans old messages.
+     */
+    private void cleanMessages() {
+        log.trace("Entering");
+        msgLock.lock();
+        if (usedMessages.size() < 100) {
+            msgLock.unlock();
+            log.trace("Leaving");
+            return;
+        }
+        long current = new Date().getTime();
+        for (Iterator<Map.Entry<String, DateTime>> it = usedMessages.entrySet().iterator(); it.hasNext();) {
+            Map.Entry<String, DateTime> usedMessage = it.next();
+            long sent = usedMessage.getValue().toDate().getTime();
+            if (current - sent > 2 * eventWindow) {
+                log.debug("Removing " + usedMessage.getKey() + " " + usedMessage.getValue()
+                        + " from the list of used verification messages");
+                it.remove();
+            }
+        }
+        msgLock.unlock();
+        log.trace("Leaving");
     }
 
     /**
@@ -167,13 +201,18 @@ public class TvilioSMSReceiverStepUpAccount extends ChallengeSenderStepUpAccount
                     continue;
                 }
                 log.trace("Leaving");
+                msgLock.lock();
+                if (usedMessages.containsKey(message.getSid())) {
+                    msgLock.unlock();
+                    log.debug("message discarded, already used");
+                    continue;
+                }
+                cleanMessages();
+                log.debug("Adding " + message.getSid() + " " + message.getDateSent()
+                        + " to the list of used verification messages");
+                usedMessages.put(message.getSid(), message.getDateSent());
+                msgLock.unlock();
                 return true;
-                // TODO: used SMS message list to prevent using same sms again
-                // TODO: new view to show information "respond to sms sent"
-                // use this view if you have specified method, otherwise the
-                // existing one. New window should have some nice waiting
-                // indication.
-
             }
             Thread.sleep(intervalOfChecks);
         }
