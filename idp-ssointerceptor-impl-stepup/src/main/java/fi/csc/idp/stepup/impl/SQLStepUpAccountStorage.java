@@ -48,7 +48,7 @@ public class SQLStepUpAccountStorage implements StepUpAccountStorage {
 
     /** Class logger. */
     @Nonnull
-    private static final Logger log = LoggerFactory.getLogger(SQLStepUpAccountStorage.class);
+    private final Logger log = LoggerFactory.getLogger(SQLStepUpAccountStorage.class);
     /** datasource constructed. */
     private DataSource datasource;
     /** url for the database connection. */
