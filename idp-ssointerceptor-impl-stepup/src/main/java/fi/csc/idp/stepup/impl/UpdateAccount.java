@@ -23,6 +23,9 @@
 
 package fi.csc.idp.stepup.impl;
 
+import java.security.Principal;
+import java.util.Map;
+
 import javax.annotation.Nonnull;
 import javax.servlet.http.HttpServletRequest;
 
@@ -35,7 +38,9 @@ import org.opensaml.profile.context.ProfileRequestContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import fi.csc.idp.stepup.api.StepUpAccount;
 import fi.csc.idp.stepup.api.StepUpEventIds;
+import fi.csc.idp.stepup.api.StepUpMethod;
 import fi.csc.idp.stepup.api.StepUpMethodContext;
 
 /**
@@ -109,10 +114,70 @@ public class UpdateAccount extends AbstractExtractionAction {
             log.trace("Leaving");
             return;
         }
+        String updateCommand[] = updateValue.split(":");
+        if (updateCommand.length != 3) {
+            log.debug("{} the command should have 3 parts", getLogPrefix());
+            ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EXCEPTION);
+            log.trace("Leaving");
+            return;
+        }
+        String method = updateCommand[0];
+        if (method == null || method.isEmpty()) {
+            log.debug("{} method cannot be empty or null", getLogPrefix());
+            ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EXCEPTION);
+            log.trace("Leaving");
+            return;
+        }
+        long id = -1;
+        try {
+            id = Long.parseLong(updateCommand[1]);
+        } catch (NumberFormatException e) {
+            log.debug("{} the commands second part shoud be interpretable as int", getLogPrefix());
+            ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EXCEPTION);
+            log.trace("Leaving");
+        }
+        String command = updateCommand[2];
+        if (command == null || command.isEmpty()) {
+            log.debug("{} command cannot be empty or null", getLogPrefix());
+            ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EXCEPTION);
+            log.trace("Leaving");
+            return;
+        }
+        // locating account
+        for (Map.Entry<Principal, StepUpMethod> entry : stepUpMethodContext.getStepUpMethods().entrySet()) {
+            if (method.equals(entry.getValue().getName())) {
+                log.debug("located target method "+method);
+                try {
+                    for (StepUpAccount account : entry.getValue().getAccounts()) {
+                        if (account.getId() == id) {
+                            log.debug("located target account "+id);
+                            log.debug("running command "+command);
+                            accountCommand(command, account);
+                        }
+                    }
+                } catch (Exception e) {
+                    log.debug("{} unexpectd exception occurred", getLogPrefix());
+                    log.error(e.getMessage());
+                    ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EXCEPTION);
+                    log.trace("Leaving");
+                    return;
+                }
+            }
+        }
         log.debug("Update value to be interpreted is " + updateValue);
         ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EVENTID_CONTINUE_STEPUP);
         log.trace("Leaving");
 
+    }
+
+    /**
+     * dummy version, always disables
+     * 
+     * @param command
+     * @param account
+     */
+    private void accountCommand(String command, StepUpAccount account) {
+        account.setEnabled(false);
     }
 
 }
