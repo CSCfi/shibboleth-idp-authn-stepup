@@ -154,7 +154,7 @@ public class UpdateAccount extends AbstractExtractionAction {
                         if (account.getId() == id) {
                             log.debug("located target account "+id);
                             log.debug("running command "+command);
-                            accountCommand(command, account);
+                            accountCommand(command, account,entry.getValue());
                         }
                     }
                 } catch (Exception e) {
@@ -177,9 +177,11 @@ public class UpdateAccount extends AbstractExtractionAction {
      * 
      * @param command
      * @param account
+     * @throws Exception 
      */
-    private void accountCommand(String command, StepUpAccount account) {
+    private void accountCommand(String command, StepUpAccount account, StepUpMethod method) throws Exception {
         account.setEnabled(false);
+        method.updateAccount(account);
     }
 
 }
