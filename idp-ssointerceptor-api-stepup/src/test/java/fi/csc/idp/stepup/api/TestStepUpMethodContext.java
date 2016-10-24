@@ -78,6 +78,12 @@ public class TestStepUpMethodContext {
 
         }
 
+        @Override
+        public void updateAccount(StepUpAccount account) {
+            // TODO Auto-generated method stub
+            
+        }
+
     }
 
     class Account implements StepUpAccount {
