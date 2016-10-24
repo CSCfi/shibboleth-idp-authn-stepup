@@ -182,4 +182,15 @@ public class AbstractStepUpAccountManager implements StepUpMethod {
         return true;
     }
 
+    /**
+     * Update a account. 
+     * @param  account
+     * @throws Exception if something unexpected occurs
+     */
+    @Override
+    public void updateAccount(StepUpAccount account) throws Exception {
+        log.trace("Entering & Leaving");
+        log.debug("Method not supported");
+    }
+
 }

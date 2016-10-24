@@ -28,6 +28,8 @@ import java.util.List;
 import javax.annotation.Nonnull;
 //import javax.sql.DataSource;
 
+
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -96,8 +98,29 @@ public class AttributeKeyBasedStorageStepUpAccountManager extends AbstractStepUp
         account.setEnabled(true);
         getAccounts().add(account);
         stepUpAccountStorage.add(account, key);
+        log.trace("Leaving");
         return account;
     }
+    
+    /**
+     * Update a editable account.
+     * 
+     * @param account to be updated.
+     * @throws Exception 
+     */
+    @Override
+    public void updateAccount(StepUpAccount account) throws Exception {
+        log.trace("Entering");
+
+        if (stepUpAccountStorage == null) {
+            log.error("Storage implementation not set, cannot add accounts");
+            log.trace("Leaving");
+            return;
+        }
+        stepUpAccountStorage.update(account, key);
+        log.trace("Leaving");
+    }
+
 
     /**
      * Initializes accounts by reading the value for key, using that to read
