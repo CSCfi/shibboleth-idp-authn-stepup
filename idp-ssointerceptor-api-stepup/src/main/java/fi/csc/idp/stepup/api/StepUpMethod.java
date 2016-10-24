@@ -82,5 +82,15 @@ public interface StepUpMethod {
      *            to be removed.
      */
     public void removeAccount(StepUpAccount account);
+    
+    /**
+     * Update a account.
+     * 
+     * @param account
+     *            to be updated.
+     * @throws Exception
+     *             if something unexpected occurred
+     */
+    public void updateAccount(StepUpAccount account) throws Exception;
 
 }
