@@ -145,10 +145,12 @@ public class UpdateAccount extends AbstractExtractionAction {
         }
         // locating account
         for (Map.Entry<Principal, StepUpMethod> entry : stepUpMethodContext.getStepUpMethods().entrySet()) {
+            log.debug("Comparing method "+method+" to "+ entry.getValue().getName());
             if (method.equals(entry.getValue().getName())) {
                 log.debug("located target method "+method);
                 try {
                     for (StepUpAccount account : entry.getValue().getAccounts()) {
+                        log.debug("Comparing account id "+id+" to "+account.getId());
                         if (account.getId() == id) {
                             log.debug("located target account "+id);
                             log.debug("running command "+command);
