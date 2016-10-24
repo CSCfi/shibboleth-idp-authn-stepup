@@ -170,6 +170,11 @@ public class TestInitializeStepUpChallengeContext {
 
         }
 
+        @Override
+        public void updateAccount(StepUpAccount account) throws Exception {
+            
+        }
+
         
     }
 
