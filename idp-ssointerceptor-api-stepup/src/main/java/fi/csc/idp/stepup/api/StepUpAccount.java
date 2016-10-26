@@ -24,6 +24,17 @@ package fi.csc.idp.stepup.api;
 /** Interface implemented by accounts. */
 public interface StepUpAccount {
 
+    /** string code for setEnabled(true).*/
+    public static final String ENABLE = "enable";
+    /** string code for setEnabled(false).*/
+    public static final String DISABLE = "disable";
+    /** string code for setName(string).*/
+    public static final String SET_NAME = "setname";
+    /** string code for setEditable(true).*/
+    public static final String SET_EDITABLE = "seteditable";
+    /** string code for setEditable(false).*/
+    public static final String SET_NOT_EDITABLE = "setnoteditable";
+    
     /**
      * Unique id of the account, may be null.
      * 
