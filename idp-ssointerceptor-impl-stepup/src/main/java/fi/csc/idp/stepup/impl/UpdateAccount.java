@@ -190,7 +190,7 @@ public class UpdateAccount extends AbstractExtractionAction {
      */
     private void accountCommand(String command, StepUpAccount account, StepUpMethod method) throws Exception {
         log.trace("Entering");
-        if ((command != StepUpMethod.ADD_ACCOUNT || command != StepUpMethod.REMOVE_ACCOUNT) && account == null) {
+        if (!(command != StepUpMethod.ADD_ACCOUNT && command != StepUpMethod.REMOVE_ACCOUNT) && account == null) {
             throw new Exception("Account operations requires account");
         }
         switch (command) {
