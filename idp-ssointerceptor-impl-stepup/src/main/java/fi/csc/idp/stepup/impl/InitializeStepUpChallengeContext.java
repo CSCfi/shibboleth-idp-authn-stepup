@@ -210,7 +210,7 @@ public class InitializeStepUpChallengeContext extends AbstractAuthenticationActi
                             if (account.isEnabled()) {
                                 log.debug("Setting a default stepup account");
                                 log.debug("Account type is " + stepUpMethods.get(authMethod).getName());
-                                log.debug("Account name is " + account.getName() == null ? "" : account.getName());
+                                log.debug("Account name is " + (account.getName() == null ? "" : account.getName()));
                                 stepUpMethodContext.setStepUpAccount(account);
                                 log.trace("Leaving");
                                 ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EVENTID_CONTINUE_STEPUP);
