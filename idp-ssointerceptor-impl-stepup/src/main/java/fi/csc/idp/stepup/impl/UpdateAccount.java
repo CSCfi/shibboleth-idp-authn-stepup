@@ -57,6 +57,9 @@ public class UpdateAccount extends AbstractExtractionAction {
     /** update parameter. */
     private String updateParameter = "_eventId_update";
 
+    /** name parameter. */
+    private String nameParameter = "j_name";
+
     /** proxy StepUp Context. */
     private StepUpMethodContext stepUpMethodContext;
 
@@ -68,6 +71,16 @@ public class UpdateAccount extends AbstractExtractionAction {
      */
     public void setUpdateParameter(@Nonnull @NotEmpty String parameter) {
         this.updateParameter = parameter;
+    }
+
+    /**
+     * Sets the parameter the name is read from.
+     * 
+     * @param parameter
+     *            name for name
+     */
+    public void nameParameter(@Nonnull @NotEmpty String parameter) {
+        this.nameParameter = parameter;
     }
 
     /** {@inheritDoc} */
@@ -155,11 +168,11 @@ public class UpdateAccount extends AbstractExtractionAction {
                             if (account.getId() == id) {
                                 log.debug("located target account " + id);
                                 log.debug("running command " + command);
-                                accountCommand(command, account, entry.getValue());
+                                accountCommand(command, account, entry.getValue(), request);
                             }
                         }
                     } else {
-                        accountCommand(command, null, entry.getValue());
+                        accountCommand(command, null, entry.getValue(), request);
                     }
                 } catch (Exception e) {
                     log.debug("{} unexpectd exception occurred", getLogPrefix());
@@ -188,7 +201,8 @@ public class UpdateAccount extends AbstractExtractionAction {
      * @throws Exception
      *             if something unexpected occurs
      */
-    private void accountCommand(String command, StepUpAccount account, StepUpMethod method) throws Exception {
+    private void accountCommand(String command, StepUpAccount account, StepUpMethod method, HttpServletRequest request)
+            throws Exception {
         log.trace("Entering");
         if (!(command != StepUpMethod.ADD_ACCOUNT && command != StepUpMethod.REMOVE_ACCOUNT) && account == null) {
             throw new Exception("Account operations requires account");
@@ -211,13 +225,15 @@ public class UpdateAccount extends AbstractExtractionAction {
             method.updateAccount(account);
             break;
         case StepUpAccount.SET_NAME:
-            log.debug("missing implementation");
+            final String name = request.getParameter(nameParameter);
+            account.setName(name);
+            method.updateAccount(account);
             break;
         case StepUpMethod.ADD_ACCOUNT:
             method.addAccount();
             break;
         case StepUpMethod.REMOVE_ACCOUNT:
-            log.debug("missing implementation");
+            method.removeAccount(account);
             break;
         default:
             log.trace("Entering");
