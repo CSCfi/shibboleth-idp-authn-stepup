@@ -177,7 +177,11 @@ public class AbstractStepUpAccountManager implements StepUpMethod {
     @Override
     public boolean initialize(AttributeContext attributeContext) throws Exception {
         log.trace("Entering");
-        getAccounts().add((StepUpAccount) getAppContext().getBean(getAccountID()));
+        StepUpAccount account = (StepUpAccount) getAppContext().getBean(getAccountID());
+        account.setEnabled(true);
+        // Accounts cannot be stored and therefore also not edited
+        account.setEditable(false);
+        getAccounts().add(account);
         log.trace("Leaving");
         return true;
     }
