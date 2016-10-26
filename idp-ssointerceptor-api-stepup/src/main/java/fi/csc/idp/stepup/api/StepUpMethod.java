@@ -29,6 +29,12 @@ import net.shibboleth.idp.attribute.context.AttributeContext;
 
 /** interface for managing Step Up Methods. */
 public interface StepUpMethod {
+    
+    /** string code for addAccount().*/
+    public static final String ADD_ACCOUNT = "addaccount";
+
+    /** string code for removeAccount().*/
+    public static final String REMOVE_ACCOUNT = "removeaccount";
 
     /**
      * This is called before any other calls to initialize the Step Up Method
