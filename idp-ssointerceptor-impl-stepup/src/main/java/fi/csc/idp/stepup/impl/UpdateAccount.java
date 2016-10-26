@@ -114,7 +114,7 @@ public class UpdateAccount extends AbstractExtractionAction {
             log.trace("Leaving");
             return;
         }
-        String updateCommand[] = updateValue.split(":");
+        String[] updateCommand = updateValue.split(":");
         if (updateCommand.length != 3) {
             log.debug("{} the command should have 3 parts", getLogPrefix());
             ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EXCEPTION);
@@ -145,17 +145,21 @@ public class UpdateAccount extends AbstractExtractionAction {
         }
         // locating account
         for (Map.Entry<Principal, StepUpMethod> entry : stepUpMethodContext.getStepUpMethods().entrySet()) {
-            log.debug("Comparing method "+method+" to "+ entry.getValue().getName());
+            log.debug("Comparing method " + method + " to " + entry.getValue().getName());
             if (method.equals(entry.getValue().getName())) {
-                log.debug("located target method "+method);
+                log.debug("located target method " + method);
                 try {
-                    for (StepUpAccount account : entry.getValue().getAccounts()) {
-                        log.debug("Comparing account id "+id+" to "+account.getId());
-                        if (account.getId() == id) {
-                            log.debug("located target account "+id);
-                            log.debug("running command "+command);
-                            accountCommand(command, account,entry.getValue());
+                    if (id >= 0) {
+                        for (StepUpAccount account : entry.getValue().getAccounts()) {
+                            log.debug("Comparing account id " + id + " to " + account.getId());
+                            if (account.getId() == id) {
+                                log.debug("located target account " + id);
+                                log.debug("running command " + command);
+                                accountCommand(command, account, entry.getValue());
+                            }
                         }
+                    } else {
+                        accountCommand(command, null, entry.getValue());
                     }
                 } catch (Exception e) {
                     log.debug("{} unexpectd exception occurred", getLogPrefix());
@@ -173,15 +177,53 @@ public class UpdateAccount extends AbstractExtractionAction {
     }
 
     /**
-     * dummy version, always disables
+     * Method performs account operations.
      * 
      * @param command
+     *            StepUpAccount or StepUpMethod command
      * @param account
-     * @throws Exception 
+     *            the operation is targeting
+     * @param method
+     *            the operation is targeting
+     * @throws Exception
+     *             if something unexpected occurs
      */
     private void accountCommand(String command, StepUpAccount account, StepUpMethod method) throws Exception {
-        account.setEnabled(false);
-        method.updateAccount(account);
+        log.trace("Entering");
+        if ((command != StepUpMethod.ADD_ACCOUNT || command != StepUpMethod.REMOVE_ACCOUNT) && account == null) {
+            throw new Exception("Account operations requires account");
+        }
+        switch (command) {
+        case StepUpAccount.DISABLE:
+            account.setEnabled(false);
+            method.updateAccount(account);
+            break;
+        case StepUpAccount.ENABLE:
+            account.setEnabled(true);
+            method.updateAccount(account);
+            break;
+        case StepUpAccount.SET_EDITABLE:
+            account.setEditable(true);
+            method.updateAccount(account);
+            break;
+        case StepUpAccount.SET_NOT_EDITABLE:
+            account.setEditable(false);
+            method.updateAccount(account);
+            break;
+        case StepUpAccount.SET_NAME:
+            log.debug("missing implementation");
+            break;
+        case StepUpMethod.ADD_ACCOUNT:
+            method.addAccount();
+            break;
+        case StepUpMethod.REMOVE_ACCOUNT:
+            log.debug("missing implementation");
+            break;
+        default:
+            log.trace("Entering");
+            throw new Exception("Unsupported command");
+        }
+
     }
 
 }
