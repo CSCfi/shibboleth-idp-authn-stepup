@@ -30,6 +30,7 @@ import javax.annotation.Nonnull;
 
 
 
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -119,6 +120,17 @@ public class AttributeKeyBasedStorageStepUpAccountManager extends AbstractStepUp
         }
         stepUpAccountStorage.update(account, key);
         log.trace("Leaving");
+    }
+    
+    /**
+     * Get the editable status.
+     * 
+     * @return true
+     */
+    @Override
+    public boolean isEditable() {
+        log.trace("Entering & Leaving");
+        return true;
     }
 
 
