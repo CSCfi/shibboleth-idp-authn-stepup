@@ -98,12 +98,6 @@ public class UpdateAccount extends AbstractExtractionAction {
             log.trace("Leaving");
             return false;
         }
-        if (stepUpMethodContext.getStepUpAccount() == null) {
-            log.debug("There is no chosen stepup account for user", getLogPrefix());
-            ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EVENTID_INVALID_USER);
-            log.trace("Leaving");
-            return false;
-        }
         return super.doPreExecute(profileRequestContext, authenticationContext);
     }
 
