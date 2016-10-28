@@ -33,7 +33,7 @@ public class TestStepUpMethodContext {
         Method method = new Method();
         stepUpMethodContext.setStepUpAccount(account);
         stepUpMethodContext.setStepUpMethod(method);
-        Map<Principal, StepUpMethod> methods = new HashMap<Principal, StepUpMethod>();
+        Map<StepUpMethod, List<? extends Principal>> methods = new HashMap<StepUpMethod, List<? extends Principal>>();
         stepUpMethodContext.setStepUpMethods(methods);
         Assert.assertEquals(account, stepUpMethodContext.getStepUpAccount());
         Assert.assertEquals(method, stepUpMethodContext.getStepUpMethod());

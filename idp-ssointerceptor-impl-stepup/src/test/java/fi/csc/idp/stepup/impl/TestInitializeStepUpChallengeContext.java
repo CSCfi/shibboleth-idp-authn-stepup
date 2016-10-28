@@ -92,11 +92,13 @@ public class TestInitializeStepUpChallengeContext {
                 new ShibbolethSpAuthenticationContext(), true);
         final AttributeContext attributeCtx = new AttributeContext();
         prc.getSubcontext(RelyingPartyContext.class).addSubcontext(attributeCtx);
-        Map<Principal, StepUpMethod> methods = new HashMap<Principal, StepUpMethod>();
+        Map<StepUpMethod, List<? extends Principal>> methods = new HashMap<StepUpMethod, List<? extends Principal>>();
         List<Principal> rcl = new ArrayList<Principal>();
         rcl.add(new AuthnContextClassRefPrincipal("test"));
         shibspCtx.setInitialRequestedContext(rcl);
-        methods.put(new AuthnContextClassRefPrincipal("not_test"), new method());
+        List<Principal> scl=new ArrayList<Principal>();
+        scl.add(new AuthnContextClassRefPrincipal("not_test"));
+        methods.put(new method(),scl);
         action.setStepUpMethods(methods);
         action.initialize();
         action.execute(src);
@@ -106,7 +108,7 @@ public class TestInitializeStepUpChallengeContext {
         Assert.assertNull(sumCtx.getStepUpAccount());
     }
 
-    /** Test that action copes with 2 matching step up methods defined */
+    /** Test that action copes with 4 methods and 2 of them matching defined */
     @Test
     public void testMatchingStepUpMethods() throws ComponentInitializationException {
         AuthenticationContext ctx = (AuthenticationContext) prc.addSubcontext(new AuthenticationContext(), true);
@@ -114,20 +116,24 @@ public class TestInitializeStepUpChallengeContext {
                 new ShibbolethSpAuthenticationContext(), true);
         final AttributeContext attributeCtx = new AttributeContext();
         prc.getSubcontext(RelyingPartyContext.class).addSubcontext(attributeCtx);
-        Map<Principal, StepUpMethod> methods = new HashMap<Principal, StepUpMethod>();
+        Map<StepUpMethod, List<? extends Principal>> methods = new HashMap<StepUpMethod, List<? extends Principal>>();
         List<Principal> rcl = new ArrayList<Principal>();
         rcl.add(new AuthnContextClassRefPrincipal("test_no_match"));
         rcl.add(new AuthnContextClassRefPrincipal("test"));
         shibspCtx.setInitialRequestedContext(rcl);
-        methods.put(new AuthnContextClassRefPrincipal("not_test"), new method());
-        methods.put(new AuthnContextClassRefPrincipal("test"), new method());
-        methods.put(new AuthnContextClassRefPrincipal("not_test"), new method());
-        methods.put(new AuthnContextClassRefPrincipal("test"), new method());
+        List<Principal> scl1=new ArrayList<Principal>();
+        scl1.add(new AuthnContextClassRefPrincipal("not_test"));
+        List<Principal> scl2=new ArrayList<Principal>();
+        scl2.add(new AuthnContextClassRefPrincipal("test"));
+        methods.put(new method(),scl1);
+        methods.put(new method(),scl2);
+        methods.put(new method(),scl1);
+        methods.put(new method(),scl2);
         action.setStepUpMethods(methods);
         action.initialize();
         action.execute(src);
         StepUpMethodContext sumCtx = (StepUpMethodContext) ctx.getSubcontext(StepUpMethodContext.class);
-        Assert.assertEquals(sumCtx.getStepUpMethods().size(), 2);
+        Assert.assertEquals(sumCtx.getStepUpMethods().size(), 4);
         Assert.assertNotNull(sumCtx.getStepUpMethod());
         Assert.assertNotNull(sumCtx.getStepUpAccount());
     }
