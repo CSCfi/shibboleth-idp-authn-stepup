@@ -23,9 +23,6 @@
 
 package fi.csc.idp.stepup.impl;
 
-import java.security.Principal;
-import java.util.Map;
-
 import javax.annotation.Nonnull;
 import javax.servlet.http.HttpServletRequest;
 
@@ -101,6 +98,7 @@ public class UpdateAccount extends AbstractExtractionAction {
         return super.doPreExecute(profileRequestContext, authenticationContext);
     }
 
+    // Checkstyle: CyclomaticComplexity OFF
     /** {@inheritDoc} */
     @Override
     protected void doExecute(@Nonnull final ProfileRequestContext profileRequestContext,
@@ -151,25 +149,25 @@ public class UpdateAccount extends AbstractExtractionAction {
             return;
         }
         // locating account
-        for (Map.Entry<Principal, StepUpMethod> entry : stepUpMethodContext.getStepUpMethods().entrySet()) {
-            log.debug("Comparing method " + method + " to " + entry.getValue().getName());
-            if (method.equals(entry.getValue().getName())) {
+        for (StepUpMethod suMethod : stepUpMethodContext.getStepUpMethods().keySet()) {
+            log.debug("Comparing method " + method + " to " + suMethod.getName());
+            if (method.equals(suMethod.getName())) {
                 log.debug("located target method " + method);
                 try {
                     if (id >= 0) {
-                        for (StepUpAccount account : entry.getValue().getAccounts()) {
+                        for (StepUpAccount account : suMethod.getAccounts()) {
                             log.debug("Comparing account id " + id + " to " + account.getId());
                             if (account.getId() == id) {
                                 log.debug("located target account " + id);
                                 log.debug("running command " + command);
-                                accountCommand(command, account, entry.getValue(), request);
+                                accountCommand(command, account, suMethod, request);
                             }
                         }
                     } else {
-                        accountCommand(command, null, entry.getValue(), request);
+                        accountCommand(command, null, suMethod, request);
                     }
                 } catch (Exception e) {
-                    log.debug("{} unexpectd exception occurred", getLogPrefix());
+                    log.debug("{} unexpected exception occurred", getLogPrefix());
                     log.error(e.getMessage());
                     ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EXCEPTION);
                     log.trace("Leaving");
@@ -180,9 +178,11 @@ public class UpdateAccount extends AbstractExtractionAction {
         log.debug("Update value to be interpreted is " + updateValue);
         ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EVENTID_CONTINUE_STEPUP);
         log.trace("Leaving");
-
     }
 
+    // Checkstyle: CyclomaticComplexity ON
+
+    // Checkstyle: CyclomaticComplexity OFF
     /**
      * Method performs account operations.
      * 
@@ -192,6 +192,8 @@ public class UpdateAccount extends AbstractExtractionAction {
      *            the operation is targeting
      * @param method
      *            the operation is targeting
+     * @param request
+     *            for reading user input
      * @throws Exception
      *             if something unexpected occurs
      */
@@ -235,5 +237,5 @@ public class UpdateAccount extends AbstractExtractionAction {
         }
 
     }
-
+    // Checkstyle: CyclomaticComplexity ON
 }

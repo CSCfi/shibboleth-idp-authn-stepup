@@ -23,8 +23,11 @@
 package fi.csc.idp.stepup.api;
 
 import java.security.Principal;
+import java.util.List;
 import java.util.Map;
+
 import javax.annotation.Nonnull;
+
 import org.opensaml.messaging.context.BaseContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,7 +43,7 @@ public class StepUpMethodContext extends BaseContext {
     private final Logger log = LoggerFactory.getLogger(StepUpMethodContext.class);
 
     /** StepUp Methods. */
-    private Map<Principal, StepUpMethod> stepupMethods;
+    private Map<StepUpMethod, List<? extends Principal>> stepupMethods;
 
     /** Active StepUp account. */
     private StepUpAccount stepUpAccount;
@@ -93,9 +96,9 @@ public class StepUpMethodContext extends BaseContext {
     /**
      * Get all step up methods by the supported authentication contexts.
      * 
-     * @return map of step up methods keyed by authentication contexts
+     * @return map of step up methods and authentication contexts
      */
-    public Map<Principal, StepUpMethod> getStepUpMethods() {
+    public Map<StepUpMethod, List<? extends Principal>> getStepUpMethods() {
         log.trace("Entering & Leaving");
         return stepupMethods;
     }
@@ -104,9 +107,9 @@ public class StepUpMethodContext extends BaseContext {
      * Set all step up methods by the supported authentication contexts.
      * 
      * @param stepUpMethods
-     *            map of step up methods keyed by authentication contexts.
+     *            map of step up methods and authentication contexts.
      */
-    public void setStepUpMethods(Map<Principal, StepUpMethod> stepUpMethods) {
+    public void setStepUpMethods(Map<StepUpMethod, List<? extends Principal>> stepUpMethods) {
         log.trace("Entering & Leaving");
         this.stepupMethods = stepUpMethods;
     }

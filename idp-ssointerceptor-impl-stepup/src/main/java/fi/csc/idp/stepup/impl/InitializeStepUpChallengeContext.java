@@ -25,7 +25,10 @@ package fi.csc.idp.stepup.impl;
 
 import java.security.Principal;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -35,6 +38,7 @@ import net.shibboleth.idp.authn.AbstractAuthenticationAction;
 import net.shibboleth.idp.authn.context.AuthenticationContext;
 import net.shibboleth.utilities.java.support.logic.Constraint;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.opensaml.messaging.context.navigate.ChildContextLookup;
 import org.opensaml.profile.action.ActionSupport;
 import org.opensaml.profile.context.ProfileRequestContext;
@@ -79,12 +83,8 @@ public class InitializeStepUpChallengeContext extends AbstractAuthenticationActi
     /** proxy authentication context. */
     private ShibbolethSpAuthenticationContext shibbolethContext;
 
-    // TODO: CLASS->2nd fac meth map is not feasible when more auth classes
-    // added.
-    // It will lead to possibly having same methods listed multiple times
-    // Change to 2nd fac meth map->LIST OF AUTH CLASSES
     /** StepUp Methods. */
-    private Map<Principal, StepUpMethod> stepUpMethods;
+    private Map<StepUpMethod, List<? extends Principal>> stepUpMethods;
 
     /** Constructor. */
     public InitializeStepUpChallengeContext() {
@@ -95,19 +95,16 @@ public class InitializeStepUpChallengeContext extends AbstractAuthenticationActi
     }
 
     /**
-     * Set the possible stepup methods keyed by requested authentication
-     * context.
+     * Set the stepup method and supported authentication contextes.
      * 
      * @param methods
      *            stepup methods in a map
-     * @param <T>
-     *            Principal
      */
 
-    public <T extends Principal> void setStepUpMethods(@Nonnull Map<T, StepUpMethod> methods) {
+    public void setStepUpMethods(@Nonnull Map<StepUpMethod, List<? extends Principal>> methods) {
         log.trace("Entering");
-        this.stepUpMethods = new HashMap<Principal, StepUpMethod>();
-        for (Map.Entry<T, StepUpMethod> entry : methods.entrySet()) {
+        this.stepUpMethods = new HashMap<StepUpMethod, List<? extends Principal>>();
+        for (Map.Entry<StepUpMethod, List<? extends Principal>> entry : methods.entrySet()) {
             this.stepUpMethods.put(entry.getKey(), entry.getValue());
         }
         log.trace("Leaving");
@@ -169,20 +166,20 @@ public class InitializeStepUpChallengeContext extends AbstractAuthenticationActi
         log.trace("Entering");
         StepUpMethodContext stepUpMethodContext = (StepUpMethodContext) authenticationContext.addSubcontext(
                 new StepUpMethodContext(), true);
-        // We have all possible methods in a map
+        // We have all possible methods in a map.
         // Initialize all for this user.. so they can be fetched from context
-        // later for instance for maintenance
+        // later for instance for maintenance operations.
         // The methods that cannot be initialized are dropped.
-        for (StepUpMethod stepupMethod : stepUpMethods.values()) {
-            // the methods and their accounts are initialized for current
-            // attribute context
-            // accounts may need attribute information
+        for (Iterator<Entry<StepUpMethod, List<? extends Principal>>> it = stepUpMethods.entrySet().iterator(); it
+                .hasNext();) {
+            Entry<StepUpMethod, List<? extends Principal>> entry = it.next();
+            StepUpMethod stepupMethod = entry.getKey();
             log.debug("Initializing StepUp method and accounts for " + stepupMethod.getName());
             try {
                 if (!stepupMethod.initialize(attributeContext)) {
                     log.debug("Not able to initialize method " + stepupMethod.getName()
                             + " removed from available methods");
-                    stepUpMethods.values().remove(stepupMethod);
+                    it.remove();
                 }
             } catch (Exception e) {
                 log.debug("Something unexpected happened", getLogPrefix());
@@ -195,21 +192,22 @@ public class InitializeStepUpChallengeContext extends AbstractAuthenticationActi
         // Set all available initializable methods to context
         log.debug("Setting " + stepUpMethods.size() + " stepup methods to context");
         stepUpMethodContext.setStepUpMethods(stepUpMethods);
+
         // Pick any non disabled account as the account to be used
-        for (Principal authMethod : stepUpMethods.keySet()) {
-            // If user has a method configured for requested context
-            if (shibbolethContext.getInitialRequestedContext().contains(authMethod)) {
+        for (Entry<StepUpMethod, List<? extends Principal>> entry : stepUpMethods.entrySet()) {
+            if (CollectionUtils.intersection(entry.getValue(), 
+                    shibbolethContext.getInitialRequestedContext()).size() > 0) {
                 // We set the last iterated method as the method
-                log.debug("Setting method " + stepUpMethods.get(authMethod).getName() + " as default method");
-                stepUpMethodContext.setStepUpMethod(stepUpMethods.get(authMethod));
+                log.debug("Setting method " + entry.getKey().getName() + " as default method");
+                stepUpMethodContext.setStepUpMethod(entry.getKey());
                 // That method has accounts
                 try {
-                    if (stepUpMethods.get(authMethod).getAccounts() != null) {
-                        for (StepUpAccount account : stepUpMethods.get(authMethod).getAccounts()) {
+                    if (entry.getKey().getAccounts() != null) {
+                        for (StepUpAccount account : entry.getKey().getAccounts()) {
                             // and the account is enabled
                             if (account.isEnabled()) {
                                 log.debug("Setting a default stepup account");
-                                log.debug("Account type is " + stepUpMethods.get(authMethod).getName());
+                                log.debug("Account type is " + entry.getKey().getName());
                                 log.debug("Account name is " + (account.getName() == null ? "" : account.getName()));
                                 stepUpMethodContext.setStepUpAccount(account);
                                 log.trace("Leaving");
@@ -225,8 +223,8 @@ public class InitializeStepUpChallengeContext extends AbstractAuthenticationActi
                     log.trace("Leaving");
                     return;
                 }
-            }
 
+            }
         }
         // No default account automatically chosen
         log.trace("Leaving");
