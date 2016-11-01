@@ -114,6 +114,13 @@ public interface StepUpAccount {
     public boolean verifyResponse(String response) throws Exception;
 
     /**
+     * If account has been used successfully to verify user.
+     * 
+     * @return true if account has been used to verify user.
+     */
+    public boolean isVerified();
+    
+    /**
      * Target parameter for stepup operations. May be sms number, email address,
      * shared secret or what ever is applicable for the implementation.
      * 
