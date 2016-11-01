@@ -160,6 +160,12 @@ public class TestStepUpMethodContext {
             return null;
         }
 
+        @Override
+        public boolean isVerified() {
+            // TODO Auto-generated method stub
+            return false;
+        }
+
     }
 
 }
