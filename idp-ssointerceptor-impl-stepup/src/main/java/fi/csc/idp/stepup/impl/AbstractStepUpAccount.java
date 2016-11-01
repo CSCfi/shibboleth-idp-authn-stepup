@@ -55,6 +55,9 @@ public abstract class AbstractStepUpAccount implements StepUpAccount {
     private boolean editable;
     /** account is enabled. */
     private boolean enabled;
+    /** user has been verified. */
+    private boolean verified;
+    
 
     /** default constructor. */
     public AbstractStepUpAccount() {
@@ -159,7 +162,27 @@ public abstract class AbstractStepUpAccount implements StepUpAccount {
         log.trace("Entering & Leaving");
         return this.editable;
     }
+    
+    /**
+     * If the account has been used to verify the 
+     * the user.
+     * 
+     * @return true if verified.
+     */
+    @Override
+    public boolean isVerified() {
+        log.trace("Entering & Leaving");
+        return this.verified;
+    }
 
+    /**
+     * Set the status of user being verified. 
+     */
+    protected void setVerified() {
+        log.trace("Entering & Leaving");
+        this.verified=true;
+    }
+    
     /**
      * Set the account editable/non editable. Non editable account cannot be
      * modified.
@@ -240,7 +263,9 @@ public abstract class AbstractStepUpAccount implements StepUpAccount {
             log.trace("Leaving");
             throw new Exception("Bean not configured with ChallengeVerifier");
         }
-        return challengeVerifier.verify(challenge, response, null);
+        this.verified = challengeVerifier.verify(challenge, response, null); 
+        log.trace("Leaving");
+        return this.verified;
     }
 
     /**

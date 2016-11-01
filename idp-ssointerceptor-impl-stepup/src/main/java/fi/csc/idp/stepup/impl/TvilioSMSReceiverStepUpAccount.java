@@ -214,6 +214,7 @@ public class TvilioSMSReceiverStepUpAccount extends ChallengeSenderStepUpAccount
                         + " to the list of used verification messages");
                 usedMessages.put(message.getSid(), message.getDateSent());
                 msgLock.unlock();
+                setVerified();
                 return true;
             }
             Thread.sleep(intervalOfChecks);
