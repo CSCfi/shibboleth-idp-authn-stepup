@@ -24,8 +24,8 @@
 package fi.csc.idp.stepup.impl;
 
 import java.security.Principal;
-import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -58,10 +58,10 @@ import fi.okm.mpass.shibboleth.authn.context.ShibbolethSpAuthenticationContext;
 
 /**
  * An action that initializes step up methods and accounts. Each of the
- * configured methods are initialized. Among the initialized methods a suitable
- * account and methods are chosen as defaults based on requested authentication
- * context. If there is no suitable account any of the suitable methods is
- * chosen as default method.
+ * configured methods are initialized. Among the initialized methods a first
+ * suitable account and methods are chosen as defaults based on requested
+ * authentication context. If there is no suitable account any of the suitable
+ * methods is chosen as default method.
  * 
  */
 
@@ -103,7 +103,7 @@ public class InitializeStepUpChallengeContext extends AbstractAuthenticationActi
 
     public void setStepUpMethods(@Nonnull Map<StepUpMethod, List<? extends Principal>> methods) {
         log.trace("Entering");
-        this.stepUpMethods = new HashMap<StepUpMethod, List<? extends Principal>>();
+        this.stepUpMethods = new LinkedHashMap<StepUpMethod, List<? extends Principal>>();
         for (Map.Entry<StepUpMethod, List<? extends Principal>> entry : methods.entrySet()) {
             this.stepUpMethods.put(entry.getKey(), entry.getValue());
         }
@@ -195,8 +195,7 @@ public class InitializeStepUpChallengeContext extends AbstractAuthenticationActi
 
         // Pick any non disabled account as the account to be used
         for (Entry<StepUpMethod, List<? extends Principal>> entry : stepUpMethods.entrySet()) {
-            if (CollectionUtils.intersection(entry.getValue(), 
-                    shibbolethContext.getInitialRequestedContext()).size() > 0) {
+            if (CollectionUtils.intersection(entry.getValue(), shibbolethContext.getInitialRequestedContext()).size() > 0) {
                 // We set the last iterated method as the method
                 log.debug("Setting method " + entry.getKey().getName() + " as default method");
                 stepUpMethodContext.setStepUpMethod(entry.getKey());
