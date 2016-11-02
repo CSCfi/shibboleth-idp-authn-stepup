@@ -1,0 +1,109 @@
+#set ($stepupMethods = $stepUpMethodContext.getStepUpMethods())
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>#springMessageText("idp.title", "Web Login Service")</title>
+    <link rel="stylesheet" type="text/css" href="$request.getContextPath()/css/main.css">
+    </script>
+  </head>
+  <body>
+    <div class="wrapper">
+      <div class="container">
+        <header>
+          <img src="$request.getContextPath()#springMessage("idp.logo")" alt="#springMessageText("idp.logo.alt-text", "logo")">
+        </header>
+        <div class="content">
+          <div class="column one">
+            #foreach ($mapEntry in $stepupMethods.entrySet())
+                #set ($method = $mapEntry.getKey())
+            	#set ($methodName = $method.getName())
+                <hr>
+                <p>#springMessageText("idp.stepup.method", "Authentication Method:")</p>
+                <p>$methodName</p>
+
+                <!-- add new account -->
+                #if ($method.isEditable() == true)
+                #set ($action = $methodName+':-1:addaccount')
+                <form action="$flowExecutionUrl" method="post">
+                    <div class="form-element-wrapper">
+                      <button class="form-element form-button" value=$action type="submit" name="_eventId_update">#springMessageText("idp.stepup.method.addaccount", "Add Account")</button>
+                    </div>
+                    </form>
+                #end
+                <!-- add new account end-->
+                       
+                <!-- list all accounts of method -->
+                <p>#springMessageText("idp.stepup.methodaccounts", "Existing accounts:")</p>
+                #set ($counter = 0)
+                #foreach ($account in $$method.getAccounts())
+                  #set ($counter = $counter+1)
+                  #set ($accountName = $account.getName())
+                  #if (!$account.getName())
+                    #set ($accountName = "")
+                  #else
+                    #set ($accountName = $account.getName())
+                  #end
+                  #if ($account.isEditable() == false)
+                    <p>Name:$accountName</p>
+                    <p>Enabled:$account.isEnabled()</p>
+                    #if ($account.getTarget())
+                      <p>Key:$account.getTarget()</p>
+                    #end
+                  #end
+
+                  <!-- if account is editable, we have controls -->
+                  #if ($account.isEditable() == true)
+                    
+                    <!-- set name -->
+                    #set ($action = $methodName+':'+$account.getId()+':setname')
+                    <form action="$flowExecutionUrl" method="post">
+                     <div class="form-element-wrapper">
+                       <label for=$methodName$counter>#springMessageText("idp.stepup.update.name", "Name")</label>
+                       <input class="form-element form-field" id=$methodName$counter name="j_name" type="text" value=$accountName>
+                     </div>
+                     <div class="form-element-wrapper">
+                       <button class="form-element form-button" value=$action type="submit" name="_eventId_update">#springMessageText("idp.stepup.update.set", "Set Name")</button>
+                     </div>
+                    </form>
+                    <!-- set name end -->
+         
+                    <!-- enable /disable button -->
+                    #if ($account.isEnabled() == true)
+                      #set ($enableCommand = 'disable')
+                      <!--  springMessageText("idp.stepup.update.disable", "disable"))-->
+                      #set ($enableText = 'Disable Account')
+                    #else
+                       #set ($enableCommand = 'enable')
+                       #set ($enableText = 'Enable Account')
+                    #end
+                    #set ($action = $methodName+':'+$account.getId()+':'+$enableCommand)
+                    <form action="$flowExecutionUrl" method="post">  
+                    <div class="form-element-wrapper">
+                      <button class="form-element form-button" value=$action type="submit" name="_eventId_update">$enableText</button>
+                    </div>
+                    </form>
+                    <!-- enable /disable button end -->
+                     <p>Key:$account.getTarget()</p>
+       	       	  #end
+                #end
+            #end 
+          </div>
+
+          <form action="$flowExecutionUrl" method="post">
+            <div class="form-element-wrapper">
+              <button class="form-element form-button" type="submit" name="_eventId_proceed">#springMessageText("idp.stepup.reinitlogin", "Reinit Login")</button>
+            </div>
+
+          </form>
+
+        </div>
+      </div>
+      <footer>
+        <div class="container container-footer">
+          <p class="footer-text">#springMessageText("idp.footer", "Insert your footer text here.")</p>
+        </div>
+      </footer>
+    </div>
+  </body>
+</html>

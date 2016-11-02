@@ -1,0 +1,14 @@
+#set ($verifyResponse = $stepupMethodContext.getStepUpAccount().verifyResponse(null))
+#set ($link_timeout = $flowExecutionUrl + "&_eventId=timeout")
+#if ($verifyResponse == true)
+  #set ($link = $flowExecutionUrl + "&_eventId=proceed")
+#else
+  #set ($link = $flowExecutionUrl + "&_eventId=retry")
+#end 
+{
+  "status": {
+    "state": $verifyResponse,
+    "event": "$link",
+    "event_timeout": "$link_timeout"
+  }
+}

@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>#springMessageText("idp.title", "Web Login Service")</title>
+    <link rel="stylesheet" type="text/css" href="$request.getContextPath()/css/main.css">
+    <script src="https://code.jquery.com/jquery-2.2.0.min.js"></script>
+  </head>
+  <body>
+    <div class="wrapper">
+      <div class="container">
+        <header>
+          <img src="$request.getContextPath()#springMessage("idp.logo")" alt="#springMessageText("idp.logo.alt-text", "logo")">
+        </header>
+        <div class="content">
+          #springMessageText("idp.stepup.backend","SMS verification.")
+          #springMessageText("idp.stepup.backend.explanation","Please reply to the sms to continue.")
+          <div id="showcounter"</div>
+        </div>
+      </div>
+      <footer>
+        <div class="container container-footer">
+          <p class="footer-text">#springMessageText("idp.footer", "Insert your footer text here.")</p>
+        </div>
+      </footer>
+    </div>
+
+   <!-- ajax script to poll for sms response -->
+   #set ($link = $flowExecutionUrl + "&_eventId=retry")
+   <script>
+         var counter = 30;
+         function verify_response_ajax(verify_url) {
+         console.log("Verifying response");
+         var jsonMimeType = "application/json;charset=UTF-8";
+
+        $.ajax({
+                type:"GET",
+                async:"false",
+                url: verify_url,
+                beforeSend: function(x) {
+                  if(x && x.overrideMimeType) {
+                  x.overrideMimeType(jsonMimeType);
+                  }
+                },
+                dataType:"json",
+                success: function(data)
+                {
+                    console.log("Response:"+data);
+                    if (counter == 0){
+                        console.log("timeout.. resolving url");
+                        var timeout_url = data.status.event_timeout.substring(data.status.event_timeout.indexOf("SSO"));
+                        console.log("timeout url resolved as "+timeout_url);
+                        location.href = timeout_url;
+                    }
+                    $('#showcounter').text('Waiting for reply ' + counter);
+                    counter = counter-1;
+                    console.log("Response:"+data);
+                    event_url = data.status.event.substring(data.status.event.indexOf("SSO"));
+                    console.log("event url:"+event_url);
+                    if(data.status.state == true) location.href = event_url;
+                    setTimeout(function(){
+                      verify_response_ajax(event_url);
+                    }, 1000);
+                }
+            });
+         }
+        $(document).ready(verify_response_ajax("$link"));
+   </script>
+  </body>
+</html>

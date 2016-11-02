@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html>
   <head>
@@ -12,7 +13,13 @@
           <img src="$request.getContextPath()#springMessage("idp.logo")" alt="#springMessageText("idp.logo.alt-text", "logo")">
         </header>
         <div class="content">
-        #springMessageText("idp.stepup.wrongresponse","You provided wrong response.")
+        #springMessageText("idp.stepup.performed","New account has been added. Please set the shared secret to your device: <br>")
+        #evaluate($stepupMethodContext.getStepUpAccount().getTarget())
+        <form action="$flowExecutionUrl" method="post">
+        <div class="form-element-wrapper">
+              <button class="form-element form-button" type="submit" name="_eventId_proceed">#springMessageText("idp.stepup.proceedlogin", "Proceed to Login")</button>
+        </div>
+        </form>
        </div>
       </div>
       <footer>
