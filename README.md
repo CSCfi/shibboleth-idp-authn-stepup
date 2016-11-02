@@ -100,7 +100,7 @@ cp ../idp-ssointerceptor-impl-stepup/src/main/resources/flows/intercept/stepup/s
 
 ##Configuration 
 
-Note! These Configuration instructions are yet not final. The contents of the flows and views will change before release still. 
+Note! You will need to modify both beans and flow to meet your use case. Please not that example bean configurations are missing vital deployment specific parameters like key values and account identifiers.  
 
 ###Configuring the beans
 
