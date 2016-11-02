@@ -52,7 +52,7 @@ After compilation, the _../idp-ssointerceptor-impl-stepup/target/idp-ssointercep
 cp ../idp-ssointerceptor-impl-stepup/target/idp-ssointerceptor-impl-stepup-\<version\>.jar /opt/shibboleth-idp/edit-webapp/WEB-INF/lib/.
 cp ../idp-ssointerceptor-impl-stepup/target/dependency/idp-ssointerceptor-api-stepup-\<version\>.jar /opt/shibboleth-idp/edit-webapp/WEB-INF/lib/.
 ```
-We have also some partially optional dependencies (depends on your configuration) you need to copy. Most of them can be found from _../idp-ssointerceptor-impl-stepup/target/dependency
+We have also some partially optional dependencies (depends on your configuration) you need to copy. Most of them can be found from _../idp-ssointerceptor-impl-stepup/target/dependency_
 ```
 cp ../idp-ssointerceptor-impl-stepup/target/dependency/googleauth-\<version\>.jar /opt/shibboleth-idp/edit-webapp/WEB-INF/lib/.
 cp ../idp-ssointerceptor-impl-stepup/target/dependency/HikariCP-\<version\>.jar /opt/shibboleth-idp/edit-webapp/WEB-INF/lib/.
@@ -104,28 +104,35 @@ Note! These Configuration instructions are yet not final. The contents of the fl
 
 ###Configuring the beans
 
-Beans are configured in file _/opt/shibboleth-idp/flows/intercept/stepup/stepup-beans.xml_
+Beans are configured in file _/opt/shibboleth-idp/flows/intercept/stepup/stepup-beans.xml_. In the following section we describe some of the relevant example bean configuration to help get an overall idea. Bean configuration file should be studied for thorough understanding.
 
-####CheckRequestedAuthenticationContext
+####CheckRequestedAuthenticationContext - fi.csc.idp.stepup.impl.CheckRequestedAuthenticationContext
 
-This bean is used to configure which requested authentication methods are considered stepup methods. Stepup may be performed only to requests containing requested method listed in the beans configuration.
+This bean is used to configure which requested authentication methods are considered stepup methods. The example flow performs stepup process only to requests containing requested method listed in the beans configuration. 
 
-####CheckProvidedAuthenticationContext
+####CheckProvidedAuthenticationContext - fi.csc.idp.stepup.impl.CheckProvidedAuthenticationContext
 
-If requested method is determined to require stepup, this bean is configured for a list of acceptable idp, sp and method triplets for stepup. This is for a case IdP and method is explicitly whitelisted for SP to be accepted as stepup. Use case for this would be a Idp having support for stronger authentication than others (the others requiring stepup performed by proxy). To make this work sensibly request method mapping feature of [MPASS Shibboleth SP Authentication](https://github.com/Digipalvelutehdas/MPASS-proxy/tree/master/idp-authn-impl-shibsp) is propably needed. 
+If requested method is determined to require stepup, this bean is configured for a list of acceptable idp, sp and method triplets for stepup. This is for a case IdP and method is explicitly whitelisted for SP to be accepted as stepup. Use case for this would be a Idp having support for stronger authentication than others (the others requiring stepup performed by proxy) and making the action unncessary in the proxy. To make this work sensibly request method mapping feature of [MPASS Shibboleth SP Authentication](https://github.com/Digipalvelutehdas/MPASS-proxy/tree/master/idp-authn-impl-shibsp) is propably needed. 
 
-####GenerateStepUpChallenge
+####InitializeStepUpChallengeContext - fi.csc.idp.stepup.impl.InitializeStepUpChallengeContext
 
-This bean needs to be configured for all stepup methods perfomed by proxy. There are challenge creation, challenge sending and challenge verification implementations that need to be mapped for each of the supported methods. This can be used to control for instance whether the challenge is send by sms or email to client depending on requested method.
+This bean is configured to initialize correctly the stepup methods and accounts for the user. Bean is configured with supported authentication manager beans (i.e. method) and a list of authentication context values they support. The action selects from all sucessfully initialized authentication managers and their accounts the first one matching the requested authentication context as the default method and account. 
 
-####VerifyPasswordFromFormRequest
-This bean needs to be configured for all stepup methods perfomed by proxy. Bean needs to be instructed which verification implementation is used for which method.
+####GoogleAuthStepUpManager - fi.csc.idp.stepup.impl.AttributeKeyBasedStorageStepUpAccountManager
 
+This bean is a example of a method that requires attribute context to inilitialize the accounts and those accounts are permanent i.e. stored to database. The account type is Google Authenticator i.e. user has to provide a TOTP passcode of a account registered to proxy.
 
-####SetRequestedAuthenticationContext
+####SMSReceiverStepUpManager - fi.csc.idp.stepup.impl.AttributeTargetBasedStepUpAccountManager
 
-This bean is used for configuring which authentication method is sent to client SP in assertion. There are two maps, a specific and default map.
-If there is a mapping of Idp, Sp, Method->new Method, the specified new Method is used in assertion. If there is no such mapping but there is default
+This bean is a example of a method that requires attribute context to inilitialize the accounts but accounts do not have to be stored. In this example case the account is initialized with user mobile number.
+
+####SMSReceiverStepUpAccount - fi.csc.idp.stepup.impl.TvilioSMSReceiverStepUpAccount
+
+This bean is an account implementation used by SMSReceiverStepUpManager. Follow how the bean is wired to get an idea how to create a new account type.
+
+####SetRequestedAuthenticationContext - fi.csc.idp.stepup.impl.SetRequestedAuthenticationContext
+
+This bean is used for configuring which authentication method is sent to client SP in assertion in the case stepup has not been performed. There are two maps, a specific and default map. If there is a mapping of Idp, Sp, Method->new Method, the specified new Method is used in assertion. If there is no such mapping but there is default
 mapping of Idp and SP, the method received from IdP is used in the new assertion. If there are no mappings at all, normal IdP logic takes place.
 
 The idea here is to allow proxy to deliver the actual used method provided by originating Idp and also to translate between incompatible SP & IdP pairs that have different understanding of methods.
