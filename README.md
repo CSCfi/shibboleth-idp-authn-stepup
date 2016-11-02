@@ -3,15 +3,32 @@
 
 ##Note
 
-Project is not deployable yet. Many of the features are still under development and even partial deployment requires instructions from undersigned.  
+Project can be deployed for testing purposes but is not production quality yet. Many of the features are still under development and deployment may require help from the development team.  
 
 ## Overview
 These modules contain extensions to achieve stepup authentication in a proxy based on Shibboleth IdP 3 and Shibboleth SP. You may want to read overall [description](https://confluence.csc.fi/display/HAKA/Description+of+SAML2+Proxy+capable+of+elevating+authentication) of the whole proxy before going forward.
 
-This project relies on [MPASS Shibboleth SP Authentication](https://github.com/Digipalvelutehdas/MPASS-proxy/tree/master/idp-authn-impl-shibsp) project for a authentication flow that actually enables to deploy a proxy based on Shibboleth IdP 3 and Shibboleth SP. The aim of this stepup project is to enhance that by providing a mechanisms for performing stepup authentication.
+This project relies on [MPASS Shibboleth SP Authentication](https://github.com/Digipalvelutehdas/MPASS-proxy/tree/master/idp-authn-impl-shibsp) project for a authentication flow that actually enables to deploy a proxy based on Shibboleth IdP 3 and Shibboleth SP. The aim of this stepup project is to enhance that by providing a mechanisms for performing stepup authentication. 
+
+The components can be deployed also to the home organization IdP. This has impact on how the flow should be configured and there is no such example yet. 
 
 ### Short Summary of flow
-Stepup flow is a post authentication interceptor flow. In practise this means that Stepup flow receives control at a point where user has been  authenticated by the actual home organization, the results of this authentication have been populated by the MPASS Shibboleth SP Authentication module, the attributes have been resolved and filtered but the actual assertion has not been formed yet. At this point interceptor flow makes decisions whether a stepup is needed, what kind of stepup that would be and how that is communicated to client SP in the assertion.
+Stepup flow is a post authentication interceptor flow. In practise this means that stepup flow receives control at a point where user has been  authenticated, the attributes have been resolved and filtered but the actual assertion has not been formed yet. At this point interceptor flow makes decisions whether a stepup is needed, what kind of stepup that would be and how that is communicated to client SP in the assertion.
+
+The flow provided with the is an example flow that may have to be heavily modified to suite the target environment. The basic building blocks consist of following functionality:
+
+- Different user authentication mechanisms: email, sms, totp (google authenticator).
+- Possibility to choose authentication mechanisms based on requested authentication method.
+- Registration of authentication mechanism and maintaining them.
+- Possibility to translate requested and provided authentication methods between SP and IdP.
+- Possibility to trust the home organization IdP to provide already the authentication level requiring stepup. 
+
+How these building blocks are applied depends on implemented flow and may result in very different use cases. The example flow here describes two cases:
+
+- User is requested to reply to received sms by his/her mobile to continue. If user has no mobile number email verification is used instead.
+- User is requested to enter code TOTP code. User may register / maintain TOTP devices after successful SMS authentication.
+
+By modifying the flow numerous other use cases may also be achieved.
 
 ## Prerequisities and compilation
 
@@ -34,11 +51,33 @@ After compilation, the _../idp-ssointerceptor-impl-stepup/target/idp-ssointercep
 ```
 cp ../idp-ssointerceptor-impl-stepup/target/idp-ssointerceptor-impl-stepup-\<version\>.jar /opt/shibboleth-idp/edit-webapp/WEB-INF/lib/.
 cp ../idp-ssointerceptor-impl-stepup/target/dependency/idp-ssointerceptor-api-stepup-\<version\>.jar /opt/shibboleth-idp/edit-webapp/WEB-INF/lib/.
+```
+We have also some partially optional dependencies (depends on your configuration) you need to copy. Most of them can be found from _../idp-ssointerceptor-impl-stepup/target/dependency
+```
+cp ../idp-ssointerceptor-impl-stepup/target/dependency/googleauth-\<version\>.jar /opt/shibboleth-idp/edit-webapp/WEB-INF/lib/.
+cp ../idp-ssointerceptor-impl-stepup/target/dependency/HikariCP-\<version\>.jar /opt/shibboleth-idp/edit-webapp/WEB-INF/lib/.
+
+cp ../idp-ssointerceptor-impl-stepup/target/dependency/jackson-annotations-\<version\>.jar /opt/shibboleth-idp/edit-webapp/WEB-INF/lib/.
+cp ../idp-ssointerceptor-impl-stepup/target/dependency/jackson-core-\<version\>.jar /opt/shibboleth-idp/edit-webapp/WEB-INF/lib/.
+cp ../idp-ssointerceptor-impl-stepup/target/dependency/jackson-databind-\<version\>.jar /opt/shibboleth-idp/edit-webapp/WEB-INF/lib/.
+
+cp ../idp-ssointerceptor-impl-stepup/target/dependency/spring-security-crypto-\<version\>.jar /opt/shibboleth-idp/edit-webapp/WEB-INF/lib/.
+cp ../idp-ssointerceptor-impl-stepup/target/dependency/twilio-\<version\>.jar /opt/shibboleth-idp/edit-webapp/WEB-INF/lib/.
+```
+If you are using a database as in example to store TOTP keys add also the relevant jdbc client library. Now finally you can build the project.
+```
 cd /opt/shibboleth-idp
 sh bin/build.sh
 ```
 
 The final command will rebuild the _war_-package for the IdP application. Please note that products of [MPASS Shibboleth SP Authentication](https://github.com/Digipalvelutehdas/MPASS-proxy/tree/master/idp-authn-impl-shibsp) are expected to be in the directory _/opt/shibboleth-idp/edit-webapp/WEB-INF/lib/_ (Deployment prerequisite).
+
+At the time of writing the instructions the http libraries provided by IdP were too old for twilio. If you have problems replace the http libraries with newer versions, for instance:
+```
+httpclient-4.5.2.jar
+httpclient-cache-4.5.2.jar
+httpcore-4.4.5.jar
+```
 
 ###Views
 Copy the necessary views to place. Create the directories if needed. 
@@ -49,13 +88,13 @@ cp ../idp-ssointerceptor-impl-stepup/src/main/resources/views/intercept/stepup/*
 ###Flows
 Copy the flow to it's correct place. Create the directories if needed.
 ```
-cp ../idp-ssointerceptor-impl-stepup/src/main/resources/flows/intercept/stepup/stepup/stepup-flow.xml /opt/shibboleth-idp/flows/intercept/stepup/.
+cp ../idp-ssointerceptor-impl-stepup/src/main/resources/flows/intercept/stepup/stepup-flow.xml /opt/shibboleth-idp/flows/intercept/stepup/.
 ```
 
 ###Beans
 Copy the bean definition to it's correct place. Create the directories if needed.
 ```
-cp ../idp-ssointerceptor-impl-stepup/src/main/resources/flows/intercept/stepup/stepup/stepup-beans.xml /opt/shibboleth-idp/flows/intercept/stepup/.
+cp ../idp-ssointerceptor-impl-stepup/src/main/resources/flows/intercept/stepup/stepup-beans.xml /opt/shibboleth-idp/flows/intercept/stepup/.
 ```
 
 
