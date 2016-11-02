@@ -128,7 +128,7 @@ This bean is a example of a method that requires attribute context to inilitiali
 
 ####SMSReceiverStepUpAccount - fi.csc.idp.stepup.impl.TvilioSMSReceiverStepUpAccount
 
-This bean is an account implementation used by SMSReceiverStepUpManager. Follow how the bean is wired to get an idea how to create a new account type.
+This bean is an account implementation used by SMSReceiverStepUpManager. This implementation is meant for user authentication performed by user receiving and replying to sms. Follow how the bean is wired to get an idea how to create a new account type.
 
 ####SetRequestedAuthenticationContext - fi.csc.idp.stepup.impl.SetRequestedAuthenticationContext
 
@@ -154,7 +154,7 @@ You need to add the new flow to list of avalable intercept flows in file _/opt/s
 Then you need to also define the intercept point. Open file _/opt/shibboleth-idp/conf/relying-party.xml_ and add _stepup_ as post authentication intercept flow.
 ```
  <bean id="shibboleth.DefaultRelyingParty" parent="RelyingParty">
-        <property name="profileConfigurations">
+        <property name="profileConfigurations"> status
             <list>
             ...
             <bean parent="SAML2.SSO" p:postAuthenticationFlows="stepup" />
