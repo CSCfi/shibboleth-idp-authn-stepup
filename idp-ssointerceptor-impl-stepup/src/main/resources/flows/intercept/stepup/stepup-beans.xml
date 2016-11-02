@@ -15,8 +15,8 @@
 	<bean class="net.shibboleth.idp.profile.impl.ProfileActionBeanPostProcessor" />
 	<bean class="net.shibboleth.ext.spring.config.IdentifiableBeanPostProcessor" />
 
-	<bean id="certia" parent="shibboleth.SAML2AuthnContextClassRef"
-		c:classRef="urn:test:certia" />
+	<bean id="foobar" parent="shibboleth.SAML2AuthnContextClassRef"
+		c:classRef="urn:test:foobar" />
 	<bean id="stepup" parent="shibboleth.SAML2AuthnContextClassRef"
 		c:classRef="urn:test:stepup" />
 	<bean id="stepup2" parent="shibboleth.SAML2AuthnContextClassRef"
@@ -34,7 +34,7 @@
 	<bean id="FooStepUpContextes" class="java.util.ArrayList">
 		<constructor-arg>
 			<list>
-				<ref bean="certia" />
+				<ref bean="foobar" />
 			</list>
 		</constructor-arg>
 	</bean>
@@ -223,7 +223,7 @@
 		<property name="stepupMethods">
 			<list>
 				<ref bean="stepup" />
-				<ref bean="certia" />
+				<ref bean="foobar" />
 			</list>
 		</property>
 	</bean>
@@ -259,7 +259,7 @@
 
 	<bean id="MailChallengeSender" class="fi.csc.idp.stepup.impl.MailChallengeSender"
 		p:subjectField="mailsubject" p:fromField="foo" p:host="bar"
-		p:port="25" p:templatePath="/mails" p:templateFile="certia.vm"
+		p:port="25" p:templatePath="/mails" p:templateFile="foobar.vm"
 		p:sMTPAuth="false" p:sMTPTtls="true">
 	</bean>
 
