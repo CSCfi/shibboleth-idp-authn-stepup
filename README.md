@@ -23,12 +23,12 @@ The flow provided with the is an example flow that may have to be heavily modifi
 - Possibility to translate requested and provided authentication methods between SP and IdP.
 - Possibility to trust the home organization IdP to provide already the authentication level requiring stepup. 
 
-How these building blocks are applied depends on implemented flow and may result in very different use cases. The example flow here describes two cases:
+How these building blocks are applied depends on implemented flow and may result in very different use cases. The example flow here implements two separate cases:
 
 - User is requested to reply to received sms by his/her mobile to continue. If user has no mobile number email verification is used instead.
-- User is requested to enter code TOTP code. User may register / maintain TOTP devices after successful SMS authentication.
+- User is requested to enter code TOTP code. Maintaining accounts requires successful sms authentication.
 
-By modifying the flow numerous other use cases may also be achieved.
+By modifying the flow numerous other use cases may also be achieved. 
 
 ## Prerequisities and compilation
 
