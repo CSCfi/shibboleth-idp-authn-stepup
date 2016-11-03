@@ -35,7 +35,6 @@
 
         $.ajax({
                 type:"GET",
-                async:"false",
                 url: verify_url,
                 beforeSend: function(x) {
                   if(x && x.overrideMimeType) {
