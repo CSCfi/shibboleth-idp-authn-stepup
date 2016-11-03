@@ -50,9 +50,8 @@ public class TvilioSMSReceiverStepUpAccount extends ChallengeSenderStepUpAccount
 
     /** Crude implementation just to test the approach */
 
-    
     /** contains messages already used for verification. */
-    private static  Map<String, DateTime> usedMessages = new HashMap<String, DateTime>();
+    private static Map<String, DateTime> usedMessages = new HashMap<String, DateTime>();
     /** lock to access usedMessages. */
     private static Lock msgLock = new ReentrantLock();
 
@@ -74,7 +73,7 @@ public class TvilioSMSReceiverStepUpAccount extends ChallengeSenderStepUpAccount
     private int numberOfChecks = 10;
     /** interval in ms between sms checks. */
     private int intervalOfChecks = 1000;
-    
+
     /**
      * Tvilio account SID.
      * 
@@ -217,7 +216,10 @@ public class TvilioSMSReceiverStepUpAccount extends ChallengeSenderStepUpAccount
                 setVerified();
                 return true;
             }
-            Thread.sleep(intervalOfChecks);
+            if (numberOfChecks > 0) {
+                Thread.sleep(intervalOfChecks);
+            }
+
         }
         log.trace("Leaving");
         return false;
