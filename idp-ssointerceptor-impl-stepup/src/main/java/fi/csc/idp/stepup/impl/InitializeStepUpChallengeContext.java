@@ -166,10 +166,6 @@ public class InitializeStepUpChallengeContext extends AbstractAuthenticationActi
         log.trace("Entering");
         StepUpMethodContext stepUpMethodContext = (StepUpMethodContext) authenticationContext.addSubcontext(
                 new StepUpMethodContext(), true);
-        // We have all possible methods in a map.
-        // Initialize all for this user.. so they can be fetched from context
-        // later for instance for maintenance operations.
-        // The methods that cannot be initialized are dropped.
         for (Iterator<Entry<StepUpMethod, List<? extends Principal>>> it = stepUpMethods.entrySet().iterator(); it
                 .hasNext();) {
             Entry<StepUpMethod, List<? extends Principal>> entry = it.next();
@@ -189,13 +185,11 @@ public class InitializeStepUpChallengeContext extends AbstractAuthenticationActi
                 return;
             }
         }
-        // Set all available initializable methods to context
         log.debug("Setting " + stepUpMethods.size() + " stepup methods to context");
         stepUpMethodContext.setStepUpMethods(stepUpMethods);
-
-        // Pick any non disabled account as the account to be used
         for (Entry<StepUpMethod, List<? extends Principal>> entry : stepUpMethods.entrySet()) {
-            if (CollectionUtils.intersection(entry.getValue(), shibbolethContext.getInitialRequestedContext()).size() > 0) {
+            if (CollectionUtils.intersection(entry.getValue(), 
+                    shibbolethContext.getInitialRequestedContext()).size() > 0) {
                 // We set the last iterated method as the method
                 log.debug("Setting method " + entry.getKey().getName() + " as default method");
                 stepUpMethodContext.setStepUpMethod(entry.getKey());
