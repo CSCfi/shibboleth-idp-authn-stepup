@@ -74,7 +74,7 @@ public class TestAddAccount {
         sumCtx.setStepUpMethod(new method());
         action.initialize();
         final Event event = action.execute(src);
-        ActionTestingSupport.assertEvent(event, StepUpEventIds.EVENTID_INVALID_USER);
+        ActionTestingSupport.assertEvent(event, StepUpEventIds.EXCEPTION);
     }
 
     /** Test that action copes with account creation throwing error */
@@ -85,7 +85,7 @@ public class TestAddAccount {
         sumCtx.setStepUpMethod(new method2());
         action.initialize();
         final Event event = action.execute(src);
-        ActionTestingSupport.assertEvent(event, StepUpEventIds.EVENTID_INVALID_USER);
+        ActionTestingSupport.assertEvent(event, StepUpEventIds.EXCEPTION);
     }
 
     /** Test that action is able to succeed */
@@ -154,10 +154,8 @@ public class TestAddAccount {
         @Override
         public void updateAccount(StepUpAccount account) throws Exception {
             // TODO Auto-generated method stub
-            
-        }
 
-        
+        }
 
     }
 
