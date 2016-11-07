@@ -38,10 +38,8 @@ import fi.csc.idp.stepup.api.StepUpMethodContext;
 import fi.csc.idp.stepup.api.StepUpAccount;
 
 /**
- * An action that generates a shared secret.The action selects attribute id and
- * challenge generator on the basis of requested authentication context.
- * Attribute value, if defined, is passed to challenge generator. Secret is
- * stored to context.
+ * An action that creates a new account and sets it 
+ * as a active account. 
  * 
  * 
  */
@@ -52,35 +50,21 @@ public class AddAccount extends AbstractAuthenticationAction {
     /** Class logger. */
     @Nonnull
     private final Logger log = LoggerFactory.getLogger(AddAccount.class);
-
-    /** proxy StepUp Context. */
-    private StepUpMethodContext stepUpMethodContext;
-
-    /** {@inheritDoc} */
-    @SuppressWarnings("unchecked")
-    /** {@inheritDoc} */
-    @Override
-    protected boolean doPreExecute(@Nonnull final ProfileRequestContext profileRequestContext,
-            @Nonnull final AuthenticationContext authenticationContext) {
-
-        log.trace("Entering");
-        stepUpMethodContext = authenticationContext.getSubcontext(StepUpMethodContext.class);
-        if (stepUpMethodContext == null) {
-            log.error("{} Could not get shib proxy context", getLogPrefix());
-            ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EVENTID_MISSING_STEPUPMETHODCONTEXT);
-            log.trace("Leaving");
-            return false;
-        }
-        return super.doPreExecute(profileRequestContext, authenticationContext);
-    }
-
+   
     /** {@inheritDoc} */
     @Override
     protected void doExecute(@Nonnull final ProfileRequestContext profileRequestContext,
             @Nonnull final AuthenticationContext authenticationContext) {
         log.trace("Entering");
+        StepUpMethodContext stepUpMethodContext = authenticationContext.getSubcontext(StepUpMethodContext.class);
+        if (stepUpMethodContext == null) {
+            log.error("{} Could not get shib proxy context", getLogPrefix());
+            ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EVENTID_MISSING_STEPUPMETHODCONTEXT);
+            log.trace("Leaving");
+            return;
+        }
         if (stepUpMethodContext.getStepUpMethod() == null) {
-            log.error("No default stepup method available", getLogPrefix());
+            log.error("No default stepup method available for user", getLogPrefix());
             ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EVENTID_INVALID_USER);
             log.trace("Leaving");
             return;
@@ -91,13 +75,13 @@ public class AddAccount extends AbstractAuthenticationAction {
             account = stepUpMethodContext.getStepUpMethod().addAccount();
         } catch (Exception e) {
             log.error("Account creation failed for unexpected reason", getLogPrefix());
-            ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EVENTID_INVALID_USER);
+            ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EXCEPTION);
             log.trace("Leaving");
             return;
         }
         if (account == null) {
             log.error("Could not create new stepup account for user", getLogPrefix());
-            ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EVENTID_INVALID_USER);
+            ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EXCEPTION);
             log.trace("Leaving");
             return;
         }
