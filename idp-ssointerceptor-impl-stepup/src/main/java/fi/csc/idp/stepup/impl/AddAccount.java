@@ -38,8 +38,7 @@ import fi.csc.idp.stepup.api.StepUpMethodContext;
 import fi.csc.idp.stepup.api.StepUpAccount;
 
 /**
- * An action that creates a new account and sets it 
- * as a active account. 
+ * An action that creates a new account and sets it as a active account.
  * 
  * 
  */
@@ -50,7 +49,7 @@ public class AddAccount extends AbstractAuthenticationAction {
     /** Class logger. */
     @Nonnull
     private final Logger log = LoggerFactory.getLogger(AddAccount.class);
-   
+
     /** {@inheritDoc} */
     @Override
     protected void doExecute(@Nonnull final ProfileRequestContext profileRequestContext,
