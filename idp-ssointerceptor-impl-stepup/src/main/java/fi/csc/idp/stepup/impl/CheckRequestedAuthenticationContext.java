@@ -22,6 +22,7 @@
  */
 
 package fi.csc.idp.stepup.impl;
+
 import java.security.Principal;
 import java.util.Collection;
 import java.util.List;
@@ -52,7 +53,7 @@ public class CheckRequestedAuthenticationContext extends AbstractAuthenticationA
     /** Class logger. */
     @Nonnull
     private final Logger log = LoggerFactory.getLogger(CheckRequestedAuthenticationContext.class);
-   
+
     /** The authentication methods indicating step up. */
     @Nonnull
     private Subject stepupPrincipals;
