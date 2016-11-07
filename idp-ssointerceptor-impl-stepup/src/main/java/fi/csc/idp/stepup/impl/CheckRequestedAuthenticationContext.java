@@ -22,30 +22,22 @@
  */
 
 package fi.csc.idp.stepup.impl;
-
 import java.security.Principal;
 import java.util.Collection;
 import java.util.List;
-
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import javax.security.auth.Subject;
-
-import net.shibboleth.idp.attribute.IdPAttribute;
 import net.shibboleth.idp.authn.AbstractAuthenticationAction;
 import net.shibboleth.idp.authn.context.AuthenticationContext;
 import net.shibboleth.utilities.java.support.annotation.constraint.NonnullElements;
 import net.shibboleth.utilities.java.support.component.ComponentSupport;
 import net.shibboleth.utilities.java.support.logic.Constraint;
-
 import org.opensaml.profile.action.ActionSupport;
 import org.opensaml.profile.context.ProfileRequestContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import com.google.common.base.Predicates;
 import com.google.common.collect.Collections2;
-
 import fi.csc.idp.stepup.api.StepUpEventIds;
 import fi.okm.mpass.shibboleth.authn.context.ShibbolethSpAuthenticationContext;
 
@@ -60,11 +52,7 @@ public class CheckRequestedAuthenticationContext extends AbstractAuthenticationA
     /** Class logger. */
     @Nonnull
     private final Logger log = LoggerFactory.getLogger(CheckRequestedAuthenticationContext.class);
-
-    /** The attribute to match against. */
-    @Nullable
-    private IdPAttribute attribute;
-
+   
     /** The authentication methods indicating step up. */
     @Nonnull
     private Subject stepupPrincipals;
