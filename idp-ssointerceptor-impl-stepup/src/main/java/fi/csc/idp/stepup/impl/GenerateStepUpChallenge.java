@@ -34,7 +34,7 @@ import fi.csc.idp.stepup.api.StepUpEventIds;
 import fi.csc.idp.stepup.api.StepUpMethodContext;
 
 /**
- * An action that creates step-up challenge.
+ * An action that generates and sends the step-up challenge.
  * 
  */
 
@@ -45,32 +45,18 @@ public class GenerateStepUpChallenge extends AbstractAuthenticationAction {
     @Nonnull
     private final Logger log = LoggerFactory.getLogger(GenerateStepUpChallenge.class);
 
-    /** proxy StepUp Context. */
-    private StepUpMethodContext stepUpMethodContext;
-
-    /** {@inheritDoc} */
-    @SuppressWarnings("unchecked")
-    /** {@inheritDoc} */
-    @Override
-    protected boolean doPreExecute(@Nonnull final ProfileRequestContext profileRequestContext,
-            @Nonnull final AuthenticationContext authenticationContext) {
-
-        log.trace("Entering");
-        stepUpMethodContext = authenticationContext.getSubcontext(StepUpMethodContext.class);
-        if (stepUpMethodContext == null) {
-            log.debug("{} Could not get shib proxy context", getLogPrefix());
-            ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EVENTID_MISSING_STEPUPMETHODCONTEXT);
-            log.trace("Leaving");
-            return false;
-        }
-        return super.doPreExecute(profileRequestContext, authenticationContext);
-    }
-
     /** {@inheritDoc} */
     @Override
     protected void doExecute(@Nonnull final ProfileRequestContext profileRequestContext,
             @Nonnull final AuthenticationContext authenticationContext) {
         log.trace("Entering");
+        StepUpMethodContext stepUpMethodContext = authenticationContext.getSubcontext(StepUpMethodContext.class);
+        if (stepUpMethodContext == null) {
+            log.debug("{} Could not get shib proxy context", getLogPrefix());
+            ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EVENTID_MISSING_STEPUPMETHODCONTEXT);
+            log.trace("Leaving");
+            return;
+        }
         if (stepUpMethodContext.getStepUpAccount() == null) {
             log.debug("There is no chosen stepup account for user", getLogPrefix());
             ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EVENTID_INVALID_USER);
