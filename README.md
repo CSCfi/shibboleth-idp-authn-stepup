@@ -1,7 +1,7 @@
 # Shibboleth IdP Stepup Proxy
 
 
-##Note
+##Please Note
 
 Project can be deployed for testing purposes but is not production quality yet. Many of the features are still under development and deployment may require help from the development team.  
 
