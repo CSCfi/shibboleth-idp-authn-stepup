@@ -1,4 +1,9 @@
 language: java
 jdk:
 - oraclejdk8
-script: mvn clean package -f idp-stepup-parent/pom.xml
+before_script:
+- git clone https://github.com/Digipalvelutehdas/MPASSid-proxy
+- cd idp-mpass-parent
+- mvn install
+script: 
+- mvn package -f idp-stepup-parent/pom.xml
