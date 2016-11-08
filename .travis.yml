@@ -3,7 +3,6 @@ jdk:
 - oraclejdk8
 before_script:
 - git clone https://github.com/Digipalvelutehdas/MPASSid-proxy
-- cd MPASSid-proxy/idp-mpass-parent
-- mvn install
+- mvn install -f MPASSid-proxy/idp-mpass-parent
 script: 
 - mvn package -f idp-stepup-parent/pom.xml
