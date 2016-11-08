@@ -48,13 +48,11 @@ import com.twilio.type.PhoneNumber;
  */
 public class TvilioSMSReceiverStepUpAccount extends ChallengeSenderStepUpAccount {
 
-    /** Crude implementation just to test the approach */
-
     /** contains messages already used for verification. */
     private static Map<String, DateTime> usedMessages = new HashMap<String, DateTime>();
     /** lock to access usedMessages. */
     private static Lock msgLock = new ReentrantLock();
-
+    
     /** Class logger. */
     @Nonnull
     private final Logger log = LoggerFactory.getLogger(TvilioSMSReceiverStepUpAccount.class);
@@ -167,11 +165,11 @@ public class TvilioSMSReceiverStepUpAccount extends ChallengeSenderStepUpAccount
         log.debug("Verificating totp response " + response);
         Twilio.init(accountSid, authToken);
 
-        // we accept sms'es starting from currentime - eventWindow
-        DateTime rangeDateSentStart = new DateTime(new Date().getTime() - eventWindow);
+        // We fetch all messages of past 24h
+        DateTime rangeDateSentStart = new DateTime().minusDays(1);
+        log.debug("Searching for messages sent since " + rangeDateSentStart.toString());
         for (int i = 0; i < numberOfChecks; i++) {
             log.debug("locating messages");
-            // filter messages by current time-1h
             ResourceSet<Message> messages = Message.reader().setFrom(new PhoneNumber(getTarget()))
                     .setDateSent(rangeDateSentStart).read();
             for (Message message : messages) {
