@@ -1,5 +1,6 @@
 # Shibboleth IdP Stepup Proxy
 
+https://travis-ci.org/CSC-IT-Center-for-Science/stepup-proxy.svg?branch=master
 
 ##Please Note
 
