@@ -1,6 +1,7 @@
 # Shibboleth IdP Stepup Proxy
 
 [![Build Status](https://travis-ci.org/CSC-IT-Center-for-Science/stepup-proxy.svg?branch=master)](https://travis-ci.org/CSC-IT-Center-for-Science/stepup-proxy)
+[![Coverage Status](https://coveralls.io/repos/github/CSC-IT-Center-for-Science/stepup-proxy/badge.svg?branch=master)](https://coveralls.io/github/CSC-IT-Center-for-Science/stepup-proxy?branch=master)
 
 ##Please Note
 
