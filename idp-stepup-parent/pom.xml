@@ -175,13 +175,27 @@
 					<artifactId>maven-checkstyle-plugin</artifactId>
 					<version>${checkstyle.version}</version>
 				</plugin>
+				<plugin>
+					<groupId>org.eluder.coveralls</groupId>
+					<artifactId>coveralls-maven-plugin</artifactId>
+					<version>4.1.0</version>
+				</plugin>
 			</plugins>
 		</pluginManagement>
 
 		<plugins>
 			<plugin>
+				<groupId>org.eluder.coveralls</groupId>
+				<artifactId>coveralls-maven-plugin</artifactId>
+			</plugin>
+			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>cobertura-maven-plugin</artifactId>
+				<configuration>
+					<check>true</check>
+					<format>xml</format>
+					<aggregate>true</aggregate>
+				</configuration>
 			</plugin>
 			<!-- Checkstyle configuration for checkstyle:* goals called directly from 
 				the command line. -->

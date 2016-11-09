@@ -6,3 +6,5 @@ before_script:
 - mvn install -f MPASSid-proxy/idp-mpass-parent
 script: 
 - mvn package -f idp-stepup-parent/pom.xml
+after_success:
+- mvn clean cobertura:cobertura coveralls:report
