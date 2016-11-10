@@ -37,8 +37,8 @@ import fi.csc.idp.stepup.api.StepUpEventIds;
 import fi.csc.idp.stepup.api.StepUpMethodContext;
 
 /**
- * An action that verifies user challenge response. This is for a case
- * of verifying the response from backend. No direct user input is used. 
+ * An action that verifies user challenge response. This is for a case of
+ * verifying the response from backend. No direct user input is used.
  * 
  */
 @SuppressWarnings("rawtypes")
@@ -48,7 +48,6 @@ public class VerifyResponse extends AbstractExtractionAction {
     @Nonnull
     private final Logger log = LoggerFactory.getLogger(VerifyResponse.class);
 
-   
     /** proxy StepUp Context. */
     private StepUpMethodContext stepUpMethodContext;
 
