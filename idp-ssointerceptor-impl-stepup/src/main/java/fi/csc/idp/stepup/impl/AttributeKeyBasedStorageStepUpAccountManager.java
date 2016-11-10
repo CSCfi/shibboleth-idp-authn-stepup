@@ -28,9 +28,6 @@ import java.util.List;
 import javax.annotation.Nonnull;
 //import javax.sql.DataSource;
 
-
-
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -102,12 +99,13 @@ public class AttributeKeyBasedStorageStepUpAccountManager extends AbstractStepUp
         log.trace("Leaving");
         return account;
     }
-    
+
     /**
      * Update a editable account.
      * 
-     * @param account to be updated.
-     * @throws Exception 
+     * @param account
+     *            to be updated.
+     * @throws Exception
      */
     @Override
     public void updateAccount(StepUpAccount account) throws Exception {
@@ -121,7 +119,7 @@ public class AttributeKeyBasedStorageStepUpAccountManager extends AbstractStepUp
         stepUpAccountStorage.update(account, key);
         log.trace("Leaving");
     }
-    
+
     /**
      * Get the editable status.
      * 
@@ -132,7 +130,6 @@ public class AttributeKeyBasedStorageStepUpAccountManager extends AbstractStepUp
         log.trace("Entering & Leaving");
         return true;
     }
-
 
     /**
      * Initializes accounts by reading the value for key, using that to read
@@ -149,9 +146,16 @@ public class AttributeKeyBasedStorageStepUpAccountManager extends AbstractStepUp
         key = null;
         getAccounts().clear();
         if (stepUpAccountStorage == null) {
-            log.error("repository implementation not set, cannot add accounts");
-            log.trace("Leaving");
-            return false;
+            throw new Exception("repository implementation not set, cannot add accounts");
+        }
+        if (attributeContext == null) {
+            throw new Exception("Attribute context has to be set");
+        }
+        if (attributeId == null) {
+            throw new Exception("Attribute Id has to be set");
+        }
+        if (getAccountID() == null) {
+            throw new Exception("No account bean defined");
         }
         IdPAttribute attribute = attributeContext.getIdPAttributes().get(attributeId);
         if (attribute == null) {
