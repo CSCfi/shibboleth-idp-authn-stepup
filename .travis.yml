@@ -7,4 +7,4 @@ before_script:
 script: 
 - mvn package -f idp-stepup-parent/pom.xml
 after_success:
-- mvn clean cobertura:cobertura coveralls:report
+- mvn clean cobertura:cobertura coveralls:report -f idp-stepup-parent/pom.xml
