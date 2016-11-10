@@ -4,9 +4,10 @@ import fi.csc.idp.stepup.api.StepUpAccount;
 
 public class MockAccount implements StepUpAccount {
 
-    long id=0;
+    public String correctResponse = "response_success";
+    long id = 0;
     String name;
-    
+
     @Override
     public long getId() {
         return id;
@@ -14,7 +15,7 @@ public class MockAccount implements StepUpAccount {
 
     @Override
     public void setId(long id) {
-        this.id=id;
+        this.id = id;
     }
 
     @Override
@@ -24,7 +25,7 @@ public class MockAccount implements StepUpAccount {
 
     @Override
     public void setName(String name) {
-        this.name=name;
+        this.name = name;
     }
 
     @Override
@@ -51,7 +52,10 @@ public class MockAccount implements StepUpAccount {
 
     @Override
     public boolean verifyResponse(String response) throws Exception {
-        return "response_success".equals(response);
+        if (response == null && correctResponse == null) {
+            return true;
+        }
+        return correctResponse.equals(response);
     }
 
     @Override
