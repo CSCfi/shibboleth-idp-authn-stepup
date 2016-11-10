@@ -94,6 +94,43 @@ public class TestAttributeKeyBasedStorageStepUpAccountManager {
     }
 
     @Test
+    public void testUnitializedAddAccount() {
+        boolean exception = false;
+        try {
+            attributeKeyBasedStorageStepUpAccountManager.addAccount();
+        } catch (Exception e) {
+            exception = true;
+            Assert.assertEquals("Storage implementation not set, cannot add accounts", e.getMessage());
+        }
+        Assert.assertEquals(exception, true);
+    }
+
+    @Test
+    public void testUnitializedUpdateAccount() {
+        boolean exception = false;
+        try {
+            attributeKeyBasedStorageStepUpAccountManager.updateAccount(new MockAccount());
+        } catch (Exception e) {
+            exception = true;
+            Assert.assertEquals("Storage implementation not set, cannot add accounts", e.getMessage());
+        }
+        Assert.assertEquals(exception, true);
+    }
+
+    @Test
+    public void testUpdateNullAccount() {
+        boolean exception = false;
+        try {
+            attributeKeyBasedStorageStepUpAccountManager.setStepUpAccountStorage(new MockStorage());
+            attributeKeyBasedStorageStepUpAccountManager.updateAccount(null);
+        } catch (Exception e) {
+            exception = true;
+            Assert.assertEquals("Account cannot be null", e.getMessage());
+        }
+        Assert.assertEquals(exception, true);
+    }
+
+    @Test
     public void testNoMatchingAttributeId() throws Exception {
         attributeKeyBasedStorageStepUpAccountManager.setAttributeId("not found");
         attributeKeyBasedStorageStepUpAccountManager.setAccountID("id");
