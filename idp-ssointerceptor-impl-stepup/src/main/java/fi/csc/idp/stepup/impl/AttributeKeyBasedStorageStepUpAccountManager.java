@@ -88,9 +88,7 @@ public class AttributeKeyBasedStorageStepUpAccountManager extends AbstractStepUp
         log.trace("Entering");
 
         if (stepUpAccountStorage == null) {
-            log.error("Storage implementation not set, cannot add accounts");
-            log.trace("Leaving");
-            return null;
+            throw new Exception("Storage implementation not set, cannot add accounts");
         }
         StepUpAccount account = (StepUpAccount) getAppContext().getBean(getAccountID());
         account.setEnabled(true);
@@ -112,9 +110,10 @@ public class AttributeKeyBasedStorageStepUpAccountManager extends AbstractStepUp
         log.trace("Entering");
 
         if (stepUpAccountStorage == null) {
-            log.error("Storage implementation not set, cannot add accounts");
-            log.trace("Leaving");
-            return;
+            throw new Exception("Storage implementation not set, cannot add accounts");
+        }
+        if (account == null) {
+            throw new Exception("Account cannot be null");
         }
         stepUpAccountStorage.update(account, key);
         log.trace("Leaving");
