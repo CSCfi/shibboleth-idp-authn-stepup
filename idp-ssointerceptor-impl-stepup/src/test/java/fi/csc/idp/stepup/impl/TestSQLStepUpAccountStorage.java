@@ -13,6 +13,7 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.hsqldb.Server;
@@ -79,6 +80,15 @@ public class TestSQLStepUpAccountStorage {
     }
     
     private void sequence() throws Exception{
+        
+        int loop=10000;
+        for (int i=0;i<loop;i++){
+            MockAccount mockAccount = new MockAccount();
+            mockAccount.setName("lma"+i);
+            sqlStepUpAccountStorage.add(mockAccount, "loopUser");
+        }
+        Assert.assertEquals(sqlStepUpAccountStorage.getAccounts("loopUser", MockAccount.class).size(), loop);
+        
         MockAccount ma1 = new MockAccount();
         ma1.setName("ma1");
         MockAccount ma2 = new MockAccount();
