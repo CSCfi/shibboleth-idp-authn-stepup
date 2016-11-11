@@ -93,7 +93,8 @@ public class TestUpdateAccount {
         request.addParameter("parameter3", "mockMethodName:x:");
         request.addParameter("parameter4", "mockMethodName:1:");
         request.addParameter("parameter5", "mockMethodName:1:setname");
-        request.addParameter("parameter6", "newname");
+        request.addParameter("parameter6", "mockMethodName:1:nocommand");
+        request.addParameter("parameter7", "newname");
         action.setHttpServletRequest(request);
         ctx.addSubcontext(stepUpContext, true);
     }
@@ -154,6 +155,31 @@ public class TestUpdateAccount {
      */
 
     @Test
+    public void testUnsupportedCommand() throws Exception {
+        baseInit();
+        AuthenticationContext ctx = (AuthenticationContext) prc.addSubcontext(new AuthenticationContext(), true);
+        StepUpMethodContext stepUpContext = new StepUpMethodContext();
+        ctx.addSubcontext(stepUpContext, true);
+        Map<StepUpMethod, List<? extends Principal>> stepUpMethods = new HashMap<StepUpMethod, List<? extends Principal>>();
+        List<Principal> ctxs = new ArrayList<Principal>();
+        ctxs.add(new AuthnContextClassRefPrincipal("test"));
+        StepUpMethod method = new MockMethod();
+        method.initialize(null);
+        stepUpMethods.put(method, ctxs);
+        stepUpContext.setStepUpMethods(stepUpMethods);
+        action.setUpdateParameter("parameter6");
+        action.initialize();
+        final Event event = action.execute(src);
+        ActionTestingSupport.assertEvent(event, StepUpEventIds.EXCEPTION);
+    }
+
+    /**
+     * Test that action name update is a success
+     * 
+     * @throws Exception
+     */
+
+    @Test
     public void testNameUpdate() throws Exception {
         baseInit();
         AuthenticationContext ctx = (AuthenticationContext) prc.addSubcontext(new AuthenticationContext(), true);
@@ -167,7 +193,7 @@ public class TestUpdateAccount {
         stepUpMethods.put(method, ctxs);
         stepUpContext.setStepUpMethods(stepUpMethods);
         action.setUpdateParameter("parameter5");
-        action.setNameParameter("parameter6");
+        action.setNameParameter("parameter7");
         action.initialize();
         final Event event = action.execute(src);
         Assert.assertEquals(method.getAccounts().get(0).getName(), "newname");
