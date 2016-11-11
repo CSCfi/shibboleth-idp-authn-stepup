@@ -76,7 +76,7 @@ public class UpdateAccount extends AbstractExtractionAction {
      * @param parameter
      *            name for name
      */
-    public void nameParameter(@Nonnull @NotEmpty String parameter) {
+    public void setNameParameter(@Nonnull @NotEmpty String parameter) {
         this.nameParameter = parameter;
     }
 
