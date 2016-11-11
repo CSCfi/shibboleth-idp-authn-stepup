@@ -94,7 +94,8 @@ public class TestUpdateAccount {
         request.addParameter("parameter4", "mockMethodName:1:");
         request.addParameter("parameter5", "mockMethodName:1:setname");
         request.addParameter("parameter6", "mockMethodName:1:nocommand");
-        request.addParameter("parameter7", "newname");
+        request.addParameter("parameter7", "mockMethodName:-1:addaccount");
+        request.addParameter("parameter8", "newname");
         action.setHttpServletRequest(request);
         ctx.addSubcontext(stepUpContext, true);
     }
@@ -193,10 +194,36 @@ public class TestUpdateAccount {
         stepUpMethods.put(method, ctxs);
         stepUpContext.setStepUpMethods(stepUpMethods);
         action.setUpdateParameter("parameter5");
-        action.setNameParameter("parameter7");
+        action.setNameParameter("parameter8");
         action.initialize();
         final Event event = action.execute(src);
         Assert.assertEquals(method.getAccounts().get(0).getName(), "newname");
+        ActionTestingSupport.assertEvent(event, StepUpEventIds.EVENTID_CONTINUE_STEPUP);
+    }
+
+    /**
+     * Test that action name update is a success
+     * 
+     * @throws Exception
+     */
+
+    @Test
+    public void testAddAccount() throws Exception {
+        baseInit();
+        AuthenticationContext ctx = (AuthenticationContext) prc.addSubcontext(new AuthenticationContext(), true);
+        StepUpMethodContext stepUpContext = new StepUpMethodContext();
+        ctx.addSubcontext(stepUpContext, true);
+        Map<StepUpMethod, List<? extends Principal>> stepUpMethods = new HashMap<StepUpMethod, List<? extends Principal>>();
+        List<Principal> ctxs = new ArrayList<Principal>();
+        ctxs.add(new AuthnContextClassRefPrincipal("test"));
+        StepUpMethod method = new MockMethod();
+        method.initialize(null);
+        stepUpMethods.put(method, ctxs);
+        stepUpContext.setStepUpMethods(stepUpMethods);
+        action.setUpdateParameter("parameter7");
+        action.initialize();
+        final Event event = action.execute(src);
+        Assert.assertEquals(method.getAccounts().size(), 2);
         ActionTestingSupport.assertEvent(event, StepUpEventIds.EVENTID_CONTINUE_STEPUP);
     }
 
@@ -231,7 +258,9 @@ public class TestUpdateAccount {
 
         @Override
         public StepUpAccount addAccount() throws Exception {
-            return null;
+            MockAccount mockAccount = new MockAccount();
+            accounts.add(mockAccount);
+            return mockAccount;
         }
 
         @Override
