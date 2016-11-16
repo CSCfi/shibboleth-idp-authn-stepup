@@ -76,26 +76,24 @@
 		p:stepUpAccountStorage-ref="GAStepUpAccountStorage" p:AccountID="GoogleAuthenticatorStepUpAccount">
 	</bean>
 
-    <!--  Hikari as datasource example -->
-    <bean id="HikariConfig" class="com.zaxxer.hikari.HikariConfig">
-      <property name="dataSourceProperties" >
-        <props>
-            <prop key="url">jdbc:mariadb://localhost:3306/totp</prop>
-            <prop key="user">foo</prop>
-            <prop key="password">bar</prop>
-        </props>
-      </property>
-      <property name="dataSourceClassName"
-                value="org.mariadb.jdbc.MySQLDataSource"/>
-    </bean>
-    <bean id="GADataSource" class="com.zaxxer.hikari.HikariDataSource">
-          <constructor-arg ref="HikariConfig" />
-    </bean>
-    
+	<!-- Hikari as datasource example -->
+	<bean id="HikariConfig" class="com.zaxxer.hikari.HikariConfig">
+		<property name="dataSourceProperties">
+			<props>
+				<prop key="url">jdbc:mariadb://localhost:3306/totp</prop>
+				<prop key="user">foo</prop>
+				<prop key="password">bar</prop>
+			</props>
+		</property>
+		<property name="dataSourceClassName" value="org.mariadb.jdbc.MySQLDataSource" />
+	</bean>
+	<bean id="GADataSource" class="com.zaxxer.hikari.HikariDataSource">
+		<constructor-arg ref="HikariConfig" />
+	</bean>
+
 	<bean id="GAStepUpAccountStorage" class="fi.csc.idp.stepup.impl.SQLStepUpAccountStorage"
-		p:dataSource-ref="GADataSource"
-		p:encryptKey="TRUE"
-		p:encryptTarget="TRUE" p:encryptor-ref="GAAccountEncryptor">
+		p:dataSource-ref="GADataSource" p:encryptKey="TRUE" p:encryptTarget="TRUE"
+		p:encryptor-ref="GAAccountEncryptor">
 		<property name="listStatement">
 			<value>
           <![CDATA[
@@ -164,8 +162,8 @@
 	<bean id="SMSReceiverStepUpAccount" class="fi.csc.idp.stepup.impl.TvilioSMSReceiverStepUpAccount"
 		scope="prototype" p:ChallengeGenerator-ref="EmptyChallengeGenerator"
 		p:ChallengeVerifier-ref="EqualVerifier" p:accountSid="foo"
-		p:authToken="bar" p:numberOfChecks="1"
-		p:eventWindow="3600000" p:ChallengeSender-ref="SMSEmptyChallengeSender">
+		p:authToken="bar" p:numberOfChecks="1" p:eventWindow="3600000"
+		p:ChallengeSender-ref="SMSEmptyChallengeSender">
 	</bean>
 
 	<bean id="GoogleAuthenticatorStepUpAccount" class="fi.csc.idp.stepup.impl.GoogleAuthenticatorStepUpAccount"
@@ -274,20 +272,19 @@
 	</bean>
 
 	<bean id="MailChallengeSender" class="fi.csc.idp.stepup.impl.MailChallengeSender"
-		p:subjectField="mailsubject" p:fromField="foo" p:host="bar"
-		p:port="25" p:templatePath="/mails" p:templateFile="foobar.vm"
-		p:sMTPAuth="false" p:sMTPTtls="true">
+		p:subjectField="mailsubject" p:fromField="foo" p:host="bar" p:port="25"
+		p:templatePath="/mails" p:templateFile="foobar.vm" p:sMTPAuth="false"
+		p:sMTPTtls="true">
 	</bean>
 
 	<bean id="SMSChallengeSender" class="fi.csc.idp.stepup.impl.TvilioSMSChallengeSender"
-		p:senderNumber="foobar" p:accountSid="foo"
-		p:authToken="bar"
+		p:senderNumber="foobar" p:accountSid="foo" p:authToken="bar"
 		p:message="The code to access the service is %s, reply with the code">
 	</bean>
 
 	<bean id="SMSEmptyChallengeSender" class="fi.csc.idp.stepup.impl.TvilioSMSChallengeSender"
-		p:senderNumber="foobar" p:accountSid="foo"
-		p:authToken="bar" p:message="Please reply to this message to gain access to service.">
+		p:senderNumber="foobar" p:accountSid="foo" p:authToken="bar"
+		p:message="Please reply to this message to gain access to service.">
 	</bean>
 
 
