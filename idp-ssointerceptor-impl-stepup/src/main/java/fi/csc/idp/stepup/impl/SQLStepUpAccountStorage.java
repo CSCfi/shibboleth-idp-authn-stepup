@@ -32,9 +32,6 @@ import java.util.List;
 import javax.annotation.Nonnull;
 import javax.sql.DataSource;
 
-import com.zaxxer.hikari.HikariConfig;
-import com.zaxxer.hikari.HikariDataSource;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -51,14 +48,6 @@ public class SQLStepUpAccountStorage implements StepUpAccountStorage {
     private final Logger log = LoggerFactory.getLogger(SQLStepUpAccountStorage.class);
     /** datasource constructed. */
     private DataSource datasource;
-    /** url for the database connection. */
-    private String jdbcUrl;
-    /** username for database connection. */
-    private String userName;
-    /** password for database connection. */
-    private String password;
-    /** pool size for database connection. */
-    private int poolSize;
     /** statement for adding items. */
     private String addStatement;
     /** statement for updating items. */
@@ -117,50 +106,6 @@ public class SQLStepUpAccountStorage implements StepUpAccountStorage {
     }
 
     /**
-     * Setter for database connection url.
-     * 
-     * @param url
-     *            for connection
-     */
-    public void setJdbcUrl(String url) {
-        log.trace("Entering & Leaving");
-        this.jdbcUrl = url;
-    }
-
-    /**
-     * Setter for database connection password.
-     * 
-     * @param psswd
-     *            for connection
-     */
-    public void setPassword(String psswd) {
-        log.trace("Entering & Leaving");
-        this.password = psswd;
-    }
-
-    /**
-     * Setter for database connection user name.
-     * 
-     * @param name
-     *            user name for connection
-     */
-    public void setUserName(String name) {
-        log.trace("Entering & Leaving");
-        this.userName = name;
-    }
-
-    /**
-     * Setter for database connection pool size.
-     * 
-     * @param size
-     *            pool size for database connection
-     */
-    public void setPoolSize(int size) {
-        log.trace("Entering & Leaving");
-        this.poolSize = size;
-    }
-
-    /**
      * Setter for add statement.
      * 
      * @param statement
@@ -205,20 +150,28 @@ public class SQLStepUpAccountStorage implements StepUpAccountStorage {
     }
 
     /**
+     * Set the datasource.
+     * 
+     * @param source
+     *            datasource
+     */
+    public void setDataSource(DataSource source) {
+        log.trace("Entering");
+        this.datasource = source;
+        log.trace("Leaving");
+    }
+
+    /**
      * Get the datasource.
      * 
      * @return datasource
+     * @throws Exception
+     *             if datasource has not been set
      */
-    private DataSource getDataSource() {
+    private DataSource getDataSource() throws Exception {
         log.trace("Entering");
         if (datasource == null) {
-            HikariConfig config = new HikariConfig();
-            config.setJdbcUrl(jdbcUrl);
-            config.setUsername(userName);
-            config.setPassword(password);
-            config.setMaximumPoolSize(poolSize);
-            config.setAutoCommit(true);
-            datasource = new HikariDataSource(config);
+            throw new Exception("Datasource must be set");
         }
         log.trace("Leaving");
         return datasource;
