@@ -7,4 +7,20 @@
 	<bean id="ChallengeSender" class="fi.csc.idp.stepup.impl.ChallengeSenderStepUpAccount">
 	</bean>
 
+    <bean id="hikariConfig" class="com.zaxxer.hikari.HikariConfig">  
+      <property name="dataSourceProperties" >
+        <props>
+            <prop key="DatabaseName">jdbc:hsqldb:mem:test</prop>
+            <prop key="User">sa</prop>
+            <prop key="Password">test</prop>
+        </props>
+      </property>  
+      <property name="dataSourceClassName"   
+                value="org.hsqldb.jdbc.JDBCDataSource" />  
+    </bean>  
+
+    <bean id="dataSource" class="com.zaxxer.hikari.HikariDataSource">  
+          <constructor-arg ref="hikariConfig" />  
+    </bean>  
+    
 </beans>
