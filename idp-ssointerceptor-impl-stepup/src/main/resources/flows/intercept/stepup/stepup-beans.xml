@@ -76,9 +76,25 @@
 		p:stepUpAccountStorage-ref="GAStepUpAccountStorage" p:AccountID="GoogleAuthenticatorStepUpAccount">
 	</bean>
 
+    <!--  Hikari as datasource example -->
+    <bean id="HikariConfig" class="com.zaxxer.hikari.HikariConfig">
+      <property name="dataSourceProperties" >
+        <props>
+            <prop key="url">jdbc:mariadb://localhost:3306/totp</prop>
+            <prop key="user">foo</prop>
+            <prop key="password">bar</prop>
+        </props>
+      </property>
+      <property name="dataSourceClassName"
+                value="org.mariadb.jdbc.MySQLDataSource"/>
+    </bean>
+    <bean id="GADataSource" class="com.zaxxer.hikari.HikariDataSource">
+          <constructor-arg ref="HikariConfig" />
+    </bean>
+    
 	<bean id="GAStepUpAccountStorage" class="fi.csc.idp.stepup.impl.SQLStepUpAccountStorage"
-		p:jdbcUrl="jdbc:mysql://localhost:3306/totp" p:poolSize="10"
-		p:userName="foo" p:password="bar" p:encryptKey="TRUE"
+		p:dataSource-ref="GADataSource"
+		p:encryptKey="TRUE"
 		p:encryptTarget="TRUE" p:encryptor-ref="GAAccountEncryptor">
 		<property name="listStatement">
 			<value>
