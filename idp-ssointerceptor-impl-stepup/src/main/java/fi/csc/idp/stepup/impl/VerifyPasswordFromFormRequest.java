@@ -119,7 +119,7 @@ public class VerifyPasswordFromFormRequest extends AbstractExtractionAction {
             }
         } catch (Exception e) {
             log.debug("User response evaluation failed", getLogPrefix());
-            ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EVENTID_INVALID_RESPONSE);
+            ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EXCEPTION);
             log.trace("Leaving");
             return;
         }
