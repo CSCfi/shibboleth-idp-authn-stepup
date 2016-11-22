@@ -141,7 +141,12 @@
 
 	<action-state id="InitializeRegistration">
 		<evaluate expression="InitializeRegistrationStepUpChallengeContext" />
-		<transition on="ContinueStepUp" to="RegistrationStepUp" />
+		<transition on="ContinueStepUp" to="DisplayInformation">
+			<set name="flowScope.viewName" value="flowRequestContext.activeFlow.id+'-startregister'"
+				type="string" />
+			<set name="flowScope.proceedAction" value="'RegistrationStepUp'"
+				type="string" />
+		</transition>
 		<!-- internal eventid mapping error -->
 		<transition to="DisplayCondolences" />
 	</action-state>
@@ -163,11 +168,11 @@
 	<action-state id="VerifyRegistrationPasswordFromFormRequest">
 		<evaluate expression="VerifyPasswordFromFormRequest" />
 		<transition on="ContinueStepUp" to="#{flowScope.regAction}" />
-		<transition on="StepUpWrongResponse" to="DisplayChallenge">
+		<transition to="DisplayChallenge">
 			<set name="flowScope.verifyResponseFailed" value="true" type="boolean" />
 		</transition>
-		<transition to="DisplayCondolences" />
 	</action-state>
+
 
 	<!-- registration execution END -->
 
