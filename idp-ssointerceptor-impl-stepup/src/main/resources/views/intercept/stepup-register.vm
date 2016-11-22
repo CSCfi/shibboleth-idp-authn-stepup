@@ -1,3 +1,4 @@
+#set ($mobileNumber = $stepUpMethodContext.getStepUpAccount().getTarget())
 <!DOCTYPE html>
 <html>
   <head>
@@ -12,9 +13,7 @@
           <img src="$request.getContextPath()#springMessage("idp.logo")" alt="#springMessageText("idp.logo.alt-text", "logo")">
         </header>
         <div class="content">
-          <p>#springMessageText("idp.stepup.register","In order for you to add or modify authentication accounts a additional authentication is required.")</p>
-          <p>#springMessageText("idp.stepup.register.explanation","A password to manage accounts has been sent to your mobile numer account.")</p>
-
+          <p>#springMessageText("idp.stepup.register.explanation","A password to manage accounts has been sent to your mobile number account ")$mobileNumber</p>
           <form action="$flowExecutionUrl" method="post">
             <div class="form-element-wrapper">
               <label for="loginhint">#springMessageText("idp.stepup.response", "Password")</label>
@@ -25,7 +24,6 @@
                 <p class="form-element form-error">#springMessageText("idp.stepup.response.failed", "your response failed to validate")</p>
               </section>
             #end
-
             <div class="form-element-wrapper">
               <button class="form-element form-button" type="submit" name="_eventId_proceed">#springMessageText("idp.stepup.login", "Login")</button>
             </div>
