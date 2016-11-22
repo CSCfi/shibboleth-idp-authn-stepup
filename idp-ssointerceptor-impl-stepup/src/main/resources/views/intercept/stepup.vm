@@ -25,6 +25,11 @@
               <label for="loginhint">#springMessageText("idp.stepup.response", "Password")</label>
               <input class="form-element form-field" id="loginhint" name="j_challengeResponse" type="text" value="">
             </div>
+            #if ($verifyResponseFailed == true)
+              <section>
+                <p class="form-element form-error">#springMessageText("idp.stepup.response.failed", "your response failed to validate")</p>
+              </section>
+            #end
 
             <div class="form-element-wrapper">
               <button class="form-element form-button" type="submit" name="_eventId_proceed">#springMessageText("idp.stepup.login", "Login")</button>
