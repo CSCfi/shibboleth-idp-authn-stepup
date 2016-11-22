@@ -100,7 +100,10 @@
 	<action-state id="VerifyPasswordFromFormRequest">
 		<evaluate expression="VerifyPasswordFromFormRequest" />
 		<transition on="ContinueStepUp" to="proceed" />
-		<transition to="DisplayWrongResponse" />
+		<transition on="StepUpWrongResponse" to="DisplayChallenge">
+			<set name="flowScope.verifyResponseFailed" value="true" type="boolean" />
+		</transition>
+		<transition to="DisplayCondolences" />
 	</action-state>
 
 	<action-state id="UpdateAccount">
@@ -160,7 +163,10 @@
 	<action-state id="VerifyRegistrationPasswordFromFormRequest">
 		<evaluate expression="VerifyPasswordFromFormRequest" />
 		<transition on="ContinueStepUp" to="#{flowScope.regAction}" />
-		<transition to="DisplayWrongResponse" />
+		<transition on="StepUpWrongResponse" to="DisplayChallenge">
+			<set name="flowScope.verifyResponseFailed" value="true" type="boolean" />
+		</transition>
+		<transition to="DisplayCondolences" />
 	</action-state>
 
 	<!-- registration execution END -->
