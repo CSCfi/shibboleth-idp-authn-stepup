@@ -22,7 +22,7 @@
             	#set ($methodName = $method.getName())
                 <hr>
                 <p>#springMessageText("idp.stepup.method", "Authentication Method:")</p>
-                <p>$methodName</p>
+                <p>$encoder.encodeForHTML($methodName)</p>
                 <!-- add new account -->
                 #if ($method.isEditable() == true)
                 #set ($action = $methodName+':-1:addaccount')
@@ -36,7 +36,7 @@
                 <table style="width:100%;table-layout:auto">
        	       	  <tr>
        	       	    <th align="left">#springMessageText("idp.stepup.methodaccounts.name", "Name")</th>
-                    <th align="left">#springMessageText("idp.stepup.methodaccounts.enabled", "Enabled")</th>
+                    <th align="left">#springMessageText("idp.stepup.methodaccounts.actions", "Actions")</th>
                     <th align="left">#springMessageText("idp.stepup.methodaccounts.key", "Key")</th>
       	          </tr>
                 <!-- list all accounts of method -->
@@ -52,11 +52,11 @@
                     #set ($accountName = $account.getName())
                   #end
                   #if ($account.isEditable() == false)
-                    <td>$accountName</td>
+                    <td>$encoder.encodeForHTML($accountName)</td>
                     <td>$account.isEnabled()</td>
                     <td>
                     #if ($account.getTarget())
-                      Key:$account.getTarget()
+                      Key:$encoder.encodeForHTML($account.getTarget())
                       <!-- TODO: show only for specific method types -->
                       #set ($qrCode = $qrLocation.format($qrLocation,$accountName,$proxyName,$account.getTarget()))
                       <p> <img src='$qrCode' style="width:128px;height:128px;"> </p>
@@ -97,10 +97,20 @@
                       <button class="form-element form-button" value=$action type="submit" name="_eventId_update" style="width:80%">$enableText</button>
                     </div>
                     </form>
-                    </td>
                     <!-- enable /disable button end -->
+                    
+                     <!-- remove button -->
+                    #set ($action = $methodName+':'+$account.getId()+':removeaccount')
+                    <form action="$flowExecutionUrl" method="post">
+                    <div class="form-element-wrapper">
+                      <button class="form-element form-button" value=$action type="submit" name="_eventId_update" style="width:80%">#springMessageText("idp.stepup.update.remove", "Remove")</button>
+                    </div>
+                    </form>
+                    </td>
+                    <!-- remove button end -->
+
                     <td>
-                      Key:$account.getTarget()
+                      Key:$encoder.encodeForHTML($account.getTarget())
                       <!-- TODO: show only for specific method types -->
                       #set ($qrCode = $qrLocation.format($qrLocation,$accountName,$proxyName,$account.getTarget()))
                       <img src='$qrCode' style="width:128px;height:128px;"> 
@@ -111,12 +121,11 @@
                 </table>
             #end 
           </div>
-
+          <hr>
           <form action="$flowExecutionUrl" method="post">
             <div class="form-element-wrapper">
               <button class="form-element form-button" type="submit" name="_eventId_proceed">#springMessageText("idp.stepup.reinitlogin", "Reinit Login")</button>
             </div>
-
           </form>
 
       </div>

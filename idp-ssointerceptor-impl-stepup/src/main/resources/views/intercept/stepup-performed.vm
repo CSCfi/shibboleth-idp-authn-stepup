@@ -14,10 +14,10 @@
           <img src="$request.getContextPath()#springMessage("idp.logo")" alt="#springMessageText("idp.logo.alt-text", "logo")">
         </header>
         <div class="content">
-        #springMessageText("idp.stepup.performed","New account has been added. Please set the shared secret to your device: <br>")
+        #springMessageText("idp.stepup.performed","Account has been added. Please set the shared secret to your device: <br>")
         #set ($target=$stepupMethodContext.getStepUpAccount().getTarget())
         #set ($qrCode = $qrLocation.format($qrLocation,"",$proxyName,$target))
-        $target<br>
+        $encoder.encodeForHTML($target)</br>
         <img src='$qrCode' alt="HTML5 Icon" style="width:128px;height:128px;"> 
         <form action="$flowExecutionUrl" method="post">
         <div class="form-element-wrapper">
