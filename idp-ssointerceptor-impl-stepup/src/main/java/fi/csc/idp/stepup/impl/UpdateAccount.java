@@ -98,7 +98,6 @@ public class UpdateAccount extends AbstractExtractionAction {
         return super.doPreExecute(profileRequestContext, authenticationContext);
     }
 
-    // Checkstyle: CyclomaticComplexity OFF
     /** {@inheritDoc} */
     @Override
     protected void doExecute(@Nonnull final ProfileRequestContext profileRequestContext,
@@ -149,38 +148,40 @@ public class UpdateAccount extends AbstractExtractionAction {
             return;
         }
         // locating account
+        StepUpAccount updateAccount = null;
+        StepUpMethod updateMethod = null;
         for (StepUpMethod suMethod : stepUpMethodContext.getStepUpMethods().keySet()) {
             log.debug("Comparing method " + method + " to " + suMethod.getName());
             if (method.equals(suMethod.getName())) {
                 log.debug("located target method " + method);
-                try {
-                    if (id >= 0) {
-                        for (StepUpAccount account : suMethod.getAccounts()) {
-                            log.debug("Comparing account id " + id + " to " + account.getId());
-                            if (account.getId() == id) {
-                                log.debug("located target account " + id);
-                                log.debug("running command " + command);
-                                accountCommand(command, account, suMethod, request);
-                            }
+                updateMethod = suMethod;
+                if (id >= 0) {
+                    for (StepUpAccount account : suMethod.getAccounts()) {
+                        log.debug("Comparing account id " + id + " to " + account.getId());
+                        if (account.getId() == id) {
+                            log.debug("located target account " + id);
+                            updateAccount = account;
+                            break;
                         }
-                    } else {
-                        accountCommand(command, null, suMethod, request);
                     }
-                } catch (Exception e) {
-                    log.debug("{} unexpected exception occurred", getLogPrefix());
-                    log.error(e.getMessage());
-                    ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EXCEPTION);
-                    log.trace("Leaving");
-                    return;
                 }
+                break;
             }
+        }
+        try {
+            log.debug("running command " + command);
+            accountCommand(command, updateAccount, updateMethod, request);
+        } catch (Exception e) {
+            log.debug("{} unexpected exception occurred", getLogPrefix());
+            log.error(e.getMessage());
+            ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EXCEPTION);
+            log.trace("Leaving");
+            return;
         }
         log.debug("Update value to be interpreted is " + updateValue);
         ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EVENTID_CONTINUE_STEPUP);
         log.trace("Leaving");
     }
-
-    // Checkstyle: CyclomaticComplexity ON
 
     // Checkstyle: CyclomaticComplexity OFF
     /**
@@ -200,7 +201,10 @@ public class UpdateAccount extends AbstractExtractionAction {
     private void accountCommand(String command, StepUpAccount account, StepUpMethod method, HttpServletRequest request)
             throws Exception {
         log.trace("Entering");
-        if (!(command != StepUpMethod.ADD_ACCOUNT && command != StepUpMethod.REMOVE_ACCOUNT) && account == null) {
+        if (method == null) {
+            throw new Exception("operations require method");
+        }
+        if (account == null && !command.equals(StepUpMethod.ADD_ACCOUNT)) {
             throw new Exception("Account operations requires account");
         }
         switch (command) {
