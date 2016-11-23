@@ -28,7 +28,7 @@
                 #set ($action = $methodName+':-1:addaccount')
                 <form action="$flowExecutionUrl" method="post">
                     <div class="form-element-wrapper">
-                      <button class="form-element form-button" value=$action type="submit" name="_eventId_update">#springMessageText("idp.stepup.method.addaccount", "Add Account")</button>
+                      <button class="form-element form-button" value=$encoder.encodeForHTML($action) type="submit" name="_eventId_update">#springMessageText("idp.stepup.method.addaccount", "Add Account")</button>
                     </div>
                     </form>
                 #end
@@ -72,10 +72,10 @@
                     #set ($action = $methodName+':'+$account.getId()+':setname')
                     <form action="$flowExecutionUrl" method="post">
                      <div class="form-element-wrapper">
-                       <input class="form-element form-field" id=$methodName$counter name="j_name" type="text" style="width:80%" value=$accountName>
+                       <input class="form-element form-field" id=$methodName$counter name="j_name" type="text" style="width:80%" value=$encoder.encodeForHTML($accountName)>
                      </div>
                      <div class="form-element-wrapper">
-                       <button class="form-element form-button" value=$action type="submit" name="_eventId_update" style="width:80%">#springMessageText("idp.stepup.update.set", "Set Name")</button>
+                       <button class="form-element form-button" value=$encoder.encodeForHTML($action) type="submit" name="_eventId_update" style="width:80%">#springMessageText("idp.stepup.update.set", "Set Name")</button>
                      </div>
                     </form>
                     </td>
@@ -94,7 +94,7 @@
                     #set ($action = $methodName+':'+$account.getId()+':'+$enableCommand)
                     <form action="$flowExecutionUrl" method="post">  
                     <div class="form-element-wrapper">
-                      <button class="form-element form-button" value=$action type="submit" name="_eventId_update" style="width:80%">$enableText</button>
+                      <button class="form-element form-button" value=$encoder.encodeForHTML($action) type="submit" name="_eventId_update" style="width:80%">$encoder.encodeForHTML($enableText)</button>
                     </div>
                     </form>
                     <!-- enable /disable button end -->
@@ -103,7 +103,7 @@
                     #set ($action = $methodName+':'+$account.getId()+':removeaccount')
                     <form action="$flowExecutionUrl" method="post">
                     <div class="form-element-wrapper">
-                      <button class="form-element form-button" value=$action type="submit" name="_eventId_update" style="width:80%">#springMessageText("idp.stepup.update.remove", "Remove")</button>
+                      <button class="form-element form-button" value=$encoder.encodeForHTML($action) type="submit" name="_eventId_update" style="width:80%">#springMessageText("idp.stepup.update.remove", "Remove")</button>
                     </div>
                     </form>
                     </td>
