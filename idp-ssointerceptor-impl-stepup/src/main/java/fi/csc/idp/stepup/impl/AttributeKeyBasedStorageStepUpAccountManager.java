@@ -99,6 +99,28 @@ public class AttributeKeyBasedStorageStepUpAccountManager extends AbstractStepUp
     }
 
     /**
+     * Method checks the operation can be performed.
+     * 
+     * @param account
+     *            the account to be operated.
+     * @throws Exception
+     *             if operation cannot be performed.
+     */
+    private void preCheck(StepUpAccount account) throws Exception {
+        log.trace("Entering");
+        if (stepUpAccountStorage == null) {
+            throw new Exception("Storage implementation not set, cannot add accounts");
+        }
+        if (account == null) {
+            throw new Exception("Account cannot be null");
+        }
+        if (!getAccounts().contains(account)) {
+            throw new Exception("Account not managed");
+        }
+        log.trace("Leaving");
+    }
+
+    /**
      * Update a editable account.
      * 
      * @param account
@@ -108,14 +130,24 @@ public class AttributeKeyBasedStorageStepUpAccountManager extends AbstractStepUp
     @Override
     public void updateAccount(StepUpAccount account) throws Exception {
         log.trace("Entering");
-
-        if (stepUpAccountStorage == null) {
-            throw new Exception("Storage implementation not set, cannot add accounts");
-        }
-        if (account == null) {
-            throw new Exception("Account cannot be null");
-        }
+        preCheck(account);
         stepUpAccountStorage.update(account, key);
+        log.trace("Leaving");
+    }
+
+    /**
+     * Remove a editable account.
+     * 
+     * @param account
+     *            to be removd.
+     * @throws Exception
+     */
+    @Override
+    public void removeAccount(StepUpAccount account) throws Exception {
+        log.trace("Entering");
+        preCheck(account);
+        stepUpAccountStorage.remove(account, key);
+        getAccounts().remove(account);
         log.trace("Leaving");
     }
 
