@@ -75,8 +75,7 @@ public class TestInitializeStepUpChallengeContext {
     @Test
     public void testNoStepUpMethods() throws ComponentInitializationException {
         AuthenticationContext ctx = (AuthenticationContext) prc.addSubcontext(new AuthenticationContext(), true);
-        ctx.addSubcontext(
-                new ShibbolethSpAuthenticationContext(), true);
+        ctx.addSubcontext(new ShibbolethSpAuthenticationContext(), true);
         final AttributeContext attributeCtx = new AttributeContext();
         prc.getSubcontext(RelyingPartyContext.class).addSubcontext(attributeCtx);
         action.initialize();
@@ -96,9 +95,9 @@ public class TestInitializeStepUpChallengeContext {
         List<Principal> rcl = new ArrayList<Principal>();
         rcl.add(new AuthnContextClassRefPrincipal("test"));
         shibspCtx.setInitialRequestedContext(rcl);
-        List<Principal> scl=new ArrayList<Principal>();
+        List<Principal> scl = new ArrayList<Principal>();
         scl.add(new AuthnContextClassRefPrincipal("not_test"));
-        methods.put(new method(),scl);
+        methods.put(new method(), scl);
         action.setStepUpMethods(methods);
         action.initialize();
         action.execute(src);
@@ -121,14 +120,14 @@ public class TestInitializeStepUpChallengeContext {
         rcl.add(new AuthnContextClassRefPrincipal("test_no_match"));
         rcl.add(new AuthnContextClassRefPrincipal("test"));
         shibspCtx.setInitialRequestedContext(rcl);
-        List<Principal> scl1=new ArrayList<Principal>();
+        List<Principal> scl1 = new ArrayList<Principal>();
         scl1.add(new AuthnContextClassRefPrincipal("not_test"));
-        List<Principal> scl2=new ArrayList<Principal>();
+        List<Principal> scl2 = new ArrayList<Principal>();
         scl2.add(new AuthnContextClassRefPrincipal("test"));
-        methods.put(new method(),scl1);
-        methods.put(new method(),scl2);
-        methods.put(new method(),scl1);
-        methods.put(new method(),scl2);
+        methods.put(new method(), scl1);
+        methods.put(new method(), scl2);
+        methods.put(new method(), scl1);
+        methods.put(new method(), scl2);
         action.setStepUpMethods(methods);
         action.initialize();
         action.execute(src);
@@ -159,7 +158,7 @@ public class TestInitializeStepUpChallengeContext {
         }
 
         @Override
-        public List<StepUpAccount> getAccounts() throws Exception {
+        public List<StepUpAccount> getAccounts() {
             if (accounts.isEmpty()) {
                 accounts.add(new MockAccount());
             }
@@ -178,10 +177,9 @@ public class TestInitializeStepUpChallengeContext {
 
         @Override
         public void updateAccount(StepUpAccount account) throws Exception {
-            
+
         }
 
-        
     }
 
 }

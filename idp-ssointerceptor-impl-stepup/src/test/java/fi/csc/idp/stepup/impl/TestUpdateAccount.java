@@ -252,7 +252,7 @@ public class TestUpdateAccount {
         }
 
         @Override
-        public List<StepUpAccount> getAccounts() throws Exception {
+        public List<StepUpAccount> getAccounts() {
             return accounts;
         }
 

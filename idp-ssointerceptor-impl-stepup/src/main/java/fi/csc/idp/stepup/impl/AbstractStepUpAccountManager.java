@@ -138,7 +138,7 @@ public class AbstractStepUpAccountManager implements StepUpMethod {
      * @return the accounts
      */
     @Override
-    public List<StepUpAccount> getAccounts() throws Exception {
+    public List<StepUpAccount> getAccounts() {
         log.trace("Entering & Leaving");
         return accounts;
     }

@@ -134,7 +134,7 @@ public class TestAddAccount {
         }
 
         @Override
-        public List<StepUpAccount> getAccounts() throws Exception {
+        public List<StepUpAccount> getAccounts() {
             if (accounts.isEmpty()) {
                 accounts.add(new MockAccount());
             }

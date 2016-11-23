@@ -44,44 +44,35 @@ public class TestStepUpMethodContext {
 
         @Override
         public boolean initialize(AttributeContext attributeContext) throws Exception {
-            // TODO Auto-generated method stub
             return false;
         }
 
         @Override
         public String getName() {
-            // TODO Auto-generated method stub
             return null;
         }
 
         @Override
         public boolean isEditable() {
-            // TODO Auto-generated method stub
             return false;
         }
 
         @Override
-        public List<StepUpAccount> getAccounts() throws Exception {
-            // TODO Auto-generated method stub
+        public List<StepUpAccount> getAccounts() {
             return null;
         }
 
         @Override
         public StepUpAccount addAccount() throws Exception {
-            // TODO Auto-generated method stub
             return null;
         }
 
         @Override
         public void removeAccount(StepUpAccount account) {
-            // TODO Auto-generated method stub
-
         }
 
         @Override
         public void updateAccount(StepUpAccount account) {
-            // TODO Auto-generated method stub
-            
         }
 
     }

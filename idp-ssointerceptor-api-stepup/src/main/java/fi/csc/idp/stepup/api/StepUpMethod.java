@@ -67,10 +67,8 @@ public interface StepUpMethod {
      * Existing accounts of the method.
      * 
      * @return list of accounts
-     * @throws Exception
-     *             if something unexpected occurred
      */
-    public List<StepUpAccount> getAccounts() throws Exception;
+    public List<StepUpAccount> getAccounts();
 
     /**
      * Adds a new account.
