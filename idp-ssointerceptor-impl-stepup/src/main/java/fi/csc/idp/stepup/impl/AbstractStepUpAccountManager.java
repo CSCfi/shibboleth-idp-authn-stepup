@@ -162,7 +162,7 @@ public class AbstractStepUpAccountManager implements StepUpMethod {
      *            to be removed.
      */
     @Override
-    public void removeAccount(StepUpAccount account) {
+    public void removeAccount(StepUpAccount account) throws Exception {
         log.trace("Entering & Leaving");
         log.debug("Method not supported");
     }
@@ -187,9 +187,11 @@ public class AbstractStepUpAccountManager implements StepUpMethod {
     }
 
     /**
-     * Update a account. 
-     * @param  account
-     * @throws Exception if something unexpected occurs
+     * Update a account.
+     * 
+     * @param account
+     * @throws Exception
+     *             if something unexpected occurs
      */
     @Override
     public void updateAccount(StepUpAccount account) throws Exception {
