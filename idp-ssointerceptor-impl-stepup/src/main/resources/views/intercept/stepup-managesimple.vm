@@ -33,7 +33,7 @@ If flow indicated updates have happened the target is shown in plaintext and as 
                   #set ($action = $methodName+':-1:addaccount')
                   <form action="$flowExecutionUrl" method="post">
                     <div class="form-element-wrapper">
-                      <button class="form-element form-button" value=$encoder.encodeForHTML($action) type="submit" name="_eventId_update">#springMessageText("idp.stepup.method.setaccount", "Set Account")</button>
+                      <button class="form-element form-button" value=$encoder.encodeForHTML($action) type="submit" name="_eventId_update">#springMessageText("idp.stepup.method.newaccount", "New Account")</button>
                     </div>
                   </form>
                 #end
@@ -64,7 +64,7 @@ If flow indicated updates have happened the target is shown in plaintext and as 
                     #set ($action = $methodName+':'+$account.getId()+':removeaccount')
                     <form action="$flowExecutionUrl" method="post">
                     <div class="form-element-wrapper">
-                      <button class="form-element form-button" value=$encoder.encodeForHTML($action) type="submit" name="_eventId_update" style="width:80%">#springMessageText("idp.stepup.update.removeaccount", "Remove Account")</button>
+                      <button class="form-element form-button" value=$encoder.encodeForHTML($action) type="submit" name="_eventId_update">#springMessageText("idp.stepup.update.removeaccount", "Remove Current Account")</button>
                     </div>
                     </form>
                     <!-- remove button end -->
