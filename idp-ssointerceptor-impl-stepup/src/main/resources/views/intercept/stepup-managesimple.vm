@@ -30,10 +30,11 @@ If flow indicated updates have happened the target is shown in plaintext and as 
                  <!-- add new account -->
                 #if ($method.isEditable() == true)
                   <p>#springMessageText("idp.stepup.method", "Authentication Method:")$encoder.encodeForHTML($methodName)</p><br>
+                  <p>#springMessageText("idp.stepup.method.exp", "Creating a new authentication method will revoke any existing TOTP secret. Creating a new method will result in a new TOTP secret.")</p><br>
                   #set ($action = $methodName+':-1:addaccount')
                   <form action="$flowExecutionUrl" method="post">
                     <div class="form-element-wrapper">
-                      <button class="form-element form-button" value=$encoder.encodeForHTML($action) type="submit" name="_eventId_update">#springMessageText("idp.stepup.method.newaccount", "New Account")</button>
+                      <button class="form-element form-button" value=$encoder.encodeForHTML($action) type="submit" name="_eventId_update">#springMessageText("idp.stepup.method.newaccount", "Create Authentication Method")</button>
                     </div>
                   </form>
                 #end
@@ -52,7 +53,7 @@ If flow indicated updates have happened the target is shown in plaintext and as 
                   #if ($account.isEditable() == true)
                      #if ($accountUpdated == true)
                      <!-- key is shown if there is indication from flow that update has happened-->
-                      #springMessageText("idp.stepup.performed","Account has been added. Please set the shared secret to your device: <br>")
+                      #springMessageText("idp.stepup.performed","Authentication method has been added. Please set the shared secret to your device: <br>")
                       $encoder.encodeForHTML($account.getTarget())<br><br>
                       <!-- TODO: show only for specific method types -->
                       #set ($qrCode = $qrLocation.format($qrLocation,$accountName,$proxyName,$account.getTarget()))
@@ -61,10 +62,11 @@ If flow indicated updates have happened the target is shown in plaintext and as 
                     #end
 
                      <!-- remove button -->
+                    <p>#springMessageText("idp.stepup.method.remove", "Removing the authentication method will revoke your existing TOTP secret.")</p><br>
                     #set ($action = $methodName+':'+$account.getId()+':removeaccount')
                     <form action="$flowExecutionUrl" method="post">
                     <div class="form-element-wrapper">
-                      <button class="form-element form-button" value=$encoder.encodeForHTML($action) type="submit" name="_eventId_update">#springMessageText("idp.stepup.update.removeaccount", "Remove Current Account")</button>
+                      <button class="form-element form-button" value=$encoder.encodeForHTML($action) type="submit" name="_eventId_update">#springMessageText("idp.stepup.update.removeaccount", "Remove Current Authentication Method")</button>
                     </div>
                     </form>
                     <!-- remove button end -->
@@ -74,7 +76,7 @@ If flow indicated updates have happened the target is shown in plaintext and as 
           </div>
           <form action="$flowExecutionUrl" method="post">
             <div class="form-element-wrapper">
-              <button class="form-element form-button" type="submit" name="_eventId_proceed">#springMessageText("idp.stepup.reinitlogin", "Reinit Login")</button>
+              <button class="form-element form-button" type="submit" name="_eventId_proceed">#springMessageText("idp.stepup.reinitlogin", "Return to service")</button>
             </div>
           </form>
 
