@@ -72,8 +72,9 @@
 
 	<bean id="GoogleAuthStepUpManager"
 		class="fi.csc.idp.stepup.impl.AttributeKeyBasedStorageStepUpAccountManager"
-		scope="prototype" p:name="GoogleAuthenticator" p:AttributeId="INTeppn"
-		p:stepUpAccountStorage-ref="GAStepUpAccountStorage" p:AccountID="GoogleAuthenticatorStepUpAccount">
+		scope="prototype" p:name="TOTP" p:attributeId="INTeppn"
+		p:accountLimit="1" p:autoRemove="true" p:stepUpAccountStorage-ref="GAStepUpAccountStorage"
+		p:accountID="GoogleAuthenticatorStepUpAccount">
 	</bean>
 
 	<!-- Hikari as datasource example -->
