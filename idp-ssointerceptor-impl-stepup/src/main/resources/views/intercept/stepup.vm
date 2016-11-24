@@ -14,9 +14,9 @@
           <img src="$request.getContextPath()#springMessage("idp.logo")" alt="#springMessageText("idp.logo.alt-text", "logo")">
         </header>
         <div class="content">
-          <p>Authentication method:$stepupMethod.getName()</>
+          <p>#springMessageText("idp.stepup.authmethod", "Authentication method"):$encoder.encodeForHTML($stepupMethod.getName())</>
           #if ($stepupAccount.getName())
-            <p>Account:$stepupAccount.getName()</>
+            <p>#springMessageText("idp.stepup.authaccount", "Account"):$encoder.encodeForHTML($stepupAccount.getName())</>
           #end
           <p>#springMessageText("idp.stepup.TOTP", "Please provide your TOTP passcode.")</p>
           <form action="$flowExecutionUrl" method="post">
@@ -30,7 +30,6 @@
                 <p class="form-element form-error">#springMessageText("idp.stepup.response.failed", "your response failed to validate")</p>
               </section>
             #end
-
             <div class="form-element-wrapper">
               <button class="form-element form-button" type="submit" name="_eventId_proceed">#springMessageText("idp.stepup.login", "Login")</button>
             </div>
