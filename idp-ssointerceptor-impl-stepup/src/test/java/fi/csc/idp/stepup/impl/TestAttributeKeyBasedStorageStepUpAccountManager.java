@@ -155,6 +155,42 @@ public class TestAttributeKeyBasedStorageStepUpAccountManager {
 
     }
 
+    @Test
+    public void testAccountLimit1() throws Exception {
+        attributeKeyBasedStorageStepUpAccountManager.setAppContext(getApplicationContext());
+        attributeKeyBasedStorageStepUpAccountManager.setAttributeId("attr1");
+        attributeKeyBasedStorageStepUpAccountManager.setAccountID("ChallengeSender");
+        MockStorage strg = new MockStorage();
+        attributeKeyBasedStorageStepUpAccountManager.setAccountLimit(1);
+        attributeKeyBasedStorageStepUpAccountManager.setStepUpAccountStorage(strg);
+        attributeKeyBasedStorageStepUpAccountManager.initialize(attribCtx);
+        Assert.assertEquals(attributeKeyBasedStorageStepUpAccountManager.getAccounts().size(), 1);
+        StepUpAccount account = attributeKeyBasedStorageStepUpAccountManager.addAccount();
+        Assert.assertNull(account);
+        Assert.assertEquals(attributeKeyBasedStorageStepUpAccountManager.getAccounts().size(), 1);
+        Assert.assertEquals(strg.accounts.size(), 1);
+
+    }
+
+    @Test
+    public void testAccountLimit2() throws Exception {
+        attributeKeyBasedStorageStepUpAccountManager.setAppContext(getApplicationContext());
+        attributeKeyBasedStorageStepUpAccountManager.setAttributeId("attr1");
+        attributeKeyBasedStorageStepUpAccountManager.setAccountID("ChallengeSender");
+        MockStorage strg = new MockStorage();
+        attributeKeyBasedStorageStepUpAccountManager.setAccountLimit(1);
+        attributeKeyBasedStorageStepUpAccountManager.setAutoRemove(true);
+        attributeKeyBasedStorageStepUpAccountManager.setStepUpAccountStorage(strg);
+        attributeKeyBasedStorageStepUpAccountManager.initialize(attribCtx);
+        Assert.assertEquals(attributeKeyBasedStorageStepUpAccountManager.getAccounts().size(), 1);
+        StepUpAccount account = attributeKeyBasedStorageStepUpAccountManager.addAccount();
+        Assert.assertNotNull(account);
+        Assert.assertEquals(attributeKeyBasedStorageStepUpAccountManager.getAccounts().size(), 1);
+        Assert.assertEquals(strg.accounts.size(), 1);
+        Assert.assertEquals(account, attributeKeyBasedStorageStepUpAccountManager.getAccounts().get(0));
+
+    }
+
     class MockStorage implements StepUpAccountStorage {
 
         public List<StepUpAccount> accounts = new ArrayList<StepUpAccount>();
@@ -167,7 +203,7 @@ public class TestAttributeKeyBasedStorageStepUpAccountManager {
 
         @Override
         public void remove(StepUpAccount account, String key) throws Exception {
-            // TODO Auto-generated method stub
+            accounts.remove(account);
 
         }
 
