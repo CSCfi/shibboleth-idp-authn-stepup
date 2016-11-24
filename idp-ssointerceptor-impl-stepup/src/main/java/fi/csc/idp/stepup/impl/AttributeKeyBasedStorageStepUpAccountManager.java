@@ -54,6 +54,12 @@ public class AttributeKeyBasedStorageStepUpAccountManager extends AbstractStepUp
     /** The account key. */
     private String key;
 
+    /** maximum number of accounts. */
+    private int accountLimit;
+
+    /** remove old account automatically if new one requires space. */
+    private boolean autoRemove;
+
     /** implements the storage functionality. */
     private StepUpAccountStorage stepUpAccountStorage;
 
@@ -78,17 +84,50 @@ public class AttributeKeyBasedStorageStepUpAccountManager extends AbstractStepUp
     }
 
     /**
+     * Set the limit for maximum number of accounts allowed. Default is no
+     * limit. Values below 1 are ignored.
+     * 
+     * @param limit
+     *            maximum number of accounts.
+     */
+    public void setAccountLimit(int limit) {
+        this.accountLimit = limit;
+    }
+
+    /**
+     * Setting automatic removal of accounts on will cause deleting old account
+     * if new account requires the space due to account limits.
+     * 
+     * @param remove
+     *            true if old accounts make way automatically for new
+     */
+    public void setAutoRemove(boolean remove) {
+        this.autoRemove = remove;
+    }
+
+    /**
      * Add a new editable account. Store it.
      * 
+     * 
+     * @return new account. Null if account limits have been reached.
      * @throws Exception
      *             if something unexpected occurred.
      */
     @Override
     public StepUpAccount addAccount() throws Exception {
         log.trace("Entering");
-
         if (stepUpAccountStorage == null) {
             throw new Exception("Storage implementation not set, cannot add accounts");
+        }
+        if (accountLimit > 0 && getAccounts().size() >= accountLimit) {
+            if (!autoRemove) {
+                log.trace("Leaving");
+                return null;
+            }
+            // we remove old account from the way
+            StepUpAccount discardedAccount = getAccounts().get(0);
+            stepUpAccountStorage.remove(discardedAccount, key);
+            getAccounts().remove(discardedAccount);
         }
         StepUpAccount account = (StepUpAccount) getAppContext().getBean(getAccountID());
         account.setEnabled(true);
@@ -162,6 +201,8 @@ public class AttributeKeyBasedStorageStepUpAccountManager extends AbstractStepUp
         return true;
     }
 
+    // Checkstyle: CyclomaticComplexity OFF
+
     /**
      * Initializes accounts by reading the value for key, using that to read
      * accounts from storage.
@@ -217,4 +258,6 @@ public class AttributeKeyBasedStorageStepUpAccountManager extends AbstractStepUp
         log.trace("Leaving");
         return true;
     }
+
+    // Checkstyle: CyclomaticComplexity OFF
 }
