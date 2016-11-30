@@ -115,10 +115,7 @@
 	<action-state id="VerifyResponse">
 		<evaluate expression="VerifyResponse" />
 		<transition on="ContinueStepUp" to="proceed" />
-		<transition to="DisplayWrongResponse">
-			<set name="flowScope.proceedAction" value="'InitializeStepUp'"
-				type="string" />
-		</transition>
+		<transition to="DisplayWrongResponse"/>
 	</action-state>
 
 	<!-- this action may be used if execution requires backend still to check 
@@ -267,6 +264,7 @@
 				expression="flowRequestContext.getExternalContext().getNativeResponse()"
 				result="viewScope.response" />
 		</on-render>
+		<transition on="manualProceed" to="VerifyResponse" />
 		<transition on="proceed" to="VerifyAccountStatusVerified" />
 		<transition on="retry" to="PollProgress" />
 	</view-state>
