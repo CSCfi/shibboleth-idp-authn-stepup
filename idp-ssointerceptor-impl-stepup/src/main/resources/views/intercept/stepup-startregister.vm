@@ -12,7 +12,7 @@
           <img src="$request.getContextPath()#springMessage("idp.logo")" alt="#springMessageText("idp.logo.alt-text", "logo")">
         </header>
         <div class="content">
-        #springMessageText("idp.stepup.startregister","TOTP account management requires first SMS verification.")<br>
+        #springMessageText("idp.stepup.startregister","TOTP account management requires first SMS verification.")<br><br>
         <form action="$flowExecutionUrl" method="post">
         <div class="form-element-wrapper">
               <button class="form-element form-button" type="submit" name="_eventId_proceed">#springMessageText("idp.stepup.proceedregistration", "Proceed to Verification")</button>

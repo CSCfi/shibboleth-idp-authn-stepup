@@ -27,7 +27,7 @@
             </div>
             #if ($verifyResponseFailed == true)
               <section>
-                <p class="form-element form-error">#springMessageText("idp.stepup.response.failed", "your response failed to validate")</p>
+                <p class="form-element form-error">#springMessageText("idp.stepup.response.failed", "Incorrect password, please retry")</p>
               </section>
             #end
             <div class="form-element-wrapper">
