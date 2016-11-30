@@ -169,7 +169,7 @@
 		<evaluate expression="VerifyPasswordFromFormRequest" />
 		<transition on="ContinueStepUp" to="#{flowScope.regAction}" />
 		<transition to="DisplayChallenge">
-			<set name="flowScope.verifyResponseFailed" value="true" type="boolean" />
+			<set name="flowScope.verifyRegResponseFailed" value="true" type="boolean" />
 		</transition>
 	</action-state>
 
