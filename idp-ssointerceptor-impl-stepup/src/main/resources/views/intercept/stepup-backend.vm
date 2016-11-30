@@ -1,4 +1,5 @@
 #set ($maxProgress=30)
+#set ($manualProceed = $flowExecutionUrl + "&_eventId=manualProceed")
 <!DOCTYPE html>
 <html>
   <head>
@@ -14,9 +15,12 @@
           <img src="$request.getContextPath()#springMessage("idp.logo")" alt="#springMessageText("idp.logo.alt-text", "logo")">
         </header>
         <div class="content">
-          #springMessageText("idp.stepup.backend","SMS verification.")
-          #springMessageText("idp.stepup.backend.explanation","Please reply to the sms to continue.")
-          <progress id="showProgress" value="$maxProgress" max="$maxProgress" width="100%"></progress>
+         #springMessageText("idp.stepup.backend","SMS verification.")
+          #springMessageText("idp.stepup.backend.explanation","Please send sms to +3584573963183 from your registered mobile to continue.")
+          <br>
+          <progress id="showProgress" value="$maxProgress" max="$maxProgress" width="100%" style="visibility:hidden;"></progress>
+          <br>
+          <a id="manualLink" href="$manualProceed">#springMessageText("idp.stepup.backend.manualproceed","Press HERE to continue after sending the sms and waiting for few seconds.")</a>
         </div>
       </div>
       <footer>
@@ -65,7 +69,11 @@
                 }
             });
          }
-        $(document).ready(verify_response_ajax("$link"));
+       $(document).ready(function(){
+            $('#showProgress').css('visibility', 'visible');
+            $('#manualLink').hide();
+            verify_response_ajax('$link');
+        });
    </script>
   </body>
 </html>
