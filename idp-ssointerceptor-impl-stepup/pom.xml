@@ -29,6 +29,10 @@
 	<name>idp-ssointerceptor-impl-stepup</name>
 	<dependencies>
 		<dependency>
+			<groupId>com.nimbusds</groupId>
+			<artifactId>oauth2-oidc-sdk</artifactId>
+		</dependency>
+		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 			<scope>test</scope>
