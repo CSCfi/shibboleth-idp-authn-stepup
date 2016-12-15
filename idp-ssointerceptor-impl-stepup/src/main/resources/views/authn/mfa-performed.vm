@@ -1,0 +1,36 @@
+#set ($qrLocation = "https://chart.googleapis.com/chart?chs=200x200&chld=M%%7C0&cht=qr&chl=otpauth://totp/%s@%s%%3Fsecret%%3D%s")
+#set ($proxyName = "Haka")
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>#springMessageText("idp.title", "Web Login Service")</title>
+    <link rel="stylesheet" type="text/css" href="$request.getContextPath()/css/main.css">
+  </head>
+  <body>
+    <div class="wrapper">
+      <div class="container">
+        <header>
+          <img src="$request.getContextPath()#springMessage("idp.logo")" alt="#springMessageText("idp.logo.alt-text", "logo")">
+        </header>
+        <div class="content">
+        #springMessageText("idp.stepup.performed","Account has been added. Please set the shared secret to your device: <br>")
+        #set ($target=$stepupMethodContext.getStepUpAccount().getTarget())
+        #set ($qrCode = $qrLocation.format($qrLocation,"",$proxyName,$target))
+        $encoder.encodeForHTML($target)</br>
+        <img src='$qrCode' alt="HTML5 Icon" style="width:128px;height:128px;"> 
+        <form action="$flowExecutionUrl" method="post">
+        <div class="form-element-wrapper">
+              <button class="form-element form-button" type="submit" name="_eventId_proceed">#springMessageText("idp.stepup.proceedlogin", "Proceed to Login")</button>
+        </div>
+        </form>
+       </div>
+      </div>
+      <footer>
+        <div class="container container-footer">
+          <p class="footer-text">#springMessageText("idp.footer", "Insert your footer text here.")</p>
+        </div>
+      </footer>
+    </div>
+  </body>
+</html>
