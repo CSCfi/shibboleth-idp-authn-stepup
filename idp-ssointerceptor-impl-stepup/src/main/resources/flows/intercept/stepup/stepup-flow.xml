@@ -1,46 +1,48 @@
- <flow xmlns="http://www.springframework.org/schema/webflow"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xsi:schemaLocation="http://www.springframework.org/schema/webflow http://www.springframework.org/schema/webflow/spring-webflow.xsd"
-       parent="intercept.abstract">
 
-    <!-- Rudimentary impediment to direct execution of subflow. -->
-    <input name="calledAsSubflow" type="boolean" required="true" />
+<flow xmlns="http://www.springframework.org/schema/webflow"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/webflow http://www.springframework.org/schema/webflow/spring-webflow.xsd"
+	parent="intercept.abstract">
 
-    <action-state id="CheckNeed">
-        <evaluate expression="CheckRequestedAuthenticationContext"/>
-        <!-- As stepup is not requested we move to setting the method -->
-        <transition on="AuthnContextNotStepUp" to="SetMethod" />
-        <!-- As stepup is requested we first check if it is provided already --> 
-        <transition on="ContinueStepUp" to="CheckProvidedAuthenticationContext" />
-        <!-- internal eventid mapping error -->
-        <transition to="DisplayCondolences" />
-    </action-state>
+	<!-- Rudimentary impediment to direct execution of subflow. -->
+	<input name="calledAsSubflow" type="boolean" required="true" />
 
-    <action-state id="SetMethod">
-        <!-- We set the authentication metohd to mapped value if it exists -->
-        <evaluate expression="SetRequestedAuthenticationContext"/>
-        <!-- end stepup manipulation -->
-        <transition on="ContinueStepUp" to="proceed" />
-        <!-- internal eventid mapping error -->
-        <transition to="DisplayCondolences" />
-    </action-state>
+	<action-state id="CheckNeed">
+		<evaluate expression="CheckRequestedAuthenticationContext" />
+		<!-- As stepup is not requested we move to setting the method -->
+		<transition on="AuthnContextNotStepUp" to="SetMethod" />
+		<!-- As stepup is requested we first check if it is provided already -->
+		<transition on="ContinueStepUp" to="CheckProvidedAuthenticationContext" />
+		<!-- internal eventid mapping error -->
+		<transition to="DisplayCondolences" />
+	</action-state>
 
-    <action-state id="CheckProvidedAuthenticationContext">
-        <evaluate expression="CheckProvidedAuthenticationContext"/>
-        <!-- actions states that provided authentication method value can be regarded as step up-->
-        <transition on="AuthnContextStepUp" to="proceed" />
-        <!-- provided value cannot be regarded as stepup, move to stepuup -->
-        <transition on="ContinueStepUp" to="PerformStepUp" />
-        <!-- internal eventid mapping error -->
-        <transition to="DisplayCondolences" />
-    </action-state>
+	<action-state id="SetMethod">
+		<!-- We set the authentication metohd to mapped value if it exists -->
+		<evaluate expression="SetRequestedAuthenticationContext" />
+		<!-- end stepup manipulation -->
+		<transition on="ContinueStepUp" to="proceed" />
+		<!-- internal eventid mapping error -->
+		<transition to="DisplayCondolences" />
+	</action-state>
 
-    <subflow-state id="PerformStepUp" subflow="authn/mfa">
-        <input name="calledAsSubflow" value="true" />
-        <transition to="proceed" />
-    </subflow-state>
+	<action-state id="CheckProvidedAuthenticationContext">
+		<evaluate expression="CheckProvidedAuthenticationContext" />
+		<!-- actions states that provided authentication method value can be regarded 
+			as step up -->
+		<transition on="AuthnContextStepUp" to="proceed" />
+		<!-- provided value cannot be regarded as stepup, move to stepuup -->
+		<transition on="ContinueStepUp" to="PerformStepUp" />
+		<!-- internal eventid mapping error -->
+		<transition to="DisplayCondolences" />
+	</action-state>
 
-    <end-state id="proceed" />
-    <bean-import resource="stepup-beans.xml" />
+	<subflow-state id="PerformStepUp" subflow="authn/mfa">
+		<input name="calledAsSubflow" value="true" />
+		<transition to="proceed" />
+	</subflow-state>
+
+	<end-state id="proceed" />
+	<bean-import resource="stepup-beans.xml" />
 
 </flow>
