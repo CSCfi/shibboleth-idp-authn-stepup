@@ -14,23 +14,37 @@ This project relies on [MPASS Shibboleth SP Authentication](https://github.com/D
 
 The components can be deployed also to the home organization IdP. This has impact on how the flow should be configured and there is no such example yet. 
 
-### Short Summary of flow
-Stepup flow is a post authentication interceptor flow. In practise this means that stepup flow receives control at a point where user has been  authenticated, the attributes have been resolved and filtered but the actual assertion has not been formed yet. At this point interceptor flow makes decisions whether a stepup is needed, what kind of stepup that would be and how that is communicated to client SP in the assertion.
+### Short Summary of flows
+
+#### StepUp
+Stepup flow is applied if the intention is to provide Mfa by a proxy.
+
+Stepup flow is a post authentication interceptor flow. In practise this means that stepup flow receives control at a point where user has been  authenticated, the attributes have been resolved and filtered but the actual assertion has not been formed yet. At this point flow makes decisions whether a stepup is needed, what kind of stepup that would be and how that is communicated to client SP in the assertion. Stepup flow uses Mfa flow to perform the user reauthentication.
+
+The flow provided with the is an example flow that may have to be heavily modified to suite the target environment. The basic building blocks consist of following functionality:
+
+- Possibility to translate requested and provided authentication methods between SP and IdP.
+- Possibility to trust the home organization IdP to provide already the authentication level requiring stepup. 
+
+By modifying the flow numerous other use cases may also be achieved. 
+
+#### MfaRequest
+MfaRquest flow is a flow implementing oidc provider. Mfarequest flow expects a oidc authentication request of type id token (implicit). Login hint parameters are parsed to perform mfa for the user. Flow uses Mfa flow to perform the user reauthentication. The flow implementation is still in very early stages and should not be used.  
+
+
+#### Mfa
+Mfa flow is a authentication flow. It is the workhorse of the other flows described here but may be used also independently. 
 
 The flow provided with the is an example flow that may have to be heavily modified to suite the target environment. The basic building blocks consist of following functionality:
 
 - Different user authentication mechanisms: email, sms, totp (google authenticator).
 - Possibility to choose authentication mechanisms based on requested authentication method.
 - Registration of authentication mechanism and maintaining them.
-- Possibility to translate requested and provided authentication methods between SP and IdP.
-- Possibility to trust the home organization IdP to provide already the authentication level requiring stepup. 
 
 How these building blocks are applied depends on implemented flow and may result in very different use cases. The example flow here implements two separate cases:
 
 - User is requested to reply to received sms by his/her mobile to continue. If user has no mobile number email verification is used instead.
 - User is requested to enter code TOTP code. Maintaining accounts requires successful sms authentication.
-
-By modifying the flow numerous other use cases may also be achieved. 
 
 ## Prerequisities and compilation
 
@@ -85,18 +99,22 @@ httpcore-4.4.5.jar
 Copy the necessary views to place. Create the directories if needed. 
 
 ```
-cp ../idp-ssointerceptor-impl-stepup/src/main/resources/views/intercept/stepup/* /opt/shibboleth-idp/views/intercept/.
+cp ../idp-ssointerceptor-impl-stepup/src/main/resources/views/authn/* /opt/shibboleth-idp/views/authn/.
 ```
 ###Flows
 Copy the flow to it's correct place. Create the directories if needed.
 ```
 cp ../idp-ssointerceptor-impl-stepup/src/main/resources/flows/intercept/stepup/stepup-flow.xml /opt/shibboleth-idp/flows/intercept/stepup/.
+cp ../idp-ssointerceptor-impl-stepup/src/main/resources/flows/authn/mfa/mfa-flow.xml /opt/shibboleth-idp/flows/authn/mfa/.
+cp ../idp-ssointerceptor-impl-stepup/src/main/resources/flows/oidc/mfarequest/mfarequest-flow.xml /opt/shibboleth-idp/flows/oidc/mfarequest/.
 ```
 
 ###Beans
 Copy the bean definition to it's correct place. Create the directories if needed.
 ```
 cp ../idp-ssointerceptor-impl-stepup/src/main/resources/flows/intercept/stepup/stepup-beans.xml /opt/shibboleth-idp/flows/intercept/stepup/.
+cp ../idp-ssointerceptor-impl-stepup/src/main/resources/flows/authn/mfa/mfa-beans.xml /opt/shibboleth-idp/flows/authn/mfa/.
+cp ../idp-ssointerceptor-impl-stepup/src/main/resources/flows/oidc/mfarequest/mfarequest-beans.xml /opt/shibboleth-idp/flows/oidc/mfarequest/.
 ```
 
 
