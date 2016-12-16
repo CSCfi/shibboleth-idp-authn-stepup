@@ -1,57 +1,52 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xmlns:context="http://www.springframework.org/schema/context" xmlns:c="http://www.springframework.org/schema/c"
-    xmlns:p="http://www.springframework.org/schema/p" xmlns:util="http://www.springframework.org/schema/util"
-    xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:c="http://www.springframework.org/schema/c" xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
                         http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
                         http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd"
-    default-init-method="initialize" default-destroy-method="destroy">
+	default-init-method="initialize" default-destroy-method="destroy">
 
 
 
-<!--
+	<!-- THIS IS A EARLY DRAFT, NOT TO BE USED!! -->
 
-THIS IS A EARLY DRAFT, NOT TO BE USED!!
-
--->
-
-    <bean class="org.springframework.context.support.PropertySourcesPlaceholderConfigurer"
-        p:placeholderPrefix="%{" p:placeholderSuffix="}" />
+	<bean
+		class="org.springframework.context.support.PropertySourcesPlaceholderConfigurer"
+		p:placeholderPrefix="%{" p:placeholderSuffix="}" />
 
 
-     <bean id="ProcessOidcStepUpRequest"
-        class="fi.csc.idp.stepup.impl.ProcessOidcStepUpRequest" scope="prototype"
-        p:subField="INTeppn">
-        <property name="RedirectUris">
-                        <map>
-                                <entry>
-                                        <key>
-                                                <value>5001</value>
-                                        </key>
-                                        <list>
-                                                <value>http://iltasanomat.fi</value>
-                                        </list>
-                                </entry>
-                                <entry>
-                                        <key>
-                                                <value>5002</value>
-                                        </key>
-                                        <list>
-                                                <value>https://testsp.funet.fi/shibboleth</value>
-                                                <value>http://iltalehti.fi/</value>
-                                        </list>
-                             	</entry>
-                        </map>
-                </property>
-     </bean>
+	<bean id="ProcessOidcStepUpRequest" class="fi.csc.idp.stepup.impl.ProcessOidcStepUpRequest"
+		scope="prototype" p:subField="INTeppn">
+		<property name="RedirectUris">
+			<map>
+				<entry>
+					<key>
+						<value>5001</value>
+					</key>
+					<list>
+						<value>http://iltasanomat.fi</value>
+					</list>
+				</entry>
+				<entry>
+					<key>
+						<value>5002</value>
+					</key>
+					<list>
+						<value>https://testsp.funet.fi/shibboleth</value>
+						<value>http://iltalehti.fi/</value>
+					</list>
+				</entry>
+			</map>
+		</property>
+	</bean>
 
-     <bean id="RespondOidcStepUpRequest"
-        class="fi.csc.idp.stepup.impl.RespondOidcStepUpRequest" scope="prototype"
-        p:issuer="hakamfaproxy"
-        p:privKey-ref="JWTPrivateKey">
-     </bean>
+	<bean id="RespondOidcStepUpRequest" class="fi.csc.idp.stepup.impl.RespondOidcStepUpRequest"
+		scope="prototype" p:issuer="hakamfaproxy" p:privKey-ref="JWTPrivateKey">
+	</bean>
 
-     <bean id="JWTPrivateKey" class="net.shibboleth.ext.spring.factory.PrivateKeyFactoryBean"
-        p:resource="../../../credentials/idp-signing.key" />
+	<bean id="JWTPrivateKey" class="net.shibboleth.ext.spring.factory.PrivateKeyFactoryBean"
+		p:resource="../../../credentials/idp-signing.key" />
 
 </beans>
