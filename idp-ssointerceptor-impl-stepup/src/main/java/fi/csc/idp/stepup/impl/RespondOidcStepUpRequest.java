@@ -48,10 +48,14 @@ import com.nimbusds.jose.JWSHeader;
 import com.nimbusds.jose.crypto.RSASSASigner;
 import com.nimbusds.jwt.SignedJWT;
 import com.nimbusds.oauth2.sdk.AuthorizationCode;
+import com.nimbusds.oauth2.sdk.ResponseMode;
 import com.nimbusds.oauth2.sdk.id.Audience;
 import com.nimbusds.oauth2.sdk.id.Issuer;
 import com.nimbusds.oauth2.sdk.id.State;
 import com.nimbusds.oauth2.sdk.id.Subject;
+import com.nimbusds.oauth2.sdk.token.AccessToken;
+import com.nimbusds.oauth2.sdk.token.AccessTokenType;
+import com.nimbusds.oauth2.sdk.token.BearerAccessToken;
 import com.nimbusds.openid.connect.sdk.AuthenticationRequest;
 import com.nimbusds.openid.connect.sdk.AuthenticationSuccessResponse;
 import com.nimbusds.openid.connect.sdk.claims.IDTokenClaimsSet;
@@ -155,6 +159,7 @@ public class RespondOidcStepUpRequest implements org.springframework.webflow.exe
         URI redirectURI = req.getRedirectionURI();
         // Generate new authorization code
         AuthorizationCode code = new AuthorizationCode();
+        AccessToken accessToken = new BearerAccessToken();
         List<Audience> aud = new ArrayList<Audience>();
         // Set the requesting client as audience
         aud.add(new Audience(req.getClientID().getValue()));
@@ -174,8 +179,8 @@ public class RespondOidcStepUpRequest implements org.springframework.webflow.exe
                 idToken2.toJWTClaimsSet());
         jwt.sign(new RSASSASigner(prvKey));
         State state = req.getState();
-        AuthenticationSuccessResponse resp = new AuthenticationSuccessResponse(redirectURI, code, jwt, null, state,
-                null, null);
+        AuthenticationSuccessResponse resp = new AuthenticationSuccessResponse(redirectURI, code, jwt, accessToken, state,
+                null, req.getResponseMode());
         log.debug("constructed response:" + resp.toURI());
         springRequestContext.getFlowScope().put("redirect", resp.toURI().toString());
         log.trace("Leaving");
