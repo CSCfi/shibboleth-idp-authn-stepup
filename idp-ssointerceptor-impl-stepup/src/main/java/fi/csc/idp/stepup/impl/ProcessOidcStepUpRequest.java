@@ -24,14 +24,17 @@
 package fi.csc.idp.stepup.impl;
 
 import java.security.Principal;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Nonnull;
 import javax.servlet.http.HttpServletRequest;
 
+import net.minidev.json.JSONObject;
 import net.shibboleth.idp.attribute.IdPAttribute;
 import net.shibboleth.idp.attribute.StringAttributeValue;
 import net.shibboleth.idp.attribute.context.AttributeContext;
@@ -47,10 +50,10 @@ import org.springframework.webflow.context.servlet.ServletExternalContext;
 import org.springframework.webflow.execution.Event;
 import org.springframework.webflow.execution.RequestContext;
 
-import com.google.common.base.Splitter;
-
 import fi.okm.mpass.shibboleth.authn.context.ShibbolethSpAuthenticationContext;
 
+import com.nimbusds.jwt.JWTClaimsSet;
+import com.nimbusds.oauth2.sdk.ResponseType;
 import com.nimbusds.openid.connect.sdk.AuthenticationRequest;
 import com.nimbusds.openid.connect.sdk.claims.ACR;
 
@@ -69,13 +72,11 @@ public class ProcessOidcStepUpRequest implements org.springframework.webflow.exe
     @Nonnull
     private final Logger log = LoggerFactory.getLogger(ProcessOidcStepUpRequest.class);
 
-    /**
-     * loginhint field name containing value matching the users sub field value.
-     */
-    private String subField;
-
     /** redirect uris that are valid per client id. */
     private Map<String, List<String>> redirectUris;
+
+    /** claim to attribute mapping. */
+    private Map<String, String> claimToAttribute;
 
     /**
      * Setter for redirect uris.
@@ -88,14 +89,14 @@ public class ProcessOidcStepUpRequest implements org.springframework.webflow.exe
     }
 
     /**
-     * Setter for loginhint field name containing value matching the users sub
-     * field value.
+     * Set mapping of claims to attributes. claim names are keys for attribute
+     * names.
      * 
-     * @param field
-     *            name for sub field in login hint.
+     * @param claimToAttribute
+     *            map
      */
-    public void setSubField(String field) {
-        this.subField = field;
+    public void setClaimToAttribute(Map<String, String> claimToAttribute) {
+        this.claimToAttribute = claimToAttribute;
     }
 
     /**
@@ -174,7 +175,7 @@ public class ProcessOidcStepUpRequest implements org.springframework.webflow.exe
     }
 
     /**
-     * Creates AttributeContext, populates it with loginhint field values and
+     * Creates AttributeContext, populates it with id token claim values and
      * adds it to RelyingPartyContext. Assumes RelyingPartyContext instance
      * exists already.
      * 
@@ -188,26 +189,68 @@ public class ProcessOidcStepUpRequest implements org.springframework.webflow.exe
     private void setAttributeCtx(@SuppressWarnings("rawtypes") @Nonnull final ProfileRequestContext prc,
             AuthenticationRequest req) throws Exception {
         log.trace("Entering");
-        if (subField == null) {
-            throw new Exception("sub field name must be set");
+        if (claimToAttribute == null) {
+            throw new Exception("request object: claims to attribute map is null");
         }
-        final Map<String, String> map = Splitter.on(',').trimResults().withKeyValueSeparator(':')
-                .split(req.getLoginHint());
+        // validate request object!
+        // TODO: check signature,ts and state of the request object.
+        String client_id = (String) req.getRequestObject().getJWTClaimsSet().getClaim("client_id");
+        if (client_id == null || !req.getClientID().getValue().equals(client_id)) {
+            throw new Exception("request object: client id is mandatory and should match parameter value");
+        }
+        String responseType = (String) req.getRequestObject().getJWTClaimsSet().getClaim("response_type");
+        if (responseType == null || !req.getResponseType().equals(new ResponseType(responseType))) {
+            throw new Exception("request object: response type is mandatory and should match parameter value");
+        }
+        String iss = (String) req.getRequestObject().getJWTClaimsSet().getClaim("iss");
+        if (iss == null || !req.getClientID().getValue().equals(iss)) {
+            throw new Exception(
+                    "request object: signed request object should contain iss claim with client id as value");
+        }
+        /*
+         * MISSING ISSUER VALUE, NEEDS RESTRUCTURING String
+         * aud=(String)req.getRequestObject().getJWTClaimsSet().getClaim("aud");
+         * if (aud == null || !){ throw new Exception(
+         * "request object: signed request object should contain aud claim with op issuer as value"
+         * ); }
+         */
+        // Now we parse id token claims to attributes
+        JSONObject claims = (JSONObject) req.getRequestObject().getJWTClaimsSet().getClaim("claims");
+        if (claims == null) {
+            throw new Exception("request object: signed request object needs to have claims");
+        }
+        JWTClaimsSet idToken = JWTClaimsSet.parse((JSONObject) claims.get("id_token"));
+        if (idToken == null) {
+            throw new Exception("request object: signed request object needs to have id token");
+        }
         List<IdPAttribute> attributes = new ArrayList<IdPAttribute>();
-        for (String key : map.keySet()) {
-            log.debug("Found attribute " + key);
-            log.debug("Attribute value is " + map.get(key));
-            IdPAttribute attribute = new IdPAttribute(key);
-            attribute.setValues(Arrays.asList(new StringAttributeValue(map.get(key))));
-            attributes.add(attribute);
-            if (key.equals(subField)) {
-                // TODO: proper name for sub
-                // We are setting value to attribute reserved for sub field in
-                // response
-                log.debug("Setting sub attribute " + map.get(key));
-                IdPAttribute attributeSub = new IdPAttribute("sub");
-                attributeSub.setValues(Arrays.asList(new StringAttributeValue(map.get(key))));
-                attributes.add(attributeSub);
+        for (String key : idToken.getClaims().keySet()) {
+            if (claimToAttribute.keySet().contains(key)) {
+                String attributeName = claimToAttribute.get(key);
+                if (attributeName == null) {
+                    log.warn("claims to attribute map contains null value for key " + key);
+                    continue;
+                }
+                List<String> values;
+                try{
+                    values = idToken.getStringListClaim(key);
+                }catch(ParseException e){
+                    values = new ArrayList<String>();
+                    values.add(idToken.getStringClaim(key));
+                }
+                if (values == null || values.size() == 0) {
+                    log.warn("claim " + key + " did not contain any values");
+                    continue;
+                }
+                log.debug("Creating attribute "+claimToAttribute.get(key)+" with value(s):");
+                IdPAttribute attribute = new IdPAttribute(claimToAttribute.get(key));
+                List<StringAttributeValue> stringAttributeValues = new ArrayList<StringAttributeValue>();
+                for (String value : values) {
+                    log.debug(value);
+                    stringAttributeValues.add(new StringAttributeValue(value));
+                }
+                attribute.setValues(stringAttributeValues);
+                attributes.add(attribute);
             }
         }
         final AttributeContext attributeCtx = new AttributeContext();
