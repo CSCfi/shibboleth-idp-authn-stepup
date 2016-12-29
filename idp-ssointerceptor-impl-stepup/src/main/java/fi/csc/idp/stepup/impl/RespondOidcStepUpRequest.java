@@ -48,17 +48,17 @@ import com.nimbusds.jose.JWSHeader;
 import com.nimbusds.jose.crypto.RSASSASigner;
 import com.nimbusds.jwt.SignedJWT;
 import com.nimbusds.oauth2.sdk.AuthorizationCode;
-import com.nimbusds.oauth2.sdk.ResponseMode;
 import com.nimbusds.oauth2.sdk.id.Audience;
 import com.nimbusds.oauth2.sdk.id.Issuer;
 import com.nimbusds.oauth2.sdk.id.State;
 import com.nimbusds.oauth2.sdk.id.Subject;
 import com.nimbusds.oauth2.sdk.token.AccessToken;
-import com.nimbusds.oauth2.sdk.token.AccessTokenType;
 import com.nimbusds.oauth2.sdk.token.BearerAccessToken;
 import com.nimbusds.openid.connect.sdk.AuthenticationRequest;
 import com.nimbusds.openid.connect.sdk.AuthenticationSuccessResponse;
 import com.nimbusds.openid.connect.sdk.claims.IDTokenClaimsSet;
+
+import fi.csc.idp.stepup.api.OidcStepUpContext;
 
 /**
  * NOT TO BE USED!! EARLY DRAFT!!
@@ -79,19 +79,7 @@ public class RespondOidcStepUpRequest implements org.springframework.webflow.exe
     private JWSAlgorithm jwsAlgorithm = JWSAlgorithm.RS256;
     /** id for the signing key. */
     private String keyID = "id";
-    /** issuer used in response. */
-    private String issuer;
-
-    /**
-     * Set the value for Issuer. Mandatory.
-     * 
-     * @param iss
-     *            value for Issuer
-     */
-    public void setIssuer(String iss) {
-        this.issuer = iss;
-    }
-
+    
     /**
      * Set the private key used for signing. Mandatory.
      * 
@@ -126,15 +114,23 @@ public class RespondOidcStepUpRequest implements org.springframework.webflow.exe
     @Override
     public Event execute(@Nonnull final RequestContext springRequestContext) throws Exception {
         log.trace("Entering");
-        if (issuer == null) {
-            throw new Exception("Issuer cannot be null");
-        }
         if (prvKey == null) {
             throw new Exception("Privatekey cannot be null");
         }
         // TODO:DEFINE PROPER KEY DEF
-        AuthenticationRequest req = (AuthenticationRequest) springRequestContext.getConversationScope().get(
-                "fi.csc.idp.stepup.impl.authenticationRequest");
+        OidcStepUpContext oidcCtx = (OidcStepUpContext) springRequestContext.getConversationScope().get(
+                "fi.csc.idp.stepup.impl.oidcctx");
+        AuthenticationRequest req = oidcCtx.getRequest();
+        /**
+         * What we want to return?
+         * 1. MFA flow failures stay within that flow unless we modify it
+         * 2. ProcessReq failures (leading here wo mfa flow) should be readable from context 
+         *      Let ProcessReq set error status and description
+         * 3. What we want to set to IdTOken?!?!
+         *       Parse requestedtokens, if anything with not "specified" value ret error,
+         *       STATE SUPP CLAIMS IN PROVDATA!! OTHERS ARE ALLOWED TO FAIL!!
+         *       otherwise include them ALL in ret. (THIS IS NOT OIDC COMPLIANT)
+         */
         final ProfileRequestContext prc = (ProfileRequestContext) springRequestContext.getConversationScope().get(
                 ProfileRequestContext.BINDING_KEY);
         if (prc == null) {
@@ -145,17 +141,6 @@ public class RespondOidcStepUpRequest implements org.springframework.webflow.exe
         if (attributeCtx == null) {
             throw new Exception("No AttributeContext");
         }
-        // TODO: proper name for sub
-        IdPAttribute attribute = attributeCtx.getIdPAttributes().get("sub");
-        if (attribute == null || attribute.getValues().size() != 1) {
-            throw new Exception("There has to be exactly one value for sub");
-        }
-        IdPAttributeValue value = (IdPAttributeValue) attribute.getValues().get(0);
-        if (!(value instanceof StringAttributeValue)) {
-            throw new Exception("sub attribute must be string");
-        }
-        // Set sub, originally received as login hint parameter
-        Subject sub = new Subject(((StringAttributeValue) value).getValue());
         URI redirectURI = req.getRedirectionURI();
         // Generate new authorization code
         AuthorizationCode code = new AuthorizationCode();
@@ -164,14 +149,15 @@ public class RespondOidcStepUpRequest implements org.springframework.webflow.exe
         // Set the requesting client as audience
         aud.add(new Audience(req.getClientID().getValue()));
         // Set Issuer
-        Issuer iss = new Issuer(issuer);
+        Issuer iss = new Issuer(oidcCtx.getIssuer());
         Date dateNow = new Date();
         // Set correct date, read RFC!
         Date iat = dateNow;
         // TODO: set configurable, exp is now + 3min
         Date exp = new Date(dateNow.getTime() + 3 * 60 * 1000L);
         // Create Token
-        IDTokenClaimsSet idToken2 = new IDTokenClaimsSet(iss, sub, aud, exp, iat);
+        //TODO:TOKEN SHOULD HAVE THE MAPPED CLAIMS
+        IDTokenClaimsSet idToken2 = new IDTokenClaimsSet(iss, new Subject("haardcodedsub"), aud, exp, iat);
         // TODO: SET ACR AS THE VALUE CHOSEN BY MFA AFTER LIST OF REQUESTED
         // NOW IT IS ONLY THE "SOME"
         idToken2.setACR(req.getACRValues().get(0));
