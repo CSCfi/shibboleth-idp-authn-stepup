@@ -54,6 +54,7 @@ import org.springframework.webflow.context.servlet.ServletExternalContext;
 import org.springframework.webflow.execution.Event;
 import org.springframework.webflow.execution.RequestContext;
 
+import fi.csc.idp.stepup.api.OidcStepUpContext;
 import fi.okm.mpass.shibboleth.authn.context.ShibbolethSpAuthenticationContext;
 
 import com.nimbusds.jose.JOSEException;
@@ -91,6 +92,22 @@ public class ProcessOidcStepUpRequest implements org.springframework.webflow.exe
 
     /** claim to attribute mapping. */
     private Map<String, String> claimToAttribute;
+
+    /** issuer used in response. */
+    private String issuer;
+
+    /** context to store and pass information to. */
+    OidcStepUpContext oidcCtx;
+
+    /**
+     * Set the value for Issuer. Mandatory.
+     * 
+     * @param iss
+     *            value for Issuer
+     */
+    public void setIssuer(String iss) {
+        this.issuer = iss;
+    }
 
     /**
      * Setter for redirect uris.
@@ -200,9 +217,8 @@ public class ProcessOidcStepUpRequest implements org.springframework.webflow.exe
     }
 
     /**
-     * Parse JWK, RSA public key for signature verification, from stream.
-     * This method picks the first available one not checking the
-     * key id.
+     * Parse JWK, RSA public key for signature verification, from stream. This
+     * method picks the first available one not checking the key id.
      * 
      * @param is
      *            inputstream containing the key
@@ -235,10 +251,12 @@ public class ProcessOidcStepUpRequest implements org.springframework.webflow.exe
     }
 
     /**
-     * Verifies JWT is signed by client. 
+     * Verifies JWT is signed by client.
      * 
-     * @param jwt signed jwt
-     * @param clientID id of the client.
+     * @param jwt
+     *            signed jwt
+     * @param clientID
+     *            id of the client.
      * @return true if successfully verified, otherwise false
      */
     private boolean verifyJWT(JWT jwt, String clientID) {
@@ -265,7 +283,7 @@ public class ProcessOidcStepUpRequest implements org.springframework.webflow.exe
         }
         try {
             JSONObject key = getProviderRSAJWK(jwkSetUri.toURL().openStream());
-            if (key == null){
+            if (key == null) {
                 log.error("jwk not found for " + clientID);
                 return false;
             }
@@ -281,6 +299,7 @@ public class ProcessOidcStepUpRequest implements org.springframework.webflow.exe
             log.error("unable to verify signed jwt " + clientID);
             return false;
         }
+        log.debug("jwt signature verified");
         log.trace("Leaving");
         return true;
     }
@@ -295,61 +314,82 @@ public class ProcessOidcStepUpRequest implements org.springframework.webflow.exe
      * @param req
      *            oidc authentication request
      * @throws Exception
-     *             if SubField is not set
+     *             if fails to build attribute context
      */
     private void setAttributeCtx(@SuppressWarnings("rawtypes") @Nonnull final ProfileRequestContext prc,
             AuthenticationRequest req) throws Exception {
         log.trace("Entering");
         if (claimToAttribute == null) {
+            log.error("request object: claims to attribute map is null");
+            log.trace("Leaving");
             throw new Exception("request object: claims to attribute map is null");
         }
         if (jwkSetUris == null) {
+            log.error("request object: jwk set uris map is null");
+            log.trace("Leaving");
             throw new Exception("request object: jwk set uris map is null");
         }
         // validate request object!
         if (!verifyJWT(req.getRequestObject(), req.getClientID().getValue())) {
+            log.error("request object: signature verify failed");
+            log.trace("Leaving");
             throw new Exception("request object: signature verify failed");
         }
-        // TODO: check signature,ts and state of the request object.
+        // TODO: check ts and state of the request object.
+        
+        
+        // TODO: check ts and state of the request object.
         String clientID = (String) req.getRequestObject().getJWTClaimsSet().getClaim("client_id");
         if (clientID == null || !req.getClientID().getValue().equals(clientID)) {
+            log.error("request object: client id is mandatory and should match parameter value");
+            log.trace("Leaving");
             throw new Exception("request object: client id is mandatory and should match parameter value");
         }
         String responseType = (String) req.getRequestObject().getJWTClaimsSet().getClaim("response_type");
         if (responseType == null || !req.getResponseType().equals(new ResponseType(responseType))) {
+            log.error("request object: response type is mandatory and should match parameter value");
+            log.trace("Leaving");
             throw new Exception("request object: response type is mandatory and should match parameter value");
         }
         String iss = (String) req.getRequestObject().getJWTClaimsSet().getClaim("iss");
         if (iss == null || !req.getClientID().getValue().equals(iss)) {
+            log.error("request object: signed request object should contain iss claim with client id as value");
+            log.trace("Leaving");
             throw new Exception(
                     "request object: signed request object should contain iss claim with client id as value");
         }
-        /*
-         * MISSING ISSUER VALUE, NEEDS RESTRUCTURING String
-         * aud=(String)req.getRequestObject().getJWTClaimsSet().getClaim("aud");
-         * if (aud == null || !){ throw new Exception(
-         * "request object: signed request object should contain aud claim with op issuer as value"
-         * ); }
-         */
+        //TODO: check that there is only aud
+        String aud = (String) req.getRequestObject().getJWTClaimsSet().getStringListClaim("aud").get(0);
+        if (aud == null || !aud.equals(oidcCtx.getIssuer())) {
+            log.error("request object: signed request object should contain aud claim with op issuer as value");
+            log.trace("Leaving");
+            throw new Exception(
+                    "request object: signed request object should contain aud claim with op issuer as value");
+        }
         // Now we parse id token claims to attributes
         JSONObject claims = (JSONObject) req.getRequestObject().getJWTClaimsSet().getClaim("claims");
         if (claims == null) {
+            log.error("request object: signed request object needs to have claims");
+            log.trace("Leaving");
             throw new Exception("request object: signed request object needs to have claims");
         }
         JWTClaimsSet idToken = JWTClaimsSet.parse((JSONObject) claims.get("id_token"));
         if (idToken == null) {
+            log.error("request object: signed request object needs to have id token");
+            log.trace("Leaving");
             throw new Exception("request object: signed request object needs to have id token");
         }
+        // check claims and convert them to attributes
         List<IdPAttribute> attributes = new ArrayList<IdPAttribute>();
         for (String key : idToken.getClaims().keySet()) {
-            // TODO: DECIDE ON WHAT TO DO WITH UNMAPPED CLAIMS
-            // THIS IS SPECIFIC SERVICE; NOT TRYING TO BE OIDC COMPLIANT 100%
             if (claimToAttribute.keySet().contains(key)) {
                 String attributeName = claimToAttribute.get(key);
                 if (attributeName == null) {
-                    log.warn("claims to attribute map contains null value for key " + key);
+                    // claim is supported but not set as attribute
+                    log.debug("claims to attribute map contains null value for key " + key);
                     continue;
                 }
+                // claim is supported and set as attribute
                 List<String> values;
                 try {
                     values = idToken.getStringListClaim(key);
@@ -370,6 +410,9 @@ public class ProcessOidcStepUpRequest implements org.springframework.webflow.exe
                 }
                 attribute.setValues(stringAttributeValues);
                 attributes.add(attribute);
+            } else {
+                // TODO: claim is not supported
+                // set error
             }
         }
         final AttributeContext attributeCtx = new AttributeContext();
@@ -408,16 +451,17 @@ public class ProcessOidcStepUpRequest implements org.springframework.webflow.exe
     @Override
     public Event execute(@Nonnull final RequestContext springRequestContext) throws Exception {
         log.trace("Entering");
+        oidcCtx = new OidcStepUpContext();
+        springRequestContext.getConversationScope().put("fi.csc.idp.stepup.impl.oidcctx", oidcCtx);
         ServletExternalContext externalContext = (ServletExternalContext) springRequestContext.getExternalContext();
         HttpServletRequest request = (HttpServletRequest) externalContext.getNativeRequest();
         // Decode the query string
         AuthenticationRequest req = AuthenticationRequest.parse(request.getQueryString());
+        oidcCtx.setRequest(req);
+        oidcCtx.setIssuer(issuer);
         if (!verifyClientRedirectUri(req)) {
             return new Event(this, "error");
         }
-        // put it to context
-        // TODO:DEFINE PROPER KEY DEF
-        springRequestContext.getConversationScope().put("fi.csc.idp.stepup.impl.authenticationRequest", req);
         // TODO: check request parameters!!
         // Set up PRC!
         final ProfileRequestContext prc = createPRC(springRequestContext);
@@ -426,7 +470,12 @@ public class ProcessOidcStepUpRequest implements org.springframework.webflow.exe
         // Set up AC!
         AuthenticationContext ctx = (AuthenticationContext) prc.addSubcontext(new AuthenticationContext(), true);
         // Set up ATRC!
-        setAttributeCtx(prc, req);
+        try {
+            setAttributeCtx(prc, req);
+        } catch (Exception e) {
+            log.trace("Leaving");
+            return new Event(this, "error");
+        }
         // Set up shibspCtx
         setShibSPCtx(ctx, req);
         log.trace("Leaving");
