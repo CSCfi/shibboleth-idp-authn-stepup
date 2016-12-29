@@ -23,17 +23,21 @@
 
 package fi.csc.idp.stepup.impl;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.security.Principal;
+import java.security.interfaces.RSAPublicKey;
 import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Nonnull;
 import javax.servlet.http.HttpServletRequest;
 
+import net.minidev.json.JSONArray;
 import net.minidev.json.JSONObject;
 import net.shibboleth.idp.attribute.IdPAttribute;
 import net.shibboleth.idp.attribute.StringAttributeValue;
@@ -52,18 +56,25 @@ import org.springframework.webflow.execution.RequestContext;
 
 import fi.okm.mpass.shibboleth.authn.context.ShibbolethSpAuthenticationContext;
 
+import com.nimbusds.jose.JOSEException;
+import com.nimbusds.jose.crypto.RSASSAVerifier;
+import com.nimbusds.jose.jwk.RSAKey;
+import com.nimbusds.jose.util.IOUtils;
+import com.nimbusds.jose.util.JSONObjectUtils;
+import com.nimbusds.jwt.JWT;
 import com.nimbusds.jwt.JWTClaimsSet;
+import com.nimbusds.jwt.SignedJWT;
 import com.nimbusds.oauth2.sdk.ResponseType;
 import com.nimbusds.openid.connect.sdk.AuthenticationRequest;
 import com.nimbusds.openid.connect.sdk.claims.ACR;
 
 /**
- * NOT TO BE USED!! EARLY DRAFT!!
+ * 
  * 
  * PROCESSES IMPLICIT FLOW REQUEST TO PERFORM MFA. FORMS SHIB CTXs FOR AUTH FLOW
  * TO USE.
  * 
- * DOES NOT CHECK THE REQUEST IS FORMED AS INTENDED ETC.
+ * NOT A GENERIC IMPLEMENTATION OF OIDC PROVIDER! ONE TRICK PONY!
  * 
  */
 public class ProcessOidcStepUpRequest implements org.springframework.webflow.execution.Action {
@@ -74,6 +85,9 @@ public class ProcessOidcStepUpRequest implements org.springframework.webflow.exe
 
     /** redirect uris that are valid per client id. */
     private Map<String, List<String>> redirectUris;
+
+    /** jwk set uris that are valid per client id. */
+    private Map<String, String> jwkSetUris;
 
     /** claim to attribute mapping. */
     private Map<String, String> claimToAttribute;
@@ -89,14 +103,25 @@ public class ProcessOidcStepUpRequest implements org.springframework.webflow.exe
     }
 
     /**
+     * Setter for jwk set uris.
+     * 
+     * @param uris
+     *            maps client ids to jwk set uris
+     */
+    public void setJwkSetUris(Map<String, String> uris) {
+        this.jwkSetUris = uris;
+    }
+
+    /**
      * Set mapping of claims to attributes. claim names are keys for attribute
      * names.
      * 
-     * @param claimToAttribute
+     * @param claimToAttributeMap
      *            map
      */
-    public void setClaimToAttribute(Map<String, String> claimToAttribute) {
-        this.claimToAttribute = claimToAttribute;
+    public void setClaimToAttribute(Map<String, String> claimToAttributeMap) {
+        log.trace("Entering & Leaving");
+        this.claimToAttribute = claimToAttributeMap;
     }
 
     /**
@@ -175,6 +200,92 @@ public class ProcessOidcStepUpRequest implements org.springframework.webflow.exe
     }
 
     /**
+     * Parse JWK, RSA public key for signature verification, from stream.
+     * This method picks the first available one not checking the
+     * key id.
+     * 
+     * @param is
+     *            inputstream containing the key
+     * @return RSA publick key as JSON Object. Null if there is no key
+     * @throws ParseException
+     *             if parsing fails.
+     * @throws IOException
+     *             if something unexpected happens.
+     */
+    private JSONObject getProviderRSAJWK(InputStream is) throws ParseException, IOException {
+        log.trace("Entering");
+        JSONObject json = JSONObjectUtils.parse(IOUtils.readInputStreamToString(is,
+                java.nio.charset.Charset.forName("UTF8")));
+        // TODO: USE ALSO KEY ID TO IDENTIFY KEY
+        JSONArray keyList = (JSONArray) json.get("keys");
+        if (keyList == null) {
+            log.trace("Leaving");
+            return null;
+        }
+        for (Object key : keyList) {
+            JSONObject k = (JSONObject) key;
+            if ("sig".equals(k.get("use")) && "RSA".equals(k.get("kty"))) {
+                log.debug("verification key " + k.toString());
+                log.trace("Leaving");
+                return k;
+            }
+        }
+        log.trace("Leaving");
+        return null;
+    }
+
+    /**
+     * Verifies JWT is signed by client. 
+     * 
+     * @param jwt signed jwt
+     * @param clientID id of the client.
+     * @return true if successfully verified, otherwise false
+     */
+    private boolean verifyJWT(JWT jwt, String clientID) {
+        log.trace("Entering");
+        // Check jwt is signed jwt
+        SignedJWT signedJWT = null;
+        try {
+            signedJWT = SignedJWT.parse(jwt.serialize());
+        } catch (ParseException e) {
+            log.error("Error when forming signed JWT " + jwt.toString());
+            return false;
+        }
+        // check we have key
+        if (!jwkSetUris.containsKey(clientID)) {
+            log.error("No jwk set uri defined for client " + clientID);
+            return false;
+        }
+        URI jwkSetUri;
+        try {
+            jwkSetUri = new URI(jwkSetUris.get(clientID));
+        } catch (URISyntaxException e) {
+            log.error("jwk set uri malformed for client " + clientID);
+            return false;
+        }
+        try {
+            JSONObject key = getProviderRSAJWK(jwkSetUri.toURL().openStream());
+            if (key == null){
+                log.error("jwk not found for " + clientID);
+                return false;
+            }
+            RSAPublicKey providerKey = RSAKey.parse(key).toRSAPublicKey();
+            RSASSAVerifier verifier = new RSASSAVerifier(providerKey);
+            if (!signedJWT.verify(verifier)) {
+                log.error("client " + clientID + " JWT signature verification failed for "
+                        + signedJWT.getParsedString());
+                log.trace("Leaving");
+                return false;
+            }
+        } catch (ParseException | IOException | JOSEException e) {
+            log.error("unable to verify signed jwt " + clientID);
+            return false;
+        }
+        log.trace("Leaving");
+        return true;
+    }
+
+    /**
      * Creates AttributeContext, populates it with id token claim values and
      * adds it to RelyingPartyContext. Assumes RelyingPartyContext instance
      * exists already.
@@ -192,10 +303,16 @@ public class ProcessOidcStepUpRequest implements org.springframework.webflow.exe
         if (claimToAttribute == null) {
             throw new Exception("request object: claims to attribute map is null");
         }
+        if (jwkSetUris == null) {
+            throw new Exception("request object: jwk set uris map is null");
+        }
         // validate request object!
+        if (!verifyJWT(req.getRequestObject(), req.getClientID().getValue())) {
+            throw new Exception("request object: signature verify failed");
+        }
         // TODO: check signature,ts and state of the request object.
-        String client_id = (String) req.getRequestObject().getJWTClaimsSet().getClaim("client_id");
-        if (client_id == null || !req.getClientID().getValue().equals(client_id)) {
+        String clientID = (String) req.getRequestObject().getJWTClaimsSet().getClaim("client_id");
+        if (clientID == null || !req.getClientID().getValue().equals(clientID)) {
             throw new Exception("request object: client id is mandatory and should match parameter value");
         }
         String responseType = (String) req.getRequestObject().getJWTClaimsSet().getClaim("response_type");
@@ -225,6 +342,8 @@ public class ProcessOidcStepUpRequest implements org.springframework.webflow.exe
         }
         List<IdPAttribute> attributes = new ArrayList<IdPAttribute>();
         for (String key : idToken.getClaims().keySet()) {
+            // TODO: DECIDE ON WHAT TO DO WITH UNMAPPED CLAIMS
+            // THIS IS SPECIFIC SERVICE; NOT TRYING TO BE OIDC COMPLIANT 100%
             if (claimToAttribute.keySet().contains(key)) {
                 String attributeName = claimToAttribute.get(key);
                 if (attributeName == null) {
@@ -232,9 +351,9 @@ public class ProcessOidcStepUpRequest implements org.springframework.webflow.exe
                     continue;
                 }
                 List<String> values;
-                try{
+                try {
                     values = idToken.getStringListClaim(key);
-                }catch(ParseException e){
+                } catch (ParseException e) {
                     values = new ArrayList<String>();
                     values.add(idToken.getStringClaim(key));
                 }
@@ -242,7 +361,7 @@ public class ProcessOidcStepUpRequest implements org.springframework.webflow.exe
                     log.warn("claim " + key + " did not contain any values");
                     continue;
                 }
-                log.debug("Creating attribute "+claimToAttribute.get(key)+" with value(s):");
+                log.debug("Creating attribute " + claimToAttribute.get(key) + " with value(s):");
                 IdPAttribute attribute = new IdPAttribute(claimToAttribute.get(key));
                 List<StringAttributeValue> stringAttributeValues = new ArrayList<StringAttributeValue>();
                 for (String value : values) {
