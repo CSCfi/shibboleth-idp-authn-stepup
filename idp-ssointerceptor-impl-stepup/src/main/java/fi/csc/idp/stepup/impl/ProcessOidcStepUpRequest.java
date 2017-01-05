@@ -95,8 +95,11 @@ public class ProcessOidcStepUpRequest implements org.springframework.webflow.exe
 
     /** issuer used in response. */
     private String issuer;
+    
+    /** demonstration purposes ony*/
+    private boolean noSignatureVerify;
 
-    /** context to store and pass information to. */
+        /** context to store and pass information to. */
     OidcStepUpContext oidcCtx;
 
     /**
@@ -119,6 +122,15 @@ public class ProcessOidcStepUpRequest implements org.springframework.webflow.exe
         this.redirectUris = uris;
     }
 
+    /**
+     * incoming request object jwt signature not checked
+     * if set true. Only for demonstration purposes. 
+     * 
+     * @param noVerify true if not checked.
+     */
+    public void setNoSignatureVerify(boolean noVerify) {
+        this.noSignatureVerify = noVerify;
+    }
     /**
      * Setter for jwk set uris.
      * 
@@ -262,6 +274,10 @@ public class ProcessOidcStepUpRequest implements org.springframework.webflow.exe
     private boolean verifyJWT(JWT jwt, String clientID) {
         log.trace("Entering");
         // Check jwt is signed jwt
+        if (this.noSignatureVerify){
+            log.warn("JWT signature not checked, do not use in production");
+            return true;
+        }
         SignedJWT signedJWT = null;
         try {
             signedJWT = SignedJWT.parse(jwt.serialize());
