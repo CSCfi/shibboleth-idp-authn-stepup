@@ -56,6 +56,7 @@ import com.nimbusds.oauth2.sdk.token.AccessToken;
 import com.nimbusds.oauth2.sdk.token.BearerAccessToken;
 import com.nimbusds.openid.connect.sdk.AuthenticationRequest;
 import com.nimbusds.openid.connect.sdk.AuthenticationSuccessResponse;
+import com.nimbusds.openid.connect.sdk.Nonce;
 import com.nimbusds.openid.connect.sdk.claims.IDTokenClaimsSet;
 
 import fi.csc.idp.stepup.api.OidcStepUpContext;
@@ -156,8 +157,14 @@ public class RespondOidcStepUpRequest implements org.springframework.webflow.exe
         // TODO: set configurable, exp is now + 3min
         Date exp = new Date(dateNow.getTime() + 3 * 60 * 1000L);
         // Create Token
-        //TODO:TOKEN SHOULD HAVE THE MAPPED CLAIMS
-        IDTokenClaimsSet idToken2 = new IDTokenClaimsSet(iss, new Subject("haardcodedsub"), aud, exp, iat);
+        //TODO:TOKEN SHOULD HAVE THE MAPPED CLAIMS, figure out how to do
+        IDTokenClaimsSet idToken2 = new IDTokenClaimsSet(iss, new Subject(oidcCtx.getIdToken().getSubject()), aud, exp, iat);
+        if (oidcCtx.getIdToken().getClaim("mobile") != null){
+            idToken2.setClaim("mobile", oidcCtx.getIdToken().getClaim("mobile"));
+        }
+        if (oidcCtx.getIdToken().getClaim("nonce") != null){
+            idToken2.setClaim("nonce", oidcCtx.getIdToken().getClaim("nonce"));
+        }
         // TODO: SET ACR AS THE VALUE CHOSEN BY MFA AFTER LIST OF REQUESTED
         // NOW IT IS ONLY THE "SOME"
         idToken2.setACR(req.getACRValues().get(0));
