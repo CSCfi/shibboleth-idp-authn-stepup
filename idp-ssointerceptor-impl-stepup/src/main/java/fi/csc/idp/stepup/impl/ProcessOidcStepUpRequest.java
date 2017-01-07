@@ -99,7 +99,7 @@ public class ProcessOidcStepUpRequest implements org.springframework.webflow.exe
     /** demonstration purposes ony*/
     private boolean noSignatureVerify;
 
-        /** context to store and pass information to. */
+    /** context to store and pass information to. */
     OidcStepUpContext oidcCtx;
 
     /**
@@ -395,6 +395,7 @@ public class ProcessOidcStepUpRequest implements org.springframework.webflow.exe
             log.trace("Leaving");
             throw new Exception("request object: signed request object needs to have id token");
         }
+        oidcCtx.setIdToken(idToken);
         // check claims and convert them to attributes
         List<IdPAttribute> attributes = new ArrayList<IdPAttribute>();
         for (String key : idToken.getClaims().keySet()) {
