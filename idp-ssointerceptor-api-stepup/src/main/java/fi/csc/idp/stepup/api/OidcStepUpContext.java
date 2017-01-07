@@ -27,6 +27,7 @@ import javax.annotation.Nonnull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.openid.connect.sdk.AuthenticationRequest;
 
 /**
@@ -49,6 +50,27 @@ public class OidcStepUpContext {
 
     /** issuer used in response. */
     private String issuer;
+    
+    /** the id token received in authentication request */
+    private JWTClaimsSet idToken;
+
+    /**
+     * Get the id token of the request.
+     * 
+     * @return id token if set, otherwise null
+     */
+    public JWTClaimsSet getIdToken() {
+        return idToken;
+    }
+
+    /**
+     * Set the id token of the authentication request.
+     * 
+     * @param token idtoken
+     */
+    public void setIdToken(JWTClaimsSet token) {
+        this.idToken = token;
+    }
 
     /**
      * Get the value of Issuer.
