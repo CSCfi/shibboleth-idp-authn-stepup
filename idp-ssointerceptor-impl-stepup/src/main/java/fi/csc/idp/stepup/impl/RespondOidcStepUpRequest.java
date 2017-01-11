@@ -145,7 +145,7 @@ public class RespondOidcStepUpRequest implements org.springframework.webflow.exe
         URI redirectURI = req.getRedirectionURI();
         // Generate new authorization code
         AuthorizationCode code = new AuthorizationCode();
-        AccessToken accessToken = new BearerAccessToken();
+        //TODO: if id_token only..
         List<Audience> aud = new ArrayList<Audience>();
         // Set the requesting client as audience
         aud.add(new Audience(req.getClientID().getValue()));
@@ -172,7 +172,7 @@ public class RespondOidcStepUpRequest implements org.springframework.webflow.exe
                 idToken2.toJWTClaimsSet());
         jwt.sign(new RSASSASigner(prvKey));
         State state = req.getState();
-        AuthenticationSuccessResponse resp = new AuthenticationSuccessResponse(redirectURI, code, jwt, accessToken, state,
+        AuthenticationSuccessResponse resp = new AuthenticationSuccessResponse(redirectURI, code, jwt, null, state,
                 null, req.getResponseMode());
         log.debug("constructed response:" + resp.toURI());
         springRequestContext.getFlowScope().put("redirect", resp.toURI().toString());
