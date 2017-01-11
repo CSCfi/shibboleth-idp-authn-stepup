@@ -162,8 +162,10 @@ public class RespondOidcStepUpRequest implements org.springframework.webflow.exe
         if (oidcCtx.getIdToken().getClaim("mobile") != null){
             idToken2.setClaim("mobile", oidcCtx.getIdToken().getClaim("mobile"));
         }
-        if (oidcCtx.getIdToken().getClaim("nonce") != null){
-            idToken2.setClaim("nonce", oidcCtx.getIdToken().getClaim("nonce"));
+        //implicit flow should always have nonce
+        //check that it is verified beforehand
+        if (oidcCtx.getRequest().getNonce() != null){
+            idToken2.setClaim("nonce", oidcCtx.getRequest().getNonce());
         }
         // TODO: SET ACR AS THE VALUE CHOSEN BY MFA AFTER LIST OF REQUESTED
         // NOW IT IS ONLY THE "SOME"
