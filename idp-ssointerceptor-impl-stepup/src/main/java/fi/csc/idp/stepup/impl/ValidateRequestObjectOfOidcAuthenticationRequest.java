@@ -370,17 +370,17 @@ public class ValidateRequestObjectOfOidcAuthenticationRequest implements org.spr
     }
 
     @Override
-    public Event execute(@Nonnull final RequestContext springRequestContext) throws Exception {
+    public Event execute(@Nonnull final RequestContext springRequestContext)  {
         log.trace("Entering");
         OidcStepUpContext oidcCtx = (OidcStepUpContext) springRequestContext.getConversationScope().get(
                 OidcStepUpContext.getContextKey());
-        if (oidcCtx == null) {
-            log.error("oidc context missing");
+        if (jwkSetUris == null) {
+            log.error("jwkset uris are not defined");
             log.trace("Leaving");
             return new Event(this, OidcProcessingEventIds.EXCEPTION);
         }
-        if (jwkSetUris == null) {
-            log.error("jwkset uris are not defined");
+        if (oidcCtx == null) {
+            log.error("oidc context missing");
             log.trace("Leaving");
             return new Event(this, OidcProcessingEventIds.EXCEPTION);
         }
@@ -398,11 +398,17 @@ public class ValidateRequestObjectOfOidcAuthenticationRequest implements org.spr
             log.trace("Leaving");
             return new Event(this, OidcProcessingEventIds.EVENTID_ERROR_OIDC);
         }
-        if (!validateRequestObject(oidcCtx, oidcCtx.getRequest())) {
-            log.error("validation failed");
-            // verify is expected to fill reason
+        try {
+            if (!validateRequestObject(oidcCtx, oidcCtx.getRequest())) {
+                log.error("validation failed");
+                // verify is expected to fill reason
+                log.trace("Leaving");
+                return new Event(this, OidcProcessingEventIds.EVENTID_ERROR_OIDC);
+            }
+        } catch (ParseException e) {
+            log.error("request object parsing failed");
             log.trace("Leaving");
-            return new Event(this, OidcProcessingEventIds.EVENTID_ERROR_OIDC);
+            return new Event(this, OidcProcessingEventIds.EXCEPTION);
         }
         return new Event(this, OidcProcessingEventIds.EVENTID_CONTINUE_OIDC);
     }
