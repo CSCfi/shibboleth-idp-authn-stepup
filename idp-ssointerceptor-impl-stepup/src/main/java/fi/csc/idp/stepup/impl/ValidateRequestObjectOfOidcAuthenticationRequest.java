@@ -256,8 +256,9 @@ public class ValidateRequestObjectOfOidcAuthenticationRequest implements org.spr
     }
 
     /**
-     * Validates request object. Checks object is valid, signed and has id token.
-     * id token validity is verified and expected to contain state and iat.
+     * Validates request object. Checks object is valid, signed and has id
+     * token. id token validity is verified and expected to contain state and
+     * iat.
      * 
      * 
      * @param oidcCtx
@@ -265,10 +266,10 @@ public class ValidateRequestObjectOfOidcAuthenticationRequest implements org.spr
      * @param req
      *            oidc authentication request
      * @return true if the object is valid
-     * @throws ParseException 
+     * @throws ParseException
      *             if fails to parse claims
      */
-    private boolean validateRequestObject(OidcStepUpContext oidcCtx, AuthenticationRequest req) throws ParseException  {
+    private boolean validateRequestObject(OidcStepUpContext oidcCtx, AuthenticationRequest req) throws ParseException {
         log.trace("Entering");
         String clientID = (String) req.getRequestObject().getJWTClaimsSet().getClaim("client_id");
         if (clientID == null || !req.getClientID().getValue().equals(clientID)) {
@@ -370,7 +371,7 @@ public class ValidateRequestObjectOfOidcAuthenticationRequest implements org.spr
     }
 
     @Override
-    public Event execute(@Nonnull final RequestContext springRequestContext)  {
+    public Event execute(@Nonnull final RequestContext springRequestContext) {
         log.trace("Entering");
         OidcStepUpContext oidcCtx = (OidcStepUpContext) springRequestContext.getConversationScope().get(
                 OidcStepUpContext.getContextKey());
