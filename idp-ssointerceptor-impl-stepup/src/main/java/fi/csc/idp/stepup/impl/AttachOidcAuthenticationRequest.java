@@ -76,7 +76,10 @@ public class AttachOidcAuthenticationRequest implements org.springframework.webf
         AuthenticationRequest req;
         try {
             req = AuthenticationRequest.parse(request.getQueryString());
-        } catch (com.nimbusds.oauth2.sdk.ParseException e1) {
+        } catch (com.nimbusds.oauth2.sdk.ParseException e) {
+            log.error("unable to parse query string "+e.getMessage());
+            log.error(request.getQueryString());
+            log.trace("Leaving");
             return new Event(this, OidcProcessingEventIds.EVENTID_INVALID_QUERYSTRING);
         }
         oidcCtx.setRequest(req);
