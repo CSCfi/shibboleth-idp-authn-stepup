@@ -40,20 +40,33 @@ public class OidcStepUpContext {
     @Nonnull
     private final Logger log = LoggerFactory.getLogger(OidcStepUpContext.class);
 
+    /** Authentication request received from rp. */ 
     private AuthenticationRequest request;
+    
+    /** key to store this context with. */
+    private final static String ContextKey = "fi.csc.idp.stepup.api.OidcStepUpContext.key";
 
-    /** error code */
+    /** error code. */
     private String error;
 
-    /** error description */
+    /** error description. */
     private String errorDescription;
 
     /** issuer used in response. */
     private String issuer;
     
-    /** the id token received in authentication request */
+    /** the id token received in authentication request. */
     private JWTClaimsSet idToken;
 
+    /**
+     * Key to store this context with.
+     * 
+     * @return key
+     */
+    public static String getContextKey() {
+        return ContextKey;
+    }
+    
     /**
      * Get the id token of the request.
      * 
@@ -75,7 +88,7 @@ public class OidcStepUpContext {
     /**
      * Get the value of Issuer.
      * 
-     * @return
+     * @return issuer value
      */
     public String getIssuer() {
         return issuer;
@@ -141,11 +154,11 @@ public class OidcStepUpContext {
     /**
      * Get received authentication request.
      * 
-     * @param request
+     * @param req
      *            received authentication request
      */
-    public void setRequest(AuthenticationRequest request) {
-        this.request = request;
+    public void setRequest(AuthenticationRequest req) {
+        this.request = req;
     }
 
 }
