@@ -28,7 +28,7 @@ import javax.annotation.Nonnull;
 import net.shibboleth.utilities.java.support.annotation.constraint.NotEmpty;
 
 /**
- * Constants to use for error results related to step up interceptor flow.
+ * Constants to use for error results related to oidc handling.
  */
 public final class OidcProcessingEventIds {
 
@@ -41,7 +41,7 @@ public final class OidcProcessingEventIds {
     @Nonnull
     @NotEmpty
     public static final String EVENTID_INVALID_QUERYSTRING = "InvalidQuerystring";
-    
+
     /** event id for the case of continuing with oidc processing. */
     @Nonnull
     @NotEmpty
@@ -51,7 +51,7 @@ public final class OidcProcessingEventIds {
     @Nonnull
     @NotEmpty
     public static final String EVENTID_ERROR_OIDC = "ErroOidc";
-    
+
     /** private constructor to prohibit use of it. */
     private OidcProcessingEventIds() {
 
