@@ -322,7 +322,7 @@ public class ValidateRequestObjectOfOidcAuthenticationRequest implements org.spr
             log.trace("Leaving");
             return false;
         }
-        State state = (State) req.getRequestObject().getJWTClaimsSet().getClaim("state");
+        State state = State.parse(req.getRequestObject().getJWTClaimsSet().getStringClaim("state"));
         if (state == null) {
             log.error("request object: state is required in request object");
             oidcCtx.setErrorCode("invalid_request");
