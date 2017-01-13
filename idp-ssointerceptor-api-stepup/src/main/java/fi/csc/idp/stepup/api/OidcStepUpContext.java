@@ -36,15 +36,15 @@ import com.nimbusds.openid.connect.sdk.AuthenticationRequest;
  */
 public class OidcStepUpContext {
 
+    /** key to store this context with. */
+    private static final String CTX_KEY = "fi.csc.idp.stepup.api.OidcStepUpContext.key";
+
     /** Class logger. */
     @Nonnull
     private final Logger log = LoggerFactory.getLogger(OidcStepUpContext.class);
 
-    /** Authentication request received from rp. */ 
+    /** Authentication request received from rp. */
     private AuthenticationRequest request;
-    
-    /** key to store this context with. */
-    private final static String ContextKey = "fi.csc.idp.stepup.api.OidcStepUpContext.key";
 
     /** error code. */
     private String error;
@@ -54,7 +54,7 @@ public class OidcStepUpContext {
 
     /** issuer used in response. */
     private String issuer;
-    
+
     /** the id token received in authentication request. */
     private JWTClaimsSet idToken;
 
@@ -64,9 +64,9 @@ public class OidcStepUpContext {
      * @return key
      */
     public static String getContextKey() {
-        return ContextKey;
+        return CTX_KEY;
     }
-    
+
     /**
      * Get the id token of the request.
      * 
@@ -79,7 +79,8 @@ public class OidcStepUpContext {
     /**
      * Set the id token of the authentication request.
      * 
-     * @param token idtoken
+     * @param token
+     *            idtoken
      */
     public void setIdToken(JWTClaimsSet token) {
         this.idToken = token;
