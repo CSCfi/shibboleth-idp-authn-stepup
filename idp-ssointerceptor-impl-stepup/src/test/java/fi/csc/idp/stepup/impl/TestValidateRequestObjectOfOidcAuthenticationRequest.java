@@ -201,7 +201,7 @@ public class TestValidateRequestObjectOfOidcAuthenticationRequest {
     public void testRequestObjectClientIdMismatch() throws Exception {
         baseInit();
         action.setNoSignatureVerify(true);
-        JWTClaimsSet claimsRequest = new JWTClaimsSet.Builder().claim("client_id", "fooNOT").claim("state", state)
+        JWTClaimsSet claimsRequest = new JWTClaimsSet.Builder().claim("client_id", "fooNOT").claim("state", state.getValue())
                 .issueTime(calendar.getTime()).claim("response_type", "id_token").claim("iss", "foo")
                 .claim("claims", claims).audience("opid").build();
         oidcCtx.setRequest(buildAuthReq3(claimsRequest));
@@ -218,7 +218,7 @@ public class TestValidateRequestObjectOfOidcAuthenticationRequest {
     public void testRequestObjectResponseTypeMismatch() throws Exception {
         baseInit();
         action.setNoSignatureVerify(true);
-        JWTClaimsSet claimsRequest = new JWTClaimsSet.Builder().claim("client_id", "foo").claim("state", state)
+        JWTClaimsSet claimsRequest = new JWTClaimsSet.Builder().claim("client_id", "foo").claim("state", state.getValue())
                 .issueTime(calendar.getTime()).claim("response_type", "code").claim("iss", "foo")
                 .claim("claims", claims).audience("opid").build();
         oidcCtx.setRequest(buildAuthReq3(claimsRequest));
@@ -235,7 +235,7 @@ public class TestValidateRequestObjectOfOidcAuthenticationRequest {
     public void testRequestObjectIssuerMismatch() throws Exception {
         baseInit();
         action.setNoSignatureVerify(true);
-        JWTClaimsSet claimsRequest = new JWTClaimsSet.Builder().claim("client_id", "foo").claim("state", state)
+        JWTClaimsSet claimsRequest = new JWTClaimsSet.Builder().claim("client_id", "foo").claim("state", state.getValue())
                 .issueTime(calendar.getTime()).claim("response_type", "id_token").claim("iss", "fooNOT")
                 .claim("claims", claims).audience("opid").build();
         oidcCtx.setRequest(buildAuthReq3(claimsRequest));
@@ -253,7 +253,7 @@ public class TestValidateRequestObjectOfOidcAuthenticationRequest {
     public void testRequestObjectAudienceMismatch() throws Exception {
         baseInit();
         action.setNoSignatureVerify(true);
-        JWTClaimsSet claimsRequest = new JWTClaimsSet.Builder().claim("client_id", "foo").claim("state", state)
+        JWTClaimsSet claimsRequest = new JWTClaimsSet.Builder().claim("client_id", "foo").claim("state", state.getValue())
                 .issueTime(calendar.getTime()).claim("response_type", "id_token").claim("iss", "foo")
                 .claim("claims", claims).audience("opidNOT").build();
         oidcCtx.setRequest(buildAuthReq3(claimsRequest));
@@ -271,7 +271,7 @@ public class TestValidateRequestObjectOfOidcAuthenticationRequest {
     public void testRequestObjectIdMissingIat() throws Exception {
         baseInit();
         action.setNoSignatureVerify(true);
-        JWTClaimsSet claimsRequest = new JWTClaimsSet.Builder().claim("client_id", "foo").claim("state", state)
+        JWTClaimsSet claimsRequest = new JWTClaimsSet.Builder().claim("client_id", "foo").claim("state", state.getValue())
                 .claim("response_type", "id_token").claim("iss", "foo").claim("claims", claims).audience("opid")
                 .build();
         oidcCtx.setRequest(buildAuthReq3(claimsRequest));
@@ -289,7 +289,7 @@ public class TestValidateRequestObjectOfOidcAuthenticationRequest {
         baseInit();
         action.setEventWindow(9 * 60 * 1000);
         action.setNoSignatureVerify(true);
-        JWTClaimsSet claimsRequest = new JWTClaimsSet.Builder().claim("client_id", "foo").claim("state", state)
+        JWTClaimsSet claimsRequest = new JWTClaimsSet.Builder().claim("client_id", "foo").claim("state", state.getValue())
                 .issueTime(calendar.getTime()).claim("response_type", "id_token").claim("iss", "foo")
                 .claim("claims", claims).audience("opid").build();
         oidcCtx.setRequest(buildAuthReq3(claimsRequest));
@@ -317,7 +317,7 @@ public class TestValidateRequestObjectOfOidcAuthenticationRequest {
     public void testRequestObjectNoClaims() throws Exception {
         baseInit();
         action.setNoSignatureVerify(true);
-        JWTClaimsSet claimsRequest = new JWTClaimsSet.Builder().claim("client_id", "foo").claim("state", state)
+        JWTClaimsSet claimsRequest = new JWTClaimsSet.Builder().claim("client_id", "foo").claim("state", state.getValue())
                 .issueTime(calendar.getTime()).claim("response_type", "id_token").claim("iss", "foo").audience("opid")
                 .build();
         oidcCtx.setRequest(buildAuthReq3(claimsRequest));
@@ -332,7 +332,7 @@ public class TestValidateRequestObjectOfOidcAuthenticationRequest {
         baseInit();
         action.setNoSignatureVerify(true);
         claims.remove("id_token");
-        JWTClaimsSet claimsRequest = new JWTClaimsSet.Builder().claim("client_id", "foo").claim("state", state)
+        JWTClaimsSet claimsRequest = new JWTClaimsSet.Builder().claim("client_id", "foo").claim("state", state.getValue())
                 .issueTime(calendar.getTime()).claim("response_type", "id_token").claim("iss", "foo")
                 .claim("claims", claims).audience("opid").build();
         oidcCtx.setRequest(buildAuthReq3(claimsRequest));
@@ -346,7 +346,7 @@ public class TestValidateRequestObjectOfOidcAuthenticationRequest {
     public void testRequestObjectReplay() throws Exception {
         baseInit();
         action.setNoSignatureVerify(true);
-        JWTClaimsSet claimsRequest = new JWTClaimsSet.Builder().claim("client_id", "foo").claim("state", state)
+        JWTClaimsSet claimsRequest = new JWTClaimsSet.Builder().claim("client_id", "foo").claim("state", state.getValue())
                 .issueTime(calendar.getTime()).claim("response_type", "id_token").claim("iss", "foo")
                 .claim("claims", claims).audience("opid").build();
         oidcCtx.setRequest(buildAuthReq3(claimsRequest));
