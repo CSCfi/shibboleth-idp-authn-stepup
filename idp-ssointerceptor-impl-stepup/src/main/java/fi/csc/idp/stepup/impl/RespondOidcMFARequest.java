@@ -171,6 +171,7 @@ public class RespondOidcMFARequest implements org.springframework.webflow.execut
                             oidcCtx.getErrorDescription()), oidcCtx.getRequest().getState(), oidcCtx.getRequest()
                             .getResponseMode());
             springRequestContext.getFlowScope().put(redirect, resp.toURI().toString());
+            return new Event(this, OidcProcessingEventIds.EVENTID_CONTINUE_FINISHED);
         }
         AuthenticationRequest req = oidcCtx.getRequest();
 
@@ -207,7 +208,7 @@ public class RespondOidcMFARequest implements org.springframework.webflow.execut
                 idToken2.setClaim(claim, oidcCtx.getIdToken().getClaim(claim));
             }
         }
-        // This responce assumes we are using implicit flow
+        // This response assumes we are using implicit flow
         if (oidcCtx.getRequest().getNonce() != null) {
             idToken2.setClaim("nonce", oidcCtx.getRequest().getNonce());
         }
@@ -223,7 +224,7 @@ public class RespondOidcMFARequest implements org.springframework.webflow.execut
         log.debug("constructed response:" + resp.toURI());
         springRequestContext.getFlowScope().put(redirect, resp.toURI().toString());
         log.trace("Leaving");
-        return new Event(this, OidcProcessingEventIds.EVENTID_CONTINUE_OIDC);
+        return new Event(this, OidcProcessingEventIds.EVENTID_CONTINUE_FINISHED);
 
     }
 
