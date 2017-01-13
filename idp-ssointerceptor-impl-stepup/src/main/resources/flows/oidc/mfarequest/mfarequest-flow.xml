@@ -5,21 +5,56 @@
 
 	<!-- THIS IS A EARLY DRAFT, NOT TO BE USED!! -->
 
-	<action-state id="ProcessIncomingOidc">
-		<evaluate expression="ProcessOidcStepUpRequest" />
-		<transition to="Stepup" />
+	<action-state id="AttachOidcAuthenticationRequest">
+		<evaluate expression="AttachOidcAuthenticationRequest" />
+		<transition on="ContinueOidc"
+			to="VerifyClientRedirectUriOfOidcAuthenticationRequest" />
+		<transition on="ErroOidc" to="proceed">
+			<evaluate expression="RespondOidcMFARequest" />
+		</transition>
+		<!-- <transition to="DisplayCondolences" /> -->
+	</action-state>
+
+	<action-state id="VerifyClientRedirectUriOfOidcAuthenticationRequest">
+		<evaluate expression="VerifyClientRedirectUriOfOidcAuthenticationRequest" />
+		<transition on="ContinueOidc"
+			to="ValidateRequestObjectOfOidcAuthenticationRequest" />
+		<transition on="ErroOidc" to="proceed">
+			<evaluate expression="RespondOidcMFARequest" />
+		</transition>
+		<!-- <transition to="DisplayCondolences" /> -->
+	</action-state>
+
+
+	<action-state id="ValidateRequestObjectOfOidcAuthenticationRequest">
+		<evaluate expression="ValidateRequestObjectOfOidcAuthenticationRequest" />
+		<transition on="ContinueOidc" to="BuildShibbolethContexts" />
+		<transition on="ErroOidc" to="proceed">
+			<evaluate expression="RespondOidcMFARequest" />
+		</transition>
+		<!-- <transition to="DisplayCondolences" /> -->
+	</action-state>
+
+	<action-state id="BuildShibbolethContexts">
+		<evaluate expression="BuildShibbolethContexts" />
+		<transition on="ContinueOidc" to="Stepup" />
+		<transition on="ErroOidc" to="proceed">
+			<evaluate expression="RespondOidcMFARequest" />
+		</transition>
+		<!-- <transition to="DisplayCondolences" /> -->
 	</action-state>
 
 	<subflow-state id="Stepup" subflow="authn/mfa">
 		<input name="calledAsSubflow" value="true" />
 		<transition to="proceed">
-			<evaluate expression="RespondOidcStepUpRequest" />
+			<evaluate expression="RespondOidcMFARequest" />
 		</transition>
 	</subflow-state>
 
 
 	<end-state id="proceed" view="externalRedirect:#{flowScope.redirect}">
 	</end-state>
+
 
 	<bean-import resource="mfarequest-beans.xml" />
 
