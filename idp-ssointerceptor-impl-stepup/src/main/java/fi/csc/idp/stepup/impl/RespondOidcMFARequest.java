@@ -170,6 +170,7 @@ public class RespondOidcMFARequest implements org.springframework.webflow.execut
                     oidcCtx.getRequest().getRedirectionURI(), new ErrorObject(oidcCtx.getErrorCode(),
                             oidcCtx.getErrorDescription()), oidcCtx.getRequest().getState(), oidcCtx.getRequest()
                             .getResponseMode());
+            log.debug("constructed response:" + resp.toURI());
             springRequestContext.getFlowScope().put(redirect, resp.toURI().toString());
             return new Event(this, OidcProcessingEventIds.EVENTID_CONTINUE_FINISHED);
         }
