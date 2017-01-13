@@ -46,6 +46,11 @@ public final class OidcProcessingEventIds {
     @Nonnull
     @NotEmpty
     public static final String EVENTID_CONTINUE_OIDC = "ContinueOidc";
+    
+    /** event id for the case of finishing oidc processing. */
+    @Nonnull
+    @NotEmpty
+    public static final String EVENTID_CONTINUE_FINISHED = "success";
 
     /** event id for the case of returning oidc error. */
     @Nonnull
