@@ -61,6 +61,7 @@ import com.nimbusds.jwt.JWT;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
 import com.nimbusds.oauth2.sdk.ResponseType;
+import com.nimbusds.oauth2.sdk.id.State;
 import com.nimbusds.openid.connect.sdk.AuthenticationRequest;
 
 /**
@@ -275,7 +276,7 @@ public class ValidateRequestObjectOfOidcAuthenticationRequest implements org.spr
         if (clientID == null || !req.getClientID().getValue().equals(clientID)) {
             log.error("request object: client id is mandatory and should match parameter value");
             oidcCtx.setErrorCode("invalid_request");
-            oidcCtx.setErrorDescription("request object not containing client id");
+            oidcCtx.setErrorDescription("request object not containing correct client id");
             log.trace("Leaving");
             return false;
         }
@@ -283,7 +284,7 @@ public class ValidateRequestObjectOfOidcAuthenticationRequest implements org.spr
         if (responseType == null || !req.getResponseType().equals(new ResponseType(responseType))) {
             log.error("request object: response type is mandatory and should match parameter value");
             oidcCtx.setErrorCode("invalid_request");
-            oidcCtx.setErrorDescription("request object not containing response type");
+            oidcCtx.setErrorDescription("request object not containing correct response type");
             log.trace("Leaving");
             return false;
         }
@@ -303,27 +304,11 @@ public class ValidateRequestObjectOfOidcAuthenticationRequest implements org.spr
             log.trace("Leaving");
             return false;
         }
-        JSONObject claims = (JSONObject) req.getRequestObject().getJWTClaimsSet().getClaim("claims");
-        if (claims == null) {
-            log.error("request object: signed request object needs to have claims");
-            oidcCtx.setErrorCode("invalid_request");
-            oidcCtx.setErrorDescription("request object not containing claims");
-            log.trace("Leaving");
-            return false;
-        }
-        JWTClaimsSet idToken = JWTClaimsSet.parse((JSONObject) claims.get("id_token"));
-        if (idToken == null) {
-            log.error("request object: signed request object needs to have id token");
-            oidcCtx.setErrorCode("invalid_request");
-            oidcCtx.setErrorDescription("request object not containing idtoken");
-            log.trace("Leaving");
-            return false;
-        }
-        Date iat = idToken.getIssueTime();
+        Date iat = req.getRequestObject().getJWTClaimsSet().getDateClaim("iat");
         if (iat == null) {
-            log.error("request object id token not containing iat");
+            log.error("request object: iat is required in request object");
             oidcCtx.setErrorCode("invalid_request");
-            oidcCtx.setErrorDescription("request object id token not containing iat");
+            oidcCtx.setErrorDescription("request object not containing iat");
             log.trace("Leaving");
             return false;
         }
@@ -337,24 +322,37 @@ public class ValidateRequestObjectOfOidcAuthenticationRequest implements org.spr
             log.trace("Leaving");
             return false;
         }
-        String state = idToken.getStringClaim("state");
+        State state = (State) req.getRequestObject().getJWTClaimsSet().getClaim("state");
         if (state == null) {
-            log.error("request object id token not containing state");
+            log.error("request object: state is required in request object");
             oidcCtx.setErrorCode("invalid_request");
-            oidcCtx.setErrorDescription("request object id token not containing state");
+            oidcCtx.setErrorDescription("request object not containing state");
             log.trace("Leaving");
             return false;
         }
-        if (!state.equals(req.getState())) {
-            log.error("request object id token state not matching parameter state");
+        
+        JSONObject claims =(JSONObject) req.getRequestObject().getJWTClaimsSet().getClaim("claims");
+        if (claims == null) {
+            log.error("request object: signed request object needs to have claims");
             oidcCtx.setErrorCode("invalid_request");
-            oidcCtx.setErrorDescription("request object id token state not matching parameter state");
+            oidcCtx.setErrorDescription("request object not containing claims");
+            log.trace("Leaving");
+            return false;
+        }
+        JWTClaimsSet idToken=null;
+        try {
+            idToken = JWTClaimsSet.parse((JSONObject) claims.get("id_token"));
+        } catch (Exception e) {}
+        if (idToken == null) {
+            log.error("request object: signed request object needs to have id token");
+            oidcCtx.setErrorCode("invalid_request");
+            oidcCtx.setErrorDescription("request object not containing idtoken");
             log.trace("Leaving");
             return false;
         }
         // check replay
         msgLock.lock();
-        if (usedMessages.containsKey(state)) {
+        if (usedMessages.containsKey(state.getValue())) {
             msgLock.unlock();
             oidcCtx.setErrorCode("invalid_request");
             oidcCtx.setErrorDescription("request object already used");
@@ -363,11 +361,12 @@ public class ValidateRequestObjectOfOidcAuthenticationRequest implements org.spr
         }
         cleanMessages();
         log.debug("Adding " + state + " " + iat + " to the list of used verification messages");
-        usedMessages.put(state, new DateTime(iat));
+        usedMessages.put(state.getValue(), new DateTime(iat));
         msgLock.unlock();
         oidcCtx.setIdToken(idToken);
         log.trace("Leaving");
         return true;
+        
     }
 
     @Override
