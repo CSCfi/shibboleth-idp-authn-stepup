@@ -169,11 +169,18 @@ public class ValidateRequestObjectOfOidcAuthenticationRequest implements org.spr
                 java.nio.charset.Charset.forName("UTF8")));
         JSONArray keyList = (JSONArray) json.get("keys");
         if (keyList == null) {
+            //not a keyset? If it is is a RSA key we are happy
+            JSONObject k = json;
+            if ("RSA".equals(k.get("kty"))) {
+                log.debug("adding verification key " + k.toString());
+                keys.add(k);
+            }
             log.trace("Leaving");
-            return null;
+            return keys;
         }
         for (Object key : keyList) {
             JSONObject k = (JSONObject) key;
+            //in case of many keys, we pick all RSA signature keys
             if ("sig".equals(k.get("use")) && "RSA".equals(k.get("kty"))) {
                 log.debug("adding verification key " + k.toString());
                 log.trace("Leaving");
