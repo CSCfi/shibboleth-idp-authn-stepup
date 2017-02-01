@@ -196,6 +196,10 @@ public class BuildShibbolethContexts implements org.springframework.webflow.exec
         ShibbolethSpAuthenticationContext shibspCtx = (ShibbolethSpAuthenticationContext) ctx.addSubcontext(
                 new ShibbolethSpAuthenticationContext(), true);
         List<Principal> requested = new ArrayList<Principal>();
+        if (req.getACRValues() == null){
+            log.debug("no acr set in request");
+            return;
+        }
         for (ACR acr : req.getACRValues()) {
             log.debug("Setting acr " + acr + " as requested AuthnContextClassRef");
             requested.add(new AuthnContextClassRefPrincipal(acr.getValue()));
