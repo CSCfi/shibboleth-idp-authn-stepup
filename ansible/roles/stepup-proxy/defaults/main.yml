@@ -3,5 +3,5 @@
 stepup_version: 1.0-SNAPSHOT
 # the version to checkout from github
 stepup_co_version: master
-#environment varaibles to build shibboleth idp package
+#environment variables to source for building shibboleth idp package
 environment_file: /etc/default/shibboleth

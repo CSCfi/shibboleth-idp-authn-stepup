@@ -8,12 +8,12 @@
 - name: Checkout MPASSid
   git: repo=https://github.com/Digipalvelutehdas/MPASSid-proxy version={{ mpassid_co_version }} dest="{{ remote_user_home }}/MPASSid-proxy"
   become: yes
-  become_user: cloud-user
+  become_user: "{{ build_user }}"
 
 - name: MPASSid maven clean install
   command: mvn -f MPASSid-proxy/idp-mpass-parent/pom.xml clean install
   become: yes
-  become_user: cloud-user
+  become_user: "{{ build_user }}"
 
 - name: Copy shibsp flows in to place
   command: cp -r "{{ remote_user_home }}/MPASSid-proxy/idp-authn-impl-shibsp/target/idp-authn-impl-shibsp-{{ mpassid_version }}-bin/idp-authn-impl-shibsp-{{ mpassid_version }}/flows/" /opt/shibboleth-idp

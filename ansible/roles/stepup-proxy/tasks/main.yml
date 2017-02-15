@@ -8,12 +8,12 @@
 - name: Checkout StepUp Proxy
   git: repo=https://github.com/CSC-IT-Center-for-Science/stepup-proxy version={{ stepup_co_version }} dest="{{ remote_user_home }}/stepup-proxy"
   become: yes
-  become_user: cloud-user
+  become_user: "{{ build_user }}"
 
 - name: StepUp Proxy maven clean package
   command: mvn -f stepup-proxy/idp-stepup-parent/pom.xml clean package
   become: yes
-  become_user: cloud-user
+  become_user: "{{ build_user }}"
 
 - name: Ensure /opt/shibboleth-idp/flows/oidc/mfarequest/ dir exists
   file: path=/opt/shibboleth-idp/flows/oidc/mfarequest/ state=directory
