@@ -1,0 +1,7 @@
+---
+# how mpass project versions the products
+mpassid_version: 1.0-SNAPSHOT
+# the version to checkout from github
+mpassid_co_version: master
+#environment varaibles to build shibboleth idp package
+environment_file: /etc/default/shibboleth
