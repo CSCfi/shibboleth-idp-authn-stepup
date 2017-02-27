@@ -8,7 +8,7 @@
 Project can be deployed for testing purposes but is not production quality yet. Many of the features are still under development and deployment may require help from the development team.  
 
 ## Overview
-These modules contain extensions to achieve stepup authentication in a proxy based on Shibboleth IdP 3 and Shibboleth SP. You may want to read overall [description](https://confluence.csc.fi/display/HAKA/Description+of+SAML2+Proxy+capable+of+elevating+authentication) of the whole proxy before going forward.
+These modules contain extensions to achieve stepup authentication in a proxy based on Shibboleth IdP 3 and Shibboleth SP. You may want to read overall [description](https://wiki.eduuni.fi/display/CSCHAKA/Description+of+SAML2+Proxy+capable+of+elevating+authentication) of the whole proxy before going forward.
 
 This project relies on [MPASS Shibboleth SP Authentication](https://github.com/Digipalvelutehdas/MPASS-proxy/tree/master/idp-authn-impl-shibsp) project for a authentication flow that actually enables to deploy a proxy based on Shibboleth IdP 3 and Shibboleth SP. The aim of this stepup project is to enhance that by providing a mechanisms for performing stepup authentication. 
 
@@ -29,7 +29,7 @@ The flow provided with the is an example flow that may have to be heavily modifi
 By modifying the flow numerous other use cases may also be achieved. 
 
 #### MfaRequest
-MfaRquest flow is a flow implementing oidc provider. Mfarequest flow expects a oidc authentication request of type id token (implicit). Login hint parameters are parsed to perform mfa for the user. Flow uses Mfa flow to perform the user reauthentication. The flow implementation is still in very early stages and should not be used.  
+MfaRquest flow is a flow implementing oidc provider. Mfarequest flow expects a oidc authentication request of type id token (implicit). The user parameters of initial authentication are expected to be found in a signed request object containing id token. Flow uses Mfa flow to perform the user reauthentication.   
 
 
 #### Mfa
