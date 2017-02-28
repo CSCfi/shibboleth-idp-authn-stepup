@@ -15,14 +15,14 @@
   become: yes
   become_user: "{{ build_user }}"
 
-- name: Ensure /opt/shibboleth-idp/flows/oidc/mfarequest/ dir exists
-  file: path=/opt/shibboleth-idp/flows/oidc/mfarequest/ state=directory
+- name: Ensure "{{ idp_home }}/flows/oidc/mfarequest/" dir exists
+  file: path="{{ idp_home }}/flows/oidc/mfarequest/" state=directory
 
-- name: Ensure /opt/shibboleth-idp/flows/authn/mfa/ dir exists
-  file: path=/opt/shibboleth-idp/flows/authn/mfa/ state=directory
+- name: Ensure "{{ idp_home }}/flows/authn/mfa/" dir exists
+  file: path="{{ idp_home }}/flows/authn/mfa/" state=directory
 
-- name: Ensure /opt/shibboleth-idp/flows/intercept/stepup/ dir exists
-  file: path=/opt/shibboleth-idp/flows/intercept/stepup/ state=directory
+- name: Ensure "{{ idp_home }}/flows/intercept/stepup/" dir exists
+  file: path="{{ idp_home }}/flows/intercept/stepup/" state=directory
 
 - name: Copy stepup flows, overwriting existing ones
   copy:
@@ -33,9 +33,9 @@
     mode: 0644
     remote_src: yes
   with_items:
-    - { src: "{{ remote_user_home }}/stepup-proxy/idp-ssointerceptor-impl-stepup/src/main/resources/flows/oidc/mfarequest/mfarequest-flow.xml", dest: '/opt/shibboleth-idp/flows/oidc/mfarequest/mfarequest-flow.xml' }
-    - { src: "{{ remote_user_home }}/stepup-proxy/idp-ssointerceptor-impl-stepup/src/main/resources/flows/authn/mfa/mfa-flow.xml", dest: '/opt/shibboleth-idp/flows/authn/mfa/mfa-flow.xml' }
-    - { src: "{{ remote_user_home }}/stepup-proxy/idp-ssointerceptor-impl-stepup/src/main/resources/flows/intercept/stepup/stepup-flow.xml", dest: '/opt/shibboleth-idp/flows/intercept/stepup/stepup-flow.xml' }
+    - { src: "{{ remote_user_home }}/stepup-proxy/idp-ssointerceptor-impl-stepup/src/main/resources/flows/oidc/mfarequest/mfarequest-flow.xml", dest: "{{ idp_home }}/flows/oidc/mfarequest/mfarequest-flow.xml" }
+    - { src: "{{ remote_user_home }}/stepup-proxy/idp-ssointerceptor-impl-stepup/src/main/resources/flows/authn/mfa/mfa-flow.xml", dest: "{{ idp_home }}/flows/authn/mfa/mfa-flow.xml" }
+    - { src: "{{ remote_user_home }}/stepup-proxy/idp-ssointerceptor-impl-stepup/src/main/resources/flows/intercept/stepup/stepup-flow.xml", dest: "{{ idp_home }}/flows/intercept/stepup/stepup-flow.xml" }
 
 - name: Copy stepup beans, preserving existing ones
   copy:
@@ -47,9 +47,9 @@
     remote_src: yes
     force: no
   with_items:
-    - { src: "{{ remote_user_home }}/stepup-proxy/idp-ssointerceptor-impl-stepup/src/main/resources/flows/oidc/mfarequest/mfarequest-beans.xml", dest: '/opt/shibboleth-idp/flows/oidc/mfarequest/mfarequest-beans.xml' }
-    - { src: "{{ remote_user_home }}/stepup-proxy/idp-ssointerceptor-impl-stepup/src/main/resources/flows/authn/mfa/mfa-beans.xml", dest: '/opt/shibboleth-idp/flows/authn/mfa/mfa-beans.xml' }
-    - { src: "{{ remote_user_home }}/stepup-proxy/idp-ssointerceptor-impl-stepup/src/main/resources/flows/intercept/stepup/stepup-beans.xml", dest: '/opt/shibboleth-idp/flows/intercept/stepup/stepup-beans.xml' }
+    - { src: "{{ remote_user_home }}/stepup-proxy/idp-ssointerceptor-impl-stepup/src/main/resources/flows/oidc/mfarequest/mfarequest-beans.xml", dest: "{{ idp_home }}/flows/oidc/mfarequest/mfarequest-beans.xml" }
+    - { src: "{{ remote_user_home }}/stepup-proxy/idp-ssointerceptor-impl-stepup/src/main/resources/flows/authn/mfa/mfa-beans.xml", dest: "{{ idp_home }}/flows/authn/mfa/mfa-beans.xml" }
+    - { src: "{{ remote_user_home }}/stepup-proxy/idp-ssointerceptor-impl-stepup/src/main/resources/flows/intercept/stepup/stepup-beans.xml", dest: "{{ idp_home }}/flows/intercept/stepup/stepup-beans.xml" }
 
 - name: Copy stepup beans as exmple beans, overwriting existing ones
   copy:
@@ -60,12 +60,12 @@
     mode: 0644
     remote_src: yes
   with_items:
-    - { src: "{{ remote_user_home }}/stepup-proxy/idp-ssointerceptor-impl-stepup/src/main/resources/flows/oidc/mfarequest/mfarequest-beans.xml", dest: '/opt/shibboleth-idp/flows/oidc/mfarequest/mfarequest-beans.xml.example' }
-    - { src: "{{ remote_user_home }}/stepup-proxy/idp-ssointerceptor-impl-stepup/src/main/resources/flows/authn/mfa/mfa-beans.xml", dest: '/opt/shibboleth-idp/flows/authn/mfa/mfa-beans.xml.example' }
-    - { src: "{{ remote_user_home }}/stepup-proxy/idp-ssointerceptor-impl-stepup/src/main/resources/flows/intercept/stepup/stepup-beans.xml", dest: '/opt/shibboleth-idp/flows/intercept/stepup/stepup-beans.xml.example' }
+    - { src: "{{ remote_user_home }}/stepup-proxy/idp-ssointerceptor-impl-stepup/src/main/resources/flows/oidc/mfarequest/mfarequest-beans.xml", dest: "{{ idp_home }}/flows/oidc/mfarequest/mfarequest-beans.xml.example" }
+    - { src: "{{ remote_user_home }}/stepup-proxy/idp-ssointerceptor-impl-stepup/src/main/resources/flows/authn/mfa/mfa-beans.xml", dest: "{{ idp_home }}/flows/authn/mfa/mfa-beans.xml.example" }
+    - { src: "{{ remote_user_home }}/stepup-proxy/idp-ssointerceptor-impl-stepup/src/main/resources/flows/intercept/stepup/stepup-beans.xml", dest: "{{ idp_home }}/flows/intercept/stepup/stepup-beans.xml.example" }
 
-- name: Ensure /opt/shibboleth-idp/views/authn/ dir exists
-  file: path=/opt/shibboleth-idp/views/authn/ state=directory
+- name: Ensure "{{ idp_home }}/views/authn/" dir exists
+  file: path="{{ idp_home }}/views/authn/" state=directory
 
 - name: Copy stepup views, overwriting existing ones
   copy:
@@ -76,21 +76,21 @@
     mode: 0644
     remote_src: yes
   with_items:
-    - { src: "{{ remote_user_home }}/stepup-proxy/idp-ssointerceptor-impl-stepup/src/main/resources/views/authn/mfa-backend-progress.vm", dest: '/opt/shibboleth-idp/views/authn/mfa-backend-progress.vm' }
-    - { src: "{{ remote_user_home }}/stepup-proxy/idp-ssointerceptor-impl-stepup/src/main/resources/views/authn/mfa-backend.vm", dest: '/opt/shibboleth-idp/views/authn/mfa-backend.vm' }
-    - { src: "{{ remote_user_home }}/stepup-proxy/idp-ssointerceptor-impl-stepup/src/main/resources/views/authn/mfa-condolences.vm", dest: '/opt/shibboleth-idp/views/authn/mfa-condolences.vm' }
-    - { src: "{{ remote_user_home }}/stepup-proxy/idp-ssointerceptor-impl-stepup/src/main/resources/views/authn/mfa-managesimple.vm", dest: '/opt/shibboleth-idp/views/authn/mfa-managesimple.vm' }
-    - { src: "{{ remote_user_home }}/stepup-proxy/idp-ssointerceptor-impl-stepup/src/main/resources/views/authn/mfa-manage.vm", dest: '/opt/shibboleth-idp/views/authn/mfa-manage.vm' }
-    - { src: "{{ remote_user_home }}/stepup-proxy/idp-ssointerceptor-impl-stepup/src/main/resources/views/authn/mfa-performed.vm", dest: '/opt/shibboleth-idp/views/authn/mfa-performed.vm' }
-    - { src: "{{ remote_user_home }}/stepup-proxy/idp-ssointerceptor-impl-stepup/src/main/resources/views/authn/mfa-register.vm", dest: '/opt/shibboleth-idp/views/authn/mfa-register.vm' }
-    - { src: "{{ remote_user_home }}/stepup-proxy/idp-ssointerceptor-impl-stepup/src/main/resources/views/authn/mfa-startregister.vm", dest: '/opt/shibboleth-idp/views/authn/mfa-startregister.vm' }
-    - { src: "{{ remote_user_home }}/stepup-proxy/idp-ssointerceptor-impl-stepup/src/main/resources/views/authn/mfa.vm", dest: '/opt/shibboleth-idp/views/authn/mfa.vm' }
-    - { src: "{{ remote_user_home }}/stepup-proxy/idp-ssointerceptor-impl-stepup/src/main/resources/views/authn/mfa-wrongresponse.vm", dest: '/opt/shibboleth-idp/views/authn/mfa-wrongresponse.vm' }
+    - { src: "{{ remote_user_home }}/stepup-proxy/idp-ssointerceptor-impl-stepup/src/main/resources/views/authn/mfa-backend-progress.vm", dest: "{{ idp_home }}/views/authn/mfa-backend-progress.vm" }
+    - { src: "{{ remote_user_home }}/stepup-proxy/idp-ssointerceptor-impl-stepup/src/main/resources/views/authn/mfa-backend.vm", dest: "{{ idp_home }}/views/authn/mfa-backend.vm" }
+    - { src: "{{ remote_user_home }}/stepup-proxy/idp-ssointerceptor-impl-stepup/src/main/resources/views/authn/mfa-condolences.vm", dest: "{{ idp_home }}/views/authn/mfa-condolences.vm" }
+    - { src: "{{ remote_user_home }}/stepup-proxy/idp-ssointerceptor-impl-stepup/src/main/resources/views/authn/mfa-managesimple.vm", dest: "{{ idp_home }}/views/authn/mfa-managesimple.vm" }
+    - { src: "{{ remote_user_home }}/stepup-proxy/idp-ssointerceptor-impl-stepup/src/main/resources/views/authn/mfa-manage.vm", dest: "{{ idp_home }}/views/authn/mfa-manage.vm" }
+    - { src: "{{ remote_user_home }}/stepup-proxy/idp-ssointerceptor-impl-stepup/src/main/resources/views/authn/mfa-performed.vm", dest: "{{ idp_home }}/views/authn/mfa-performed.vm" }
+    - { src: "{{ remote_user_home }}/stepup-proxy/idp-ssointerceptor-impl-stepup/src/main/resources/views/authn/mfa-register.vm", dest: "{{ idp_home }}/views/authn/mfa-register.vm" }
+    - { src: "{{ remote_user_home }}/stepup-proxy/idp-ssointerceptor-impl-stepup/src/main/resources/views/authn/mfa-startregister.vm", dest: "{{ idp_home }}/views/authn/mfa-startregister.vm" }
+    - { src: "{{ remote_user_home }}/stepup-proxy/idp-ssointerceptor-impl-stepup/src/main/resources/views/authn/mfa.vm", dest: "{{ idp_home }}/views/authn/mfa.vm" }
+    - { src: "{{ remote_user_home }}/stepup-proxy/idp-ssointerceptor-impl-stepup/src/main/resources/views/authn/mfa-wrongresponse.vm", dest: "{{ idp_home }}/views/authn/mfa-wrongresponse.vm" }
 
 - name: Copy stepup dependency twilio-7.1.0.jar for bulding new idp.war
   copy:
     src: "{{ remote_user_home }}/stepup-proxy/idp-ssointerceptor-impl-stepup/target/dependency/twilio-7.1.0.jar"
-    dest: "/opt/shibboleth-idp/edit-webapp/WEB-INF/lib/twilio-7.1.0.jar"
+    dest: "{{ idp_home }}/edit-webapp/WEB-INF/lib/twilio-7.1.0.jar"
     owner: root
     group: root
     mode: 0644
@@ -99,7 +99,7 @@
 - name: Copy stepup dependency spring-security-crypto-4.1.3.RELEASE.jar for bulding new idp.war
   copy:
     src: "{{ remote_user_home }}/stepup-proxy/idp-ssointerceptor-impl-stepup/target/dependency/spring-security-crypto-4.1.3.RELEASE.jar"
-    dest: "/opt/shibboleth-idp/edit-webapp/WEB-INF/lib/spring-security-crypto-4.1.3.RELEASE.jar"
+    dest: "{{ idp_home }}/edit-webapp/WEB-INF/lib/spring-security-crypto-4.1.3.RELEASE.jar"
     owner: root
     group: root
     mode: 0644
@@ -108,7 +108,7 @@
 - name: Copy stepup dependency oauth2-oidc-sdk-5.18.1.jar for bulding new idp.war
   copy:
     src: "{{ remote_user_home }}/stepup-proxy/idp-ssointerceptor-impl-stepup/target/dependency/oauth2-oidc-sdk-5.18.1.jar"
-    dest: "/opt/shibboleth-idp/edit-webapp/WEB-INF/lib/oauth2-oidc-sdk-5.18.1.jar"
+    dest: "{{ idp_home }}/edit-webapp/WEB-INF/lib/oauth2-oidc-sdk-5.18.1.jar"
     owner: root
     group: root
     mode: 0644
@@ -117,7 +117,7 @@
 - name: Copy stepup dependency nimbus-jose-jwt-4.34.1.jar for bulding new idp.war
   copy:
     src: "{{ remote_user_home }}/stepup-proxy/idp-ssointerceptor-impl-stepup/target/dependency/nimbus-jose-jwt-4.34.1.jar"
-    dest: "/opt/shibboleth-idp/edit-webapp/WEB-INF/lib/nimbus-jose-jwt-4.34.1.jar"
+    dest: "{{ idp_home }}/edit-webapp/WEB-INF/lib/nimbus-jose-jwt-4.34.1.jar"
     owner: root
     group: root
     mode: 0644
@@ -126,7 +126,7 @@
 - name: Copy stepup dependency lang-tag-1.4.3.jar for bulding new idp.war
   copy:
     src: "{{ remote_user_home }}/stepup-proxy/idp-ssointerceptor-impl-stepup/target/dependency/lang-tag-1.4.3.jar"
-    dest: "/opt/shibboleth-idp/edit-webapp/WEB-INF/lib/lang-tag-1.4.3.jar"
+    dest: "{{ idp_home }}/edit-webapp/WEB-INF/lib/lang-tag-1.4.3.jar"
     owner: root
     group: root
     mode: 0644
@@ -135,43 +135,43 @@
 - name: Copy stepup dependency json-smart-1.3.1.jar for bulding new idp.war
   copy:
     src: "{{ remote_user_home }}/stepup-proxy/idp-ssointerceptor-impl-stepup/target/dependency/json-smart-1.3.1.jar"
-    dest: "/opt/shibboleth-idp/edit-webapp/WEB-INF/lib/json-smart-1.3.1.jar"
+    dest: "{{ idp_home }}/edit-webapp/WEB-INF/lib/json-smart-1.3.1.jar"
     owner: root
     group: root
     mode: 0644
     remote_src: yes
 
-- name: Copy stepup dependency jackson-databind-2.4.3.jar for bulding new idp.war
-  copy:
-    src: "{{ remote_user_home }}/stepup-proxy/idp-ssointerceptor-impl-stepup/target/dependency/jackson-databind-2.4.3.jar"
-    dest: "/opt/shibboleth-idp/edit-webapp/WEB-INF/lib/jackson-databind-2.4.3.jar"
-    owner: root
-    group: root
-    mode: 0644
-    remote_src: yes
+#- name: Copy stepup dependency jackson-databind-2.4.3.jar for bulding new idp.war
+#  copy:
+#    src: "{{ remote_user_home }}/stepup-proxy/idp-ssointerceptor-impl-stepup/target/dependency/jackson-databind-2.4.3.jar"
+#    dest: "{{ idp_home }}/edit-webapp/WEB-INF/lib/jackson-databind-2.4.3.jar"
+#    owner: root
+#    group: root
+#    mode: 0644
+#    remote_src: yes
 
-- name: Copy stepup dependency jackson-core-2.4.3.jar for bulding new idp.war
-  copy:
-    src: "{{ remote_user_home }}/stepup-proxy/idp-ssointerceptor-impl-stepup/target/dependency/jackson-core-2.4.3.jar"
-    dest: "/opt/shibboleth-idp/edit-webapp/WEB-INF/lib/jackson-core-2.4.3.jar"
-    owner: root
-    group: root
-    mode: 0644
-    remote_src: yes
+#- name: Copy stepup dependency jackson-core-2.4.3.jar for bulding new idp.war
+#  copy:
+#    src: "{{ remote_user_home }}/stepup-proxy/idp-ssointerceptor-impl-stepup/target/dependency/jackson-core-2.4.3.jar"
+#    dest: "{{ idp_home }}/edit-webapp/WEB-INF/lib/jackson-core-2.4.3.jar"
+#    owner: root
+#    group: root
+#    mode: 0644
+#    remote_src: yes
 
-- name: Copy stepup dependency jackson-annotations-2.4.3.jar for bulding new idp.war
-  copy:
-    src: "{{ remote_user_home }}/stepup-proxy/idp-ssointerceptor-impl-stepup/target/dependency/jackson-annotations-2.4.3.jar"
-    dest: "/opt/shibboleth-idp/edit-webapp/WEB-INF/lib/jackson-annotations-2.4.3.jar"
-    owner: root
-    group: root
-    mode: 0644
-    remote_src: yes
+#- name: Copy stepup dependency jackson-annotations-2.4.3.jar for bulding new idp.war
+#  copy:
+#    src: "{{ remote_user_home }}/stepup-proxy/idp-ssointerceptor-impl-stepup/target/dependency/jackson-annotations-2.4.3.jar"
+#    dest: "{{ idp_home }}/edit-webapp/WEB-INF/lib/jackson-annotations-2.4.3.jar"
+#    owner: root
+#    group: root
+#    mode: 0644
+#    remote_src: yes
 
 - name: Copy stepup dependency googleauth-1.1.1.jar for bulding new idp.war
   copy:
     src: "{{ remote_user_home }}/stepup-proxy/idp-ssointerceptor-impl-stepup/target/dependency/googleauth-1.1.1.jar"
-    dest: "/opt/shibboleth-idp/edit-webapp/WEB-INF/lib/googleauth-1.1.1.jar"
+    dest: "{{ idp_home }}/edit-webapp/WEB-INF/lib/googleauth-1.1.1.jar"
     owner: root
     group: root
     mode: 0644
@@ -180,7 +180,7 @@
 - name: Copy stepup dependency commons-lang3-3.4.jar for bulding new idp.war
   copy:
     src: "{{ remote_user_home }}/stepup-proxy/idp-ssointerceptor-impl-stepup/target/dependency/commons-lang3-3.4.jar"
-    dest: "/opt/shibboleth-idp/edit-webapp/WEB-INF/lib/commons-lang3-3.4.jar"
+    dest: "{{ idp_home }}/edit-webapp/WEB-INF/lib/commons-lang3-3.4.jar"
     owner: root
     group: root
     mode: 0644
@@ -189,7 +189,7 @@
 - name: Copy stepup dependency commons-collections4-4.1.jar for bulding new idp.war
   copy:
     src: "{{ remote_user_home }}/stepup-proxy/idp-ssointerceptor-impl-stepup/target/dependency/commons-collections4-4.1.jar"
-    dest: "/opt/shibboleth-idp/edit-webapp/WEB-INF/lib/commons-collections4-4.1.jar"
+    dest: "{{ idp_home }}/edit-webapp/WEB-INF/lib/commons-collections4-4.1.jar"
     owner: root
     group: root
     mode: 0644
@@ -198,7 +198,7 @@
 - name: Copy stepup dependency HikariCP-2.4.7.jar for bulding new idp.war
   copy:
     src: "{{ remote_user_home }}/stepup-proxy/idp-ssointerceptor-impl-stepup/target/dependency/HikariCP-2.4.7.jar"
-    dest: "/opt/shibboleth-idp/edit-webapp/WEB-INF/lib/HikariCP-2.4.7.jar"
+    dest: "{{ idp_home }}/edit-webapp/WEB-INF/lib/HikariCP-2.4.7.jar"
     owner: root
     group: root
     mode: 0644
@@ -207,7 +207,7 @@
 - name: Copy stepup idp-ssointerceptor-api-stepup.jar for bulding new idp.war
   copy:
     src: "{{ remote_user_home }}/stepup-proxy/idp-ssointerceptor-api-stepup/target/idp-ssointerceptor-api-stepup-{{ stepup_version }}.jar"
-    dest: "/opt/shibboleth-idp/edit-webapp/WEB-INF/lib/idp-ssointerceptor-api-stepup.jar"
+    dest: "{{ idp_home }}/edit-webapp/WEB-INF/lib/idp-ssointerceptor-api-stepup.jar"
     owner: root
     group: root
     mode: 0644
@@ -216,7 +216,7 @@
 - name: Copy stepup idp-ssointerceptor-impl-stepup.jar for bulding new idp.war
   copy:
     src: "{{ remote_user_home }}/stepup-proxy/idp-ssointerceptor-impl-stepup/target/idp-ssointerceptor-impl-stepup-{{ stepup_version }}.jar"
-    dest: "/opt/shibboleth-idp/edit-webapp/WEB-INF/lib/idp-ssointerceptor-impl-stepup.jar"
+    dest: "{{ idp_home }}/edit-webapp/WEB-INF/lib/idp-ssointerceptor-impl-stepup.jar"
     owner: root
     group: root
     mode: 0644
@@ -225,7 +225,7 @@
 #add copy of basic set of dependencies
 
 - name: Build new idp.war
-  shell: source {{ environment_file }} && /opt/shibboleth-idp/bin/build.sh
+  shell: source {{ environment_file }} && "{{ idp_home }}/bin/build.sh"
   become_user: root
 
 - name: Restart shibboleth idp
