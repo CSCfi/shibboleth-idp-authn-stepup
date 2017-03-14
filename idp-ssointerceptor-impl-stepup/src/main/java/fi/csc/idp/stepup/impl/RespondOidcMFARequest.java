@@ -213,6 +213,9 @@ public class RespondOidcMFARequest implements org.springframework.webflow.execut
         if (oidcCtx.getRequest().getNonce() != null) {
             idToken2.setClaim("nonce", oidcCtx.getRequest().getNonce());
         }
+        //We always authenticate user and also set the time therefore
+        idToken2.setClaim("auth_time", new Date());
+        
         // We pick any ACR value from request
         // Action assumes there is only one and that has been performed
         idToken2.setACR(req.getACRValues().get(0));
