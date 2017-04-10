@@ -20,7 +20,7 @@ Clone or copy jmx-file and bash script from this folder.
 
 ## Running
 
-* Define the secret of your totp authentication method to appropriate parameters 
+* Define the secret of your totp authentication method as appropriate parameters 
 of the script file
 * Replace your user name on the test-idp in the jmx-file
 * Run the script: `./test.sh`
