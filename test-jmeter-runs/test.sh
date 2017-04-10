@@ -4,7 +4,7 @@ threadCount=2
 roundCount=2
 otpSecret=secretStr
 
-jmxFile=~/mfa-jmeter-runs/shibbo-sp-MFA-OIDC-Flow-Haka-test.jmx
+jmxFile=./shibbo-sp-MFA-OIDC-Flow-Haka-test.jmx
 otpProg=~/git/oathgen/oathgen_mac
 jmeterProg=~/apache-jmeter-3.1/bin/jmeter
 
