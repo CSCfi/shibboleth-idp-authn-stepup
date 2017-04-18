@@ -8,7 +8,7 @@
 Project can be deployed for testing purposes but is not fully production quality yet. Many of the features are still under development and deployment may require help from the development team.  
 
 ## Overview
-These modules contain extensions to achieve MFA service for both SPs and IdPs. The modules may act both as SAML2 proxy or as OIDC provider to offer the MFA service. SAML2 proxy is based on Shibboleth IdP 3 and Shibboleth SP. Proxying use case relies on [MPASS Shibboleth SP Authentication](https://github.com/Digipalvelutehdas/MPASS-proxy/tree/master/idp-authn-impl-shibsp) project for a authentication flow that actually enables to deploy a proxy based on Shibboleth IdP 3 and Shibboleth SP.  
+These modules contain extensions to achieve MFA service for both SPs and IdPs. The modules may act both as SAML2 proxy or as OIDC provider to offer the MFA service. SAML2 proxy is based on Shibboleth IdP 3 and Shibboleth SP. Proxying use case relies on [MPASS Shibboleth SP Authentication](https://github.com/Digipalvelutehdas/MPASS-proxy/tree/master/idp-authn-impl-shibsp) project for a authentication flow that actually enables to deploy a proxy based on Shibboleth IdP 3 and Shibboleth SP. If proxying is left out and only OIDC part is used Shibboleth SP is not needed not is there any dependency to [MPASS Shibboleth SP Authentication](https://github.com/Digipalvelutehdas/MPASS-proxy/tree/master/idp-authn-impl-shibsp). 
 
 ### Short Summary of flows
 
