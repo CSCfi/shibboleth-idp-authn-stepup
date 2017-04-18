@@ -15,7 +15,7 @@
 		p:placeholderPrefix="%{" p:placeholderSuffix="}" />
 
 	<bean id="AttachOidcAuthenticationRequest" class="fi.csc.idp.stepup.impl.AttachOidcAuthenticationRequest"
-		scope="prototype" p:issuer="mfapilot.funet.fi">
+		scope="prototype" p:issuer="MyIssuerValue">
 	</bean>
 
 	<bean id="VerifyClientRedirectUriOfOidcAuthenticationRequest"
@@ -25,45 +25,33 @@
 			<map>
 				<entry>
 					<key>
-						<value>vm0995.kaj.pouta.csc.fi</value>
+						<value>foo</value>
 					</key>
 					<list>
-						<value>https://vm0995.kaj.pouta.csc.fi/idp/Authn/SocialUserOpenIdConnectEnd
+						<value>https://foo.bar/idp/Authn/SocialUserOpenIdConnectEnd
 						</value>
 					</list>
 				</entry>
 				<entry>
 					<key>
-						<value>vm0988.kaj.pouta.csc.fi</value>
+						<value>foo2</value>
 					</key>
 					<list>
-						<value>https://vm0988.kaj.pouta.csc.fi/idp/Authn/SocialUserOpenIdConnectEnd
-						</value>
-					</list>
-				</entry>
-				<entry>
-					<key>
-						<value>vm0222.kaj.pouta.csc.fi</value>
-					</key>
-					<list>
-						<value>https://vm0222.kaj.pouta.csc.fi/idp/Authn/SocialUserOpenIdConnectEnd
+						<value>https://foo2.bar/idp/Authn/SocialUserOpenIdConnectEnd
 						</value>
 					</list>
 				</entry>
 			</map>
 		</property>
 	</bean>
+
 	<bean id="ValidateRequestObjectOfOidcAuthenticationRequest"
 		class="fi.csc.idp.stepup.impl.ValidateRequestObjectOfOidcAuthenticationRequest"
-		scope="prototype" p:noSignatureVerify="true">
+		scope="prototype" p:noSignatureVerify="false">
 		<property name="JwkSetUris">
 			<map>
-				<entry key="vm0222.kaj.pouta.csc.fi"
-					value="https://vm0222.kaj.pouta.csc.fi/keyset/mfaclientkeyset2.jwk" />
-				<entry key="vm0995.kaj.pouta.csc.fi"
-					value="https://vm0995.kaj.pouta.csc.fi/keyset/mfaclientkeyset2.jwk" />
-				<entry key="vm0988.kaj.pouta.csc.fi"
-					value="https://vm0988.kaj.pouta.csc.fi/keyset/mfaclientkeyset2.jwk" />
+				<entry key="foo" value="https://foo.bar/keyset/mfaclientkeyset.jwk" />
+				<entry key="foo2" value="https://foo2.bar/keyset/mfaclientkeyset.jwk" />
 			</map>
 		</property>
 	</bean>
