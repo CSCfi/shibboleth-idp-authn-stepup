@@ -17,7 +17,7 @@ Stepup flow is applied if the intention is to  build a SAML2 proxy providing MFA
 
 Stepup flow is a post authentication interceptor flow. In practise this means that stepup flow receives control at a point where user has been  authenticated, the attributes have been resolved and filtered but the actual assertion has not been formed yet. At this point flow makes decisions whether a stepup is needed, what kind of stepup that would be and how that is communicated to client SP in the assertion. Stepup flow uses Mfa flow to perform the user reauthentication.
 
-The flow provided with the is an example flow that may have to be heavily modified to suite the target environment. The basic building blocks consist of following functionality:
+The flow provided with the project is an example flow that may have to be heavily modified to suite the target environment. The basic building blocks consist of following functionality:
 
 - Possibility to translate requested and provided authentication methods between SP and IdP.
 - Possibility to trust the home organization IdP to provide already the authentication level requiring stepup. 
