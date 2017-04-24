@@ -55,7 +55,12 @@ public final class OidcProcessingEventIds {
     /** event id for the case of returning oidc error. */
     @Nonnull
     @NotEmpty
-    public static final String EVENTID_ERROR_OIDC = "ErroOidc";
+    public static final String EVENTID_ERROR_OIDC = "ErrorOidc";
+    
+    /** event id for the case of showing locally oidc error. */
+    @Nonnull
+    @NotEmpty
+    public static final String EVENTID_ERROR_LOCAL_OIDC = "ErrorLocalOidc";
 
     /** private constructor to prohibit use of it. */
     private OidcProcessingEventIds() {
