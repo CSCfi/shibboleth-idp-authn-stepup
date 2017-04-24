@@ -78,11 +78,13 @@ public class VerifyClientRedirectUriOfOidcAuthenticationRequest extends Abstract
         }
         oidcCtx = profileRequestContext.getSubcontext(OidcStepUpContext.class, false);
         if (oidcCtx == null) {
+            //TODO: not causing a failure, fix
             log.error("{} Unable to locate oidc context", getLogPrefix());
             ActionSupport.buildEvent(profileRequestContext, EventIds.INVALID_PROFILE_CTX);
             return false;
         }
         if (redirectUris == null) {
+            //TODO: not causing a failure, fix
             log.error("{} bean not initialized with redirect uris", getLogPrefix());
             ActionSupport.buildEvent(profileRequestContext, EventIds.INVALID_SEC_CFG);
             return false;
