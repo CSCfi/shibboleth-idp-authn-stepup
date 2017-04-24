@@ -15,7 +15,7 @@
         <evaluate expression="InitializeRelyingPartyContext" />
         <evaluate expression="InitializeAttributeContext" />
         <evaluate expression="'proceed'" />
-        <transition on="ErrorOidc" to="end">
+        <transition on="ErrorOidc" to="FormResponse">
             <evaluate expression="RespondOidcMFARequest" />
         </transition>
         <transition on="ErrorLocalOidc" to="DisplayCondolences" />
