@@ -9,10 +9,22 @@
 	default-init-method="initialize" default-destroy-method="destroy">
 
 
-
 	<bean
 		class="org.springframework.context.support.PropertySourcesPlaceholderConfigurer"
 		p:placeholderPrefix="%{" p:placeholderSuffix="}" />
+
+	<bean id="InitializeProfileRequestContext"
+		class="net.shibboleth.idp.profile.impl.InitializeProfileRequestContext"
+		scope="prototype" p:profileId="http://csc.fi/ns/profiles/oidc/mfarequest/browser"
+		p:loggingId="%{idp.service.logging.saml2sso:SSO}" p:browserProfile="true" />
+
+	<bean id="DecodeMessage" class="org.opensaml.profile.action.impl.DecodeMessage"
+		scope="prototype">
+		<constructor-arg>
+			<bean class="fi.csc.idp.stepup.impl.OIDCDecoder" scope="prototype"
+				p:httpServletRequest-ref="shibboleth.HttpServletRequest" />
+		</constructor-arg>
+	</bean>
 
 	<bean id="AttachOidcAuthenticationRequest" class="fi.csc.idp.stepup.impl.AttachOidcAuthenticationRequest"
 		scope="prototype" p:issuer="MyIssuerValue">
@@ -78,5 +90,8 @@
 
 	<bean id="JWTPrivateKey" class="net.shibboleth.ext.spring.factory.PrivateKeyFactoryBean"
 		p:resource="../../../credentials/oidcjwkprivatekey.pem" />
+
+	<bean id="RecordResponseComplete" class="net.shibboleth.idp.profile.impl.RecordResponseComplete"
+		scope="prototype" />
 
 </beans>

@@ -2,14 +2,24 @@
 <flow xmlns="http://www.springframework.org/schema/webflow"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://www.springframework.org/schema/webflow http://www.springframework.org/schema/webflow/spring-webflow.xsd">
-
-	<!-- THIS IS A EARLY DRAFT, NOT TO BE USED!! -->
+	
+	<action-state id="InitializeProfileRequestContext">
+		<evaluate expression="InitializeProfileRequestContext" />
+		<evaluate expression="'proceed'" />
+		<transition on="proceed" to="DecodeMessage" />
+	</action-state>
+	
+	<action-state id="DecodeMessage">
+		<evaluate expression="DecodeMessage" />
+		<evaluate expression="'proceed'" />
+		<transition on="proceed" to="AttachOidcAuthenticationRequest" />
+	</action-state>
 
 	<action-state id="AttachOidcAuthenticationRequest">
 		<evaluate expression="AttachOidcAuthenticationRequest" />
 		<transition on="ContinueOidc"
 			to="VerifyClientRedirectUriOfOidcAuthenticationRequest" />
-		<transition on="ErroOidc" to="proceed">
+		<transition on="ErroOidc" to="end">
 			<evaluate expression="RespondOidcMFARequest" />
 		</transition>
 		<!-- <transition to="DisplayCondolences" /> -->
@@ -19,7 +29,7 @@
 		<evaluate expression="VerifyClientRedirectUriOfOidcAuthenticationRequest" />
 		<transition on="ContinueOidc"
 			to="ValidateRequestObjectOfOidcAuthenticationRequest" />
-		<transition on="ErroOidc" to="proceed">
+		<transition on="ErroOidc" to="end">
 			<evaluate expression="RespondOidcMFARequest" />
 		</transition>
 		<!-- <transition to="DisplayCondolences" /> -->
@@ -29,7 +39,7 @@
 	<action-state id="ValidateRequestObjectOfOidcAuthenticationRequest">
 		<evaluate expression="ValidateRequestObjectOfOidcAuthenticationRequest" />
 		<transition on="ContinueOidc" to="BuildShibbolethContexts" />
-		<transition on="ErroOidc" to="proceed">
+		<transition on="ErroOidc" to="end">
 			<evaluate expression="RespondOidcMFARequest" />
 		</transition>
 		<!-- <transition to="DisplayCondolences" /> -->
@@ -38,7 +48,7 @@
 	<action-state id="BuildShibbolethContexts">
 		<evaluate expression="BuildShibbolethContexts" />
 		<transition on="ContinueOidc" to="Stepup" />
-		<transition on="ErroOidc" to="proceed">
+		<transition on="ErroOidc" to="end">
 			<evaluate expression="RespondOidcMFARequest" />
 		</transition>
 		<!-- <transition to="DisplayCondolences" /> -->
@@ -46,16 +56,19 @@
 
 	<subflow-state id="Stepup" subflow="authn/mfa">
 		<input name="calledAsSubflow" value="true" />
-		<transition to="proceed">
+		<transition to="end">
 			<evaluate expression="RespondOidcMFARequest" />
 		</transition>
 	</subflow-state>
 
 
-	<end-state id="proceed" view="externalRedirect:#{flowScope.redirect}">
+	<end-state id="end" view="externalRedirect:#{flowScope.redirect}">
+		<on-entry>
+			<evaluate expression="RecordResponseComplete" />
+		</on-entry>
 	</end-state>
 
-
+    <bean-import resource="../../../system/flows/saml/security-beans.xml" />
 	<bean-import resource="mfarequest-beans.xml" />
 
 </flow>
