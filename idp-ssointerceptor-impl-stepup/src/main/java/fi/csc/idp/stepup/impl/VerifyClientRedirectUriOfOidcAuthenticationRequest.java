@@ -114,7 +114,7 @@ public class VerifyClientRedirectUriOfOidcAuthenticationRequest extends Abstract
         oidcCtx.setErrorDescription("client has not registered redirect uri "
                 + oidcCtx.getRequest().getRedirectionURI().toString());
         log.trace("Leaving");
-        log.error("{} client {} has not registered redirect uri ", getLogPrefix(), oidcCtx.getRequest().getClientID()
+        log.error("{} client {} has not registered redirect uri {}", getLogPrefix(), oidcCtx.getRequest().getClientID()
                 .getValue(), oidcCtx.getRequest().getRedirectionURI().toString());
         ActionSupport.buildEvent(profileRequestContext, OidcProcessingEventIds.EVENTID_ERROR_LOCAL_OIDC);
     }
