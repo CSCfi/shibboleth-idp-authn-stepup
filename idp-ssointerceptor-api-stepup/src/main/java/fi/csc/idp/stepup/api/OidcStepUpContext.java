@@ -24,6 +24,7 @@ package fi.csc.idp.stepup.api;
 
 import javax.annotation.Nonnull;
 
+import org.opensaml.messaging.context.BaseContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,7 +35,7 @@ import com.nimbusds.openid.connect.sdk.AuthenticationRequest;
  * Context for passing information between oidc request and response handlers.
  * 
  */
-public class OidcStepUpContext {
+public class OidcStepUpContext extends BaseContext{
 
     /** key to store this context with. */
     private static final String CTX_KEY = "fi.csc.idp.stepup.api.OidcStepUpContext.key";
