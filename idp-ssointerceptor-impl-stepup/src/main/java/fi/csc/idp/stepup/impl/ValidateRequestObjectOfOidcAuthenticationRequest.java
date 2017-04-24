@@ -42,12 +42,14 @@ import javax.annotation.Nonnull;
 
 import net.minidev.json.JSONArray;
 import net.minidev.json.JSONObject;
+import net.shibboleth.idp.profile.AbstractProfileAction;
 
 import org.joda.time.DateTime;
+import org.opensaml.profile.action.ActionSupport;
+import org.opensaml.profile.action.EventIds;
+import org.opensaml.profile.context.ProfileRequestContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.webflow.execution.Event;
-import org.springframework.webflow.execution.RequestContext;
 
 import fi.csc.idp.stepup.api.OidcProcessingEventIds;
 import fi.csc.idp.stepup.api.OidcStepUpContext;
@@ -71,13 +73,17 @@ import com.nimbusds.openid.connect.sdk.AuthenticationRequest;
  * id token is stored to context.
  * 
  */
-public class ValidateRequestObjectOfOidcAuthenticationRequest implements org.springframework.webflow.execution.Action {
+@SuppressWarnings("rawtypes")
+public class ValidateRequestObjectOfOidcAuthenticationRequest extends AbstractProfileAction {
 
     /** contains messages already used for verification. */
     private static Map<String, DateTime> usedMessages = new HashMap<String, DateTime>();
 
     /** lock to access usedMessages. */
     private static Lock msgLock = new ReentrantLock();
+
+    /** OIDC Ctx. */
+    private OidcStepUpContext oidcCtx;
 
     /** Class logger. */
     @Nonnull
@@ -169,7 +175,7 @@ public class ValidateRequestObjectOfOidcAuthenticationRequest implements org.spr
                 java.nio.charset.Charset.forName("UTF8")));
         JSONArray keyList = (JSONArray) json.get("keys");
         if (keyList == null) {
-            //not a keyset? If it is is a RSA key we are happy
+            // not a keyset? If it is is a RSA key we are happy
             JSONObject k = json;
             if ("RSA".equals(k.get("kty"))) {
                 log.debug("adding verification key " + k.toString());
@@ -180,7 +186,7 @@ public class ValidateRequestObjectOfOidcAuthenticationRequest implements org.spr
         }
         for (Object key : keyList) {
             JSONObject k = (JSONObject) key;
-            //in case of many keys, we pick all RSA signature keys
+            // in case of many keys, we pick all RSA signature keys
             if ("sig".equals(k.get("use")) && "RSA".equals(k.get("kty"))) {
                 log.debug("adding verification key " + k.toString());
                 log.trace("Leaving");
@@ -337,8 +343,8 @@ public class ValidateRequestObjectOfOidcAuthenticationRequest implements org.spr
             log.trace("Leaving");
             return false;
         }
-        
-        JSONObject claims =(JSONObject) req.getRequestObject().getJWTClaimsSet().getClaim("claims");
+
+        JSONObject claims = (JSONObject) req.getRequestObject().getJWTClaimsSet().getClaim("claims");
         if (claims == null) {
             log.error("request object: signed request object needs to have claims");
             oidcCtx.setErrorCode("invalid_request");
@@ -346,10 +352,11 @@ public class ValidateRequestObjectOfOidcAuthenticationRequest implements org.spr
             log.trace("Leaving");
             return false;
         }
-        JWTClaimsSet idToken=null;
+        JWTClaimsSet idToken = null;
         try {
             idToken = JWTClaimsSet.parse((JSONObject) claims.get("id_token"));
-        } catch (Exception e) {}
+        } catch (Exception e) {
+        }
         if (idToken == null) {
             log.error("request object: signed request object needs to have id token");
             oidcCtx.setErrorCode("invalid_request");
@@ -373,51 +380,63 @@ public class ValidateRequestObjectOfOidcAuthenticationRequest implements org.spr
         oidcCtx.setIdToken(idToken);
         log.trace("Leaving");
         return true;
-        
+
     }
 
+    /** {@inheritDoc} */
+    @SuppressWarnings("unchecked")
     @Override
-    public Event execute(@Nonnull final RequestContext springRequestContext) {
-        log.trace("Entering");
-        OidcStepUpContext oidcCtx = (OidcStepUpContext) springRequestContext.getConversationScope().get(
-                OidcStepUpContext.getContextKey());
-        if (jwkSetUris == null) {
-            log.error("jwkset uris are not defined");
-            log.trace("Leaving");
-            return new Event(this, OidcProcessingEventIds.EXCEPTION);
+    protected boolean doPreExecute(@Nonnull final ProfileRequestContext profileRequestContext) {
+        if (!super.doPreExecute(profileRequestContext)) {
+            log.error("{} pre-execute failed", getLogPrefix());
+            return false;
         }
+        oidcCtx = profileRequestContext.getSubcontext(OidcStepUpContext.class, false);
         if (oidcCtx == null) {
-            log.error("oidc context missing");
-            log.trace("Leaving");
-            return new Event(this, OidcProcessingEventIds.EXCEPTION);
+            // TODO: not causing a failure, fix
+            log.error("{} Unable to locate oidc context", getLogPrefix());
+            ActionSupport.buildEvent(profileRequestContext, EventIds.INVALID_PROFILE_CTX);
+            return false;
         }
-        // validate request object!
+        if (jwkSetUris == null) {
+            // TODO: not causing a failure, fix
+            log.error("{} bean not initialized with jwkSetUris uris", getLogPrefix());
+            ActionSupport.buildEvent(profileRequestContext, EventIds.INVALID_SEC_CFG);
+            return false;
+        }
+        return true;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    protected void doExecute(@Nonnull final ProfileRequestContext profileRequestContext) {
         if (oidcCtx.getRequest().getRequestObject() == null) {
-            log.error("request does not contain request object");
             oidcCtx.setErrorCode("invalid_request");
             oidcCtx.setErrorDescription("request does not contain request object");
             log.trace("Leaving");
-            return new Event(this, OidcProcessingEventIds.EVENTID_ERROR_OIDC);
+            log.error("{} request does not contain request object", getLogPrefix());
+            ActionSupport.buildEvent(profileRequestContext, OidcProcessingEventIds.EVENTID_ERROR_OIDC);
         }
         if (!verifyJWT(oidcCtx, oidcCtx.getRequest().getRequestObject(), oidcCtx.getRequest().getClientID().getValue())) {
             log.error("verify failed");
             // verify is expected to fill reason
             log.trace("Leaving");
-            return new Event(this, OidcProcessingEventIds.EVENTID_ERROR_OIDC);
+            log.error("{} verify failed {}:{}", getLogPrefix(), oidcCtx.getErrorCode(), oidcCtx.getErrorDescription());
+            ActionSupport.buildEvent(profileRequestContext, OidcProcessingEventIds.EVENTID_ERROR_OIDC);
         }
         try {
             if (!validateRequestObject(oidcCtx, oidcCtx.getRequest())) {
                 log.error("validation failed");
                 // verify is expected to fill reason
-                log.trace("Leaving");
-                return new Event(this, OidcProcessingEventIds.EVENTID_ERROR_OIDC);
+                log.error("{} validation failed", getLogPrefix());
+                ActionSupport.buildEvent(profileRequestContext, OidcProcessingEventIds.EVENTID_ERROR_OIDC);
             }
         } catch (ParseException e) {
             log.error("request object parsing failed");
             log.trace("Leaving");
-            return new Event(this, OidcProcessingEventIds.EXCEPTION);
+            log.error("{} request object parsing failed", getLogPrefix());
+            ActionSupport.buildEvent(profileRequestContext, OidcProcessingEventIds.EVENTID_ERROR_OIDC);
         }
-        return new Event(this, OidcProcessingEventIds.EVENTID_CONTINUE_OIDC);
     }
 
 }
