@@ -108,6 +108,7 @@ public class VerifyClientRedirectUriOfOidcAuthenticationRequest extends Abstract
             log.debug("matching to " + uri);
             if (uri.equals(oidcCtx.getRequest().getRedirectionURI().toString())) {
                 log.debug("redirect uri validated");
+                oidcCtx.setRedirectUriValidated(true);
                 log.trace("Leaving");
                 return;
             }
