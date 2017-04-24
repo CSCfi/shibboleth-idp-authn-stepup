@@ -14,21 +14,21 @@
 		<evaluate expression="AttachOidcAuthenticationRequest" />
 		<evaluate expression="VerifyClientRedirectUriOfOidcAuthenticationRequest" />
 		<evaluate expression="ValidateRequestObjectOfOidcAuthenticationRequest" />
+		<evaluate expression="InitializeRelyingPartyContext" />
+		<evaluate expression="InitializeAttributeContext" />
 		<evaluate expression="'proceed'" />
 		<transition on="ErrorOidc" to="end">
 			<evaluate expression="RespondOidcMFARequest" />
 		</transition>
 		<transition on="ErrorLocalOidc" to="DisplayCondolences"/>
-		<transition on="proceed" to="BuildShibbolethContexts" />
+		<transition on="proceed" to="PostInitialSetup" />
 	</action-state>
-
-	<action-state id="BuildShibbolethContexts">
-		<evaluate expression="BuildShibbolethContexts" />
-		<transition on="ContinueOidc" to="Stepup" />
-		<transition on="ErroOidc" to="end">
-			<evaluate expression="RespondOidcMFARequest" />
-		</transition>
-		<!-- <transition to="DisplayCondolences" /> -->
+    
+    <action-state id="PostInitialSetup">
+		<evaluate expression="InitializeAuthenticationContext" />
+		<evaluate expression="InitializeShibSPContext" />
+		<evaluate expression="'proceed'" />
+		<transition on="proceed" to="Stepup" />
 	</action-state>
 
 	<subflow-state id="Stepup" subflow="authn/mfa">
