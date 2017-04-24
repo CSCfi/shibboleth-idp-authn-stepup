@@ -32,19 +32,25 @@ import java.util.List;
 import javax.annotation.Nonnull;
 
 import net.shibboleth.idp.attribute.context.AttributeContext;
+import net.shibboleth.idp.profile.AbstractProfileAction;
 import net.shibboleth.idp.profile.context.RelyingPartyContext;
+import net.shibboleth.idp.profile.context.SpringRequestContext;
 
+import org.opensaml.profile.action.ActionSupport;
+import org.opensaml.profile.action.EventIds;
 import org.opensaml.profile.context.ProfileRequestContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.webflow.execution.Event;
 import org.springframework.webflow.execution.RequestContext;
 
+import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.JWSAlgorithm;
 import com.nimbusds.jose.JWSHeader;
 import com.nimbusds.jose.crypto.RSASSASigner;
 import com.nimbusds.jwt.SignedJWT;
 import com.nimbusds.oauth2.sdk.AuthorizationCode;
+import com.nimbusds.oauth2.sdk.ParseException;
 import com.nimbusds.oauth2.sdk.id.Audience;
 import com.nimbusds.oauth2.sdk.id.Issuer;
 import com.nimbusds.oauth2.sdk.id.State;
@@ -70,11 +76,17 @@ import com.nimbusds.oauth2.sdk.ErrorObject;
  * 
  */
 
-public class RespondOidcMFARequest implements org.springframework.webflow.execution.Action {
+@SuppressWarnings("rawtypes")
+public class RespondOidcMFARequest extends AbstractProfileAction {
 
     /** Class logger. */
     @Nonnull
     private final Logger log = LoggerFactory.getLogger(RespondOidcMFARequest.class);
+
+    /** OIDC Ctx. */
+    private OidcStepUpContext oidcCtx;
+    /** spring request context */
+    SpringRequestContext srCtx;
 
     /** private key used for JWT signing. */
     private PrivateKey prvKey;
@@ -149,46 +161,57 @@ public class RespondOidcMFARequest implements org.springframework.webflow.execut
         this.keyID = id;
     }
 
-    @SuppressWarnings({ "rawtypes" })
+    /** {@inheritDoc} */
+    @SuppressWarnings("unchecked")
     @Override
-    public Event execute(@Nonnull final RequestContext springRequestContext) throws Exception {
-        log.trace("Entering");
-        OidcStepUpContext oidcCtx = (OidcStepUpContext) springRequestContext.getConversationScope().get(
-                OidcStepUpContext.getContextKey());
+    protected boolean doPreExecute(@Nonnull final ProfileRequestContext profileRequestContext) {
+        if (!super.doPreExecute(profileRequestContext)) {
+            log.error("{} pre-execute failed", getLogPrefix());
+            return false;
+        }
+        oidcCtx = profileRequestContext.getSubcontext(OidcStepUpContext.class, false);
         if (oidcCtx == null) {
-            log.error("oidc context missing, misconfiguration in flow");
-            log.trace("Leaving");
-            return new Event(this, OidcProcessingEventIds.EXCEPTION);
+            // TODO: not causing a failure, fix
+            log.error("{} Unable to locate oidc context", getLogPrefix());
+            ActionSupport.buildEvent(profileRequestContext, EventIds.INVALID_PROFILE_CTX);
+            return false;
         }
         if (prvKey == null) {
-            log.error("oidc context missing, misconfiguration in flow");
-            log.trace("Leaving");
-            return new Event(this, OidcProcessingEventIds.EXCEPTION);
+            // TODO: not causing a failure, fix
+            log.error("{} bean not initialized with private key", getLogPrefix());
+            ActionSupport.buildEvent(profileRequestContext, EventIds.INVALID_SEC_CFG);
+            return false;
         }
+        srCtx = profileRequestContext.getSubcontext(SpringRequestContext.class);
+        if (srCtx == null) {
+            // TODO: not causing a failure, fix
+            log.error("{} unable to get spring request context", getLogPrefix());
+            ActionSupport.buildEvent(profileRequestContext, EventIds.INVALID_PROFILE_CTX);
+            return false;
+        }
+        return true;
+
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    protected void doExecute(@Nonnull final ProfileRequestContext profileRequestContext) {
         if (oidcCtx.getErrorCode() != null) {
             AuthenticationErrorResponse resp = new AuthenticationErrorResponse(
                     oidcCtx.getRequest().getRedirectionURI(), new ErrorObject(oidcCtx.getErrorCode(),
                             oidcCtx.getErrorDescription()), oidcCtx.getRequest().getState(), oidcCtx.getRequest()
                             .getResponseMode());
             log.debug("constructed response:" + resp.toURI());
-            springRequestContext.getFlowScope().put(redirect, resp.toURI().toString());
-            return new Event(this, OidcProcessingEventIds.EVENTID_CONTINUE_FINISHED);
+            srCtx.getRequestContext().getFlowScope().put(redirect, resp.toURI().toString());
+            return;
         }
         AuthenticationRequest req = oidcCtx.getRequest();
-
-        final ProfileRequestContext prc = (ProfileRequestContext) springRequestContext.getConversationScope().get(
-                ProfileRequestContext.BINDING_KEY);
-        if (prc == null) {
-            log.error("prc context missing, misconfiguration in flow");
-            log.trace("Leaving");
-            return new Event(this, OidcProcessingEventIds.EXCEPTION);
-        }
-        final AttributeContext attributeCtx = prc.getSubcontext(RelyingPartyContext.class).getSubcontext(
-                AttributeContext.class);
+        final AttributeContext attributeCtx = profileRequestContext.getSubcontext(RelyingPartyContext.class)
+                .getSubcontext(AttributeContext.class);
         if (attributeCtx == null) {
-            log.error("attribute context missing, misconfiguration in flow");
-            log.trace("Leaving");
-            return new Event(this, OidcProcessingEventIds.EXCEPTION);
+            log.error("{} attribute context missing", getLogPrefix());
+            ActionSupport.buildEvent(profileRequestContext, EventIds.INVALID_PROFILE_CTX);
+            return;
         }
         // Generate new authorization code
         AuthorizationCode code = new AuthorizationCode();
@@ -213,23 +236,26 @@ public class RespondOidcMFARequest implements org.springframework.webflow.execut
         if (oidcCtx.getRequest().getNonce() != null) {
             idToken2.setClaim("nonce", oidcCtx.getRequest().getNonce());
         }
-        //We always authenticate user and also set the time therefore
+        // We always authenticate user and also set the time therefore
         idToken2.setClaim("auth_time", new Date());
-        
+
         // We pick any ACR value from request
         // Action assumes there is only one and that has been performed
         idToken2.setACR(req.getACRValues().get(0));
-        SignedJWT jwt = new SignedJWT(new JWSHeader.Builder(jwsAlgorithm).keyID(keyID).build(),
-                idToken2.toJWTClaimsSet());
-        jwt.sign(new RSASSASigner(prvKey));
+        SignedJWT jwt = null;
+        try {
+            jwt = new SignedJWT(new JWSHeader.Builder(jwsAlgorithm).keyID(keyID).build(), idToken2.toJWTClaimsSet());
+            jwt.sign(new RSASSASigner(prvKey));
+        } catch (ParseException | JOSEException e) {
+            log.error("{} not able to sign jwt:{}", getLogPrefix(), e.getMessage());
+            ActionSupport.buildEvent(profileRequestContext, EventIds.INVALID_PROFILE_CTX);
+        }
+
         State state = req.getState();
         AuthenticationSuccessResponse resp = new AuthenticationSuccessResponse(req.getRedirectionURI(), code, jwt,
                 null, state, null, req.getResponseMode());
         log.debug("constructed response:" + resp.toURI());
-        springRequestContext.getFlowScope().put(redirect, resp.toURI().toString());
-        log.trace("Leaving");
-        return new Event(this, OidcProcessingEventIds.EVENTID_CONTINUE_FINISHED);
-
+        srCtx.getRequestContext().getFlowScope().put(redirect, resp.toURI().toString());
     }
 
 }
