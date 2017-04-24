@@ -13,22 +13,13 @@
 		<evaluate expression="DecodeMessage" />
 		<evaluate expression="AttachOidcAuthenticationRequest" />
 		<evaluate expression="VerifyClientRedirectUriOfOidcAuthenticationRequest" />
+		<evaluate expression="ValidateRequestObjectOfOidcAuthenticationRequest" />
 		<evaluate expression="'proceed'" />
 		<transition on="ErrorOidc" to="end">
 			<evaluate expression="RespondOidcMFARequest" />
 		</transition>
 		<transition on="ErrorLocalOidc" to="DisplayCondolences"/>
-		<transition on="proceed" to="ValidateRequestObjectOfOidcAuthenticationRequest" />
-	</action-state>
-
-
-	<action-state id="ValidateRequestObjectOfOidcAuthenticationRequest">
-		<evaluate expression="ValidateRequestObjectOfOidcAuthenticationRequest" />
-		<transition on="ContinueOidc" to="BuildShibbolethContexts" />
-		<transition on="ErroOidc" to="end">
-			<evaluate expression="RespondOidcMFARequest" />
-		</transition>
-		<!-- <transition to="DisplayCondolences" /> -->
+		<transition on="proceed" to="BuildShibbolethContexts" />
 	</action-state>
 
 	<action-state id="BuildShibbolethContexts">
