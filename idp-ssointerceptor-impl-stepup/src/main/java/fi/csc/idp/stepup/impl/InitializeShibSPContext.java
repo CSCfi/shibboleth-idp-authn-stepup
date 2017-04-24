@@ -45,8 +45,8 @@ import fi.csc.idp.stepup.api.OidcStepUpContext;
 import fi.okm.mpass.shibboleth.authn.context.ShibbolethSpAuthenticationContext;
 
 /**
- * An action that creates an {@link ShibbolethSpAuthenticationContext} and attaches it to
- * the current {@link AuthenticationContext}.
+ * An action that creates an {@link ShibbolethSpAuthenticationContext} and
+ * attaches it to the current {@link AuthenticationContext}.
  * 
  */
 @SuppressWarnings("rawtypes")
