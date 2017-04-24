@@ -28,7 +28,7 @@ public class TestAttachOidcAuthenticationRequest {
 
     /** Test that action copes with no issuer set. 
     */
-    @Test
+    //@Test
     public void testNoIssuer() {
         
         final Event event = action.execute(src);
@@ -37,7 +37,7 @@ public class TestAttachOidcAuthenticationRequest {
 
     /** Test that action copes with no query parameters. 
      */
-     @Test
+     //@Test
      public void testNoQuery() {
          
          action.setIssuer("iss value");
@@ -47,7 +47,7 @@ public class TestAttachOidcAuthenticationRequest {
      
      /** Test that in case of a(ny) valid oidc request we return success event. 
       */
-      @Test
+      //@Test
       public void testSuccess() throws ComponentInitializationException {
           action.setIssuer("iss value");
           MockHttpServletRequest msr=new MockHttpServletRequest();
