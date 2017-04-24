@@ -1,51 +1,47 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<flow xmlns="http://www.springframework.org/schema/webflow"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://www.springframework.org/schema/webflow http://www.springframework.org/schema/webflow/spring-webflow.xsd">
-	
-	<action-state id="InitializeProfileRequestContext">
-		<evaluate expression="InitializeProfileRequestContext" />
-		<evaluate expression="'proceed'" />
-		<transition on="proceed" to="DecodeMessage" />
-	</action-state>
-	
-	<action-state id="DecodeMessage">
-		<evaluate expression="DecodeMessage" />
-		<evaluate expression="AttachOidcAuthenticationRequest" />
-		<evaluate expression="VerifyClientRedirectUriOfOidcAuthenticationRequest" />
-		<evaluate expression="ValidateRequestObjectOfOidcAuthenticationRequest" />
-		<evaluate expression="InitializeRelyingPartyContext" />
-		<evaluate expression="InitializeAttributeContext" />
-		<evaluate expression="'proceed'" />
-		<transition on="ErrorOidc" to="end">
-			<evaluate expression="RespondOidcMFARequest" />
-		</transition>
-		<transition on="ErrorLocalOidc" to="DisplayCondolences"/>
-		<transition on="proceed" to="PostInitialSetup" />
-	</action-state>
+<flow xmlns="http://www.springframework.org/schema/webflow" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.springframework.org/schema/webflow http://www.springframework.org/schema/webflow/spring-webflow.xsd">
+    
+    <action-state id="InitializeProfileRequestContext">
+        <evaluate expression="InitializeProfileRequestContext" />
+        <evaluate expression="'proceed'" />
+        <transition on="proceed" to="DecodeMessage" />
+    </action-state>
+    
+    <action-state id="DecodeMessage">
+        <evaluate expression="DecodeMessage" />
+        <evaluate expression="AttachOidcAuthenticationRequest" />
+        <evaluate expression="VerifyClientRedirectUriOfOidcAuthenticationRequest" />
+        <evaluate expression="ValidateRequestObjectOfOidcAuthenticationRequest" />
+        <evaluate expression="InitializeRelyingPartyContext" />
+        <evaluate expression="InitializeAttributeContext" />
+        <evaluate expression="'proceed'" />
+        <transition on="ErrorOidc" to="end">
+            <evaluate expression="RespondOidcMFARequest" />
+        </transition>
+        <transition on="ErrorLocalOidc" to="DisplayCondolences" />
+        <transition on="proceed" to="PostInitialSetup" />
+    </action-state>
     
     <action-state id="PostInitialSetup">
-		<evaluate expression="InitializeAuthenticationContext" />
-		<evaluate expression="InitializeShibSPContext" />
-		<evaluate expression="'proceed'" />
-		<transition on="proceed" to="Stepup" />
-	</action-state>
-
-	<subflow-state id="Stepup" subflow="authn/mfa">
-		<input name="calledAsSubflow" value="true" />
-		<transition to="end">
-			<evaluate expression="RespondOidcMFARequest" />
-		</transition>
-	</subflow-state>
-
-
-	<end-state id="end" view="externalRedirect:#{flowScope.redirect}">
-		<on-entry>
-			<evaluate expression="RecordResponseComplete" />
-		</on-entry>
-	</end-state>
-
+        <evaluate expression="InitializeAuthenticationContext" />
+        <evaluate expression="InitializeShibSPContext" />
+        <evaluate expression="'proceed'" />
+        <transition on="proceed" to="Stepup" />
+    </action-state>
+    
+    <subflow-state id="Stepup" subflow="authn/mfa">
+        <input name="calledAsSubflow" value="true" />
+        <transition to="FormResponse" />
+    </subflow-state>
+    
+    <action-state id="FormResponse">
+        <evaluate expression="RespondOidcMFARequest" />
+        <evaluate expression="'proceed'" />
+        <transition on="proceed" to="end" />
+    </action-state>
+    
+    <end-state id="end" view="externalRedirect:#{opensamlProfileRequestContext.getSubcontext(T(fi.csc.idp.stepup.api.OidcStepUpContext)).getResponse().toString()}"></end-state>
+    
     <bean-import resource="../../../system/flows/saml/security-beans.xml" />
-	<bean-import resource="mfarequest-beans.xml" />
-
+    <bean-import resource="mfarequest-beans.xml" />
 </flow>
