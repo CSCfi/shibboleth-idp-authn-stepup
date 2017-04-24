@@ -46,7 +46,10 @@ public class OidcStepUpContext extends BaseContext{
 
     /** Authentication request received from rp. */
     private AuthenticationRequest request;
-
+    
+    /** whether the redirect uri should be trusted*/
+    private boolean redirectUriValidated;
+   
     /** error code. */
     private String error;
 
@@ -59,6 +62,23 @@ public class OidcStepUpContext extends BaseContext{
     /** the id token received in authentication request. */
     private JWTClaimsSet idToken;
 
+    /**
+     * True if the redirect uri has been validated.
+     * @return true for validated uri.
+     */
+    public boolean isRedirectUriValidated() {
+        return redirectUriValidated;
+    }
+
+    /**
+     * Set to true if the redirect uri is validated successfully.
+     * 
+     * @param redirectUriValidated true if validated.
+     */
+    public void setRedirectUriValidated(boolean redirectUriValidated) {
+        this.redirectUriValidated = redirectUriValidated;
+    }
+    
     /**
      * Key to store this context with.
      * 
