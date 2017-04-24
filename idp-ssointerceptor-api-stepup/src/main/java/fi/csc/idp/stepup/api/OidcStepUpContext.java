@@ -22,6 +22,8 @@
  */
 package fi.csc.idp.stepup.api;
 
+import java.net.URI;
+
 import javax.annotation.Nonnull;
 
 import org.opensaml.messaging.context.BaseContext;
@@ -49,6 +51,8 @@ public class OidcStepUpContext extends BaseContext{
     
     /** whether the redirect uri should be trusted*/
     private boolean redirectUriValidated;
+    
+    private URI response;
    
     /** error code. */
     private String error;
@@ -62,6 +66,24 @@ public class OidcStepUpContext extends BaseContext{
     /** the id token received in authentication request. */
     private JWTClaimsSet idToken;
 
+    /**
+     * Get the response.
+     * 
+     * @return redirect uri for response
+     */
+    public URI getResponse() {
+        return response;
+    }
+
+    /**
+     * Set the redirect uri response.
+     * 
+     * @param response formed for client.
+     */
+    public void setResponse(URI response) {
+        this.response = response;
+    }
+    
     /**
      * True if the redirect uri has been validated.
      * @return true for validated uri.
