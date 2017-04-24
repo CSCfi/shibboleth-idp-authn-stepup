@@ -11,28 +11,14 @@
 	
 	<action-state id="DecodeMessage">
 		<evaluate expression="DecodeMessage" />
-		<evaluate expression="'proceed'" />
-		<transition on="proceed" to="AttachOidcAuthenticationRequest" />
-	</action-state>
-
-	<action-state id="AttachOidcAuthenticationRequest">
 		<evaluate expression="AttachOidcAuthenticationRequest" />
-		<transition on="ContinueOidc"
-			to="VerifyClientRedirectUriOfOidcAuthenticationRequest" />
-		<transition on="ErroOidc" to="end">
-			<evaluate expression="RespondOidcMFARequest" />
-		</transition>
-		<!-- <transition to="DisplayCondolences" /> -->
-	</action-state>
-
-	<action-state id="VerifyClientRedirectUriOfOidcAuthenticationRequest">
 		<evaluate expression="VerifyClientRedirectUriOfOidcAuthenticationRequest" />
-		<transition on="ContinueOidc"
-			to="ValidateRequestObjectOfOidcAuthenticationRequest" />
-		<transition on="ErroOidc" to="end">
+		<transition on="ErrorOidc" to="end">
 			<evaluate expression="RespondOidcMFARequest" />
 		</transition>
-		<!-- <transition to="DisplayCondolences" /> -->
+		<transition on="ErrorLocalOidc" to="DisplayCondolences"/>
+		<evaluate expression="'proceed'" />
+		<transition on="proceed" to="ValidateRequestObjectOfOidcAuthenticationRequest" />
 	</action-state>
 
 

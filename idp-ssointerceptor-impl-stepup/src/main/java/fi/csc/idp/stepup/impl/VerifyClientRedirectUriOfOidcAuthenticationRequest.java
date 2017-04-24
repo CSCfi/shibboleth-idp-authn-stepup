@@ -28,10 +28,14 @@ import java.util.Map;
 
 import javax.annotation.Nonnull;
 
+import net.shibboleth.idp.profile.AbstractProfileAction;
+
+import org.opensaml.profile.action.ActionSupport;
+import org.opensaml.profile.action.EventIds;
+import org.opensaml.profile.context.ProfileRequestContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.webflow.execution.Event;
-import org.springframework.webflow.execution.RequestContext;
+
 
 import fi.csc.idp.stepup.api.OidcProcessingEventIds;
 import fi.csc.idp.stepup.api.OidcStepUpContext;
@@ -41,8 +45,8 @@ import fi.csc.idp.stepup.api.OidcStepUpContext;
  * whitelisted.
  * 
  */
-public class VerifyClientRedirectUriOfOidcAuthenticationRequest 
-    implements org.springframework.webflow.execution.Action {
+@SuppressWarnings("rawtypes")
+public class VerifyClientRedirectUriOfOidcAuthenticationRequest extends AbstractProfileAction {
 
     /** Class logger. */
     @Nonnull
@@ -50,6 +54,9 @@ public class VerifyClientRedirectUriOfOidcAuthenticationRequest
 
     /** redirect uris that are valid per client id. */
     private Map<String, List<String>> redirectUris;
+
+    /** OIDC Ctx. */
+    private OidcStepUpContext oidcCtx;
 
     /**
      * Setter for redirect uris.
@@ -61,34 +68,38 @@ public class VerifyClientRedirectUriOfOidcAuthenticationRequest
         this.redirectUris = uris;
     }
 
+    /** {@inheritDoc} */
+    @SuppressWarnings("unchecked")
     @Override
-    public Event execute(@Nonnull final RequestContext springRequestContext) {
-        log.trace("Entering");
-        if (redirectUris == null) {
-            log.error("redirect uri whitelist not set");
-            log.trace("Leaving");
-            return new Event(this, OidcProcessingEventIds.EXCEPTION);
+    protected boolean doPreExecute(@Nonnull final ProfileRequestContext profileRequestContext) {
+        if (!super.doPreExecute(profileRequestContext)) {
+            log.error("{} pre-execute failed", getLogPrefix());
+            return false;
         }
-        OidcStepUpContext oidcCtx = (OidcStepUpContext) springRequestContext.getConversationScope().get(
-                OidcStepUpContext.getContextKey());
+        oidcCtx = profileRequestContext.getSubcontext(OidcStepUpContext.class, false);
         if (oidcCtx == null) {
-            log.error("oidc context missing");
-            log.trace("Leaving");
-            return new Event(this, OidcProcessingEventIds.EXCEPTION);
+            log.error("{} Unable to locate oidc context", getLogPrefix());
+            ActionSupport.buildEvent(profileRequestContext, EventIds.INVALID_PROFILE_CTX);
+            return false;
         }
-        if (oidcCtx.getRequest() == null) {
-            log.error("authentication request missing");
-            log.trace("Leaving");
-            return new Event(this, OidcProcessingEventIds.EXCEPTION);
+        if (redirectUris == null) {
+            log.error("{} bean not initialized with redirect uris", getLogPrefix());
+            ActionSupport.buildEvent(profileRequestContext, EventIds.INVALID_SEC_CFG);
+            return false;
         }
-        // if request is found it is assumed to be formally valid
+        return true;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    protected void doExecute(@Nonnull final ProfileRequestContext profileRequestContext) {
         if (!redirectUris.containsKey(oidcCtx.getRequest().getClientID().getValue())) {
-            log.error("client id " + oidcCtx.getRequest().getClientID().getValue()
-                    + " has not registered redirect uris");
             oidcCtx.setErrorCode("unauthorized_client");
             oidcCtx.setErrorDescription("client has not registered any redirect uri");
             log.trace("Leaving");
-            return new Event(this, OidcProcessingEventIds.EVENTID_ERROR_OIDC);
+            log.error("{} client {} has not registered redirect uris", getLogPrefix(), oidcCtx.getRequest()
+                    .getClientID().getValue());
+            ActionSupport.buildEvent(profileRequestContext, OidcProcessingEventIds.EVENTID_ERROR_LOCAL_OIDC);
 
         }
         for (String uri : redirectUris.get(oidcCtx.getRequest().getClientID().getValue())) {
@@ -96,16 +107,16 @@ public class VerifyClientRedirectUriOfOidcAuthenticationRequest
             if (uri.equals(oidcCtx.getRequest().getRedirectionURI().toString())) {
                 log.debug("redirect uri validated");
                 log.trace("Leaving");
-                return new Event(this, OidcProcessingEventIds.EVENTID_CONTINUE_OIDC);
+                return;
             }
         }
-        log.error("client id " + oidcCtx.getRequest().getClientID().getValue() + " has not registered uri "
-                + oidcCtx.getRequest().getRedirectionURI().toString());
         oidcCtx.setErrorCode("unauthorized_client");
         oidcCtx.setErrorDescription("client has not registered redirect uri "
                 + oidcCtx.getRequest().getRedirectionURI().toString());
         log.trace("Leaving");
-        return new Event(this, OidcProcessingEventIds.EVENTID_ERROR_OIDC);
+        log.error("{} client {} has not registered redirect uri ", getLogPrefix(), oidcCtx.getRequest().getClientID()
+                .getValue(), oidcCtx.getRequest().getRedirectionURI().toString());
+        ActionSupport.buildEvent(profileRequestContext, OidcProcessingEventIds.EVENTID_ERROR_LOCAL_OIDC);
     }
 
 }

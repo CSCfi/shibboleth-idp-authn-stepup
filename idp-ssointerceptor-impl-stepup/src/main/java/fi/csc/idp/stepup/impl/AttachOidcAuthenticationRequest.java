@@ -24,17 +24,17 @@
 package fi.csc.idp.stepup.impl;
 
 import javax.annotation.Nonnull;
-import javax.servlet.http.HttpServletRequest;
 
+import net.shibboleth.idp.profile.AbstractProfileAction;
+
+import org.opensaml.profile.action.ActionSupport;
+import org.opensaml.profile.action.EventIds;
+import org.opensaml.profile.context.ProfileRequestContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.webflow.context.servlet.ServletExternalContext;
-import org.springframework.webflow.execution.Event;
-import org.springframework.webflow.execution.RequestContext;
 
 import com.nimbusds.openid.connect.sdk.AuthenticationRequest;
 
-import fi.csc.idp.stepup.api.OidcProcessingEventIds;
 import fi.csc.idp.stepup.api.OidcStepUpContext;
 
 /**
@@ -42,7 +42,8 @@ import fi.csc.idp.stepup.api.OidcStepUpContext;
  * and parsed authentication request.
  * 
  */
-public class AttachOidcAuthenticationRequest implements org.springframework.webflow.execution.Action {
+@SuppressWarnings("rawtypes")
+public class AttachOidcAuthenticationRequest extends AbstractProfileAction {
 
     /** Class logger. */
     @Nonnull
@@ -50,6 +51,9 @@ public class AttachOidcAuthenticationRequest implements org.springframework.webf
 
     /** issuer stored to be used in verifications and response. */
     private String issuer;
+
+    /** OIDC Authentication request. */
+    private AuthenticationRequest request;
 
     /**
      * Set the value for Issuer. Mandatory.
@@ -62,30 +66,44 @@ public class AttachOidcAuthenticationRequest implements org.springframework.webf
         this.issuer = iss;
     }
 
+    /** {@inheritDoc} */
+    @SuppressWarnings("unchecked")
     @Override
-    public Event execute(@Nonnull final RequestContext springRequestContext) {
-        log.trace("Entering");
+    protected boolean doPreExecute(@Nonnull final ProfileRequestContext profileRequestContext) {
+        if (!super.doPreExecute(profileRequestContext)) {
+            log.error("{} pre-execute failed", getLogPrefix());
+            return false;
+        }
+        if (profileRequestContext.getInboundMessageContext() == null) {
+            log.error("{} Unable to locate inbound message context", getLogPrefix());
+            ActionSupport.buildEvent(profileRequestContext, EventIds.INVALID_MSG_CTX);
+            return false;
+        }
+        Object message = profileRequestContext.getInboundMessageContext().getMessage();
+
+        if (message == null || !(message instanceof AuthenticationRequest)) {
+            log.error("{} Unable to locate inbound message", getLogPrefix());
+            ActionSupport.buildEvent(profileRequestContext, EventIds.INVALID_MSG_CTX);
+            return false;
+        }
         if (issuer == null) {
-            log.error("issuer not set");
-            return new Event(this, OidcProcessingEventIds.EXCEPTION);
+            log.error("{} bean not initialized with issuer", getLogPrefix());
+            ActionSupport.buildEvent(profileRequestContext, EventIds.INVALID_SEC_CFG);
+            return false;
         }
+        request = (AuthenticationRequest) message;
+        return true;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    protected void doExecute(@Nonnull final ProfileRequestContext profileRequestContext) {
         OidcStepUpContext oidcCtx = new OidcStepUpContext();
-        springRequestContext.getConversationScope().put(OidcStepUpContext.getContextKey(), oidcCtx);
-        ServletExternalContext externalContext = (ServletExternalContext) springRequestContext.getExternalContext();
-        HttpServletRequest request = (HttpServletRequest) externalContext.getNativeRequest();
-        AuthenticationRequest req;
-        try {
-            req = AuthenticationRequest.parse(request.getQueryString());
-        } catch (com.nimbusds.oauth2.sdk.ParseException e) {
-            log.error("unable to parse query string "+e.getMessage());
-            log.error(request.getQueryString());
-            log.trace("Leaving");
-            return new Event(this, OidcProcessingEventIds.EVENTID_INVALID_QUERYSTRING);
-        }
-        oidcCtx.setRequest(req);
+        profileRequestContext.addSubcontext(oidcCtx);
+        log.debug("Attaching inbound message to oidc stepup context {}", request.toQueryString());
+        oidcCtx.setRequest(request);
+        log.debug("Setting issuer value to oidc stepup context {}", issuer);
         oidcCtx.setIssuer(issuer);
-        log.trace("Leaving");
-        return new Event(this, OidcProcessingEventIds.EVENTID_CONTINUE_OIDC);
     }
 
 }
