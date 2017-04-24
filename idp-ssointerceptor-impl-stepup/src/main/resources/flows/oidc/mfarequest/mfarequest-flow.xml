@@ -13,11 +13,11 @@
 		<evaluate expression="DecodeMessage" />
 		<evaluate expression="AttachOidcAuthenticationRequest" />
 		<evaluate expression="VerifyClientRedirectUriOfOidcAuthenticationRequest" />
+		<evaluate expression="'proceed'" />
 		<transition on="ErrorOidc" to="end">
 			<evaluate expression="RespondOidcMFARequest" />
 		</transition>
 		<transition on="ErrorLocalOidc" to="DisplayCondolences"/>
-		<evaluate expression="'proceed'" />
 		<transition on="proceed" to="ValidateRequestObjectOfOidcAuthenticationRequest" />
 	</action-state>
 
