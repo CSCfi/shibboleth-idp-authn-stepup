@@ -202,6 +202,7 @@ public class RespondOidcMFARequest extends AbstractProfileAction {
                             oidcCtx.getErrorDescription()), oidcCtx.getRequest().getState(), oidcCtx.getRequest()
                             .getResponseMode());
             log.debug("constructed response:" + resp.toURI());
+            oidcCtx.setResponse(resp.toURI());
             srCtx.getRequestContext().getFlowScope().put(redirect, resp.toURI().toString());
             return;
         }
@@ -255,6 +256,7 @@ public class RespondOidcMFARequest extends AbstractProfileAction {
         AuthenticationSuccessResponse resp = new AuthenticationSuccessResponse(req.getRedirectionURI(), code, jwt,
                 null, state, null, req.getResponseMode());
         log.debug("constructed response:" + resp.toURI());
+        oidcCtx.setResponse(resp.toURI());
         srCtx.getRequestContext().getFlowScope().put(redirect, resp.toURI().toString());
     }
 
