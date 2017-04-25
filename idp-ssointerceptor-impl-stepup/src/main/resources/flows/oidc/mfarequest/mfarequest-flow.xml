@@ -40,7 +40,38 @@
         <transition on="proceed" to="end" />
     </action-state>
     
+    <!-- Error handling and end states -->
+    
+    <!-- Passthrough state if an exception is thrown. -->
+    <action-state id="LogRuntimeException">
+        <on-entry>
+            <evaluate expression="T(org.slf4j.LoggerFactory).getLogger('net.shibboleth.idp.saml.profile').error('Uncaught runtime exception', flowExecutionException.getCause())" />
+        </on-entry>
+        <evaluate expression="'RuntimeException'" />
+        <transition to="HandleError" />
+    </action-state>
+
+    <!-- Should error be returned or handled locally -->
+    <decision-state id="HandleError">
+        <if test="currentEvent.id.equals('ErrorOidc')" then="FormResponse" else="HandleErrorLocally" />
+    </decision-state>
+
     <end-state id="end" view="externalRedirect:#{opensamlProfileRequestContext.getSubcontext(T(fi.csc.idp.stepup.api.OidcStepUpContext)).getResponse().toString()}"></end-state>
+
+    <!-- placeholder for view -->
+    <end-state id="HandleErrorLocally">
+        <on-entry>
+            <evaluate expression="RecordResponseComplete" />
+        </on-entry>
+    </end-state>
+
+    
+    <!-- all unhandled non proceed results are turned into errors -->
+    <global-transitions>
+        <transition on-exception="java.lang.RuntimeException" to="LogRuntimeException" />
+        <transition on="#{!'proceed'.equals(currentEvent.id)}" to="HandleError" />
+    </global-transitions>
+    
     
     <bean-import resource="../../../system/flows/saml/security-beans.xml" />
     <bean-import resource="mfarequest-beans.xml" />
