@@ -9,7 +9,10 @@ import java.util.Map;
 
 import net.shibboleth.idp.profile.ActionTestingSupport;
 import net.shibboleth.idp.profile.RequestContextBuilder;
+import net.shibboleth.idp.profile.context.navigate.WebflowRequestContextProfileRequestContextLookup;
 
+import org.opensaml.profile.action.EventIds;
+import org.opensaml.profile.context.ProfileRequestContext;
 import org.springframework.webflow.execution.Event;
 import org.springframework.webflow.execution.RequestContext;
 import org.testng.Assert;
@@ -29,37 +32,31 @@ public class TestVerifyClientRedirectUriOfOidcAuthenticationRequest {
     private VerifyClientRedirectUriOfOidcAuthenticationRequest action;
 
     protected RequestContext src;
+    @SuppressWarnings("rawtypes")
+    protected ProfileRequestContext prc;
+    protected OidcStepUpContext oidcCtx;
 
     @BeforeMethod
     public void setUp() throws Exception {
         src = new RequestContextBuilder().buildRequestContext();
+        prc = new WebflowRequestContextProfileRequestContextLookup().apply(src);
+        oidcCtx = new OidcStepUpContext(); 
+        prc.addSubcontext(oidcCtx);
         action = new VerifyClientRedirectUriOfOidcAuthenticationRequest();
+        action.initialize();
 
     }
 
     /**
-     * Test that action copes with no issuer set.
+     * Test that action copes with no redirect uris set.
      */
-    //@Test
-    public void testNoIssuer() {
+    @Test
+    public void testNoRedirectUris() {
         final Event event = action.execute(src);
-        ActionTestingSupport.assertEvent(event, OidcProcessingEventIds.EXCEPTION);
+        ActionTestingSupport.assertEvent(event,  EventIds.INVALID_SEC_CFG);
     }
 
-    /**
-     * Test that action copes with no context set.
-     */
-    //@Test
-    public void testNoCtx() {
-        Map<String, List<String>> uris = new HashMap<String, List<String>>();
-        List<String> value = new ArrayList<String>();
-        value.add("foobaar");
-        uris.put("key", value);
-        action.setRedirectUris(uris);
-        final Event event = action.execute(src);
-        ActionTestingSupport.assertEvent(event, OidcProcessingEventIds.EXCEPTION);
-    }
-
+    
     /**
      * Test that action copes with no request set.
      */
@@ -69,8 +66,6 @@ public class TestVerifyClientRedirectUriOfOidcAuthenticationRequest {
         List<String> value = new ArrayList<String>();
         value.add("foobaar");
         uris.put("key", value);
-        OidcStepUpContext oidcCtx = new OidcStepUpContext();
-        src.getConversationScope().put(OidcStepUpContext.getContextKey(), oidcCtx);
         action.setRedirectUris(uris);
         final Event event = action.execute(src);
         ActionTestingSupport.assertEvent(event, OidcProcessingEventIds.EXCEPTION);
@@ -85,8 +80,6 @@ public class TestVerifyClientRedirectUriOfOidcAuthenticationRequest {
         List<String> value = new ArrayList<String>();
         value.add("http://bar");
         uris.put("foo", value);
-        OidcStepUpContext oidcCtx = new OidcStepUpContext();
-        src.getConversationScope().put(OidcStepUpContext.getContextKey(), oidcCtx);
         action.setRedirectUris(uris);
         ClientID clientID = new ClientID("fooO");
         URI redirectURI = new URI("http://barO");
@@ -109,8 +102,6 @@ public class TestVerifyClientRedirectUriOfOidcAuthenticationRequest {
         List<String> value = new ArrayList<String>();
         value.add("http://bar");
         uris.put("foo", value);
-        OidcStepUpContext oidcCtx = new OidcStepUpContext();
-        src.getConversationScope().put(OidcStepUpContext.getContextKey(), oidcCtx);
         action.setRedirectUris(uris);
         ClientID clientID = new ClientID("foo");
         URI redirectURI = new URI("http://barO");
@@ -133,8 +124,6 @@ public class TestVerifyClientRedirectUriOfOidcAuthenticationRequest {
         List<String> value = new ArrayList<String>();
         value.add("http://bar");
         uris.put("foo", value);
-        OidcStepUpContext oidcCtx = new OidcStepUpContext();
-        src.getConversationScope().put(OidcStepUpContext.getContextKey(), oidcCtx);
         action.setRedirectUris(uris);
         ClientID clientID = new ClientID("foo");
         URI redirectURI = new URI("http://bar");
