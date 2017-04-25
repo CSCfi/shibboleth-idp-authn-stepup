@@ -76,7 +76,7 @@ public class AttachOidcAuthenticationRequest extends AbstractProfileAction {
         }
         if (profileRequestContext.getInboundMessageContext() == null) {
             log.error("{} Unable to locate inbound message context", getLogPrefix());
-            ActionSupport.buildEvent(profileRequestContext, EventIds.INVALID_MSG_CTX);
+            ActionSupport.buildEvent(profileRequestContext, EventIds.INVALID_PROFILE_CTX);
             return false;
         }
         Object message = profileRequestContext.getInboundMessageContext().getMessage();
