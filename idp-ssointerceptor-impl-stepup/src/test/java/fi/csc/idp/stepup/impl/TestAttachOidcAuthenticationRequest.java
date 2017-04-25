@@ -2,59 +2,63 @@ package fi.csc.idp.stepup.impl;
 
 import net.shibboleth.idp.profile.ActionTestingSupport;
 import net.shibboleth.idp.profile.RequestContextBuilder;
+import net.shibboleth.idp.profile.context.navigate.WebflowRequestContextProfileRequestContextLookup;
 import net.shibboleth.utilities.java.support.component.ComponentInitializationException;
 
-import org.springframework.mock.web.MockHttpServletRequest;
+import org.opensaml.profile.action.EventIds;
+import org.opensaml.profile.context.ProfileRequestContext;
 import org.springframework.webflow.execution.Event;
 import org.springframework.webflow.execution.RequestContext;
+import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-import fi.csc.idp.stepup.api.OidcProcessingEventIds;
+import com.nimbusds.openid.connect.sdk.AuthenticationRequest;
 
+import fi.csc.idp.stepup.api.OidcStepUpContext;
 
 public class TestAttachOidcAuthenticationRequest {
 
     private AttachOidcAuthenticationRequest action;
 
     protected RequestContext src;
-   
+    @SuppressWarnings("rawtypes")
+    protected ProfileRequestContext prc;
+    protected RequestContext requestCtx;
+
     @BeforeMethod
     public void setUp() throws Exception {
         src = new RequestContextBuilder().buildRequestContext();
+        AuthenticationRequest req = AuthenticationRequest
+                .parse("response_type=code&client_id=s6BhdRkqt3&login_hint=foo&redirect_uri=https%3A%2F%2Fclient.example.org%2Fcb&scope=openid%20profile&state=af0ifjsldkj&nonce=n-0S6_WzA2Mj");
+        requestCtx = new RequestContextBuilder().setInboundMessage(req).buildRequestContext();
+        prc = new WebflowRequestContextProfileRequestContextLookup().apply(requestCtx);
         action = new AttachOidcAuthenticationRequest();
-       
+        action.initialize();
     }
 
-    /** Test that action copes with no issuer set. 
-    */
-    //@Test
-    public void testNoIssuer() {
-        
-        final Event event = action.execute(src);
-        ActionTestingSupport.assertEvent(event, OidcProcessingEventIds.EXCEPTION);
-    }
-
-    /** Test that action copes with no query parameters. 
+    /**
+     * Test that action copes with no issuer set.
+     * 
+     * @throws ComponentInitializationException
      */
-     //@Test
-     public void testNoQuery() {
-         
-         action.setIssuer("iss value");
-         final Event event = action.execute(src);
-         ActionTestingSupport.assertEvent(event, OidcProcessingEventIds.EVENTID_INVALID_QUERYSTRING);
-     }
-     
-     /** Test that in case of a(ny) valid oidc request we return success event. 
-      */
-      //@Test
-      public void testSuccess() throws ComponentInitializationException {
-          action.setIssuer("iss value");
-          MockHttpServletRequest msr=new MockHttpServletRequest();
-          msr.setQueryString("response_type=code&scope=openid&client_id=client&state=af0ifjsldkj&redirect_uri=https://server.example.com");
-          src = new RequestContextBuilder().setHttpRequest(msr).buildRequestContext();
-          final Event event = action.execute(src);
-          ActionTestingSupport.assertEvent(event, OidcProcessingEventIds.EVENTID_CONTINUE_OIDC);
-      }
-   
+    @Test
+    public void testNoIssuer() {
+        final Event event = action.execute(requestCtx);
+        ActionTestingSupport.assertEvent(event, EventIds.INVALID_SEC_CFG);
+    }
+
+    /**
+     * Test success
+     */
+    @Test
+    public void testSuccess() {
+        action.setIssuer("iss value");
+        final Event event = action.execute(requestCtx);
+        Assert.assertNull(event);
+        OidcStepUpContext oidcCtx = prc.getSubcontext(OidcStepUpContext.class, false);
+        Assert.assertEquals(oidcCtx.getIssuer(), "iss value");
+
+    }
+
 }
