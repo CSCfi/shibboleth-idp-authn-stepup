@@ -1,21 +1,10 @@
 package fi.csc.idp.stepup.impl;
 
-import java.net.URI;
-import java.security.KeyPair;
-import java.security.KeyPairGenerator;
-import java.security.PrivateKey;
-import java.util.Calendar;
-import java.util.HashMap;
 import java.util.Map;
 
-import net.minidev.json.JSONObject;
-import net.shibboleth.idp.authn.context.AuthenticationContext;
-import net.shibboleth.idp.profile.ActionTestingSupport;
 import net.shibboleth.idp.profile.RequestContextBuilder;
 import net.shibboleth.idp.profile.context.RelyingPartyContext;
 import net.shibboleth.idp.profile.context.navigate.WebflowRequestContextProfileRequestContextLookup;
-
-import org.opensaml.profile.action.EventIds;
 import org.opensaml.profile.context.ProfileRequestContext;
 import org.springframework.webflow.execution.Event;
 import org.springframework.webflow.execution.RequestContext;
@@ -23,21 +12,7 @@ import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-import com.nimbusds.jose.JWSAlgorithm;
-import com.nimbusds.jose.JWSHeader;
-import com.nimbusds.jose.JWSSigner;
-import com.nimbusds.jose.crypto.RSASSASigner;
-import com.nimbusds.jwt.JWT;
-import com.nimbusds.jwt.JWTClaimsSet;
-import com.nimbusds.jwt.SignedJWT;
-import com.nimbusds.oauth2.sdk.ResponseType;
-import com.nimbusds.oauth2.sdk.Scope;
-import com.nimbusds.oauth2.sdk.id.ClientID;
-import com.nimbusds.oauth2.sdk.id.State;
 import com.nimbusds.openid.connect.sdk.AuthenticationRequest;
-import com.nimbusds.openid.connect.sdk.Nonce;
-
-import fi.csc.idp.stepup.api.OidcProcessingEventIds;
 import fi.csc.idp.stepup.api.OidcStepUpContext;
 
 public class TestInitializeRelyingPartyContext {
