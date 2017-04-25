@@ -26,17 +26,11 @@ package fi.csc.idp.stepup.impl;
 import javax.annotation.Nonnull;
 
 import net.shibboleth.idp.authn.context.AuthenticationContext;
-import net.shibboleth.idp.profile.AbstractProfileAction;
-
-import org.opensaml.profile.action.ActionSupport;
-import org.opensaml.profile.action.EventIds;
 import org.opensaml.profile.context.ProfileRequestContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.nimbusds.openid.connect.sdk.Prompt;
-
-import fi.csc.idp.stepup.api.OidcStepUpContext;
 
 /**
  * An action that creates an {@link AuthenticationContext} and attaches it to
