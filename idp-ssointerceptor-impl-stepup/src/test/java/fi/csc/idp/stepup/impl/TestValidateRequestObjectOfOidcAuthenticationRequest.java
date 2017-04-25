@@ -13,7 +13,11 @@ import java.util.Map;
 import net.minidev.json.JSONObject;
 import net.shibboleth.idp.profile.ActionTestingSupport;
 import net.shibboleth.idp.profile.RequestContextBuilder;
+import net.shibboleth.idp.profile.context.navigate.WebflowRequestContextProfileRequestContextLookup;
+import net.shibboleth.utilities.java.support.component.ComponentInitializationException;
 
+import org.opensaml.profile.action.EventIds;
+import org.opensaml.profile.context.ProfileRequestContext;
 import org.springframework.webflow.execution.Event;
 import org.springframework.webflow.execution.RequestContext;
 import org.testng.Assert;
@@ -46,6 +50,8 @@ public class TestValidateRequestObjectOfOidcAuthenticationRequest {
     private ValidateRequestObjectOfOidcAuthenticationRequest action;
 
     protected RequestContext src;
+    @SuppressWarnings("rawtypes")
+    protected ProfileRequestContext prc;
 
     private OidcStepUpContext oidcCtx;
 
@@ -55,16 +61,14 @@ public class TestValidateRequestObjectOfOidcAuthenticationRequest {
     JSONObject claims;
     Calendar calendar;
 
-    void baseInit() {
+    void baseInit() throws ComponentInitializationException {
         idToken = new JSONObject();
         claims = new JSONObject();
         claims.put("id_token", idToken);
-        oidcCtx = new OidcStepUpContext();
         action.setEventWindow(11 * 60 * 1000);
         calendar = Calendar.getInstance();
         calendar.add(Calendar.MINUTE, -10);
         oidcCtx.setIssuer("opid");
-        src.getConversationScope().put(OidcStepUpContext.getContextKey(), oidcCtx);
         Map<String, String> uris = new HashMap<String, String>();
         uris.put("foo", "http://bar.foo");
         action.setJwkSetUris(uris);
@@ -73,31 +77,23 @@ public class TestValidateRequestObjectOfOidcAuthenticationRequest {
     @BeforeMethod
     public void setUp() throws Exception {
         src = new RequestContextBuilder().buildRequestContext();
+        prc = new WebflowRequestContextProfileRequestContextLookup().apply(src);
+        oidcCtx = new OidcStepUpContext(); 
+        prc.addSubcontext(oidcCtx);
         action = new ValidateRequestObjectOfOidcAuthenticationRequest();
-
+        action.initialize();
     }
 
     /**
      * Test that action copes with no keysets.
      */
-    //@Test
+    @Test
     public void testNoKeySets() {
         final Event event = action.execute(src);
-        ActionTestingSupport.assertEvent(event, OidcProcessingEventIds.EXCEPTION);
+        ActionTestingSupport.assertEvent(event, EventIds.INVALID_SEC_CFG);
     }
 
-    /**
-     * Test that action copes with no oidc ctx.
-     */
-    //@Test
-    public void testNoCtx() {
-        Map<String, String> uris = new HashMap<String, String>();
-        uris.put("foo", "http://bar.foo");
-        action.setJwkSetUris(uris);
-        final Event event = action.execute(src);
-        ActionTestingSupport.assertEvent(event, OidcProcessingEventIds.EXCEPTION);
-    }
-
+    
     private AuthenticationRequest buildAuthReq1() throws URISyntaxException {
         ClientID clientID = new ClientID("foo");
         URI redirectURI = new URI("http://bar");
@@ -141,9 +137,9 @@ public class TestValidateRequestObjectOfOidcAuthenticationRequest {
     }
 
     /**
-     * Test that action copes with no oidc ctx.
+     * Test that action copes with no request object.
      */
-    //@Test
+    @Test
     public void testNoRequestObject() throws Exception {
         baseInit();
         Map<String, String> uris = new HashMap<String, String>();
@@ -160,7 +156,7 @@ public class TestValidateRequestObjectOfOidcAuthenticationRequest {
      * Test that action copes with unsigned request object.
      */
 
-    //@Test
+    @Test
     public void testNotSignedRequestObject() throws Exception {
         baseInit();
         Map<String, String> uris = new HashMap<String, String>();
@@ -177,7 +173,7 @@ public class TestValidateRequestObjectOfOidcAuthenticationRequest {
      * Test that action copes with client not having key registered.
      */
 
-    //@Test
+    @Test
     public void testNoClientRegisteredKey() throws Exception {
         baseInit();
         Map<String, String> uris = new HashMap<String, String>();
@@ -195,7 +191,7 @@ public class TestValidateRequestObjectOfOidcAuthenticationRequest {
     /*
      * client id mismatch in req obj
      */
-    //@Test
+    @Test
     public void testRequestObjectClientIdMismatch() throws Exception {
         baseInit();
         action.setNoSignatureVerify(true);
@@ -212,7 +208,7 @@ public class TestValidateRequestObjectOfOidcAuthenticationRequest {
     /*
      * response type mismatch in req obj
      */
-    //@Test
+    @Test
     public void testRequestObjectResponseTypeMismatch() throws Exception {
         baseInit();
         action.setNoSignatureVerify(true);
@@ -229,7 +225,7 @@ public class TestValidateRequestObjectOfOidcAuthenticationRequest {
     /*
      * issuer mismatch in req obj
      */
-    //@Test
+    @Test
     public void testRequestObjectIssuerMismatch() throws Exception {
         baseInit();
         action.setNoSignatureVerify(true);
@@ -247,7 +243,7 @@ public class TestValidateRequestObjectOfOidcAuthenticationRequest {
     /*
      * op must be the audience in req obj
      */
-    //@Test
+    @Test
     public void testRequestObjectAudienceMismatch() throws Exception {
         baseInit();
         action.setNoSignatureVerify(true);
@@ -265,7 +261,7 @@ public class TestValidateRequestObjectOfOidcAuthenticationRequest {
     /*
      * test coping with missing iat section
      */
-    //@Test
+    @Test
     public void testRequestObjectIdMissingIat() throws Exception {
         baseInit();
         action.setNoSignatureVerify(true);
@@ -282,7 +278,7 @@ public class TestValidateRequestObjectOfOidcAuthenticationRequest {
     /*
      * test coping with old iat
      */
-    //@Test
+    @Test
     public void testRequestObjectIdOldIat() throws Exception {
         baseInit();
         action.setEventWindow(9 * 60 * 1000);
@@ -297,7 +293,7 @@ public class TestValidateRequestObjectOfOidcAuthenticationRequest {
         ActionTestingSupport.assertEvent(event, OidcProcessingEventIds.EVENTID_ERROR_OIDC);
     }
 
-    //@Test
+    @Test
     public void testRequestObjectIdNoState() throws Exception {
         baseInit();
         action.setNoSignatureVerify(true);
@@ -311,7 +307,7 @@ public class TestValidateRequestObjectOfOidcAuthenticationRequest {
         ActionTestingSupport.assertEvent(event, OidcProcessingEventIds.EVENTID_ERROR_OIDC);
     }
 
-    //@Test
+    @Test
     public void testRequestObjectNoClaims() throws Exception {
         baseInit();
         action.setNoSignatureVerify(true);
@@ -325,7 +321,7 @@ public class TestValidateRequestObjectOfOidcAuthenticationRequest {
         ActionTestingSupport.assertEvent(event, OidcProcessingEventIds.EVENTID_ERROR_OIDC);
     }
 
-    //@Test
+    @Test
     public void testRequestObjectNoIdToken() throws Exception {
         baseInit();
         action.setNoSignatureVerify(true);
@@ -340,7 +336,7 @@ public class TestValidateRequestObjectOfOidcAuthenticationRequest {
         ActionTestingSupport.assertEvent(event, OidcProcessingEventIds.EVENTID_ERROR_OIDC);
     }
 
-    //@Test
+    @Test
     public void testRequestObjectReplay() throws Exception {
         baseInit();
         action.setNoSignatureVerify(true);
@@ -349,7 +345,7 @@ public class TestValidateRequestObjectOfOidcAuthenticationRequest {
                 .claim("claims", claims).audience("opid").build();
         oidcCtx.setRequest(buildAuthReq3(claimsRequest));
         final Event event = action.execute(src);
-        ActionTestingSupport.assertEvent(event, OidcProcessingEventIds.EVENTID_CONTINUE_OIDC);
+        Assert.assertNull(event);
         final Event event2 = action.execute(src);
         Assert.assertEquals(oidcCtx.getErrorCode(), "invalid_request");
         Assert.assertEquals(oidcCtx.getErrorDescription(), "request object already used");
