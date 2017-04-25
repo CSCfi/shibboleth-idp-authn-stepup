@@ -26,22 +26,15 @@ package fi.csc.idp.stepup.impl;
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
-
 import javax.annotation.Nonnull;
-
 import net.shibboleth.idp.authn.context.AuthenticationContext;
-import net.shibboleth.idp.profile.AbstractProfileAction;
 import net.shibboleth.idp.saml.authn.principal.AuthnContextClassRefPrincipal;
-
 import org.opensaml.profile.action.ActionSupport;
 import org.opensaml.profile.action.EventIds;
 import org.opensaml.profile.context.ProfileRequestContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import com.nimbusds.openid.connect.sdk.claims.ACR;
-
-import fi.csc.idp.stepup.api.OidcStepUpContext;
 import fi.okm.mpass.shibboleth.authn.context.ShibbolethSpAuthenticationContext;
 
 /**
@@ -50,33 +43,11 @@ import fi.okm.mpass.shibboleth.authn.context.ShibbolethSpAuthenticationContext;
  * 
  */
 @SuppressWarnings("rawtypes")
-public class InitializeShibSPContext extends AbstractProfileAction {
+public class InitializeShibSPContext extends AbstractOidcProfileAction {
 
     /** Class logger. */
     @Nonnull
     private final Logger log = LoggerFactory.getLogger(InitializeShibSPContext.class);
-
-    /** OIDC Ctx. */
-    private OidcStepUpContext oidcCtx;
-
-    /** {@inheritDoc} */
-    @SuppressWarnings("unchecked")
-    @Override
-    protected boolean doPreExecute(@Nonnull final ProfileRequestContext profileRequestContext) {
-        if (!super.doPreExecute(profileRequestContext)) {
-            log.error("{} pre-execute failed", getLogPrefix());
-            return false;
-        }
-        oidcCtx = profileRequestContext.getSubcontext(OidcStepUpContext.class, false);
-        if (oidcCtx == null) {
-            // TODO: not causing a failure, fix
-            log.error("{} Unable to locate oidc context", getLogPrefix());
-            ActionSupport.buildEvent(profileRequestContext, EventIds.INVALID_PROFILE_CTX);
-            return false;
-        }
-        return true;
-
-    }
 
     /**
      * Creates ShibbolethSpAuthenticationContext instance and adds it to
@@ -89,7 +60,6 @@ public class InitializeShibSPContext extends AbstractProfileAction {
     /** {@inheritDoc} */
     @Override
     protected void doExecute(@Nonnull final ProfileRequestContext profileRequestContext) {
-
         AuthenticationContext authnCtx = profileRequestContext.getSubcontext(AuthenticationContext.class, false);
         if (authnCtx == null) {
             log.error("{} Unable to locate authentication context", getLogPrefix());

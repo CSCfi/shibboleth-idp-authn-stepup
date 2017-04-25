@@ -28,20 +28,14 @@ import javax.annotation.Nonnull;
 import org.opensaml.profile.action.ActionSupport;
 import org.opensaml.profile.action.EventIds;
 import org.opensaml.profile.context.ProfileRequestContext;
-
-import net.shibboleth.idp.profile.AbstractProfileAction;
 import net.shibboleth.idp.profile.IdPEventIds;
 import net.shibboleth.idp.profile.context.RelyingPartyContext;
 import net.shibboleth.utilities.java.support.component.ComponentSupport;
 import net.shibboleth.utilities.java.support.logic.Constraint;
-
 import org.opensaml.messaging.context.navigate.ChildContextLookup;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import com.google.common.base.Function;
-
-import fi.csc.idp.stepup.api.OidcStepUpContext;
 
 /**
  * Action that adds a {@link RelyingPartyContext} to the current
@@ -54,14 +48,11 @@ import fi.csc.idp.stepup.api.OidcStepUpContext;
  *       with relying party id set.
  */
 @SuppressWarnings("rawtypes")
-public class InitializeRelyingPartyContext extends AbstractProfileAction {
+public class InitializeRelyingPartyContext extends AbstractOidcProfileAction {
 
     /** Class logger. */
     @Nonnull
     private final Logger log = LoggerFactory.getLogger(InitializeRelyingPartyContext.class);
-
-    /** OIDC Ctx. */
-    private OidcStepUpContext oidcCtx;
 
     /** Strategy that will return or create a {@link RelyingPartyContext}. */
     @Nonnull
@@ -88,28 +79,8 @@ public class InitializeRelyingPartyContext extends AbstractProfileAction {
     }
 
     /** {@inheritDoc} */
-    @SuppressWarnings("unchecked")
-    @Override
-    protected boolean doPreExecute(@Nonnull final ProfileRequestContext profileRequestContext) {
-        if (!super.doPreExecute(profileRequestContext)) {
-            log.error("{} pre-execute failed", getLogPrefix());
-            return false;
-        }
-        oidcCtx = profileRequestContext.getSubcontext(OidcStepUpContext.class, false);
-        if (oidcCtx == null) {
-            // TODO: not causing a failure, fix
-            log.error("{} Unable to locate oidc context", getLogPrefix());
-            ActionSupport.buildEvent(profileRequestContext, EventIds.INVALID_PROFILE_CTX);
-            return false;
-        }
-        return true;
-
-    }
-
-    /** {@inheritDoc} */
     @Override
     protected void doExecute(@Nonnull final ProfileRequestContext profileRequestContext) {
-
         final RelyingPartyContext rpContext = relyingPartyContextCreationStrategy.apply(profileRequestContext);
         if (rpContext == null) {
             log.debug("{} Unable to locate or create RelyingPartyContext", getLogPrefix());

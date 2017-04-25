@@ -52,38 +52,15 @@ import fi.csc.idp.stepup.api.OidcStepUpContext;
  * 
  */
 @SuppressWarnings("rawtypes")
-public class InitializeAuthenticationContext extends AbstractProfileAction {
+public class InitializeAuthenticationContext extends AbstractOidcProfileAction {
 
     /** Class logger. */
     @Nonnull
     private final Logger log = LoggerFactory.getLogger(InitializeAuthenticationContext.class);
 
-    /** OIDC Ctx. */
-    private OidcStepUpContext oidcCtx;
-
-    /** {@inheritDoc} */
-    @SuppressWarnings("unchecked")
-    @Override
-    protected boolean doPreExecute(@Nonnull final ProfileRequestContext profileRequestContext) {
-        if (!super.doPreExecute(profileRequestContext)) {
-            log.error("{} pre-execute failed", getLogPrefix());
-            return false;
-        }
-        oidcCtx = profileRequestContext.getSubcontext(OidcStepUpContext.class, false);
-        if (oidcCtx == null) {
-            // TODO: not causing a failure, fix
-            log.error("{} Unable to locate oidc context", getLogPrefix());
-            ActionSupport.buildEvent(profileRequestContext, EventIds.INVALID_PROFILE_CTX);
-            return false;
-        }
-        return true;
-
-    }
-
     /** {@inheritDoc} */
     @Override
     protected void doExecute(@Nonnull final ProfileRequestContext profileRequestContext) {
-
         log.debug("{} Initializing authentication context", getLogPrefix());
         final AuthenticationContext authnCtx = new AuthenticationContext();
         authnCtx.setForceAuthn(oidcCtx.getRequest().getMaxAge() == 0);

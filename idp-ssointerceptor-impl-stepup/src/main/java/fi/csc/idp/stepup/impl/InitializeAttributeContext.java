@@ -27,36 +27,28 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
 import javax.annotation.Nonnull;
-
 import org.opensaml.profile.action.ActionSupport;
 import org.opensaml.profile.action.EventIds;
 import org.opensaml.profile.context.ProfileRequestContext;
-
 import net.shibboleth.idp.attribute.IdPAttribute;
 import net.shibboleth.idp.attribute.StringAttributeValue;
 import net.shibboleth.idp.attribute.context.AttributeContext;
-import net.shibboleth.idp.profile.AbstractProfileAction;
 import net.shibboleth.idp.profile.context.RelyingPartyContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import fi.csc.idp.stepup.api.OidcProcessingEventIds;
-import fi.csc.idp.stepup.api.OidcStepUpContext;
 
 /**
  * Creates AttributeContext, populates it with id token claim values and adds it
  * to RelyingPartyContext.
  */
 @SuppressWarnings("rawtypes")
-public class InitializeAttributeContext extends AbstractProfileAction {
+public class InitializeAttributeContext extends AbstractOidcProfileAction {
 
     /** Class logger. */
     @Nonnull
     private final Logger log = LoggerFactory.getLogger(InitializeAttributeContext.class);
-
-    /** OIDC Ctx. */
-    private OidcStepUpContext oidcCtx;
 
     /** claim to attribute mapping. */
     private Map<String, String> claimToAttribute;
@@ -74,22 +66,13 @@ public class InitializeAttributeContext extends AbstractProfileAction {
     }
 
     /** {@inheritDoc} */
-    @SuppressWarnings("unchecked")
     @Override
     protected boolean doPreExecute(@Nonnull final ProfileRequestContext profileRequestContext) {
         if (!super.doPreExecute(profileRequestContext)) {
             log.error("{} pre-execute failed", getLogPrefix());
             return false;
         }
-        oidcCtx = profileRequestContext.getSubcontext(OidcStepUpContext.class, false);
-        if (oidcCtx == null) {
-            // TODO: not causing a failure, fix
-            log.error("{} Unable to locate oidc context", getLogPrefix());
-            ActionSupport.buildEvent(profileRequestContext, EventIds.INVALID_PROFILE_CTX);
-            return false;
-        }
         if (claimToAttribute == null) {
-            // TODO: not causing a failure, fix
             log.error("{} bean not initialized with claims to attribute mapping", getLogPrefix());
             ActionSupport.buildEvent(profileRequestContext, EventIds.INVALID_SEC_CFG);
             return false;

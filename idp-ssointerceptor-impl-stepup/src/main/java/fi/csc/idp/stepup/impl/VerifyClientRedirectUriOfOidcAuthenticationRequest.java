@@ -25,20 +25,14 @@ package fi.csc.idp.stepup.impl;
 
 import java.util.List;
 import java.util.Map;
-
 import javax.annotation.Nonnull;
-
-import net.shibboleth.idp.profile.AbstractProfileAction;
-
 import org.opensaml.profile.action.ActionSupport;
 import org.opensaml.profile.action.EventIds;
 import org.opensaml.profile.context.ProfileRequestContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
 import fi.csc.idp.stepup.api.OidcProcessingEventIds;
-import fi.csc.idp.stepup.api.OidcStepUpContext;
 
 /**
  * This actions checks that the redirect uri of the authentication request is
@@ -46,7 +40,7 @@ import fi.csc.idp.stepup.api.OidcStepUpContext;
  * 
  */
 @SuppressWarnings("rawtypes")
-public class VerifyClientRedirectUriOfOidcAuthenticationRequest extends AbstractProfileAction {
+public class VerifyClientRedirectUriOfOidcAuthenticationRequest extends AbstractOidcProfileAction {
 
     /** Class logger. */
     @Nonnull
@@ -54,9 +48,6 @@ public class VerifyClientRedirectUriOfOidcAuthenticationRequest extends Abstract
 
     /** redirect uris that are valid per client id. */
     private Map<String, List<String>> redirectUris;
-
-    /** OIDC Ctx. */
-    private OidcStepUpContext oidcCtx;
 
     /**
      * Setter for redirect uris.
@@ -69,22 +60,14 @@ public class VerifyClientRedirectUriOfOidcAuthenticationRequest extends Abstract
     }
 
     /** {@inheritDoc} */
-    @SuppressWarnings("unchecked")
     @Override
     protected boolean doPreExecute(@Nonnull final ProfileRequestContext profileRequestContext) {
         if (!super.doPreExecute(profileRequestContext)) {
             log.error("{} pre-execute failed", getLogPrefix());
             return false;
         }
-        oidcCtx = profileRequestContext.getSubcontext(OidcStepUpContext.class, false);
-        if (oidcCtx == null) {
-            //TODO: not causing a failure, fix
-            log.error("{} Unable to locate oidc context", getLogPrefix());
-            ActionSupport.buildEvent(profileRequestContext, EventIds.INVALID_PROFILE_CTX);
-            return false;
-        }
         if (redirectUris == null) {
-            //TODO: not causing a failure, fix
+            // TODO: not causing a failure, fix
             log.error("{} bean not initialized with redirect uris", getLogPrefix());
             ActionSupport.buildEvent(profileRequestContext, EventIds.INVALID_SEC_CFG);
             return false;

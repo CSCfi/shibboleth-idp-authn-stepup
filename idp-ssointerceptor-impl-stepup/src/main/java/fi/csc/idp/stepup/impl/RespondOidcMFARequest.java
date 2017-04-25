@@ -77,14 +77,12 @@ import com.nimbusds.oauth2.sdk.ErrorObject;
  */
 
 @SuppressWarnings("rawtypes")
-public class RespondOidcMFARequest extends AbstractProfileAction {
+public class RespondOidcMFARequest extends AbstractOidcProfileAction {
 
     /** Class logger. */
     @Nonnull
     private final Logger log = LoggerFactory.getLogger(RespondOidcMFARequest.class);
 
-    /** OIDC Ctx. */
-    private OidcStepUpContext oidcCtx;
     /** spring request context */
     SpringRequestContext srCtx;
 
@@ -162,29 +160,19 @@ public class RespondOidcMFARequest extends AbstractProfileAction {
     }
 
     /** {@inheritDoc} */
-    @SuppressWarnings("unchecked")
     @Override
     protected boolean doPreExecute(@Nonnull final ProfileRequestContext profileRequestContext) {
         if (!super.doPreExecute(profileRequestContext)) {
             log.error("{} pre-execute failed", getLogPrefix());
             return false;
         }
-        oidcCtx = profileRequestContext.getSubcontext(OidcStepUpContext.class, false);
-        if (oidcCtx == null) {
-            // TODO: not causing a failure, fix
-            log.error("{} Unable to locate oidc context", getLogPrefix());
-            ActionSupport.buildEvent(profileRequestContext, EventIds.INVALID_PROFILE_CTX);
-            return false;
-        }
         if (prvKey == null) {
-            // TODO: not causing a failure, fix
             log.error("{} bean not initialized with private key", getLogPrefix());
             ActionSupport.buildEvent(profileRequestContext, EventIds.INVALID_SEC_CFG);
             return false;
         }
         srCtx = profileRequestContext.getSubcontext(SpringRequestContext.class);
         if (srCtx == null) {
-            // TODO: not causing a failure, fix
             log.error("{} unable to get spring request context", getLogPrefix());
             ActionSupport.buildEvent(profileRequestContext, EventIds.INVALID_PROFILE_CTX);
             return false;

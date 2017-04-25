@@ -37,23 +37,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
-
 import javax.annotation.Nonnull;
-
 import net.minidev.json.JSONArray;
 import net.minidev.json.JSONObject;
-import net.shibboleth.idp.profile.AbstractProfileAction;
-
 import org.joda.time.DateTime;
 import org.opensaml.profile.action.ActionSupport;
 import org.opensaml.profile.action.EventIds;
 import org.opensaml.profile.context.ProfileRequestContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import fi.csc.idp.stepup.api.OidcProcessingEventIds;
 import fi.csc.idp.stepup.api.OidcStepUpContext;
-
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.crypto.RSASSAVerifier;
 import com.nimbusds.jose.jwk.RSAKey;
@@ -74,16 +68,13 @@ import com.nimbusds.openid.connect.sdk.AuthenticationRequest;
  * 
  */
 @SuppressWarnings("rawtypes")
-public class ValidateRequestObjectOfOidcAuthenticationRequest extends AbstractProfileAction {
+public class ValidateRequestObjectOfOidcAuthenticationRequest extends AbstractOidcProfileAction {
 
     /** contains messages already used for verification. */
     private static Map<String, DateTime> usedMessages = new HashMap<String, DateTime>();
 
     /** lock to access usedMessages. */
     private static Lock msgLock = new ReentrantLock();
-
-    /** OIDC Ctx. */
-    private OidcStepUpContext oidcCtx;
 
     /** Class logger. */
     @Nonnull
@@ -384,22 +375,13 @@ public class ValidateRequestObjectOfOidcAuthenticationRequest extends AbstractPr
     }
 
     /** {@inheritDoc} */
-    @SuppressWarnings("unchecked")
     @Override
     protected boolean doPreExecute(@Nonnull final ProfileRequestContext profileRequestContext) {
         if (!super.doPreExecute(profileRequestContext)) {
             log.error("{} pre-execute failed", getLogPrefix());
             return false;
         }
-        oidcCtx = profileRequestContext.getSubcontext(OidcStepUpContext.class, false);
-        if (oidcCtx == null) {
-            // TODO: not causing a failure, fix
-            log.error("{} Unable to locate oidc context", getLogPrefix());
-            ActionSupport.buildEvent(profileRequestContext, EventIds.INVALID_PROFILE_CTX);
-            return false;
-        }
         if (jwkSetUris == null) {
-            // TODO: not causing a failure, fix
             log.error("{} bean not initialized with jwkSetUris uris", getLogPrefix());
             ActionSupport.buildEvent(profileRequestContext, EventIds.INVALID_SEC_CFG);
             return false;
