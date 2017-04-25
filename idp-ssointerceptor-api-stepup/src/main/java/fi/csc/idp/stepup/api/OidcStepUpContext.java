@@ -39,9 +39,7 @@ import com.nimbusds.openid.connect.sdk.AuthenticationRequest;
  */
 public class OidcStepUpContext extends BaseContext{
 
-    /** key to store this context with. */
-    private static final String CTX_KEY = "fi.csc.idp.stepup.api.OidcStepUpContext.key";
-
+   
     /** Class logger. */
     @Nonnull
     private final Logger log = LoggerFactory.getLogger(OidcStepUpContext.class);
@@ -101,14 +99,7 @@ public class OidcStepUpContext extends BaseContext{
         this.redirectUriValidated = redirectUriValidated;
     }
     
-    /**
-     * Key to store this context with.
-     * 
-     * @return key
-     */
-    public static String getContextKey() {
-        return CTX_KEY;
-    }
+    
 
     /**
      * Get the id token of the request.

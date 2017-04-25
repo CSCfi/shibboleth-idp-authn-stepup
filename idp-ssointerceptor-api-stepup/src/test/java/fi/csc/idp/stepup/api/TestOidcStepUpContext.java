@@ -33,7 +33,6 @@ public class TestOidcStepUpContext {
         Assert.assertNull(oidcStepUpContext.getIdToken());
         Assert.assertNull(oidcStepUpContext.getIssuer());
         Assert.assertNull(oidcStepUpContext.getRequest());
-        Assert.assertNotNull(OidcStepUpContext.getContextKey());
     }
 
     @Test
