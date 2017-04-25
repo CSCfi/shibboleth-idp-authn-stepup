@@ -32,7 +32,6 @@ import java.util.List;
 import javax.annotation.Nonnull;
 
 import net.shibboleth.idp.attribute.context.AttributeContext;
-import net.shibboleth.idp.profile.AbstractProfileAction;
 import net.shibboleth.idp.profile.context.RelyingPartyContext;
 import net.shibboleth.idp.profile.context.SpringRequestContext;
 
@@ -41,8 +40,6 @@ import org.opensaml.profile.action.EventIds;
 import org.opensaml.profile.context.ProfileRequestContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.webflow.execution.Event;
-import org.springframework.webflow.execution.RequestContext;
 
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.JWSAlgorithm;
@@ -59,10 +56,6 @@ import com.nimbusds.openid.connect.sdk.AuthenticationErrorResponse;
 import com.nimbusds.openid.connect.sdk.AuthenticationRequest;
 import com.nimbusds.openid.connect.sdk.AuthenticationSuccessResponse;
 import com.nimbusds.openid.connect.sdk.claims.IDTokenClaimsSet;
-
-import fi.csc.idp.stepup.api.OidcProcessingEventIds;
-import fi.csc.idp.stepup.api.OidcStepUpContext;
-
 import com.nimbusds.oauth2.sdk.ErrorObject;
 
 /**
