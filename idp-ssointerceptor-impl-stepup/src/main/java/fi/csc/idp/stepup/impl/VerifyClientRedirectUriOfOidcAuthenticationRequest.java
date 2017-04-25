@@ -67,7 +67,6 @@ public class VerifyClientRedirectUriOfOidcAuthenticationRequest extends Abstract
             return false;
         }
         if (redirectUris == null) {
-            // TODO: not causing a failure, fix
             log.error("{} bean not initialized with redirect uris", getLogPrefix());
             ActionSupport.buildEvent(profileRequestContext, EventIds.INVALID_SEC_CFG);
             return false;
@@ -85,6 +84,7 @@ public class VerifyClientRedirectUriOfOidcAuthenticationRequest extends Abstract
             log.error("{} client {} has not registered redirect uris", getLogPrefix(), oidcCtx.getRequest()
                     .getClientID().getValue());
             ActionSupport.buildEvent(profileRequestContext, OidcProcessingEventIds.EVENTID_ERROR_LOCAL_OIDC);
+            return;
 
         }
         for (String uri : redirectUris.get(oidcCtx.getRequest().getClientID().getValue())) {
