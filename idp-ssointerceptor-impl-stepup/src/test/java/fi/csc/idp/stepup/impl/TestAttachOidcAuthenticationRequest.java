@@ -20,14 +20,12 @@ public class TestAttachOidcAuthenticationRequest {
 
     private AttachOidcAuthenticationRequest action;
 
-    protected RequestContext src;
     @SuppressWarnings("rawtypes")
     protected ProfileRequestContext prc;
     protected RequestContext requestCtx;
 
     @BeforeMethod
     public void setUp() throws Exception {
-        src = new RequestContextBuilder().buildRequestContext();
         AuthenticationRequest req = AuthenticationRequest
                 .parse("response_type=code&client_id=s6BhdRkqt3&login_hint=foo&redirect_uri=https%3A%2F%2Fclient.example.org%2Fcb&scope=openid%20profile&state=af0ifjsldkj&nonce=n-0S6_WzA2Mj");
         requestCtx = new RequestContextBuilder().setInboundMessage(req).buildRequestContext();
