@@ -26,7 +26,6 @@ package fi.csc.idp.stepup.impl;
 import javax.annotation.Nonnull;
 
 import net.shibboleth.idp.profile.AbstractProfileAction;
-
 import org.opensaml.profile.action.ActionSupport;
 import org.opensaml.profile.action.EventIds;
 import org.opensaml.profile.context.ProfileRequestContext;
@@ -75,7 +74,6 @@ public class AttachOidcAuthenticationRequest extends AbstractProfileAction {
             return false;
         }
         if (profileRequestContext.getInboundMessageContext() == null) {
-            //TODO: not causing a failure, fix
             log.error("{} Unable to locate inbound message context", getLogPrefix());
             ActionSupport.buildEvent(profileRequestContext, EventIds.INVALID_MSG_CTX);
             return false;
@@ -83,13 +81,11 @@ public class AttachOidcAuthenticationRequest extends AbstractProfileAction {
         Object message = profileRequestContext.getInboundMessageContext().getMessage();
 
         if (message == null || !(message instanceof AuthenticationRequest)) {
-            //TODO: not causing a failure, fix
             log.error("{} Unable to locate inbound message", getLogPrefix());
             ActionSupport.buildEvent(profileRequestContext, EventIds.INVALID_MSG_CTX);
             return false;
         }
         if (issuer == null) {
-            //TODO: not causing a failure, fix
             log.error("{} bean not initialized with issuer", getLogPrefix());
             ActionSupport.buildEvent(profileRequestContext, EventIds.INVALID_SEC_CFG);
             return false;
