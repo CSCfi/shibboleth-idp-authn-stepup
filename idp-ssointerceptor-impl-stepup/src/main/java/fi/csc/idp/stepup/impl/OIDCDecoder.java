@@ -35,6 +35,7 @@ import org.slf4j.LoggerFactory;
 
 import com.nimbusds.openid.connect.sdk.AuthenticationRequest;
 
+/** Decoder for OIDC authentication requests. */
 public class OIDCDecoder extends AbstractHttpServletRequestMessageDecoder<AuthenticationRequest> implements
         MessageDecoder<AuthenticationRequest> {
 
