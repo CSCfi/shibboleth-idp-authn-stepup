@@ -392,12 +392,14 @@ public class ValidateRequestObjectOfOidcAuthenticationRequest extends AbstractOi
     /** {@inheritDoc} */
     @Override
     protected void doExecute(@Nonnull final ProfileRequestContext profileRequestContext) {
+
         if (oidcCtx.getRequest().getRequestObject() == null) {
             oidcCtx.setErrorCode("invalid_request");
             oidcCtx.setErrorDescription("request does not contain request object");
             log.trace("Leaving");
             log.error("{} request does not contain request object", getLogPrefix());
             ActionSupport.buildEvent(profileRequestContext, OidcProcessingEventIds.EVENTID_ERROR_OIDC);
+            return;
         }
         if (!verifyJWT(oidcCtx, oidcCtx.getRequest().getRequestObject(), oidcCtx.getRequest().getClientID().getValue())) {
             log.error("verify failed");
@@ -405,6 +407,7 @@ public class ValidateRequestObjectOfOidcAuthenticationRequest extends AbstractOi
             log.trace("Leaving");
             log.error("{} verify failed {}:{}", getLogPrefix(), oidcCtx.getErrorCode(), oidcCtx.getErrorDescription());
             ActionSupport.buildEvent(profileRequestContext, OidcProcessingEventIds.EVENTID_ERROR_OIDC);
+            return;
         }
         try {
             if (!validateRequestObject(oidcCtx, oidcCtx.getRequest())) {
@@ -412,6 +415,7 @@ public class ValidateRequestObjectOfOidcAuthenticationRequest extends AbstractOi
                 // verify is expected to fill reason
                 log.error("{} validation failed", getLogPrefix());
                 ActionSupport.buildEvent(profileRequestContext, OidcProcessingEventIds.EVENTID_ERROR_OIDC);
+                return;
             }
         } catch (ParseException e) {
             log.error("request object parsing failed");
