@@ -41,7 +41,8 @@ import fi.csc.idp.stepup.api.OidcProcessingEventIds;
 
 /**
  * Creates AttributeContext, populates it with id token claim values and adds it
- * to RelyingPartyContext.
+ * to RelyingPartyContext. Assumes requst object with id token exists and is 
+ * validated.
  */
 @SuppressWarnings("rawtypes")
 public class InitializeAttributeContext extends AbstractOidcProfileAction {
