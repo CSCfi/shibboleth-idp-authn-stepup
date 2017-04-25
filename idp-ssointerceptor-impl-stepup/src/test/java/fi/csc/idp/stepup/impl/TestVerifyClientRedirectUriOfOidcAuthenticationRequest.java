@@ -57,24 +57,11 @@ public class TestVerifyClientRedirectUriOfOidcAuthenticationRequest {
     }
 
     
-    /**
-     * Test that action copes with no request set.
-     */
-    //@Test
-    public void testNoRequest() {
-        Map<String, List<String>> uris = new HashMap<String, List<String>>();
-        List<String> value = new ArrayList<String>();
-        value.add("foobaar");
-        uris.put("key", value);
-        action.setRedirectUris(uris);
-        final Event event = action.execute(src);
-        ActionTestingSupport.assertEvent(event, OidcProcessingEventIds.EXCEPTION);
-    }
-
+   
     /**
      * Test that action copes with no client id registered.
      */
-    //@Test
+    @Test
     public void testClientIdRegistered() throws URISyntaxException {
         Map<String, List<String>> uris = new HashMap<String, List<String>>();
         List<String> value = new ArrayList<String>();
@@ -90,13 +77,13 @@ public class TestVerifyClientRedirectUriOfOidcAuthenticationRequest {
         final Event event = action.execute(src);
         Assert.assertEquals(oidcCtx.getErrorCode(), "unauthorized_client");
         Assert.assertEquals(oidcCtx.getErrorDescription(), "client has not registered any redirect uri");
-        ActionTestingSupport.assertEvent(event, OidcProcessingEventIds.EVENTID_ERROR_OIDC);
+        ActionTestingSupport.assertEvent(event, OidcProcessingEventIds.EVENTID_ERROR_LOCAL_OIDC);
     }
 
     /**
      * Test that action copes with client not having registered correct uri.
      */
-    //@Test
+    @Test
     public void testUriRegistered() throws URISyntaxException {
         Map<String, List<String>> uris = new HashMap<String, List<String>>();
         List<String> value = new ArrayList<String>();
@@ -112,7 +99,7 @@ public class TestVerifyClientRedirectUriOfOidcAuthenticationRequest {
         final Event event = action.execute(src);
         Assert.assertEquals(oidcCtx.getErrorCode(), "unauthorized_client");
         Assert.assertEquals(oidcCtx.getErrorDescription(), "client has not registered redirect uri http://barO");
-        ActionTestingSupport.assertEvent(event, OidcProcessingEventIds.EVENTID_ERROR_OIDC);
+        ActionTestingSupport.assertEvent(event, OidcProcessingEventIds.EVENTID_ERROR_LOCAL_OIDC);
     }
 
     /**
@@ -132,6 +119,6 @@ public class TestVerifyClientRedirectUriOfOidcAuthenticationRequest {
         AuthenticationRequest req = new AuthenticationRequest.Builder(rt, scope, clientID, redirectURI).build();
         oidcCtx.setRequest(req);
         final Event event = action.execute(src);
-        ActionTestingSupport.assertEvent(event, OidcProcessingEventIds.EVENTID_CONTINUE_OIDC);
+        Assert.assertNull(event);
     }
 }
