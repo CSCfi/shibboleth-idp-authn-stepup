@@ -90,16 +90,6 @@
 		</property>
 	</bean>
 
-	<bean id="BuildShibbolethContexts" class="fi.csc.idp.stepup.impl.BuildShibbolethContexts"
-		scope="prototype">
-		<property name="claimToAttribute">
-			<map>
-				<entry key="eppn" value="INTeppn" />
-				<entry key="mobile" value="INTmobile" />
-			</map>
-		</property>
-	</bean>
-
 	<bean id="RespondOidcMFARequest" class="fi.csc.idp.stepup.impl.RespondOidcMFARequest"
 		scope="prototype" p:privKey-ref="JWTPrivateKey">
 		<property name="tokenResponseClaims">
