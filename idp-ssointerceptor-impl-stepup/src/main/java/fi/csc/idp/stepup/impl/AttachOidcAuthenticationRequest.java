@@ -25,15 +25,11 @@ package fi.csc.idp.stepup.impl;
 
 import javax.annotation.Nonnull;
 
-import net.shibboleth.idp.profile.AbstractProfileAction;
 import org.opensaml.profile.action.ActionSupport;
 import org.opensaml.profile.action.EventIds;
 import org.opensaml.profile.context.ProfileRequestContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.nimbusds.openid.connect.sdk.AuthenticationRequest;
-
 import fi.csc.idp.stepup.api.OidcStepUpContext;
 
 /**
@@ -42,7 +38,7 @@ import fi.csc.idp.stepup.api.OidcStepUpContext;
  * 
  */
 @SuppressWarnings("rawtypes")
-public class AttachOidcAuthenticationRequest extends AbstractProfileAction {
+public class AttachOidcAuthenticationRequest extends AbstractOidcAuthenticationAction {
 
     /** Class logger. */
     @Nonnull
@@ -50,9 +46,6 @@ public class AttachOidcAuthenticationRequest extends AbstractProfileAction {
 
     /** issuer stored to be used in verifications and response. */
     private String issuer;
-
-    /** OIDC Authentication request. */
-    private AuthenticationRequest request;
 
     /**
      * Set the value for Issuer. Mandatory.
@@ -66,23 +59,10 @@ public class AttachOidcAuthenticationRequest extends AbstractProfileAction {
     }
 
     /** {@inheritDoc} */
-    @SuppressWarnings("unchecked")
     @Override
     protected boolean doPreExecute(@Nonnull final ProfileRequestContext profileRequestContext) {
         if (!super.doPreExecute(profileRequestContext)) {
             log.error("{} pre-execute failed", getLogPrefix());
-            return false;
-        }
-        if (profileRequestContext.getInboundMessageContext() == null) {
-            log.error("{} Unable to locate inbound message context", getLogPrefix());
-            ActionSupport.buildEvent(profileRequestContext, EventIds.INVALID_MSG_CTX);
-            return false;
-        }
-        Object message = profileRequestContext.getInboundMessageContext().getMessage();
-
-        if (message == null || !(message instanceof AuthenticationRequest)) {
-            log.error("{} Unable to locate inbound message", getLogPrefix());
-            ActionSupport.buildEvent(profileRequestContext, EventIds.INVALID_MSG_CTX);
             return false;
         }
         if (issuer == null) {
@@ -90,7 +70,6 @@ public class AttachOidcAuthenticationRequest extends AbstractProfileAction {
             ActionSupport.buildEvent(profileRequestContext, EventIds.INVALID_SEC_CFG);
             return false;
         }
-        request = (AuthenticationRequest) message;
         return true;
     }
 
