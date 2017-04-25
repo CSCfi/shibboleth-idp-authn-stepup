@@ -3,7 +3,6 @@ package fi.csc.idp.stepup.impl;
 import net.shibboleth.idp.profile.ActionTestingSupport;
 import net.shibboleth.idp.profile.RequestContextBuilder;
 import net.shibboleth.idp.profile.context.navigate.WebflowRequestContextProfileRequestContextLookup;
-import net.shibboleth.utilities.java.support.component.ComponentInitializationException;
 
 import org.opensaml.profile.action.EventIds;
 import org.opensaml.profile.context.ProfileRequestContext;
@@ -40,12 +39,35 @@ public class TestAttachOidcAuthenticationRequest {
     /**
      * Test that action copes with no issuer set.
      * 
-     * @throws ComponentInitializationException
      */
     @Test
     public void testNoIssuer() {
         final Event event = action.execute(requestCtx);
         ActionTestingSupport.assertEvent(event, EventIds.INVALID_SEC_CFG);
+    }
+
+    /**
+     * Test that action copes with no inbound message context.
+     * 
+     */
+    @SuppressWarnings("unchecked")
+    @Test
+    public void testNoInboundMessageContext() {
+        prc.setInboundMessageContext(null);
+        final Event event = action.execute(requestCtx);
+        ActionTestingSupport.assertEvent(event, EventIds.INVALID_PROFILE_CTX);
+    }
+
+    /**
+     * Test that action copes with no inbound message.
+     * 
+     */
+    @SuppressWarnings("unchecked")
+    @Test
+    public void testNoInboundMessage() {
+        prc.getInboundMessageContext().setMessage(null);
+        final Event event = action.execute(requestCtx);
+        ActionTestingSupport.assertEvent(event, EventIds.INVALID_MSG_CTX);
     }
 
     /**
