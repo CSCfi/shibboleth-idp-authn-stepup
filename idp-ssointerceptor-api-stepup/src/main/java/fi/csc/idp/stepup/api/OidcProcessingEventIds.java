@@ -32,31 +32,11 @@ import net.shibboleth.utilities.java.support.annotation.constraint.NotEmpty;
  */
 public final class OidcProcessingEventIds {
 
-    /** Generic ID for exception thrown. */
-    @Nonnull
-    @NotEmpty
-    public static final String EXCEPTION = "StepUpException";
-
-    /** event id for case of invalid query string. */
-    @Nonnull
-    @NotEmpty
-    public static final String EVENTID_INVALID_QUERYSTRING = "InvalidQuerystring";
-
-    /** event id for the case of continuing with oidc processing. */
-    @Nonnull
-    @NotEmpty
-    public static final String EVENTID_CONTINUE_OIDC = "ContinueOidc";
-    
-    /** event id for the case of finishing oidc processing. */
-    @Nonnull
-    @NotEmpty
-    public static final String EVENTID_CONTINUE_FINISHED = "success";
-
     /** event id for the case of returning oidc error. */
     @Nonnull
     @NotEmpty
     public static final String EVENTID_ERROR_OIDC = "ErrorOidc";
-    
+
     /** event id for the case of showing locally oidc error. */
     @Nonnull
     @NotEmpty
