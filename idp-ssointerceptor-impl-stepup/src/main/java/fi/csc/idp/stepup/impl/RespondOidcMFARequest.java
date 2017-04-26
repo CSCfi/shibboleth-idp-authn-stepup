@@ -81,9 +81,6 @@ public class RespondOidcMFARequest extends AbstractOidcProfileAction {
     @Nonnull
     private final Logger log = LoggerFactory.getLogger(RespondOidcMFARequest.class);
 
-    /** spring request context */
-    SpringRequestContext srCtx;
-
     /** private key used for JWT signing. */
     private PrivateKey prvKey;
     /** JWT signing algorithm. */
@@ -169,12 +166,6 @@ public class RespondOidcMFARequest extends AbstractOidcProfileAction {
             ActionSupport.buildEvent(profileRequestContext, EventIds.INVALID_SEC_CFG);
             return false;
         }
-        srCtx = profileRequestContext.getSubcontext(SpringRequestContext.class);
-        if (srCtx == null) {
-            log.error("{} unable to get spring request context", getLogPrefix());
-            ActionSupport.buildEvent(profileRequestContext, EventIds.INVALID_PROFILE_CTX);
-            return false;
-        }
         return true;
 
     }
@@ -182,6 +173,12 @@ public class RespondOidcMFARequest extends AbstractOidcProfileAction {
     /** {@inheritDoc} */
     @Override
     protected void doExecute(@Nonnull final ProfileRequestContext profileRequestContext) {
+        SpringRequestContext srCtx = profileRequestContext.getSubcontext(SpringRequestContext.class);
+        if (srCtx == null) {
+            log.error("{} unable to get spring request context", getLogPrefix());
+            ActionSupport.buildEvent(profileRequestContext, EventIds.INVALID_PROFILE_CTX);
+            return;
+        }
         if (getOidcCtx().getErrorCode() != null) {
             AuthenticationErrorResponse resp = new AuthenticationErrorResponse(getOidcCtx().getRequest()
                     .getRedirectionURI(), new ErrorObject(getOidcCtx().getErrorCode(), getOidcCtx()
