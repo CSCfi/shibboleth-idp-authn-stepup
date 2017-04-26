@@ -39,7 +39,7 @@ import fi.csc.idp.stepup.api.OidcStepUpContext;
 
 /**
  * This action creates OidcStepUpContext and initializes it with issuer value
- * and parsed authentication request.
+ * and authentication request.
  * 
  */
 @SuppressWarnings("rawtypes")
@@ -49,9 +49,6 @@ public class AttachOidcAuthenticationRequest extends AbstractProfileAction {
     @Nonnull
     private final Logger log = LoggerFactory.getLogger(AttachOidcAuthenticationRequest.class);
 
-    /** OIDC Authentication request. */
-    protected AuthenticationRequest request;
-    
     /** issuer stored to be used in verifications and response. */
     private String issuer;
 
@@ -79,13 +76,6 @@ public class AttachOidcAuthenticationRequest extends AbstractProfileAction {
             ActionSupport.buildEvent(profileRequestContext, EventIds.INVALID_PROFILE_CTX);
             return false;
         }
-        Object message = profileRequestContext.getInboundMessageContext().getMessage();
-        if (message == null || !(message instanceof AuthenticationRequest)) {
-            log.error("{} Unable to locate inbound message", getLogPrefix());
-            ActionSupport.buildEvent(profileRequestContext, EventIds.INVALID_MSG_CTX);
-            return false;
-        }
-        request = (AuthenticationRequest) message;
         if (issuer == null) {
             log.error("{} bean not initialized with issuer", getLogPrefix());
             ActionSupport.buildEvent(profileRequestContext, EventIds.INVALID_SEC_CFG);
@@ -97,10 +87,17 @@ public class AttachOidcAuthenticationRequest extends AbstractProfileAction {
     /** {@inheritDoc} */
     @Override
     protected void doExecute(@Nonnull final ProfileRequestContext profileRequestContext) {
+        Object message = profileRequestContext.getInboundMessageContext().getMessage();
+        if (message == null || !(message instanceof AuthenticationRequest)) {
+            log.error("{} Unable to locate inbound message", getLogPrefix());
+            ActionSupport.buildEvent(profileRequestContext, EventIds.INVALID_MSG_CTX);
+            return;
+        }
         OidcStepUpContext oidcCtx = new OidcStepUpContext();
         profileRequestContext.addSubcontext(oidcCtx);
-        log.debug("Attaching inbound message to oidc stepup context {}", request.toQueryString());
-        oidcCtx.setRequest(request);
+        log.debug("Attaching inbound message to oidc stepup context {}",
+                ((AuthenticationRequest) message).toQueryString());
+        oidcCtx.setRequest((AuthenticationRequest) message);
         log.debug("Setting issuer value to oidc stepup context {}", issuer);
         oidcCtx.setIssuer(issuer);
     }
