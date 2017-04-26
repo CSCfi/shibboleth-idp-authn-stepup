@@ -41,7 +41,7 @@ import fi.csc.idp.stepup.api.OidcProcessingEventIds;
 
 /**
  * Creates AttributeContext, populates it with id token claim values and adds it
- * to RelyingPartyContext. Assumes requst object with id token exists and is 
+ * to RelyingPartyContext. Assumes request object with id token exists and is 
  * validated.
  */
 @SuppressWarnings("rawtypes")
@@ -62,7 +62,6 @@ public class InitializeAttributeContext extends AbstractOidcProfileAction {
      *            map
      */
     public void setClaimToAttribute(Map<String, String> claimToAttributeMap) {
-        log.trace("Entering & Leaving");
         this.claimToAttribute = claimToAttributeMap;
     }
 
@@ -114,7 +113,6 @@ public class InitializeAttributeContext extends AbstractOidcProfileAction {
                         getOidcCtx().setErrorDescription("id token contained a unparsable claim");
                         log.error("{} id token contained a unparsable claim", getLogPrefix());
                         ActionSupport.buildEvent(profileRequestContext, OidcProcessingEventIds.EVENTID_ERROR_OIDC);
-                        log.trace("Leaving");
                     }
                 }
                 if (values == null || values.size() == 0) {
@@ -135,7 +133,6 @@ public class InitializeAttributeContext extends AbstractOidcProfileAction {
                 getOidcCtx().setErrorDescription("request does not have required claim in id token: " + key);
                 log.error("{} request does not have required claim in id token: {}", getLogPrefix(), key);
                 ActionSupport.buildEvent(profileRequestContext, OidcProcessingEventIds.EVENTID_ERROR_OIDC);
-                log.trace("Leaving");
                 return;
             }
         }
