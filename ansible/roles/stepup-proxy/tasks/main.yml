@@ -76,6 +76,7 @@
     mode: 0644
     remote_src: yes
   with_items:
+    - { src: "{{ remote_user_home }}/stepup-proxy/idp-ssointerceptor-impl-stepup/src/main/resources/views/oidc/mfarequest-error.vm", dest: "{{ idp_home }}/views/oidc/mfarequest-error.vm" }
     - { src: "{{ remote_user_home }}/stepup-proxy/idp-ssointerceptor-impl-stepup/src/main/resources/views/authn/mfa-backend-progress.vm", dest: "{{ idp_home }}/views/authn/mfa-backend-progress.vm" }
     - { src: "{{ remote_user_home }}/stepup-proxy/idp-ssointerceptor-impl-stepup/src/main/resources/views/authn/mfa-backend.vm", dest: "{{ idp_home }}/views/authn/mfa-backend.vm" }
     - { src: "{{ remote_user_home }}/stepup-proxy/idp-ssointerceptor-impl-stepup/src/main/resources/views/authn/mfa-condolences.vm", dest: "{{ idp_home }}/views/authn/mfa-condolences.vm" }
@@ -114,10 +115,10 @@
     mode: 0644
     remote_src: yes
 
-- name: Copy stepup dependency nimbus-jose-jwt-4.34.1.jar for bulding new idp.war
+- name: Copy stepup dependency nimbus-jose-jwt-4.37.jar for bulding new idp.war
   copy:
-    src: "{{ remote_user_home }}/stepup-proxy/idp-ssointerceptor-impl-stepup/target/dependency/nimbus-jose-jwt-4.34.1.jar"
-    dest: "{{ idp_home }}/edit-webapp/WEB-INF/lib/nimbus-jose-jwt-4.34.1.jar"
+    src: "{{ remote_user_home }}/stepup-proxy/idp-ssointerceptor-impl-stepup/target/dependency/nimbus-jose-jwt-4.37.jar"
+    dest: "{{ idp_home }}/edit-webapp/WEB-INF/lib/nimbus-jose-jwt-4.37.jar"
     owner: root
     group: root
     mode: 0644
