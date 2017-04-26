@@ -35,8 +35,20 @@
         <evaluate expression="'proceed'" />
         <transition on="proceed" to="end" />
     </action-state>
-    
-    <!-- Error handling and end states -->
+  
+    <!-- Error views,  handling and end states -->
+
+    <view-state id="DisplayError" view="#{flowRequestContext.activeFlow.id}-error">
+    <on-render>
+        <evaluate expression="environment" result="viewScope.environment" />
+        <evaluate expression="opensamlProfileRequestContext" result="viewScope.profileRequestContext" />
+        <evaluate expression="opensamlProfileRequestContext.getSubcontext(T(fi.csc.idp.stepup.api.OidcStepUpContext))" result="viewScope.oidcStepUpContext" />
+        <evaluate expression="T(net.shibboleth.utilities.java.support.codec.HTMLEncoder)" result="viewScope.encoder" />
+        <evaluate expression="flowRequestContext.getExternalContext().getNativeRequest()" result="viewScope.request" />
+        <evaluate expression="flowRequestContext.getExternalContext().getNativeResponse()" result="viewScope.response" />
+    </on-render>
+    </view-state>
+      
     
     <!-- Passthrough state if an exception is thrown. -->
     <action-state id="LogRuntimeException">
@@ -49,7 +61,7 @@
 
     <!-- Should error be returned or handled locally -->
     <decision-state id="HandleError">
-        <if test="currentEvent.id.equals('ErrorOidc')" then="FormResponse" else="HandleErrorLocally" />
+        <if test="currentEvent.id.equals('ErrorOidc')" then="FormResponse" else="DisplayErrory" />
     </decision-state>
 
     <end-state id="end" view="externalRedirect:#{opensamlProfileRequestContext.getSubcontext(T(fi.csc.idp.stepup.api.OidcStepUpContext)).getResponse().toString()}"></end-state>
