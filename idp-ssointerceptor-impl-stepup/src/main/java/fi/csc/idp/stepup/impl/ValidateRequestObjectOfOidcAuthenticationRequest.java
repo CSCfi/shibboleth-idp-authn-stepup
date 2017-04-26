@@ -61,10 +61,10 @@ import com.nimbusds.oauth2.sdk.id.State;
 import com.nimbusds.openid.connect.sdk.AuthenticationRequest;
 
 /**
- * Action verifies that the request object is signed and that the signature can
- * be verified. Action also checks request object contains required claims and
- * is not a replayed object. Action requires id token to be in request object.
- * id token is stored to context.
+ * Action verifies that 1) the request object is signed and that the signature
+ * can be verified, 2) request object contains required claims and 3) is not a
+ * replayed object. Action requires id token to be in request object. As a
+ * result verified id token is stored to context.
  * 
  */
 @SuppressWarnings("rawtypes")
@@ -401,11 +401,13 @@ public class ValidateRequestObjectOfOidcAuthenticationRequest extends AbstractOi
             ActionSupport.buildEvent(profileRequestContext, OidcProcessingEventIds.EVENTID_ERROR_OIDC);
             return;
         }
-        if (!verifyJWT(getOidcCtx(), getOidcCtx().getRequest().getRequestObject(), getOidcCtx().getRequest().getClientID().getValue())) {
+        if (!verifyJWT(getOidcCtx(), getOidcCtx().getRequest().getRequestObject(), getOidcCtx().getRequest()
+                .getClientID().getValue())) {
             log.error("verify failed");
             // verify is expected to fill reason
             log.trace("Leaving");
-            log.error("{} verify failed {}:{}", getLogPrefix(), getOidcCtx().getErrorCode(), getOidcCtx().getErrorDescription());
+            log.error("{} verify failed {}:{}", getLogPrefix(), getOidcCtx().getErrorCode(), getOidcCtx()
+                    .getErrorDescription());
             ActionSupport.buildEvent(profileRequestContext, OidcProcessingEventIds.EVENTID_ERROR_OIDC);
             return;
         }
