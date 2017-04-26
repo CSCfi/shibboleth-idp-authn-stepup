@@ -63,6 +63,7 @@ public class TestAttachOidcAuthenticationRequest {
     @SuppressWarnings("unchecked")
     @Test
     public void testNoInboundMessage() {
+        action.setIssuer("iss value");
         prc.getInboundMessageContext().setMessage(null);
         final Event event = action.execute(requestCtx);
         ActionTestingSupport.assertEvent(event, EventIds.INVALID_MSG_CTX);
