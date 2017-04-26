@@ -105,7 +105,7 @@ public class TestVerifyClientRedirectUriOfOidcAuthenticationRequest {
     /**
      * Test that action is able to verify registered uri
      */
-    //@Test
+    @Test
     public void testSuccess() throws URISyntaxException {
         Map<String, List<String>> uris = new HashMap<String, List<String>>();
         List<String> value = new ArrayList<String>();
