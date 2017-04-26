@@ -37,21 +37,21 @@ import com.nimbusds.openid.connect.sdk.AuthenticationRequest;
  * Context for passing information between oidc request and response handlers.
  * 
  */
-public class OidcStepUpContext extends BaseContext{
+public class OidcStepUpContext extends BaseContext {
 
-   
     /** Class logger. */
     @Nonnull
     private final Logger log = LoggerFactory.getLogger(OidcStepUpContext.class);
 
     /** Authentication request received from rp. */
     private AuthenticationRequest request;
-    
-    /** whether the redirect uri should be trusted*/
+
+    /** whether the redirect uri should be trusted. */
     private boolean redirectUriValidated;
-    
+
+    /** The response for the rp. */
     private URI response;
-   
+
     /** error code. */
     private String error;
 
@@ -65,7 +65,7 @@ public class OidcStepUpContext extends BaseContext{
     private JWTClaimsSet idToken;
 
     /**
-     * Get the response.
+     * Get the response for the rp.
      * 
      * @return redirect uri for response
      */
@@ -74,16 +74,18 @@ public class OidcStepUpContext extends BaseContext{
     }
 
     /**
-     * Set the redirect uri response.
+     * Set the redirect uri response for the rp.
      * 
-     * @param response formed for client.
+     * @param resp
+     *            formed for client.
      */
-    public void setResponse(URI response) {
-        this.response = response;
+    public void setResponse(URI resp) {
+        this.response = resp;
     }
-    
+
     /**
      * True if the redirect uri has been validated.
+     * 
      * @return true for validated uri.
      */
     public boolean isRedirectUriValidated() {
@@ -93,13 +95,12 @@ public class OidcStepUpContext extends BaseContext{
     /**
      * Set to true if the redirect uri is validated successfully.
      * 
-     * @param redirectUriValidated true if validated.
+     * @param validated
+     *            true if validated.
      */
-    public void setRedirectUriValidated(boolean redirectUriValidated) {
-        this.redirectUriValidated = redirectUriValidated;
+    public void setRedirectUriValidated(boolean validated) {
+        this.redirectUriValidated = validated;
     }
-    
-    
 
     /**
      * Get the id token of the request.
