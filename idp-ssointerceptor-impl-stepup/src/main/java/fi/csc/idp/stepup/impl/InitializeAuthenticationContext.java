@@ -57,12 +57,12 @@ public class InitializeAuthenticationContext extends AbstractOidcProfileAction {
     protected void doExecute(@Nonnull final ProfileRequestContext profileRequestContext) {
         log.debug("{} Initializing authentication context", getLogPrefix());
         final AuthenticationContext authnCtx = new AuthenticationContext();
-        authnCtx.setForceAuthn(oidcCtx.getRequest().getMaxAge() == 0);
-        if (oidcCtx.getRequest().getPrompt() != null) {
-            authnCtx.setIsPassive(oidcCtx.getRequest().getPrompt().contains(Prompt.Type.NONE));
+        authnCtx.setForceAuthn(getOidcCtx().getRequest().getMaxAge() == 0);
+        if (getOidcCtx().getRequest().getPrompt() != null) {
+            authnCtx.setIsPassive(getOidcCtx().getRequest().getPrompt().contains(Prompt.Type.NONE));
         }
-        if (oidcCtx.getRequest().getLoginHint() != null) {
-            authnCtx.setHintedName(oidcCtx.getRequest().getLoginHint());
+        if (getOidcCtx().getRequest().getLoginHint() != null) {
+            authnCtx.setHintedName(getOidcCtx().getRequest().getLoginHint());
         }
         profileRequestContext.addSubcontext(authnCtx, true);
         log.debug("{} Created authentication context: {}", getLogPrefix(), authnCtx);

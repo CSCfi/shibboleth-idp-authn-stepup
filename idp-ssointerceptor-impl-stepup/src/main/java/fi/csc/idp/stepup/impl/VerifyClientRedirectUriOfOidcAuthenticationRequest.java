@@ -77,31 +77,31 @@ public class VerifyClientRedirectUriOfOidcAuthenticationRequest extends Abstract
     /** {@inheritDoc} */
     @Override
     protected void doExecute(@Nonnull final ProfileRequestContext profileRequestContext) {
-        if (!redirectUris.containsKey(oidcCtx.getRequest().getClientID().getValue())) {
-            oidcCtx.setErrorCode("unauthorized_client");
-            oidcCtx.setErrorDescription("client has not registered any redirect uri");
+        if (!redirectUris.containsKey(getOidcCtx().getRequest().getClientID().getValue())) {
+            getOidcCtx().setErrorCode("unauthorized_client");
+            getOidcCtx().setErrorDescription("client has not registered any redirect uri");
             log.trace("Leaving");
-            log.error("{} client {} has not registered redirect uris", getLogPrefix(), oidcCtx.getRequest()
+            log.error("{} client {} has not registered redirect uris", getLogPrefix(), getOidcCtx().getRequest()
                     .getClientID().getValue());
             ActionSupport.buildEvent(profileRequestContext, OidcProcessingEventIds.EVENTID_ERROR_LOCAL_OIDC);
             return;
 
         }
-        for (String uri : redirectUris.get(oidcCtx.getRequest().getClientID().getValue())) {
+        for (String uri : redirectUris.get(getOidcCtx().getRequest().getClientID().getValue())) {
             log.debug("matching to " + uri);
-            if (uri.equals(oidcCtx.getRequest().getRedirectionURI().toString())) {
+            if (uri.equals(getOidcCtx().getRequest().getRedirectionURI().toString())) {
                 log.debug("redirect uri validated");
-                oidcCtx.setRedirectUriValidated(true);
+                getOidcCtx().setRedirectUriValidated(true);
                 log.trace("Leaving");
                 return;
             }
         }
-        oidcCtx.setErrorCode("unauthorized_client");
-        oidcCtx.setErrorDescription("client has not registered redirect uri "
-                + oidcCtx.getRequest().getRedirectionURI().toString());
+        getOidcCtx().setErrorCode("unauthorized_client");
+        getOidcCtx().setErrorDescription("client has not registered redirect uri "
+                + getOidcCtx().getRequest().getRedirectionURI().toString());
         log.trace("Leaving");
-        log.error("{} client {} has not registered redirect uri {}", getLogPrefix(), oidcCtx.getRequest().getClientID()
-                .getValue(), oidcCtx.getRequest().getRedirectionURI().toString());
+        log.error("{} client {} has not registered redirect uri {}", getLogPrefix(), getOidcCtx().getRequest().getClientID()
+                .getValue(), getOidcCtx().getRequest().getRedirectionURI().toString());
         ActionSupport.buildEvent(profileRequestContext, OidcProcessingEventIds.EVENTID_ERROR_LOCAL_OIDC);
     }
 

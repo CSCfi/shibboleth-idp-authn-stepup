@@ -24,7 +24,6 @@
 package fi.csc.idp.stepup.impl;
 
 import javax.annotation.Nonnull;
-
 import net.shibboleth.idp.profile.AbstractProfileAction;
 import org.opensaml.profile.action.ActionSupport;
 import org.opensaml.profile.action.EventIds;
@@ -35,7 +34,8 @@ import org.slf4j.LoggerFactory;
 import fi.csc.idp.stepup.api.OidcStepUpContext;
 
 /**
- * Abstract class for oidc authentication actions. Resolves the request.
+ * Abstract class for oidc authentication actions. Locates oidc stepup context.
+ * If no context is found a error event is triggered.
  * 
  */
 @SuppressWarnings("rawtypes")
@@ -46,7 +46,17 @@ abstract class AbstractOidcProfileAction extends AbstractProfileAction {
     private final Logger log = LoggerFactory.getLogger(AbstractOidcProfileAction.class);
 
     /** OIDC Ctx. */
-    protected OidcStepUpContext oidcCtx;
+    private OidcStepUpContext oidcCtx;
+
+    /**
+     * Returns the oidc context.
+     * 
+     * @return oidc context
+     */
+    @Nonnull
+    public OidcStepUpContext getOidcCtx() {
+        return oidcCtx;
+    }
 
     /** {@inheritDoc} */
     @SuppressWarnings("unchecked")
@@ -54,11 +64,6 @@ abstract class AbstractOidcProfileAction extends AbstractProfileAction {
     protected boolean doPreExecute(@Nonnull final ProfileRequestContext profileRequestContext) {
         if (!super.doPreExecute(profileRequestContext)) {
             log.error("{} pre-execute failed", getLogPrefix());
-            return false;
-        }
-        if (profileRequestContext.getInboundMessageContext() == null) {
-            log.error("{} Unable to locate inbound message context", getLogPrefix());
-            ActionSupport.buildEvent(profileRequestContext, EventIds.INVALID_MSG_CTX);
             return false;
         }
         oidcCtx = profileRequestContext.getSubcontext(OidcStepUpContext.class, false);

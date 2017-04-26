@@ -177,17 +177,17 @@ public class RespondOidcMFARequest extends AbstractOidcProfileAction {
     /** {@inheritDoc} */
     @Override
     protected void doExecute(@Nonnull final ProfileRequestContext profileRequestContext) {
-        if (oidcCtx.getErrorCode() != null) {
+        if (getOidcCtx().getErrorCode() != null) {
             AuthenticationErrorResponse resp = new AuthenticationErrorResponse(
-                    oidcCtx.getRequest().getRedirectionURI(), new ErrorObject(oidcCtx.getErrorCode(),
-                            oidcCtx.getErrorDescription()), oidcCtx.getRequest().getState(), oidcCtx.getRequest()
+                    getOidcCtx().getRequest().getRedirectionURI(), new ErrorObject(getOidcCtx().getErrorCode(),
+                            getOidcCtx().getErrorDescription()), getOidcCtx().getRequest().getState(), getOidcCtx().getRequest()
                             .getResponseMode());
             log.debug("constructed response:" + resp.toURI());
-            oidcCtx.setResponse(resp.toURI());
+            getOidcCtx().setResponse(resp.toURI());
             srCtx.getRequestContext().getFlowScope().put(redirect, resp.toURI().toString());
             return;
         }
-        AuthenticationRequest req = oidcCtx.getRequest();
+        AuthenticationRequest req = getOidcCtx().getRequest();
         final AttributeContext attributeCtx = profileRequestContext.getSubcontext(RelyingPartyContext.class)
                 .getSubcontext(AttributeContext.class);
         if (attributeCtx == null) {
@@ -201,22 +201,22 @@ public class RespondOidcMFARequest extends AbstractOidcProfileAction {
         // Set the requesting client as audience
         aud.add(new Audience(req.getClientID().getValue()));
         // Set us as the Issuer
-        Issuer iss = new Issuer(oidcCtx.getIssuer());
+        Issuer iss = new Issuer(getOidcCtx().getIssuer());
         // set exp
         Calendar calExp = Calendar.getInstance();
         calExp.add(Calendar.SECOND, (int) exp);
         // Create Token
-        IDTokenClaimsSet idToken2 = new IDTokenClaimsSet(iss, new Subject(oidcCtx.getIdToken().getSubject()), aud,
+        IDTokenClaimsSet idToken2 = new IDTokenClaimsSet(iss, new Subject(getOidcCtx().getIdToken().getSubject()), aud,
                 calExp.getTime(), new Date());
         // We need to copy specified claims back to response
         if (tokenResponseClaims != null) {
             for (String claim : tokenResponseClaims) {
-                idToken2.setClaim(claim, oidcCtx.getIdToken().getClaim(claim));
+                idToken2.setClaim(claim, getOidcCtx().getIdToken().getClaim(claim));
             }
         }
         // This response assumes we are using implicit flow
-        if (oidcCtx.getRequest().getNonce() != null) {
-            idToken2.setClaim("nonce", oidcCtx.getRequest().getNonce());
+        if (getOidcCtx().getRequest().getNonce() != null) {
+            idToken2.setClaim("nonce", getOidcCtx().getRequest().getNonce());
         }
         // We always authenticate user and also set the time therefore
         idToken2.setClaim("auth_time", new Date());
@@ -237,7 +237,7 @@ public class RespondOidcMFARequest extends AbstractOidcProfileAction {
         AuthenticationSuccessResponse resp = new AuthenticationSuccessResponse(req.getRedirectionURI(), code, jwt,
                 null, state, null, req.getResponseMode());
         log.debug("constructed response:" + resp.toURI());
-        oidcCtx.setResponse(resp.toURI());
+        getOidcCtx().setResponse(resp.toURI());
         srCtx.getRequestContext().getFlowScope().put(redirect, resp.toURI().toString());
     }
 

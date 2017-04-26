@@ -88,10 +88,10 @@ public class InitializeRelyingPartyContext extends AbstractOidcProfileAction {
             return;
         }
 
-        log.debug("{} Attaching RelyingPartyContext for rp {}", getLogPrefix(), oidcCtx.getRequest().getClientID()
+        log.debug("{} Attaching RelyingPartyContext for rp {}", getLogPrefix(), getOidcCtx().getRequest().getClientID()
                 .getValue());
-        rpContext.setVerified(oidcCtx.isRedirectUriValidated());
-        rpContext.setRelyingPartyId(oidcCtx.getRequest().getClientID().getValue());
+        rpContext.setVerified(getOidcCtx().isRedirectUriValidated());
+        rpContext.setRelyingPartyId(getOidcCtx().getRequest().getClientID().getValue());
     }
 
 }

@@ -94,7 +94,7 @@ public class InitializeAttributeContext extends AbstractOidcProfileAction {
         }
         List<IdPAttribute> attributes = new ArrayList<IdPAttribute>();
         for (String key : claimToAttribute.keySet()) {
-            if (oidcCtx.getIdToken().getClaims().keySet().contains(key)) {
+            if (getOidcCtx().getIdToken().getClaims().keySet().contains(key)) {
                 String attributeName = claimToAttribute.get(key);
                 if (attributeName == null) {
                     // claim is listed but not set as attribute
@@ -104,14 +104,14 @@ public class InitializeAttributeContext extends AbstractOidcProfileAction {
                 // claim is supported and set as attribute
                 List<String> values;
                 try {
-                    values = oidcCtx.getIdToken().getStringListClaim(key);
+                    values = getOidcCtx().getIdToken().getStringListClaim(key);
                 } catch (ParseException e) {
                     values = new ArrayList<String>();
                     try {
-                        values.add(oidcCtx.getIdToken().getStringClaim(key));
+                        values.add(getOidcCtx().getIdToken().getStringClaim(key));
                     } catch (ParseException e1) {
-                        oidcCtx.setErrorCode("invalid_request");
-                        oidcCtx.setErrorDescription("id token contained a unparsable claim");
+                        getOidcCtx().setErrorCode("invalid_request");
+                        getOidcCtx().setErrorDescription("id token contained a unparsable claim");
                         log.error("{} id token contained a unparsable claim", getLogPrefix());
                         ActionSupport.buildEvent(profileRequestContext, OidcProcessingEventIds.EVENTID_ERROR_OIDC);
                         log.trace("Leaving");
@@ -131,8 +131,8 @@ public class InitializeAttributeContext extends AbstractOidcProfileAction {
                 attribute.setValues(stringAttributeValues);
                 attributes.add(attribute);
             } else {
-                oidcCtx.setErrorCode("invalid_request");
-                oidcCtx.setErrorDescription("request does not have required claim in id token: " + key);
+                getOidcCtx().setErrorCode("invalid_request");
+                getOidcCtx().setErrorDescription("request does not have required claim in id token: " + key);
                 log.error("{} request does not have required claim in id token: {}", getLogPrefix(), key);
                 ActionSupport.buildEvent(profileRequestContext, OidcProcessingEventIds.EVENTID_ERROR_OIDC);
                 log.trace("Leaving");
