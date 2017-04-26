@@ -24,9 +24,7 @@
 package fi.csc.idp.stepup.impl;
 
 import javax.annotation.Nonnull;
-
 import org.opensaml.profile.action.ActionSupport;
-import org.opensaml.profile.action.EventIds;
 import org.opensaml.profile.context.ProfileRequestContext;
 import net.shibboleth.idp.profile.IdPEventIds;
 import net.shibboleth.idp.profile.context.RelyingPartyContext;
