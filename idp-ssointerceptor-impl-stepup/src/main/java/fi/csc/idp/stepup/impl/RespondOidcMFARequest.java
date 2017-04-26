@@ -62,9 +62,14 @@ import com.nimbusds.oauth2.sdk.ErrorObject;
  * Forms a oidc authentication response. Implementation is not generic, assumes
  * that is responding to request specific to Haka MFA request.
  * 
- * This actions does not copy any attributes to responce etc. This is solely for
- * use case of performing specific stepup authentication and delivering the
- * response in ACR
+ * This actions does not copy any attributes to response or anything you would
+ * expect from a step similar to building saml2 assertion. The target is to
+ * confirm rp that MFA authentication has been performed or to return a error
+ * message of the event.
+ * 
+ * Action assumes that unless there is a error description present user has
+ * performed MFA successfully i.e. the flow must not be directed to this action
+ * otherwise.
  * 
  * 
  */
@@ -178,10 +183,10 @@ public class RespondOidcMFARequest extends AbstractOidcProfileAction {
     @Override
     protected void doExecute(@Nonnull final ProfileRequestContext profileRequestContext) {
         if (getOidcCtx().getErrorCode() != null) {
-            AuthenticationErrorResponse resp = new AuthenticationErrorResponse(
-                    getOidcCtx().getRequest().getRedirectionURI(), new ErrorObject(getOidcCtx().getErrorCode(),
-                            getOidcCtx().getErrorDescription()), getOidcCtx().getRequest().getState(), getOidcCtx().getRequest()
-                            .getResponseMode());
+            AuthenticationErrorResponse resp = new AuthenticationErrorResponse(getOidcCtx().getRequest()
+                    .getRedirectionURI(), new ErrorObject(getOidcCtx().getErrorCode(), getOidcCtx()
+                    .getErrorDescription()), getOidcCtx().getRequest().getState(), getOidcCtx().getRequest()
+                    .getResponseMode());
             log.debug("constructed response:" + resp.toURI());
             getOidcCtx().setResponse(resp.toURI());
             srCtx.getRequestContext().getFlowScope().put(redirect, resp.toURI().toString());
