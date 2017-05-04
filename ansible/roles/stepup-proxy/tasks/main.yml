@@ -6,7 +6,7 @@
     - maven
 
 - name: Checkout StepUp Proxy
-  git: repo=https://github.com/CSC-IT-Center-for-Science/stepup-proxy version={{ stepup_co_version }} dest="{{ remote_user_home }}/stepup-proxy"
+  git: repo=https://github.com/CSCfi/stepup-proxy version={{ stepup_co_version }} dest="{{ remote_user_home }}/stepup-proxy"
   become: yes
   become_user: "{{ build_user }}"
 
@@ -66,6 +66,9 @@
 
 - name: Ensure "{{ idp_home }}/views/authn/" dir exists
   file: path="{{ idp_home }}/views/authn/" state=directory
+
+- name: Ensure "{{ idp_home }}/views/oidc/" dir exists
+  file: path="{{ idp_home }}/views/oidc/" state=directory
 
 - name: Copy stepup views, overwriting existing ones
   copy:
