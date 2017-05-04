@@ -1,9 +1,9 @@
 # Shibboleth IdP Stepup Proxy
 
-[![Build Status](https://travis-ci.org/CSC-IT-Center-for-Science/stepup-proxy.svg?branch=master)](https://travis-ci.org/CSC-IT-Center-for-Science/stepup-proxy)
+[![Build Status](https://travis-ci.org/CSCfi/stepup-proxy.svg?branch=master)](https://travis-ci.org/CSCfi/stepup-proxy)
 [![Coverage Status](https://coveralls.io/repos/github/CSC-IT-Center-for-Science/stepup-proxy/badge.svg?branch=master)](https://coveralls.io/github/CSC-IT-Center-for-Science/stepup-proxy?branch=master)
 
-##Please Note
+## Please Note
 
 Project can be deployed for testing purposes but is not fully production quality yet. Many of the features are still under development and deployment may require help from the development team.  
 
