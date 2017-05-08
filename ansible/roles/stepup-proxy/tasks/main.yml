@@ -118,14 +118,19 @@
     mode: 0644
     remote_src: yes
 
-- name: Copy stepup dependency nimbus-jose-jwt-4.37.jar for bulding new idp.war
+- name: Find current nimbus library
+  shell: "ls {{ remote_user_home }}stepup-proxy/idp-ssointerceptor-impl-stepup/target/dependency/nimbus-jose-jwt-*"
+  register: nimbus_file
+
+- name: Copy stepup dependency nimbus-jose-jwt-* for bulding new idp.war
   copy:
-    src: "{{ remote_user_home }}/stepup-proxy/idp-ssointerceptor-impl-stepup/target/dependency/nimbus-jose-jwt-4.37.jar"
-    dest: "{{ idp_home }}/edit-webapp/WEB-INF/lib/nimbus-jose-jwt-4.37.jar"
+    src: "{{ item }}"
+    dest: "{{ idp_home }}/edit-webapp/WEB-INF/lib/"
     owner: root
     group: root
     mode: 0644
     remote_src: yes
+  with_items: "{{ nimbus_file.stdout_lines }}"
 
 - name: Copy stepup dependency lang-tag-1.4.3.jar for bulding new idp.war
   copy:
