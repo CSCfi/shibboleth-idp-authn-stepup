@@ -23,6 +23,7 @@
 
 package fi.csc.idp.stepup.impl;
 
+import fi.csc.idp.stepup.api.FailureLimitReachedException;
 import fi.csc.idp.stepup.api.StepUpAccount;
 
 public class MockAccount implements StepUpAccount {
@@ -30,6 +31,8 @@ public class MockAccount implements StepUpAccount {
     public String correctResponse = "response_success";
     long id = 0;
     String name;
+    
+    public boolean noRetries;
 
     @Override
     public long getId() {
@@ -78,7 +81,11 @@ public class MockAccount implements StepUpAccount {
         if (response == null && correctResponse == null) {
             return true;
         }
-        return correctResponse.equals(response);
+        boolean resp=correctResponse.equals(response);
+        if (resp == false && noRetries){
+            throw new FailureLimitReachedException("failure limit reached");
+        }
+        return resp;
     }
 
     @Override
