@@ -17,20 +17,17 @@
 		class="net.shibboleth.idp.profile.impl.InitializeProfileRequestContext"
 		scope="prototype" p:profileId="http://csc.fi/ns/profiles/oidc/mfarequest/browser"
 		p:loggingId="%{idp.service.logging.saml2sso:SSO}" p:browserProfile="true" />
-		
-	<bean id="InitializeRelyingPartyContext"
-		class="fi.csc.idp.stepup.impl.InitializeRelyingPartyContext"
-		scope="prototype" />
-	
-	<bean id="InitializeAuthenticationContext"
-		class="fi.csc.idp.stepup.impl.InitializeAuthenticationContext"
-		scope="prototype" />
-		
-	<bean id="InitializeShibSPContext"
-		class="fi.csc.idp.stepup.impl.InitializeShibSPContext"
+
+	<bean id="InitializeRelyingPartyContext" class="fi.csc.idp.stepup.impl.InitializeRelyingPartyContext"
 		scope="prototype" />
 
-    <bean id="InitializeAttributeContext" class="fi.csc.idp.stepup.impl.InitializeAttributeContext"
+	<bean id="InitializeAuthenticationContext" class="fi.csc.idp.stepup.impl.InitializeAuthenticationContext"
+		scope="prototype" />
+
+	<bean id="InitializeShibSPContext" class="fi.csc.idp.stepup.impl.InitializeShibSPContext"
+		scope="prototype" />
+
+	<bean id="InitializeAttributeContext" class="fi.csc.idp.stepup.impl.InitializeAttributeContext"
 		scope="prototype">
 		<property name="claimToAttribute">
 			<map>
@@ -39,7 +36,7 @@
 			</map>
 		</property>
 	</bean>
-	
+
 	<bean id="DecodeMessage" class="org.opensaml.profile.action.impl.DecodeMessage"
 		scope="prototype">
 		<constructor-arg>

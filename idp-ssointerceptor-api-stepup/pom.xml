@@ -39,7 +39,7 @@
 		<dependency>
 			<groupId>com.nimbusds</groupId>
 			<artifactId>oauth2-oidc-sdk</artifactId>
-		</dependency> 
+		</dependency>
 	</dependencies>
 	<build>
 		<plugins>

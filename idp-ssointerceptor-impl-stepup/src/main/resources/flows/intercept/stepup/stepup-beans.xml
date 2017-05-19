@@ -20,7 +20,7 @@
 	<bean id="foobar2" parent="shibboleth.SAML2AuthnContextClassRef"
 		c:classRef="urn:test:foobar2" />
 	<bean id="foobar3" parent="shibboleth.SAML2AuthnContextClassRef"
-		c:classRef="urn:test:foobar3" />	
+		c:classRef="urn:test:foobar3" />
 	<bean id="password" parent="shibboleth.SAML2AuthnContextClassRef"
 		c:classRef="urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport" />
 
