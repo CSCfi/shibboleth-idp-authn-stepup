@@ -78,6 +78,8 @@ public class GoogleAuthenticatorStepUpAccount extends AbstractStepUpAccount {
         boolean verified=gAuth.authorize(getTarget(), code);
         if (verified){
             setVerified();
+        }else{
+            verificationFailedCheck();
         }
         log.trace("Leaving");
         return verified;
