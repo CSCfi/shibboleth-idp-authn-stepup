@@ -220,6 +220,7 @@ public class TvilioSMSReceiverStepUpAccount extends ChallengeSenderStepUpAccount
 
         }
         log.trace("Leaving");
+        verificationFailedCheck();
         return false;
     }
 
