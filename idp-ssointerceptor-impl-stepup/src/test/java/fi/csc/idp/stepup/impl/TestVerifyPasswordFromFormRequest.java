@@ -86,7 +86,7 @@ public class TestVerifyPasswordFromFormRequest {
         ActionTestingSupport.assertEvent(event, StepUpEventIds.EXCEPTION);
     }
 
-    private void baseInit() {
+    private void baseInit(MockAccount account) {
         AuthenticationContext ctx = (AuthenticationContext) prc.addSubcontext(new AuthenticationContext(), true);
         ShibbolethSpAuthenticationContext sCtx = new ShibbolethSpAuthenticationContext();
         List<Principal> requested = new ArrayList<Principal>();
@@ -94,7 +94,10 @@ public class TestVerifyPasswordFromFormRequest {
         sCtx.setInitialRequestedContext(requested);
         ctx.addSubcontext(sCtx, true);
         StepUpMethodContext stepUpContext = new StepUpMethodContext();
-        stepUpContext.setStepUpAccount(new MockAccount());
+        if (account == null){
+            account=new MockAccount();
+        }
+        stepUpContext.setStepUpAccount(account);
         MockHttpServletRequest request = new MockHttpServletRequest();
         request.addParameter("parameter_key", "response_failure");
         request.addParameter("parameter_key2", "response_success");
@@ -108,7 +111,7 @@ public class TestVerifyPasswordFromFormRequest {
      */
     @Test
     public void testNoParameterInServletRequest() throws ComponentInitializationException {
-        baseInit();
+        baseInit(null);
         action.initialize();
         final Event event = action.execute(src);
         ActionTestingSupport.assertEvent(event, StepUpEventIds.EVENTID_INVALID_RESPONSE);
@@ -117,17 +120,30 @@ public class TestVerifyPasswordFromFormRequest {
     /** Test that action copes with user entering wrong response */
     @Test
     public void testWrongResponse() throws ComponentInitializationException {
-        baseInit();
+        baseInit(null);
         action.setChallengeResponseParameter("parameter_key");
         action.initialize();
         final Event event = action.execute(src);
         ActionTestingSupport.assertEvent(event, StepUpEventIds.EVENTID_INVALID_RESPONSE);
     }
+    
+    /** Test that action copes with user entering wrong response with limit reached */
+    @Test
+    public void testWrongResponseLimit() throws ComponentInitializationException {
+        MockAccount account=new MockAccount();
+        account.noRetries=true;
+        baseInit(account);
+        action.setChallengeResponseParameter("parameter_key");
+        action.initialize();
+        final Event event = action.execute(src);
+        ActionTestingSupport.assertEvent(event, StepUpEventIds.EVENTID_RESPONSE_LIMIT);
+    }
+    
 
     /** Test that action copes with user entering correct response */
     @Test
     public void testCorrectResponse() throws ComponentInitializationException {
-        baseInit();
+        baseInit(null);
         action.setChallengeResponseParameter("parameter_key2");
         action.initialize();
         final Event event = action.execute(src);
