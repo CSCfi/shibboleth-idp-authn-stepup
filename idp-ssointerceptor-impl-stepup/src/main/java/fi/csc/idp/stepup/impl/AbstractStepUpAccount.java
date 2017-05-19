@@ -30,6 +30,7 @@ import org.slf4j.LoggerFactory;
 
 import fi.csc.idp.stepup.api.ChallengeGenerator;
 import fi.csc.idp.stepup.api.ChallengeVerifier;
+import fi.csc.idp.stepup.api.FailureLimitReachedException;
 import fi.csc.idp.stepup.api.StepUpAccount;
 
 /** Helper class for StepUpAccount implementations. */
@@ -57,7 +58,19 @@ public abstract class AbstractStepUpAccount implements StepUpAccount {
     private boolean enabled;
     /** user has been verified. */
     private boolean verified;
-    
+    /** retry limit for trying to successfully verify. */
+    private int retries = -1;
+
+    /**
+     * Set 0 or a positive number for retries allowed. Negative number is
+     * interpreted as infinite retries. 0 means one try, no retries.
+     * 
+     * @param retries
+     *            allowed.
+     */
+    public void setRetryLimit(int limit) {
+        this.retries = limit;
+    }
 
     /** default constructor. */
     public AbstractStepUpAccount() {
@@ -74,7 +87,7 @@ public abstract class AbstractStepUpAccount implements StepUpAccount {
     @Override
     public long getId() {
         log.trace("Entering & Leaving");
-        return id;
+        return this.id;
     }
 
     /**
@@ -100,7 +113,7 @@ public abstract class AbstractStepUpAccount implements StepUpAccount {
      * @return challenge created
      */
     public String getChallenge() {
-        return challenge;
+        return this.challenge;
     }
 
     /**
@@ -149,7 +162,7 @@ public abstract class AbstractStepUpAccount implements StepUpAccount {
     @Override
     public String getName() {
         log.trace("Entering & Leaving");
-        return name;
+        return this.name;
     }
 
     /**
@@ -162,10 +175,9 @@ public abstract class AbstractStepUpAccount implements StepUpAccount {
         log.trace("Entering & Leaving");
         return this.editable;
     }
-    
+
     /**
-     * If the account has been used to verify the 
-     * the user.
+     * If the account has been used to verify the the user.
      * 
      * @return true if verified.
      */
@@ -176,13 +188,31 @@ public abstract class AbstractStepUpAccount implements StepUpAccount {
     }
 
     /**
-     * Set the status of user being verified. 
+     * Set the status of user being verified.
      */
     protected void setVerified() {
         log.trace("Entering & Leaving");
-        this.verified=true;
+        this.verified = true;
     }
-    
+
+    /**
+     * Method to check if account failure limit is reached after failed
+     * authentication.
+     * 
+     * 
+     * @throws FailureLimitReachedException
+     *             if account limit is reached.
+     */
+    protected void verificationFailedCheck() throws FailureLimitReachedException {
+        if (this.retries < 0) {
+            return;
+        }
+        if (this.retries == 0) {
+            throw new FailureLimitReachedException("Account verification retry limit reached");
+        }
+        this.retries--;
+    }
+
     /**
      * Set the account editable/non editable. Non editable account cannot be
      * modified.
@@ -263,7 +293,10 @@ public abstract class AbstractStepUpAccount implements StepUpAccount {
             log.trace("Leaving");
             throw new Exception("Bean not configured with ChallengeVerifier");
         }
-        this.verified = challengeVerifier.verify(challenge, response, null); 
+        this.verified = challengeVerifier.verify(challenge, response, null);
+        if (!this.verified) {
+            verificationFailedCheck();
+        }
         log.trace("Leaving");
         return this.verified;
     }
