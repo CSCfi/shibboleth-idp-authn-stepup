@@ -112,7 +112,7 @@ public class SQLStepUpAccountStorage implements StepUpAccountStorage {
      *            add statement.
      */
     public void setAddStatement(String statement) {
-        log.trace("Entering & Leaving");
+        
         this.addStatement = statement;
     }
 
@@ -123,7 +123,7 @@ public class SQLStepUpAccountStorage implements StepUpAccountStorage {
      *            update statement.
      */
     public void setUpdateStatement(String statement) {
-        log.trace("Entering & Leaving");
+        
         this.updateStatement = statement;
     }
 
@@ -134,7 +134,7 @@ public class SQLStepUpAccountStorage implements StepUpAccountStorage {
      *            remove statement.
      */
     public void setRemoveStatement(String statement) {
-        log.trace("Entering & Leaving");
+        
         this.removeStatement = statement;
     }
 
@@ -145,7 +145,7 @@ public class SQLStepUpAccountStorage implements StepUpAccountStorage {
      *            list statement.
      */
     public void setListStatement(String statement) {
-        log.trace("Entering & Leaving");
+        
         this.listStatement = statement;
     }
 
@@ -156,9 +156,9 @@ public class SQLStepUpAccountStorage implements StepUpAccountStorage {
      *            datasource
      */
     public void setDataSource(DataSource source) {
-        log.trace("Entering");
+        
         this.datasource = source;
-        log.trace("Leaving");
+        
     }
 
     /**
@@ -169,11 +169,11 @@ public class SQLStepUpAccountStorage implements StepUpAccountStorage {
      *             if datasource has not been set
      */
     private DataSource getDataSource() throws Exception {
-        log.trace("Entering");
+        
         if (datasource == null) {
             throw new Exception("Datasource must be set");
         }
-        log.trace("Leaving");
+        
         return datasource;
     }
 
@@ -187,18 +187,18 @@ public class SQLStepUpAccountStorage implements StepUpAccountStorage {
      *             if something unexpected occurs
      */
     private String encrypt(String parameter) throws Exception {
-        log.trace("Entering");
+        
         if (encryptor == null) {
-            log.trace("Leaving");
+            
             throw new Exception("Encryptor not set");
         }
         if (parameter == null) {
-            log.trace("Leaving");
+            
             return null;
         }
         String result = encryptor.encrypt(parameter);
         log.debug("encrypt(" + parameter + ")=" + result);
-        log.trace("Leaving");
+        
         return result;
     }
 
@@ -212,18 +212,18 @@ public class SQLStepUpAccountStorage implements StepUpAccountStorage {
      *             if something unexpected occurs
      */
     private String decrypt(String parameter) throws Exception {
-        log.trace("Entering");
+        
         if (encryptor == null) {
-            log.trace("Leaving");
+            
             throw new Exception("Encryptor not set");
         }
         if (parameter == null) {
-            log.trace("Leaving");
+            
             return null;
         }
         String result = encryptor.decrypt(parameter);
         log.debug("decrypt(" + parameter + ")=" + result);
-        log.trace("Leaving");
+        
         return result;
     }
 
@@ -237,12 +237,12 @@ public class SQLStepUpAccountStorage implements StepUpAccountStorage {
      *             if something unexpected occurs
      */
     private String encryptKey(String key) throws Exception {
-        log.trace("Entering");
+        
         if (!encryptKey) {
-            log.trace("Leaving");
+            
             return key;
         }
-        log.trace("Leaving");
+        
         return encrypt(key);
     }
 
@@ -256,12 +256,12 @@ public class SQLStepUpAccountStorage implements StepUpAccountStorage {
      *             if something unexpected occurs
      */
     private String encryptName(String name) throws Exception {
-        log.trace("Entering");
+        
         if (!encryptName) {
-            log.trace("Leaving");
+            
             return name;
         }
-        log.trace("Leaving");
+        
         return encrypt(name);
     }
 
@@ -275,12 +275,12 @@ public class SQLStepUpAccountStorage implements StepUpAccountStorage {
      *             if something unexpected occurs
      */
     private String decryptName(String name) throws Exception {
-        log.trace("Entering");
+        
         if (!encryptName) {
-            log.trace("Leaving");
+            
             return name;
         }
-        log.trace("Leaving");
+        
         return decrypt(name);
     }
 
@@ -294,12 +294,12 @@ public class SQLStepUpAccountStorage implements StepUpAccountStorage {
      *             if something unexpected occurs
      */
     private String encryptTarget(String target) throws Exception {
-        log.trace("Entering");
+        
         if (!encryptTarget) {
-            log.trace("Leaving");
+            
             return target;
         }
-        log.trace("Leaving");
+        
         return encrypt(target);
     }
 
@@ -313,18 +313,18 @@ public class SQLStepUpAccountStorage implements StepUpAccountStorage {
      *             if something unexpected occurs
      */
     private String decryptTarget(String target) throws Exception {
-        log.trace("Entering");
+        
         if (!encryptTarget) {
-            log.trace("Leaving");
+            
             return target;
         }
-        log.trace("Leaving");
+        
         return decrypt(target);
     }
 
     @Override
     public void add(StepUpAccount account, String key) throws Exception {
-        log.trace("Entering");
+        
         Connection conn = getDataSource().getConnection();
         PreparedStatement add = conn.prepareStatement(addStatement);
         try {
@@ -339,12 +339,12 @@ public class SQLStepUpAccountStorage implements StepUpAccountStorage {
             add.close();
             conn.close();
         }
-        log.trace("Leaving");
+        
     }
 
     @Override
     public void remove(StepUpAccount account, String key) throws Exception {
-        log.trace("Entering");
+        
         Connection conn = getDataSource().getConnection();
         PreparedStatement remove = conn.prepareStatement(removeStatement);
         try {
@@ -355,13 +355,13 @@ public class SQLStepUpAccountStorage implements StepUpAccountStorage {
             remove.close();
             conn.close();
         }
-        log.trace("Leaving");
+        
 
     }
 
     @Override
     public void update(StepUpAccount account, String key) throws Exception {
-        log.trace("Entering");
+        
         Connection conn = getDataSource().getConnection();
         PreparedStatement update = conn.prepareStatement(updateStatement);
         try {
@@ -377,12 +377,12 @@ public class SQLStepUpAccountStorage implements StepUpAccountStorage {
             update.close();
             conn.close();
         }
-        log.trace("Leaving");
+        
     }
 
     @Override
     public <T> List<StepUpAccount> getAccounts(String key, Class<T> aClass) throws Exception {
-        log.trace("Entering");
+        
         log.debug("About to read accounts for " + key);
         Connection conn = getDataSource().getConnection();
         List<StepUpAccount> accounts = new ArrayList<StepUpAccount>();
@@ -405,7 +405,7 @@ public class SQLStepUpAccountStorage implements StepUpAccountStorage {
                 stepUpAccount.setEditable(rs.getBoolean("editable"));
                 accounts.add(stepUpAccount);
             }
-            log.trace("Leaving");
+            
             rs.close();
         } finally {
             list.close();

@@ -49,18 +49,18 @@ public class GenerateStepUpChallenge extends AbstractAuthenticationAction {
     @Override
     protected void doExecute(@Nonnull final ProfileRequestContext profileRequestContext,
             @Nonnull final AuthenticationContext authenticationContext) {
-        log.trace("Entering");
+        
         StepUpMethodContext stepUpMethodContext = authenticationContext.getSubcontext(StepUpMethodContext.class);
         if (stepUpMethodContext == null) {
             log.debug("{} Could not get shib proxy context", getLogPrefix());
             ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EVENTID_MISSING_STEPUPMETHODCONTEXT);
-            log.trace("Leaving");
+            
             return;
         }
         if (stepUpMethodContext.getStepUpAccount() == null) {
             log.debug("There is no chosen stepup account for user", getLogPrefix());
             ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EVENTID_INVALID_USER);
-            log.trace("Leaving");
+            
             return;
         }
         try {
@@ -70,11 +70,11 @@ public class GenerateStepUpChallenge extends AbstractAuthenticationAction {
             log.error(e.getMessage());
             log.debug("Unable to generate/pass challenge using", getLogPrefix());
             ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EXCEPTION);
-            log.trace("Leaving");
+            
             return;
         }
         ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EVENTID_CONTINUE_STEPUP);
-        log.trace("Leaving");
+        
     }
 
 }

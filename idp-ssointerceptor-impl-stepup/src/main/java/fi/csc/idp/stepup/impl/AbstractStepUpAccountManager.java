@@ -106,7 +106,7 @@ public class AbstractStepUpAccountManager implements StepUpMethod {
      *            is method name
      */
     public void setName(String methodName) {
-        log.trace("Entering & Leaving");
+        
         this.name = methodName;
     }
 
@@ -117,7 +117,7 @@ public class AbstractStepUpAccountManager implements StepUpMethod {
      */
     @Override
     public String getName() {
-        log.trace("Entering & Leaving");
+        
         return name;
     }
 
@@ -128,7 +128,7 @@ public class AbstractStepUpAccountManager implements StepUpMethod {
      */
     @Override
     public boolean isEditable() {
-        log.trace("Entering & Leaving");
+        
         return false;
     }
 
@@ -139,7 +139,7 @@ public class AbstractStepUpAccountManager implements StepUpMethod {
      */
     @Override
     public List<StepUpAccount> getAccounts() {
-        log.trace("Entering & Leaving");
+        
         return accounts;
     }
 
@@ -150,7 +150,7 @@ public class AbstractStepUpAccountManager implements StepUpMethod {
      */
     @Override
     public StepUpAccount addAccount() throws Exception {
-        log.trace("Entering & Leaving");
+        
         log.debug("Method not supported");
         return null;
     }
@@ -163,7 +163,7 @@ public class AbstractStepUpAccountManager implements StepUpMethod {
      */
     @Override
     public void removeAccount(StepUpAccount account) throws Exception {
-        log.trace("Entering & Leaving");
+        
         log.debug("Method not supported");
     }
 
@@ -176,13 +176,13 @@ public class AbstractStepUpAccountManager implements StepUpMethod {
      */
     @Override
     public boolean initialize(AttributeContext attributeContext) throws Exception {
-        log.trace("Entering");
+        
         StepUpAccount account = (StepUpAccount) getAppContext().getBean(getAccountID());
         account.setEnabled(true);
         // Accounts cannot be stored and therefore also not edited
         account.setEditable(false);
         getAccounts().add(account);
-        log.trace("Leaving");
+        
         return true;
     }
 
@@ -195,7 +195,7 @@ public class AbstractStepUpAccountManager implements StepUpMethod {
      */
     @Override
     public void updateAccount(StepUpAccount account) throws Exception {
-        log.trace("Entering & Leaving");
+        
         log.debug("Method not supported");
     }
 

@@ -88,10 +88,10 @@ public class InitializeStepUpChallengeContext extends AbstractAuthenticationActi
 
     /** Constructor. */
     public InitializeStepUpChallengeContext() {
-        log.trace("Entering");
+        
         attributeContextLookupStrategy = Functions.compose(new ChildContextLookup<>(AttributeContext.class),
                 new ChildContextLookup<ProfileRequestContext, RelyingPartyContext>(RelyingPartyContext.class));
-        log.trace("Leaving");
+        
     }
 
     /**
@@ -102,12 +102,12 @@ public class InitializeStepUpChallengeContext extends AbstractAuthenticationActi
      */
 
     public void setStepUpMethods(@Nonnull Map<StepUpMethod, List<? extends Principal>> methods) {
-        log.trace("Entering");
+        
         this.stepUpMethods = new LinkedHashMap<StepUpMethod, List<? extends Principal>>();
         for (Map.Entry<StepUpMethod, List<? extends Principal>> entry : methods.entrySet()) {
             this.stepUpMethods.put(entry.getKey(), entry.getValue());
         }
-        log.trace("Leaving");
+        
     }
 
     /**
@@ -119,10 +119,10 @@ public class InitializeStepUpChallengeContext extends AbstractAuthenticationActi
 
     public void setAttributeContextLookupStrategy(
             @Nonnull final Function<ProfileRequestContext, AttributeContext> strategy) {
-        log.trace("Entering");
+        
         attributeContextLookupStrategy = Constraint.isNotNull(strategy,
                 "AttributeContext lookup strategy cannot be null");
-        log.trace("Leaving");
+        
     }
 
     // Checkstyle: CyclomaticComplexity OFF
@@ -133,12 +133,12 @@ public class InitializeStepUpChallengeContext extends AbstractAuthenticationActi
     protected boolean doPreExecute(@Nonnull final ProfileRequestContext profileRequestContext,
             @Nonnull final AuthenticationContext authenticationContext) {
 
-        log.trace("Entering");
+        
         attributeContext = attributeContextLookupStrategy.apply(profileRequestContext);
         if (attributeContext == null) {
             log.error("{} Unable to locate attribute context", getLogPrefix());
             ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EVENTID_MISSING_ATTRIBUTECONTEXT);
-            log.trace("Leaving");
+            
             return false;
         }
 
@@ -146,16 +146,16 @@ public class InitializeStepUpChallengeContext extends AbstractAuthenticationActi
         if (shibbolethContext == null) {
             log.debug("{} Could not get shib proxy context", getLogPrefix());
             ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EVENTID_MISSING_SHIBSPCONTEXT);
-            log.trace("Leaving");
+            
             return false;
         }
         if (stepUpMethods == null) {
             log.debug("{} Bean not configured correctly, step up methods not set", getLogPrefix());
             ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EXCEPTION);
-            log.trace("Leaving");
+            
             return false;
         }
-        log.trace("Leaving");
+        
         return super.doPreExecute(profileRequestContext, authenticationContext);
     }
 
@@ -163,7 +163,7 @@ public class InitializeStepUpChallengeContext extends AbstractAuthenticationActi
     @Override
     protected void doExecute(@Nonnull final ProfileRequestContext profileRequestContext,
             @Nonnull final AuthenticationContext authenticationContext) {
-        log.trace("Entering");
+        
         StepUpMethodContext stepUpMethodContext = (StepUpMethodContext) authenticationContext.addSubcontext(
                 new StepUpMethodContext(), true);
         for (Iterator<Entry<StepUpMethod, List<? extends Principal>>> it = stepUpMethods.entrySet().iterator(); it
@@ -181,7 +181,7 @@ public class InitializeStepUpChallengeContext extends AbstractAuthenticationActi
                 log.debug("Something unexpected happened", getLogPrefix());
                 log.error(e.getMessage());
                 ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EXCEPTION);
-                log.trace("Leaving");
+                
                 return;
             }
         }
@@ -203,7 +203,7 @@ public class InitializeStepUpChallengeContext extends AbstractAuthenticationActi
                                 log.debug("Account type is " + entry.getKey().getName());
                                 log.debug("Account name is " + (account.getName() == null ? "" : account.getName()));
                                 stepUpMethodContext.setStepUpAccount(account);
-                                log.trace("Leaving");
+                                
                                 ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EVENTID_CONTINUE_STEPUP);
                                 return;
                             }
@@ -213,14 +213,14 @@ public class InitializeStepUpChallengeContext extends AbstractAuthenticationActi
                     log.debug("Something unexpected happened", getLogPrefix());
                     log.error(e.getMessage());
                     ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EXCEPTION);
-                    log.trace("Leaving");
+                    
                     return;
                 }
 
             }
         }
         // No default account automatically chosen
-        log.trace("Leaving");
+        
         ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EVENTID_CONTINUE_STEPUP);
     }
     // Checkstyle: CyclomaticComplexity ON

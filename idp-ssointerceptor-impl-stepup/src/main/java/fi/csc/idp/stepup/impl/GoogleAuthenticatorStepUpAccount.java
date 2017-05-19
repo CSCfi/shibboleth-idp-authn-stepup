@@ -40,14 +40,14 @@ public class GoogleAuthenticatorStepUpAccount extends AbstractStepUpAccount {
     
     @Override
     public String getTarget() {
-        log.trace("Entering");
+        
         if (super.getTarget() == null) {
             GoogleAuthenticator gAuth = new GoogleAuthenticator();
             final GoogleAuthenticatorKey key = gAuth.createCredentials();
             log.debug("Secret key with value " + key.getKey() + " created");
             setTarget(key.getKey());
         }
-        log.trace("Leaving");
+        
         return super.getTarget();
     }
 
@@ -57,9 +57,9 @@ public class GoogleAuthenticatorStepUpAccount extends AbstractStepUpAccount {
      */
     @Override
     public void sendChallenge() throws Exception {
-        log.trace("Entering");
+        
         log.debug("not supported");
-        log.trace("Leaving");
+        
     }
     
     /**
@@ -71,7 +71,7 @@ public class GoogleAuthenticatorStepUpAccount extends AbstractStepUpAccount {
      */
     @Override
     public boolean verifyResponse(String response) throws Exception {
-        log.trace("Entering");
+        
         log.debug("Verificating totp response " + response);
         GoogleAuthenticator gAuth = new GoogleAuthenticator();
         int code = Integer.parseInt(response);
@@ -81,7 +81,7 @@ public class GoogleAuthenticatorStepUpAccount extends AbstractStepUpAccount {
         }else{
             verificationFailedCheck();
         }
-        log.trace("Leaving");
+        
         return verified;
       }
 

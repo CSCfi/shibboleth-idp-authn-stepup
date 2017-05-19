@@ -127,11 +127,11 @@ public class ValidateRequestObjectOfOidcAuthenticationRequest extends AbstractOi
      * Cleans old messages.
      */
     private void cleanMessages() {
-        log.trace("Entering");
+        
         msgLock.lock();
         if (usedMessages.size() < 100) {
             msgLock.unlock();
-            log.trace("Leaving");
+            
             return;
         }
         long current = new Date().getTime();
@@ -145,7 +145,7 @@ public class ValidateRequestObjectOfOidcAuthenticationRequest extends AbstractOi
             }
         }
         msgLock.unlock();
-        log.trace("Leaving");
+        
     }
 
     /**
@@ -160,7 +160,7 @@ public class ValidateRequestObjectOfOidcAuthenticationRequest extends AbstractOi
      *             if something unexpected happens.
      */
     private List<JSONObject> getProviderRSAJWK(InputStream is) throws ParseException, IOException {
-        log.trace("Entering");
+        
         List<JSONObject> keys = new ArrayList<JSONObject>();
         JSONObject json = JSONObjectUtils.parse(IOUtils.readInputStreamToString(is,
                 java.nio.charset.Charset.forName("UTF8")));
@@ -172,7 +172,7 @@ public class ValidateRequestObjectOfOidcAuthenticationRequest extends AbstractOi
                 log.debug("adding verification key " + k.toString());
                 keys.add(k);
             }
-            log.trace("Leaving");
+            
             return keys;
         }
         for (Object key : keyList) {
@@ -180,11 +180,11 @@ public class ValidateRequestObjectOfOidcAuthenticationRequest extends AbstractOi
             // in case of many keys, we pick all RSA signature keys
             if ("sig".equals(k.get("use")) && "RSA".equals(k.get("kty"))) {
                 log.debug("adding verification key " + k.toString());
-                log.trace("Leaving");
+                
                 keys.add(k);
             }
         }
-        log.trace("Leaving");
+        
         return keys;
     }
 
@@ -200,7 +200,7 @@ public class ValidateRequestObjectOfOidcAuthenticationRequest extends AbstractOi
      * @return true if successfully verified, otherwise false
      */
     private boolean verifyJWT(OidcStepUpContext oidcCtx, JWT jwt, String clientID) {
-        log.trace("Entering");
+        
         // Check jwt is signed jwt
         if (this.noSignatureVerify) {
             log.warn("JWT signature not checked, do not use in production");
@@ -243,14 +243,14 @@ public class ValidateRequestObjectOfOidcAuthenticationRequest extends AbstractOi
                 RSAPublicKey providerKey = RSAKey.parse(key).toRSAPublicKey();
                 RSASSAVerifier verifier = new RSASSAVerifier(providerKey);
                 if (signedJWT.verify(verifier)) {
-                    log.trace("Leaving");
+                    
                     return true;
                 }
             }
             log.error("client " + clientID + " JWT signature verification failed for " + signedJWT.getParsedString());
             getOidcCtx().setErrorCode("invalid_request");
             getOidcCtx().setErrorDescription("request object signature verification failed");
-            log.trace("Leaving");
+            
             return false;
         } catch (ParseException | IOException | JOSEException e) {
             log.error("unable to verify signed jwt " + clientID);
@@ -275,13 +275,13 @@ public class ValidateRequestObjectOfOidcAuthenticationRequest extends AbstractOi
      *             if fails to parse claims
      */
     private boolean validateRequestObject(OidcStepUpContext oidcCtx, AuthenticationRequest req) throws ParseException {
-        log.trace("Entering");
+        
         String clientID = (String) req.getRequestObject().getJWTClaimsSet().getClaim("client_id");
         if (clientID == null || !req.getClientID().getValue().equals(clientID)) {
             log.error("request object: client id is mandatory and should match parameter value");
             getOidcCtx().setErrorCode("invalid_request");
             getOidcCtx().setErrorDescription("request object not containing correct client id");
-            log.trace("Leaving");
+            
             return false;
         }
         String responseType = (String) req.getRequestObject().getJWTClaimsSet().getClaim("response_type");
@@ -289,7 +289,7 @@ public class ValidateRequestObjectOfOidcAuthenticationRequest extends AbstractOi
             log.error("request object: response type is mandatory and should match parameter value");
             getOidcCtx().setErrorCode("invalid_request");
             getOidcCtx().setErrorDescription("request object not containing correct response type");
-            log.trace("Leaving");
+            
             return false;
         }
         String iss = (String) req.getRequestObject().getJWTClaimsSet().getClaim("iss");
@@ -297,7 +297,7 @@ public class ValidateRequestObjectOfOidcAuthenticationRequest extends AbstractOi
             log.error("request object: signed request object should contain iss claim with client id as value");
             getOidcCtx().setErrorCode("invalid_request");
             getOidcCtx().setErrorDescription("request object not containing iss claim with client id as value");
-            log.trace("Leaving");
+            
             return false;
         }
         String aud = (String) req.getRequestObject().getJWTClaimsSet().getStringListClaim("aud").get(0);
@@ -305,7 +305,7 @@ public class ValidateRequestObjectOfOidcAuthenticationRequest extends AbstractOi
             log.error("request object: signed request object should contain aud claim with op issuer as value");
             getOidcCtx().setErrorCode("invalid_request");
             getOidcCtx().setErrorDescription("request object not containing aud claim with op issuer as value");
-            log.trace("Leaving");
+            
             return false;
         }
         Date iat = req.getRequestObject().getJWTClaimsSet().getDateClaim("iat");
@@ -313,7 +313,7 @@ public class ValidateRequestObjectOfOidcAuthenticationRequest extends AbstractOi
             log.error("request object: iat is required in request object");
             getOidcCtx().setErrorCode("invalid_request");
             getOidcCtx().setErrorDescription("request object not containing iat");
-            log.trace("Leaving");
+            
             return false;
         }
         // check event window
@@ -323,7 +323,7 @@ public class ValidateRequestObjectOfOidcAuthenticationRequest extends AbstractOi
             log.error("id token too old: " + current + "/" + sent);
             getOidcCtx().setErrorCode("invalid_request");
             getOidcCtx().setErrorDescription("id token too old");
-            log.trace("Leaving");
+            
             return false;
         }
         State state = State.parse(req.getRequestObject().getJWTClaimsSet().getStringClaim("state"));
@@ -331,7 +331,7 @@ public class ValidateRequestObjectOfOidcAuthenticationRequest extends AbstractOi
             log.error("request object: state is required in request object");
             getOidcCtx().setErrorCode("invalid_request");
             getOidcCtx().setErrorDescription("request object not containing state");
-            log.trace("Leaving");
+            
             return false;
         }
 
@@ -340,7 +340,7 @@ public class ValidateRequestObjectOfOidcAuthenticationRequest extends AbstractOi
             log.error("request object: signed request object needs to have claims");
             getOidcCtx().setErrorCode("invalid_request");
             getOidcCtx().setErrorDescription("request object not containing claims");
-            log.trace("Leaving");
+            
             return false;
         }
         JWTClaimsSet idToken = null;
@@ -352,7 +352,7 @@ public class ValidateRequestObjectOfOidcAuthenticationRequest extends AbstractOi
             log.error("request object: signed request object needs to have id token");
             getOidcCtx().setErrorCode("invalid_request");
             getOidcCtx().setErrorDescription("request object not containing idtoken");
-            log.trace("Leaving");
+            
             return false;
         }
         // check replay
@@ -361,7 +361,7 @@ public class ValidateRequestObjectOfOidcAuthenticationRequest extends AbstractOi
             msgLock.unlock();
             getOidcCtx().setErrorCode("invalid_request");
             getOidcCtx().setErrorDescription("request object already used");
-            log.trace("Leaving");
+            
             return false;
         }
         cleanMessages();
@@ -369,7 +369,7 @@ public class ValidateRequestObjectOfOidcAuthenticationRequest extends AbstractOi
         usedMessages.put(state.getValue(), new DateTime(iat));
         msgLock.unlock();
         getOidcCtx().setIdToken(idToken);
-        log.trace("Leaving");
+        
         return true;
 
     }
@@ -396,7 +396,7 @@ public class ValidateRequestObjectOfOidcAuthenticationRequest extends AbstractOi
         if (getOidcCtx().getRequest().getRequestObject() == null) {
             getOidcCtx().setErrorCode("invalid_request");
             getOidcCtx().setErrorDescription("request does not contain request object");
-            log.trace("Leaving");
+            
             log.error("{} request does not contain request object", getLogPrefix());
             ActionSupport.buildEvent(profileRequestContext, OidcProcessingEventIds.EVENTID_ERROR_OIDC);
             return;
@@ -405,7 +405,7 @@ public class ValidateRequestObjectOfOidcAuthenticationRequest extends AbstractOi
                 .getClientID().getValue())) {
             log.error("verify failed");
             // verify is expected to fill reason
-            log.trace("Leaving");
+            
             log.error("{} verify failed {}:{}", getLogPrefix(), getOidcCtx().getErrorCode(), getOidcCtx()
                     .getErrorDescription());
             ActionSupport.buildEvent(profileRequestContext, OidcProcessingEventIds.EVENTID_ERROR_OIDC);
@@ -421,7 +421,7 @@ public class ValidateRequestObjectOfOidcAuthenticationRequest extends AbstractOi
             }
         } catch (ParseException e) {
             log.error("request object parsing failed");
-            log.trace("Leaving");
+            
             log.error("{} request object parsing failed", getLogPrefix());
             ActionSupport.buildEvent(profileRequestContext, OidcProcessingEventIds.EVENTID_ERROR_OIDC);
         }

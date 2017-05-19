@@ -54,18 +54,18 @@ public class AddAccount extends AbstractAuthenticationAction {
     @Override
     protected void doExecute(@Nonnull final ProfileRequestContext profileRequestContext,
             @Nonnull final AuthenticationContext authenticationContext) {
-        log.trace("Entering");
+        
         StepUpMethodContext stepUpMethodContext = authenticationContext.getSubcontext(StepUpMethodContext.class);
         if (stepUpMethodContext == null) {
             log.error("{} Could not get shib proxy context", getLogPrefix());
             ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EVENTID_MISSING_STEPUPMETHODCONTEXT);
-            log.trace("Leaving");
+            
             return;
         }
         if (stepUpMethodContext.getStepUpMethod() == null) {
             log.error("No default stepup method available for user", getLogPrefix());
             ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EVENTID_INVALID_USER);
-            log.trace("Leaving");
+            
             return;
         }
         log.debug("Adding a stepup account of type " + stepUpMethodContext.getStepUpMethod().getName());
@@ -75,19 +75,19 @@ public class AddAccount extends AbstractAuthenticationAction {
         } catch (Exception e) {
             log.error("Account creation failed for unexpected reason", getLogPrefix());
             ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EXCEPTION);
-            log.trace("Leaving");
+            
             return;
         }
         if (account == null) {
             log.error("Could not create new stepup account for user", getLogPrefix());
             ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EXCEPTION);
-            log.trace("Leaving");
+            
             return;
         }
         // We set the account as active
         stepUpMethodContext.setStepUpAccount(account);
         ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EVENTID_CONTINUE_STEPUP);
-        log.trace("Leaving");
+        
     }
 
 }

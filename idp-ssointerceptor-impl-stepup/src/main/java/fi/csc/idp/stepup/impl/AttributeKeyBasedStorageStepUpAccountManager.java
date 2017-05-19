@@ -115,13 +115,13 @@ public class AttributeKeyBasedStorageStepUpAccountManager extends AbstractStepUp
      */
     @Override
     public StepUpAccount addAccount() throws Exception {
-        log.trace("Entering");
+        
         if (stepUpAccountStorage == null) {
             throw new Exception("Storage implementation not set, cannot add accounts");
         }
         if (accountLimit > 0 && getAccounts().size() >= accountLimit) {
             if (!autoRemove) {
-                log.trace("Leaving");
+                
                 return null;
             }
             // we remove old account from the way
@@ -133,7 +133,7 @@ public class AttributeKeyBasedStorageStepUpAccountManager extends AbstractStepUp
         account.setEnabled(true);
         getAccounts().add(account);
         stepUpAccountStorage.add(account, key);
-        log.trace("Leaving");
+        
         return account;
     }
 
@@ -146,7 +146,7 @@ public class AttributeKeyBasedStorageStepUpAccountManager extends AbstractStepUp
      *             if operation cannot be performed.
      */
     private void preCheck(StepUpAccount account) throws Exception {
-        log.trace("Entering");
+        
         if (stepUpAccountStorage == null) {
             throw new Exception("Storage implementation not set, cannot add accounts");
         }
@@ -156,7 +156,7 @@ public class AttributeKeyBasedStorageStepUpAccountManager extends AbstractStepUp
         if (!getAccounts().contains(account)) {
             throw new Exception("Account not managed");
         }
-        log.trace("Leaving");
+        
     }
 
     /**
@@ -168,10 +168,10 @@ public class AttributeKeyBasedStorageStepUpAccountManager extends AbstractStepUp
      */
     @Override
     public void updateAccount(StepUpAccount account) throws Exception {
-        log.trace("Entering");
+        
         preCheck(account);
         stepUpAccountStorage.update(account, key);
-        log.trace("Leaving");
+        
     }
 
     /**
@@ -183,11 +183,11 @@ public class AttributeKeyBasedStorageStepUpAccountManager extends AbstractStepUp
      */
     @Override
     public void removeAccount(StepUpAccount account) throws Exception {
-        log.trace("Entering");
+        
         preCheck(account);
         stepUpAccountStorage.remove(account, key);
         getAccounts().remove(account);
-        log.trace("Leaving");
+        
     }
 
     /**
@@ -197,7 +197,7 @@ public class AttributeKeyBasedStorageStepUpAccountManager extends AbstractStepUp
      */
     @Override
     public boolean isEditable() {
-        log.trace("Entering & Leaving");
+        
         return true;
     }
 
@@ -213,7 +213,7 @@ public class AttributeKeyBasedStorageStepUpAccountManager extends AbstractStepUp
     @Override
     public boolean initialize(AttributeContext attributeContext) throws Exception {
 
-        log.trace("Entering");
+        
         log.debug("Adding accounts of type " + getName());
         key = null;
         getAccounts().clear();
@@ -232,7 +232,7 @@ public class AttributeKeyBasedStorageStepUpAccountManager extends AbstractStepUp
         IdPAttribute attribute = attributeContext.getIdPAttributes().get(attributeId);
         if (attribute == null) {
             log.warn("Not able to create accounts, Attributes do not contain value for " + attributeId);
-            log.trace("Leaving");
+            
             return false;
         }
         for (@SuppressWarnings("rawtypes")
@@ -255,7 +255,7 @@ public class AttributeKeyBasedStorageStepUpAccountManager extends AbstractStepUp
                 }
             }
         }
-        log.trace("Leaving");
+        
         return true;
     }
 

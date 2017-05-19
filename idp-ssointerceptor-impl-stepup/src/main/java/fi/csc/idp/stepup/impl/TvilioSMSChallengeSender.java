@@ -72,7 +72,7 @@ public class TvilioSMSChallengeSender implements ChallengeSender {
      * @param sid of the account
      */
     public void setAccountSid(String sid) {
-        log.trace("Entering & Leaving");
+        
         this.accountSid = sid;
     }
 
@@ -94,10 +94,10 @@ public class TvilioSMSChallengeSender implements ChallengeSender {
      */
     @Override
     public void send(String challenge, String target) throws Exception {
-        log.trace("Entering");
+        
         if (accountSid == null || authToken == null || accountSid == null || message == null){
             log.error("tvilio parameters not set");
-            log.trace("Leaving");
+            
             throw new Exception("bean not properly initialized");
         }
         log.debug("Sending challenge " + challenge + " to " + target);
@@ -109,7 +109,7 @@ public class TvilioSMSChallengeSender implements ChallengeSender {
             throw new Exception("Message sending failed");
         }
         log.debug("Challenge sending triggered");
-        log.trace("Leaving");
+        
     }
 
 }

@@ -69,7 +69,7 @@ public class CheckRequestedAuthenticationContext extends AbstractAuthenticationA
      */
 
     public <T extends Principal> void setStepupMethods(@Nonnull @NonnullElements final Collection<T> principals) {
-        log.trace("Entering");
+        
         ComponentSupport.ifInitializedThrowUnmodifiabledComponentException(this);
         Constraint.isNotNull(principals, "Principal collection cannot be null.");
         if (stepupPrincipals == null) {
@@ -77,21 +77,21 @@ public class CheckRequestedAuthenticationContext extends AbstractAuthenticationA
         }
         stepupPrincipals.getPrincipals().clear();
         stepupPrincipals.getPrincipals().addAll(Collections2.filter(principals, Predicates.notNull()));
-        log.trace("Leaving");
+        
     }
 
     /** {@inheritDoc} */
     @Override
     protected void doExecute(@Nonnull final ProfileRequestContext profileRequestContext,
             @Nonnull final AuthenticationContext authenticationContext) {
-        log.trace("Entering");
+        
 
         final ShibbolethSpAuthenticationContext shibbolethContext = authenticationContext
                 .getSubcontext(ShibbolethSpAuthenticationContext.class);
         if (shibbolethContext == null) {
             log.debug("{} Could not get shib proxy context", getLogPrefix());
             ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EVENTID_MISSING_SHIBSPCONTEXT);
-            log.trace("Leaving");
+            
             return;
         }
 
@@ -101,12 +101,12 @@ public class CheckRequestedAuthenticationContext extends AbstractAuthenticationA
 
             log.debug("{} AuthnRequest did not contain a RequestedAuthnContext matching any StepUp", getLogPrefix());
             ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EVENTID_AUTHNCONTEXT_NOT_STEPUP);
-            log.trace("Leaving");
+            
             return;
         }
 
         ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EVENTID_CONTINUE_STEPUP);
-        log.trace("Leaving");
+        
     }
 
     /**
@@ -120,14 +120,14 @@ public class CheckRequestedAuthenticationContext extends AbstractAuthenticationA
      * @return true if the requested method requires step up.
      */
     private boolean stepupRequested(List<Principal> requestedPrincipals, Subject stPrincipals) {
-        log.trace("Entering");
+        
         for (Principal requestedPrincipal : requestedPrincipals) {
             if (stPrincipals.getPrincipals().contains(requestedPrincipal)) {
-                log.trace("Leaving");
+                
                 return true;
             }
         }
-        log.trace("Leaving");
+        
         return false;
     }
 

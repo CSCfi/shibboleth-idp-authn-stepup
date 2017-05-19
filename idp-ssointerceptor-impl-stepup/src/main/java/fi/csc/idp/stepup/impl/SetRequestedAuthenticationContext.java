@@ -99,10 +99,10 @@ public class SetRequestedAuthenticationContext extends AbstractAuthenticationAct
 
     /** Constructor. */
     public SetRequestedAuthenticationContext() {
-        log.trace("Entering");
+        
         authnRequestLookupStrategy = Functions.compose(new MessageLookup<>(AuthnRequest.class),
                 new InboundMessageContextLookup());
-        log.trace("Leaving");
+        
     }
 
     /**
@@ -129,7 +129,7 @@ public class SetRequestedAuthenticationContext extends AbstractAuthenticationAct
      */
     // Checkstyle: CyclomaticComplexity OFF
     public <T extends Principal> void setAuthenticationMethodMapping(@Nonnull Map<String, Map<String, Map<T, T>>> map) {
-        log.trace("Entering");
+        
         if (this.authMethodMap == null) {
             this.authMethodMap = new HashMap<String, Map<String, Map<Principal, Principal>>>();
         }
@@ -159,7 +159,7 @@ public class SetRequestedAuthenticationContext extends AbstractAuthenticationAct
                 }
             }
         }
-        log.trace("Leaving");
+        
     }
 
     // Checkstyle: CyclomaticComplexity ON
@@ -169,20 +169,20 @@ public class SetRequestedAuthenticationContext extends AbstractAuthenticationAct
     protected void doExecute(@Nonnull final ProfileRequestContext profileRequestContext,
             @Nonnull final AuthenticationContext authenticationContext) {
 
-        log.trace("Entering");
+        
         final ShibbolethSpAuthenticationContext shibbolethContext = authenticationContext
                 .getSubcontext(ShibbolethSpAuthenticationContext.class);
         if (shibbolethContext == null || shibbolethContext.getIdp() == null) {
             log.debug("{} Could not get shib proxy context and provider id", getLogPrefix());
             ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EVENTID_MISSING_SHIBSPCONTEXT);
-            log.trace("Leaving");
+            
             return;
         }
         RelyingPartyContext rpCtx = profileRequestContext.getSubcontext(RelyingPartyContext.class, false);
         if (rpCtx == null || rpCtx.getRelyingPartyId() == null) {
             log.debug("{} Could not get relying party context and sp entity id ", getLogPrefix());
             ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EVENTID_INVALID_RPCONTEXT);
-            log.trace("Leaving");
+            
             return;
         }
 
@@ -195,7 +195,7 @@ public class SetRequestedAuthenticationContext extends AbstractAuthenticationAct
         if (providedMethod == null) {
             log.debug("{} Could not get authentication method ", getLogPrefix());
             ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EVENTID_INVALID_SHIBSPCONTEXT);
-            log.trace("Leaving");
+            
             return;
         }
 
@@ -211,7 +211,7 @@ public class SetRequestedAuthenticationContext extends AbstractAuthenticationAct
         }
 
         ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EVENTID_CONTINUE_STEPUP);
-        log.trace("Leaving");
+        
     }
 
     /**
@@ -226,18 +226,18 @@ public class SetRequestedAuthenticationContext extends AbstractAuthenticationAct
      * @return The new mapped value if it exists. If not, null.
      */
     private Principal getExactMapping(String idp, String sp, Principal method) {
-        log.trace("Entering");
+        
         if (idp == null || sp == null || method == null || authMethodMap == null) {
-            log.trace("Leaving");
+            
             return null;
         }
         log.debug("Searching a match for triplet {},{} and {}", idp, sp, method.getName());
         if (authMethodMap.containsKey(idp) && authMethodMap.get(idp) != null && authMethodMap.get(idp).containsKey(sp)
                 && authMethodMap.get(idp).get(sp) != null && authMethodMap.get(idp).get(sp).containsKey(method)) {
-            log.trace("Leaving");
+            
             return authMethodMap.get(idp).get(sp).get(method);
         }
-        log.trace("Leaving");
+        
         return null;
     }
 
@@ -253,7 +253,7 @@ public class SetRequestedAuthenticationContext extends AbstractAuthenticationAct
      * @return method if there is a mapping, otherwise a null.
      */
     private Principal getDefaultMapping(String idp, String sp, Principal method) {
-        log.trace("Entering");
+        
         if (idp == null || sp == null || method == null || defaultValueMap == null) {
             return null;
         }
@@ -262,7 +262,7 @@ public class SetRequestedAuthenticationContext extends AbstractAuthenticationAct
                 && defaultValueMap.get(idp).contains(sp)) {
             return method;
         }
-        log.trace("Leaving");
+        
         return null;
     }
 

@@ -67,7 +67,7 @@ public class AttributeTargetBasedStepUpAccountManager extends AbstractStepUpAcco
      */
     @Override
     public boolean initialize(AttributeContext attributeContext) throws Exception {
-        log.trace("Entering & Leaving");
+        
         String target = null;
         log.debug("Adding accounts of type " + getName());
         if (attributeContext == null){
@@ -82,7 +82,7 @@ public class AttributeTargetBasedStepUpAccountManager extends AbstractStepUpAcco
         IdPAttribute attribute = attributeContext.getIdPAttributes().get(attributeId);
         if (attribute == null) {
             log.warn("Not able to create accounts, Attributes do not contain value for " + attributeId);
-            log.trace("Leaving");
+            
             return false;
         }
         for (@SuppressWarnings("rawtypes")
@@ -100,13 +100,13 @@ public class AttributeTargetBasedStepUpAccountManager extends AbstractStepUpAcco
                         getAccounts().add(account);
                     } catch (Exception e) {
                         log.debug("Not able to add account during initialization");
-                        log.trace("Leaving");
+                        
                         return false;
                     }
                 }
             }
         }
-        log.trace("Leaving");
+        
         return true;
     }
 }

@@ -75,7 +75,7 @@ public abstract class AbstractStepUpAccount implements StepUpAccount {
     /** default constructor. */
     public AbstractStepUpAccount() {
         super();
-        log.trace("Entering & Leaving");
+        
         this.editable = true;
     }
 
@@ -86,7 +86,7 @@ public abstract class AbstractStepUpAccount implements StepUpAccount {
      */
     @Override
     public long getId() {
-        log.trace("Entering & Leaving");
+        
         return this.id;
     }
 
@@ -98,13 +98,13 @@ public abstract class AbstractStepUpAccount implements StepUpAccount {
      */
     @Override
     public void setId(long idValue) {
-        log.trace("Entering");
+        
         if (this.editable) {
             this.id = idValue;
         } else {
             log.warn("not supported");
         }
-        log.trace("Leaving");
+        
     }
 
     /**
@@ -123,7 +123,7 @@ public abstract class AbstractStepUpAccount implements StepUpAccount {
      *            implementation
      */
     public void setChallengeGenerator(ChallengeGenerator generator) {
-        log.trace("Entering & Leaving");
+        
         this.challengeGenerator = generator;
     }
 
@@ -134,7 +134,7 @@ public abstract class AbstractStepUpAccount implements StepUpAccount {
      *            implementation
      */
     public void setChallengeVerifier(ChallengeVerifier verifier) {
-        log.trace("Entering & Leaving");
+        
         this.challengeVerifier = verifier;
     }
 
@@ -145,13 +145,13 @@ public abstract class AbstractStepUpAccount implements StepUpAccount {
      *            name of the account
      */
     public void setName(String accountName) {
-        log.trace("Entering");
+        
         if (this.editable) {
             this.name = accountName;
         } else {
             log.warn("not supported");
         }
-        log.trace("Leaving");
+        
     }
 
     /**
@@ -161,7 +161,7 @@ public abstract class AbstractStepUpAccount implements StepUpAccount {
      */
     @Override
     public String getName() {
-        log.trace("Entering & Leaving");
+        
         return this.name;
     }
 
@@ -172,7 +172,7 @@ public abstract class AbstractStepUpAccount implements StepUpAccount {
      */
     @Override
     public boolean isEditable() {
-        log.trace("Entering & Leaving");
+        
         return this.editable;
     }
 
@@ -183,7 +183,7 @@ public abstract class AbstractStepUpAccount implements StepUpAccount {
      */
     @Override
     public boolean isVerified() {
-        log.trace("Entering & Leaving");
+        
         return this.verified;
     }
 
@@ -191,7 +191,7 @@ public abstract class AbstractStepUpAccount implements StepUpAccount {
      * Set the status of user being verified.
      */
     protected void setVerified() {
-        log.trace("Entering & Leaving");
+        
         this.verified = true;
     }
 
@@ -222,13 +222,13 @@ public abstract class AbstractStepUpAccount implements StepUpAccount {
      */
     @Override
     public void setEditable(boolean isEditable) {
-        log.trace("Entering");
+        
         if (this.editable) {
             this.editable = isEditable;
         } else {
             log.warn("not supported");
         }
-        log.trace("Leaving");
+        
     }
 
     /**
@@ -239,13 +239,13 @@ public abstract class AbstractStepUpAccount implements StepUpAccount {
      */
     @Override
     public void setEnabled(boolean isEnabled) {
-        log.trace("Entering");
+        
         if (this.editable) {
             this.enabled = isEnabled;
         } else {
             log.warn("not supported");
         }
-        log.trace("Leaving");
+        
     }
 
     /**
@@ -255,7 +255,7 @@ public abstract class AbstractStepUpAccount implements StepUpAccount {
      */
     @Override
     public boolean isEnabled() {
-        log.trace("Entering & Leaving");
+        
         return this.enabled;
     }
 
@@ -267,13 +267,13 @@ public abstract class AbstractStepUpAccount implements StepUpAccount {
      */
     @Override
     public void sendChallenge() throws Exception {
-        log.trace("Entering");
+        
         challenge = null;
         if (challengeGenerator == null) {
             throw new Exception("Bean not configured with ChallengeGenerator");
         }
         challenge = challengeGenerator.generate(null);
-        log.trace("Leaving");
+        
     }
 
     /**
@@ -284,20 +284,20 @@ public abstract class AbstractStepUpAccount implements StepUpAccount {
      */
     @Override
     public boolean verifyResponse(String response) throws Exception {
-        log.trace("Entering");
+        
         if (challenge == null) {
-            log.trace("Leaving");
+            
             throw new Exception("null challenge defies logic");
         }
         if (challengeVerifier == null) {
-            log.trace("Leaving");
+            
             throw new Exception("Bean not configured with ChallengeVerifier");
         }
         this.verified = challengeVerifier.verify(challenge, response, null);
         if (!this.verified) {
             verificationFailedCheck();
         }
-        log.trace("Leaving");
+        
         return this.verified;
     }
 
@@ -309,13 +309,13 @@ public abstract class AbstractStepUpAccount implements StepUpAccount {
      */
     @Override
     public void setTarget(String accountTarget) {
-        log.trace("Entering");
+        
         if (this.editable) {
             this.target = accountTarget;
         } else {
             log.warn("not supported");
         }
-        log.trace("Leaving");
+        
     }
 
     /**

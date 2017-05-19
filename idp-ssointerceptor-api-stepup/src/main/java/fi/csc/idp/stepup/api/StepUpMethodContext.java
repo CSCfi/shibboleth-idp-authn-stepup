@@ -57,7 +57,7 @@ public class StepUpMethodContext extends BaseContext {
      * @return active method.
      */
     public StepUpMethod getStepUpMethod() {
-        log.trace("Entering & Leaving");
+        
         return stepUpMethod;
     }
 
@@ -68,7 +68,7 @@ public class StepUpMethodContext extends BaseContext {
      *            active step up method.
      */
     public void setStepUpMethod(StepUpMethod method) {
-        log.trace("Entering & Leaving");
+        
         this.stepUpMethod = method;
     }
 
@@ -78,7 +78,7 @@ public class StepUpMethodContext extends BaseContext {
      * @return active step up account.
      */
     public StepUpAccount getStepUpAccount() {
-        log.trace("Entering & Leaving");
+        
         return stepUpAccount;
     }
 
@@ -89,7 +89,7 @@ public class StepUpMethodContext extends BaseContext {
      *            active stepup account
      */
     public void setStepUpAccount(StepUpAccount account) {
-        log.trace("Entering & Leaving");
+        
         this.stepUpAccount = account;
     }
 
@@ -99,7 +99,7 @@ public class StepUpMethodContext extends BaseContext {
      * @return map of step up methods and authentication contexts
      */
     public Map<StepUpMethod, List<? extends Principal>> getStepUpMethods() {
-        log.trace("Entering & Leaving");
+        
         return stepupMethods;
     }
 
@@ -110,7 +110,7 @@ public class StepUpMethodContext extends BaseContext {
      *            map of step up methods and authentication contexts.
      */
     public void setStepUpMethods(Map<StepUpMethod, List<? extends Principal>> stepUpMethods) {
-        log.trace("Entering & Leaving");
+        
         this.stepupMethods = stepUpMethods;
     }
 

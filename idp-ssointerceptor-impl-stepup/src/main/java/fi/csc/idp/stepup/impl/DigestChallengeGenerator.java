@@ -66,9 +66,9 @@ public class DigestChallengeGenerator implements ChallengeGenerator {
      *            to replace default one.
      */
     public void setSalt(@Nonnull String newSalt) {
-        log.trace("Entering");
+        
         salt = newSalt;
-        log.trace("Leaving");
+        
     }
 
     /**
@@ -79,11 +79,11 @@ public class DigestChallengeGenerator implements ChallengeGenerator {
      *            to replace default one.
      */
     public void setMaxLength(int newMaxLength) {
-        log.trace("Entering");
+        
         if (newMaxLength > -1) {
             maxLength = newMaxLength;
         }
-        log.trace("Leaving");
+        
     }
 
     /**
@@ -93,9 +93,9 @@ public class DigestChallengeGenerator implements ChallengeGenerator {
      *            to replace default one.
      */
     public void setDigest(@Nonnull String newDigest) {
-        log.trace("Entering");
+        
         digest = newDigest;
-        log.trace("Leaving");
+        
     }
 
     /**
@@ -105,18 +105,18 @@ public class DigestChallengeGenerator implements ChallengeGenerator {
      *            decimal instead of default hex
      */
     public void setDecimal(@Nonnull boolean use) {
-        log.trace("Entering");
+        
         useDecimal = use;
-        log.trace("Leaving");
+        
     }
 
     @Override
     public String generate(String target) throws Exception {
-        log.trace("Entering");
+        
         String challenge = "";
         //to explicitly support generating empty challenge
         if (maxLength == 0){
-            log.trace("Leaving");
+            
             return challenge;
         }
         try {
@@ -144,10 +144,10 @@ public class DigestChallengeGenerator implements ChallengeGenerator {
 
         } catch (NoSuchAlgorithmException e) {
             log.error("unable to generate challenge " + e.getMessage());
-            log.trace("Leaving");
+            
             return null;
         }
-        log.trace("Leaving");
+        
         return challenge.substring(0, challenge.length() > maxLength ? maxLength : challenge.length());
     }
 

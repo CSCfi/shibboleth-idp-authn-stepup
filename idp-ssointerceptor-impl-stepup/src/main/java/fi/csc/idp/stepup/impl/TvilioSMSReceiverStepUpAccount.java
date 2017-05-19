@@ -79,7 +79,7 @@ public class TvilioSMSReceiverStepUpAccount extends ChallengeSenderStepUpAccount
      *            of the account
      */
     public void setAccountSid(String sid) {
-        log.trace("Entering & Leaving");
+        
         this.accountSid = sid;
     }
 
@@ -127,11 +127,11 @@ public class TvilioSMSReceiverStepUpAccount extends ChallengeSenderStepUpAccount
      * Cleans old messages.
      */
     private void cleanMessages() {
-        log.trace("Entering");
+        
         msgLock.lock();
         if (usedMessages.size() < 100) {
             msgLock.unlock();
-            log.trace("Leaving");
+            
             return;
         }
         long current = new Date().getTime();
@@ -145,7 +145,7 @@ public class TvilioSMSReceiverStepUpAccount extends ChallengeSenderStepUpAccount
             }
         }
         msgLock.unlock();
-        log.trace("Leaving");
+        
     }
 
     /**
@@ -161,7 +161,7 @@ public class TvilioSMSReceiverStepUpAccount extends ChallengeSenderStepUpAccount
      */
     @Override
     public boolean verifyResponse(String response) throws Exception {
-        log.trace("Entering");
+        
         log.debug("Verificating totp response " + response);
         Twilio.init(accountSid, authToken);
 
@@ -199,7 +199,7 @@ public class TvilioSMSReceiverStepUpAccount extends ChallengeSenderStepUpAccount
                     log.debug("message discarded, challenge not replied");
                     continue;
                 }
-                log.trace("Leaving");
+                
                 msgLock.lock();
                 if (usedMessages.containsKey(message.getSid())) {
                     msgLock.unlock();
@@ -219,7 +219,7 @@ public class TvilioSMSReceiverStepUpAccount extends ChallengeSenderStepUpAccount
             }
 
         }
-        log.trace("Leaving");
+        
         verificationFailedCheck();
         return false;
     }

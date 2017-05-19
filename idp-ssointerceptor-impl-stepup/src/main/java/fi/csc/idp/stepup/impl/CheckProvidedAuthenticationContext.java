@@ -73,26 +73,26 @@ public class CheckProvidedAuthenticationContext extends AbstractAuthenticationAc
      */
     @SuppressWarnings("unchecked")
     public <T extends Principal> void setTrustedStepupProviders(@Nonnull Map<String, List<T>> stepupProviders) {
-        log.trace("Entering");
+        
         this.trustedStepupProviders = new HashMap<String, List<Principal>>();
         for (Map.Entry<String, List<T>> entry : stepupProviders.entrySet()) {
             this.trustedStepupProviders.put(entry.getKey(), (List<Principal>) entry.getValue());
         }
-        log.trace("Leaving");
+        
     }
 
     /** {@inheritDoc} */
     @Override
     protected void doExecute(@Nonnull final ProfileRequestContext profileRequestContext,
             @Nonnull final AuthenticationContext authenticationContext) {
-        log.trace("Entering");
+        
 
         final ShibbolethSpAuthenticationContext shibbolethContext = authenticationContext
                 .getSubcontext(ShibbolethSpAuthenticationContext.class);
         if (shibbolethContext == null || shibbolethContext.getIdp() == null) {
             log.debug("{} Could not get shib proxy context", getLogPrefix());
             ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EVENTID_MISSING_SHIBSPCONTEXT);
-            log.trace("Leaving");
+            
             return;
         }
         Principal providedMethod = null;
@@ -104,12 +104,12 @@ public class CheckProvidedAuthenticationContext extends AbstractAuthenticationAc
         if (providedMethod == null) {
             log.debug("{} Could not get authentication method ", getLogPrefix());
             ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EVENTID_INVALID_SHIBSPCONTEXT);
-            log.trace("Leaving");
+            
             return;
         }
         if (trustedStepupProviders == null || !trustedStepupProviders.containsKey(shibbolethContext.getIdp())) {
             ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EVENTID_CONTINUE_STEPUP);
-            log.trace("Leaving");
+            
             return;
         }
         if (trustedStepupProviders.get(shibbolethContext.getIdp()).contains(providedMethod)) {
@@ -118,7 +118,7 @@ public class CheckProvidedAuthenticationContext extends AbstractAuthenticationAc
             return;
         }
         ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EVENTID_CONTINUE_STEPUP);
-        log.trace("Leaving");
+        
     }
 
 }

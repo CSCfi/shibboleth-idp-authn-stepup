@@ -81,10 +81,10 @@ public class MailChallengeSender implements ChallengeSender {
      *            the value of the sender
      */
     public void setFromField(String fromField) {
-        log.trace("Entering");
+        
         log.debug("setting from to " + fromField);
         this.from = fromField;
-        log.trace("Leaving");
+        
     }
 
     /**
@@ -94,10 +94,10 @@ public class MailChallengeSender implements ChallengeSender {
      *            the value of the sender
      */
     public void setSubjectField(String subjectField) {
-        log.trace("Entering");
+        
         log.debug("setting subject to " + subjectField);
         this.subject = subjectField;
-        log.trace("Leaving");
+        
     }
 
     /**
@@ -107,10 +107,10 @@ public class MailChallengeSender implements ChallengeSender {
      *            is the username
      */
     public void setUserName(String accountUserName) {
-        log.trace("Entering");
+        
         log.debug("setting account username to " + accountUserName);
         this.userName = accountUserName;
-        log.trace("Leaving");
+        
     }
 
     /**
@@ -120,10 +120,10 @@ public class MailChallengeSender implements ChallengeSender {
      *            is the Password
      */
     public void setPassword(String accountPassword) {
-        log.trace("Entering");
+        
         log.debug("setting account password to " + accountPassword);
         this.password = accountPassword;
-        log.trace("Leaving");
+        
     }
 
     /**
@@ -133,10 +133,10 @@ public class MailChallengeSender implements ChallengeSender {
      *            SMTP Auth property
      */
     public void setSMTPAuth(String serverSMTPAuth) {
-        log.trace("Entering");
+        
         log.debug("setting SMTP Auth to " + serverSMTPAuth);
         props.put("mail.smtp.auth", serverSMTPAuth);
-        log.trace("Leaving");
+        
     }
 
     /**
@@ -146,10 +146,10 @@ public class MailChallengeSender implements ChallengeSender {
      *            SMTP TTLS Start property
      */
     public void setSMTPTtls(String serverSMTPTtls) {
-        log.trace("Entering");
+        
         log.debug("setting SMTP Start TLS to " + serverSMTPTtls);
         props.put("mail.smtp.starttls.enable", serverSMTPTtls);
-        log.trace("Leaving");
+        
     }
 
     /**
@@ -159,10 +159,10 @@ public class MailChallengeSender implements ChallengeSender {
      *            email server hostname
      */
     public void setHost(String hostName) {
-        log.trace("Entering");
+        
         log.debug("setting host to " + hostName);
         props.put("mail.smtp.host", hostName);
-        log.trace("Leaving");
+        
     }
 
     /**
@@ -172,10 +172,10 @@ public class MailChallengeSender implements ChallengeSender {
      *            port of email server
      */
     public void setPort(String serverPort) {
-        log.trace("Entering");
+        
         log.debug("setting port to " + serverPort);
         props.put("mail.smtp.port", serverPort);
-        log.trace("Leaving");
+        
     }
 
     /**
@@ -185,10 +185,10 @@ public class MailChallengeSender implements ChallengeSender {
      *            template file replacing the default one
      */
     public void setTemplateFile(String fileName) {
-        log.trace("Entering");
+        
         log.debug("setting template filename to " + fileName);
         this.templateFileName = fileName;
-        log.trace("Leaving");
+        
     }
 
     /**
@@ -198,10 +198,10 @@ public class MailChallengeSender implements ChallengeSender {
      *            loader path to template file replacing the default one
      */
     public void setTemplatePath(String path) {
-        log.trace("Entering");
+        
         log.debug("setting path to template files " + path);
         this.templateFilePath = path;
-        log.trace("Leaving");
+        
     }
 
     /**
@@ -210,20 +210,20 @@ public class MailChallengeSender implements ChallengeSender {
      * @return template for challenge email
      */
     private Template getVelocityTemplate() {
-        log.trace("Entering");
+        
         VelocityEngine velocityEngine = new VelocityEngine();
         if (templateFileName != null && !templateFileName.isEmpty() && templateFilePath != null
                 && !templateFilePath.isEmpty()) {
             velocityEngine.setProperty(RuntimeConstants.RESOURCE_LOADER, "file");
             velocityEngine.setProperty(RuntimeConstants.FILE_RESOURCE_LOADER_PATH, templateFilePath);
             velocityEngine.init();
-            log.trace("Leaving");
+            
             return velocityEngine.getTemplate(templateFileName);
         }
         velocityEngine.setProperty(RuntimeConstants.RESOURCE_LOADER, "classpath");
         velocityEngine.setProperty("classpath.resource.loader.class", ClasspathResourceLoader.class.getName());
         velocityEngine.init();
-        log.trace("Leaving");
+        
         return velocityEngine.getTemplate(File.separator + "emails" + File.separator + "default.vm");
 
     }
@@ -232,7 +232,7 @@ public class MailChallengeSender implements ChallengeSender {
      * Initializes velocity template and mail session if not initialized yet.
      */
     private synchronized void init() {
-        log.trace("Entering");
+        
         if (template == null) {
             template = getVelocityTemplate();
         }
@@ -247,12 +247,12 @@ public class MailChallengeSender implements ChallengeSender {
                 session = Session.getInstance(props);
             }
         }
-        log.trace("Leaving");
+        
     }
 
     @Override
     public void send(String challenge, String target) throws AddressException, MessagingException {
-        log.trace("Entering");
+        
         log.debug("Sending challenge " + challenge + " to " + target);
         init();
         final VelocityContext velocityContext = new VelocityContext();
@@ -273,7 +273,7 @@ public class MailChallengeSender implements ChallengeSender {
             throw e;
         }
         log.debug("Challenge sending triggered");
-        log.trace("Leaving");
+        
     }
 
 }
