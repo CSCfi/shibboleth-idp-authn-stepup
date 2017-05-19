@@ -107,6 +107,11 @@ public final class StepUpEventIds {
     @NotEmpty
     public static final String EVENTID_INVALID_RESPONSE = "StepUpWrongResponse";
 
+    /** event id for case of user reaching retry limit for challenge response. */
+    @Nonnull
+    @NotEmpty
+    public static final String EVENTID_RESPONSE_LIMIT = "StepUpLimitReached";
+
     /** private constructor to prohibit use of it. */
     private StepUpEventIds() {
 
