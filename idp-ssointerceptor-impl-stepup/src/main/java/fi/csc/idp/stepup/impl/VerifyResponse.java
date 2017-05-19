@@ -33,6 +33,7 @@ import org.opensaml.profile.context.ProfileRequestContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import fi.csc.idp.stepup.api.FailureLimitReachedException;
 import fi.csc.idp.stepup.api.StepUpEventIds;
 import fi.csc.idp.stepup.api.StepUpMethodContext;
 
@@ -88,6 +89,11 @@ public class VerifyResponse extends AbstractExtractionAction {
                 log.trace("Leaving");
                 return;
             }
+        } catch (FailureLimitReachedException e) {
+            log.debug("{} User response failed too many times", getLogPrefix());
+            ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EVENTID_RESPONSE_LIMIT);
+            log.trace("Leaving");
+            return;
         } catch (Exception e) {
             log.debug("User response evaluation failed", getLogPrefix());
             ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EVENTID_INVALID_RESPONSE);

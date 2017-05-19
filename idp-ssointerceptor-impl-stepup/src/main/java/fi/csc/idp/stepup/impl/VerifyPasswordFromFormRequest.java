@@ -35,6 +35,7 @@ import org.opensaml.profile.context.ProfileRequestContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import fi.csc.idp.stepup.api.FailureLimitReachedException;
 import fi.csc.idp.stepup.api.StepUpEventIds;
 import fi.csc.idp.stepup.api.StepUpMethodContext;
 
@@ -112,13 +113,18 @@ public class VerifyPasswordFromFormRequest extends AbstractExtractionAction {
         log.debug("User challenge response was " + challengeResponse);
         try {
             if (!stepUpMethodContext.getStepUpAccount().verifyResponse(challengeResponse)) {
-                log.debug("User presented wrong response to  challenge", getLogPrefix());
+                log.debug("{} User presented wrong response to  challenge", getLogPrefix());
                 ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EVENTID_INVALID_RESPONSE);
                 log.trace("Leaving");
                 return;
             }
+        } catch (FailureLimitReachedException e) {
+            log.debug("{} User response failed too many times", getLogPrefix());
+            ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EVENTID_RESPONSE_LIMIT);
+            log.trace("Leaving");
+            return;
         } catch (Exception e) {
-            log.debug("User response evaluation failed", getLogPrefix());
+            log.debug("{} User response evaluation failed", getLogPrefix());
             ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EXCEPTION);
             log.trace("Leaving");
             return;
