@@ -39,9 +39,8 @@ public class LogChallengeSender implements ChallengeSender {
 
     @Override
     public void send(String challenge, String target) {
-        
+
         log.info("Sending Challenge " + challenge + " to " + target);
-        
 
     }
 

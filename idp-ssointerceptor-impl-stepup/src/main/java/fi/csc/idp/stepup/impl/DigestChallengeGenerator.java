@@ -66,9 +66,9 @@ public class DigestChallengeGenerator implements ChallengeGenerator {
      *            to replace default one.
      */
     public void setSalt(@Nonnull String newSalt) {
-        
+
         salt = newSalt;
-        
+
     }
 
     /**
@@ -79,11 +79,11 @@ public class DigestChallengeGenerator implements ChallengeGenerator {
      *            to replace default one.
      */
     public void setMaxLength(int newMaxLength) {
-        
+
         if (newMaxLength > -1) {
             maxLength = newMaxLength;
         }
-        
+
     }
 
     /**
@@ -93,9 +93,9 @@ public class DigestChallengeGenerator implements ChallengeGenerator {
      *            to replace default one.
      */
     public void setDigest(@Nonnull String newDigest) {
-        
+
         digest = newDigest;
-        
+
     }
 
     /**
@@ -105,18 +105,18 @@ public class DigestChallengeGenerator implements ChallengeGenerator {
      *            decimal instead of default hex
      */
     public void setDecimal(@Nonnull boolean use) {
-        
+
         useDecimal = use;
-        
+
     }
 
     @Override
     public String generate(String target) throws Exception {
-        
+
         String challenge = "";
-        //to explicitly support generating empty challenge
-        if (maxLength == 0){
-            
+        // to explicitly support generating empty challenge
+        if (maxLength == 0) {
+
             return challenge;
         }
         try {
@@ -143,11 +143,11 @@ public class DigestChallengeGenerator implements ChallengeGenerator {
             }
 
         } catch (NoSuchAlgorithmException e) {
-            log.error("unable to generate challenge " + e.getMessage());
-            
+            log.error("Unable to generate challenge {}", e.getMessage());
+
             return null;
         }
-        
+
         return challenge.substring(0, challenge.length() > maxLength ? maxLength : challenge.length());
     }
 

@@ -72,7 +72,7 @@ public class AttachOidcAuthenticationRequest extends AbstractProfileAction {
             return false;
         }
         if (profileRequestContext.getInboundMessageContext() == null) {
-            log.error("{} Unable to locate inbound message context", getLogPrefix());
+            log.error("{} unable to locate inbound message context", getLogPrefix());
             ActionSupport.buildEvent(profileRequestContext, EventIds.INVALID_PROFILE_CTX);
             return false;
         }
@@ -89,16 +89,16 @@ public class AttachOidcAuthenticationRequest extends AbstractProfileAction {
     protected void doExecute(@Nonnull final ProfileRequestContext profileRequestContext) {
         Object message = profileRequestContext.getInboundMessageContext().getMessage();
         if (message == null || !(message instanceof AuthenticationRequest)) {
-            log.error("{} Unable to locate inbound message", getLogPrefix());
+            log.error("{} unable to locate inbound message", getLogPrefix());
             ActionSupport.buildEvent(profileRequestContext, EventIds.INVALID_MSG_CTX);
             return;
         }
         OidcStepUpContext oidcCtx = new OidcStepUpContext();
         profileRequestContext.addSubcontext(oidcCtx);
-        log.debug("{} attaching inbound message to oidc stepup context {}",getLogPrefix(),
+        log.debug("{} attaching inbound message to oidc stepup context {}", getLogPrefix(),
                 ((AuthenticationRequest) message).toQueryString());
         oidcCtx.setRequest((AuthenticationRequest) message);
-        log.debug("{} setting issuer value to oidc stepup context {}",getLogPrefix(), issuer);
+        log.debug("{} setting issuer value to oidc stepup context {}", getLogPrefix(), issuer);
         oidcCtx.setIssuer(issuer);
     }
 

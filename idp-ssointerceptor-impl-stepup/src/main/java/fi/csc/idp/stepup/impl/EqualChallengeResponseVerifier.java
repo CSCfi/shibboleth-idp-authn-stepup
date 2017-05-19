@@ -39,16 +39,16 @@ public class EqualChallengeResponseVerifier implements ChallengeVerifier {
 
     @Override
     public boolean verify(String challenge, String response, String target) {
-        
+
         if (challenge == null && response == null) {
-            
+
             return true;
         }
         if (challenge == null || response == null) {
-            
+
             return false;
         }
-        
+
         return challenge.trim().equals(response.trim());
     }
 

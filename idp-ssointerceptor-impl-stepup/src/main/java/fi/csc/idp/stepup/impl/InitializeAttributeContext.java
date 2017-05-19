@@ -41,7 +41,7 @@ import fi.csc.idp.stepup.api.OidcProcessingEventIds;
 
 /**
  * Creates AttributeContext, populates it with id token claim values and adds it
- * to RelyingPartyContext. Assumes request object with id token exists and is 
+ * to RelyingPartyContext. Assumes request object with id token exists and is
  * validated.
  */
 @SuppressWarnings("rawtypes")
@@ -87,7 +87,7 @@ public class InitializeAttributeContext extends AbstractOidcProfileAction {
 
         final RelyingPartyContext rpContext = profileRequestContext.getSubcontext(RelyingPartyContext.class, false);
         if (rpContext == null) {
-            log.error("{} Unable to locate relying party context", getLogPrefix());
+            log.error("{} unable to locate relying party context", getLogPrefix());
             ActionSupport.buildEvent(profileRequestContext, EventIds.INVALID_PROFILE_CTX);
             return;
         }

@@ -54,40 +54,41 @@ public class AddAccount extends AbstractAuthenticationAction {
     @Override
     protected void doExecute(@Nonnull final ProfileRequestContext profileRequestContext,
             @Nonnull final AuthenticationContext authenticationContext) {
-        
+
         StepUpMethodContext stepUpMethodContext = authenticationContext.getSubcontext(StepUpMethodContext.class);
         if (stepUpMethodContext == null) {
-            log.error("{} Could not get shib proxy context", getLogPrefix());
+            log.error("{} could not get shib proxy context", getLogPrefix());
             ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EVENTID_MISSING_STEPUPMETHODCONTEXT);
-            
+
             return;
         }
         if (stepUpMethodContext.getStepUpMethod() == null) {
-            log.error("No default stepup method available for user", getLogPrefix());
+            log.error("{} no default stepup method available for user", getLogPrefix());
             ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EVENTID_INVALID_USER);
-            
+
             return;
         }
-        log.debug("{} adding a stepup account of type {}", getLogPrefix(), stepUpMethodContext.getStepUpMethod().getName());
+        log.debug("{} adding a stepup account of type {}", getLogPrefix(), stepUpMethodContext.getStepUpMethod()
+                .getName());
         StepUpAccount account;
         try {
             account = stepUpMethodContext.getStepUpMethod().addAccount();
         } catch (Exception e) {
-            log.error("Account creation failed for unexpected reason", getLogPrefix());
+            log.error("{} account creation failed for unexpected reason", getLogPrefix());
             ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EXCEPTION);
-            
+
             return;
         }
         if (account == null) {
-            log.error("Could not create new stepup account for user", getLogPrefix());
+            log.error("{} could not create new stepup account for user", getLogPrefix());
             ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EXCEPTION);
-            
+
             return;
         }
         // We set the account as active
         stepUpMethodContext.setStepUpAccount(account);
         ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EVENTID_CONTINUE_STEPUP);
-        
+
     }
 
 }

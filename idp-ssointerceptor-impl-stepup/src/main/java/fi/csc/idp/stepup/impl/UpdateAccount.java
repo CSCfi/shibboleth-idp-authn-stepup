@@ -87,12 +87,11 @@ public class UpdateAccount extends AbstractExtractionAction {
     protected boolean doPreExecute(@Nonnull final ProfileRequestContext profileRequestContext,
             @Nonnull final AuthenticationContext authenticationContext) {
 
-        
         stepUpMethodContext = authenticationContext.getSubcontext(StepUpMethodContext.class);
         if (stepUpMethodContext == null) {
             log.debug("{} could not get shib proxy context", getLogPrefix());
             ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EVENTID_MISSING_STEPUPMETHODCONTEXT);
-            
+
             return false;
         }
         return super.doPreExecute(profileRequestContext, authenticationContext);
@@ -103,33 +102,32 @@ public class UpdateAccount extends AbstractExtractionAction {
     protected void doExecute(@Nonnull final ProfileRequestContext profileRequestContext,
             @Nonnull final AuthenticationContext authenticationContext) {
 
-        
         final HttpServletRequest request = getHttpServletRequest();
         if (request == null) {
             log.debug("{} profile action does not contain an HttpServletRequest", getLogPrefix());
             ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EXCEPTION);
-            
+
             return;
         }
         final String updateValue = request.getParameter(updateParameter);
         if (updateValue == null) {
             log.debug("{} no update value found", getLogPrefix());
             ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EVENTID_INVALID_RESPONSE);
-            
+
             return;
         }
         String[] updateCommand = updateValue.split(":");
         if (updateCommand.length != 3) {
             log.debug("{} the command should have 3 parts", getLogPrefix());
             ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EXCEPTION);
-            
+
             return;
         }
         String method = updateCommand[0];
         if (method == null || method.isEmpty()) {
             log.debug("{} method cannot be empty or null", getLogPrefix());
             ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EXCEPTION);
-            
+
             return;
         }
         long id = -1;
@@ -138,28 +136,28 @@ public class UpdateAccount extends AbstractExtractionAction {
         } catch (NumberFormatException e) {
             log.debug("{} the commands second part shoud be interpretable as int", getLogPrefix());
             ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EXCEPTION);
-            
+
         }
         String command = updateCommand[2];
         if (command == null || command.isEmpty()) {
             log.debug("{} command cannot be empty or null", getLogPrefix());
             ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EXCEPTION);
-            
+
             return;
         }
         // locating account
         StepUpAccount updateAccount = null;
         StepUpMethod updateMethod = null;
         for (StepUpMethod suMethod : stepUpMethodContext.getStepUpMethods().keySet()) {
-            log.debug("{} comparing method {} to {}",getLogPrefix(),  method, suMethod.getName());
+            log.debug("{} comparing method {} to {}", getLogPrefix(), method, suMethod.getName());
             if (method.equals(suMethod.getName())) {
-                log.debug("{} located target method {}",getLogPrefix(), method);
+                log.debug("{} located target method {}", getLogPrefix(), method);
                 updateMethod = suMethod;
                 if (id >= 0) {
                     for (StepUpAccount account : suMethod.getAccounts()) {
-                        log.debug("{} comparing account id {} to {}",getLogPrefix(),id, account.getId());
+                        log.debug("{} comparing account id {} to {}", getLogPrefix(), id, account.getId());
                         if (account.getId() == id) {
-                            log.debug("{} located target account {}",getLogPrefix(), id);
+                            log.debug("{} located target account {}", getLogPrefix(), id);
                             updateAccount = account;
                             break;
                         }
@@ -175,12 +173,12 @@ public class UpdateAccount extends AbstractExtractionAction {
             log.debug("{} unexpected exception occurred", getLogPrefix());
             log.error(e.getMessage());
             ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EXCEPTION);
-            
+
             return;
         }
-        log.debug("{} update value to be interpreted is {}",getLogPrefix(), updateValue);
+        log.debug("{} update value to be interpreted is {}", getLogPrefix(), updateValue);
         ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EVENTID_CONTINUE_STEPUP);
-        
+
     }
 
     // Checkstyle: CyclomaticComplexity OFF
@@ -200,7 +198,7 @@ public class UpdateAccount extends AbstractExtractionAction {
      */
     private void accountCommand(String command, StepUpAccount account, StepUpMethod method, HttpServletRequest request)
             throws Exception {
-        
+
         if (method == null) {
             throw new Exception("operations require method");
         }
@@ -236,7 +234,7 @@ public class UpdateAccount extends AbstractExtractionAction {
             method.removeAccount(account);
             break;
         default:
-            
+
             throw new Exception("Unsupported command");
         }
 

@@ -61,13 +61,12 @@ public class ChallengeSenderStepUpAccount extends AbstractStepUpAccount {
      */
     @Override
     public void sendChallenge() throws Exception {
-        
+
         super.sendChallenge();
         if (challengeSender == null) {
             throw new Exception("Bean not configured with ChallengeSender");
         }
         challengeSender.send(getChallenge(), getTarget());
-        
 
     }
 

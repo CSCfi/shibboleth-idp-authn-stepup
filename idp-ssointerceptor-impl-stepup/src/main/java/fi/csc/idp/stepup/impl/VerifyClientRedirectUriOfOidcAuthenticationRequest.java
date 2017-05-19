@@ -87,7 +87,7 @@ public class VerifyClientRedirectUriOfOidcAuthenticationRequest extends Abstract
 
         }
         for (String uri : redirectUris.get(getOidcCtx().getRequest().getClientID().getValue())) {
-            log.debug("{} matching to {}",getLogPrefix(), uri);
+            log.debug("{} matching to {}", getLogPrefix(), uri);
             if (uri.equals(getOidcCtx().getRequest().getRedirectionURI().toString())) {
                 log.debug("{} redirect uri validated", getLogPrefix());
                 getOidcCtx().setRedirectUriValidated(true);

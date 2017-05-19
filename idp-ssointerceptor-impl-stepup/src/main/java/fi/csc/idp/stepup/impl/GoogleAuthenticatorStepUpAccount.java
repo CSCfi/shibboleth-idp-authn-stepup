@@ -31,23 +31,23 @@ import org.slf4j.LoggerFactory;
 import com.warrenstrange.googleauth.GoogleAuthenticator;
 import com.warrenstrange.googleauth.GoogleAuthenticatorKey;
 
-/** Step Up Account implementation for GA.*/
+/** Step Up Account implementation for GA. */
 public class GoogleAuthenticatorStepUpAccount extends AbstractStepUpAccount {
 
     /** Class logger. */
     @Nonnull
     private final Logger log = LoggerFactory.getLogger(GoogleAuthenticatorStepUpAccount.class);
-    
+
     @Override
     public String getTarget() {
-        
+
         if (super.getTarget() == null) {
             GoogleAuthenticator gAuth = new GoogleAuthenticator();
             final GoogleAuthenticatorKey key = gAuth.createCredentials();
-            log.debug("Secret key with value {} created",key.getKey());
+            log.debug("Secret key with value {} created", key.getKey());
             setTarget(key.getKey());
         }
-        
+
         return super.getTarget();
     }
 
@@ -59,29 +59,30 @@ public class GoogleAuthenticatorStepUpAccount extends AbstractStepUpAccount {
     public void sendChallenge() throws Exception {
         log.debug("Not supported");
     }
-    
+
     /**
-     *Verify users response to totp challenge.
+     * Verify users response to totp challenge.
      *
-     *@param response to totp challenge.
-     *@return true if response was verified successfully
-     *@throws Exception if something unexpected occurred
+     * @param response
+     *            to totp challenge.
+     * @return true if response was verified successfully
+     * @throws Exception
+     *             if something unexpected occurred
      */
     @Override
     public boolean verifyResponse(String response) throws Exception {
-        
+
         log.debug("Verificating totp response {}", response);
         GoogleAuthenticator gAuth = new GoogleAuthenticator();
         int code = Integer.parseInt(response);
-        boolean verified=gAuth.authorize(getTarget(), code);
-        if (verified){
+        boolean verified = gAuth.authorize(getTarget(), code);
+        if (verified) {
             setVerified();
-        }else{
+        } else {
             verificationFailedCheck();
         }
-        
-        return verified;
-      }
 
-    
+        return verified;
+    }
+
 }

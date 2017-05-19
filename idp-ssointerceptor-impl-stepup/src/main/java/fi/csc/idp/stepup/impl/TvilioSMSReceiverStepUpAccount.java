@@ -52,7 +52,7 @@ public class TvilioSMSReceiverStepUpAccount extends ChallengeSenderStepUpAccount
     private static Map<String, DateTime> usedMessages = new HashMap<String, DateTime>();
     /** lock to access usedMessages. */
     private static Lock msgLock = new ReentrantLock();
-    
+
     /** Class logger. */
     @Nonnull
     private final Logger log = LoggerFactory.getLogger(TvilioSMSReceiverStepUpAccount.class);
@@ -79,7 +79,7 @@ public class TvilioSMSReceiverStepUpAccount extends ChallengeSenderStepUpAccount
      *            of the account
      */
     public void setAccountSid(String sid) {
-        
+
         this.accountSid = sid;
     }
 
@@ -127,11 +127,11 @@ public class TvilioSMSReceiverStepUpAccount extends ChallengeSenderStepUpAccount
      * Cleans old messages.
      */
     private void cleanMessages() {
-        
+
         msgLock.lock();
         if (usedMessages.size() < 100) {
             msgLock.unlock();
-            
+
             return;
         }
         long current = new Date().getTime();
@@ -139,12 +139,13 @@ public class TvilioSMSReceiverStepUpAccount extends ChallengeSenderStepUpAccount
             Map.Entry<String, DateTime> usedMessage = it.next();
             long sent = usedMessage.getValue().toDate().getTime();
             if (current - sent > 2 * eventWindow) {
-                log.debug("Removing {} {} from the list of used verification messages",usedMessage.getKey(),usedMessage.getValue());
+                log.debug("Removing {} {} from the list of used verification messages", usedMessage.getKey(),
+                        usedMessage.getValue());
                 it.remove();
             }
         }
         msgLock.unlock();
-        
+
     }
 
     /**
@@ -160,19 +161,19 @@ public class TvilioSMSReceiverStepUpAccount extends ChallengeSenderStepUpAccount
      */
     @Override
     public boolean verifyResponse(String response) throws Exception {
-        
-        log.debug("Verificating totp response {}",response);
+
+        log.debug("Verificating totp response {}", response);
         Twilio.init(accountSid, authToken);
 
         // We fetch all messages of past 24h
         DateTime rangeDateSentStart = new DateTime().minusDays(1);
-        log.debug("Searching for messages sent since {}",rangeDateSentStart.toString());
+        log.debug("Searching for messages sent since {}", rangeDateSentStart.toString());
         for (int i = 0; i < numberOfChecks; i++) {
             log.debug("Locating messages");
             ResourceSet<Message> messages = Message.reader().setFrom(new PhoneNumber(getTarget()))
                     .setDateSent(rangeDateSentStart).read();
             for (Message message : messages) {
-                log.debug("Message sid {}",message.getSid());
+                log.debug("Message sid {}", message.getSid());
                 // has to be received by us, doublecheck
                 if (!(message.getDirection() == Direction.INBOUND)) {
                     log.debug("Message discarded, not inbound");
@@ -198,7 +199,7 @@ public class TvilioSMSReceiverStepUpAccount extends ChallengeSenderStepUpAccount
                     log.debug("Message discarded, challenge not replied");
                     continue;
                 }
-                
+
                 msgLock.lock();
                 if (usedMessages.containsKey(message.getSid())) {
                     msgLock.unlock();
@@ -206,7 +207,8 @@ public class TvilioSMSReceiverStepUpAccount extends ChallengeSenderStepUpAccount
                     continue;
                 }
                 cleanMessages();
-                log.debug("Adding {} {} to the list of used verification messages", message.getSid(),message.getDateSent() );
+                log.debug("Adding {} {} to the list of used verification messages", message.getSid(),
+                        message.getDateSent());
                 usedMessages.put(message.getSid(), message.getDateSent());
                 msgLock.unlock();
                 setVerified();
@@ -217,7 +219,7 @@ public class TvilioSMSReceiverStepUpAccount extends ChallengeSenderStepUpAccount
             }
 
         }
-        
+
         verificationFailedCheck();
         return false;
     }

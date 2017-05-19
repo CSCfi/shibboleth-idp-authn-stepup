@@ -68,7 +68,7 @@ abstract class AbstractOidcProfileAction extends AbstractProfileAction {
         }
         oidcCtx = profileRequestContext.getSubcontext(OidcStepUpContext.class, false);
         if (oidcCtx == null) {
-            log.error("{} Unable to locate oidc context", getLogPrefix());
+            log.error("{} unable to locate oidc context", getLogPrefix());
             ActionSupport.buildEvent(profileRequestContext, EventIds.INVALID_PROFILE_CTX);
             return false;
         }

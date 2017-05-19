@@ -99,10 +99,10 @@ public class SetRequestedAuthenticationContext extends AbstractAuthenticationAct
 
     /** Constructor. */
     public SetRequestedAuthenticationContext() {
-        
+
         authnRequestLookupStrategy = Functions.compose(new MessageLookup<>(AuthnRequest.class),
                 new InboundMessageContextLookup());
-        
+
     }
 
     /**
@@ -129,7 +129,7 @@ public class SetRequestedAuthenticationContext extends AbstractAuthenticationAct
      */
     // Checkstyle: CyclomaticComplexity OFF
     public <T extends Principal> void setAuthenticationMethodMapping(@Nonnull Map<String, Map<String, Map<T, T>>> map) {
-        
+
         if (this.authMethodMap == null) {
             this.authMethodMap = new HashMap<String, Map<String, Map<Principal, Principal>>>();
         }
@@ -159,7 +159,7 @@ public class SetRequestedAuthenticationContext extends AbstractAuthenticationAct
                 }
             }
         }
-        
+
     }
 
     // Checkstyle: CyclomaticComplexity ON
@@ -169,20 +169,19 @@ public class SetRequestedAuthenticationContext extends AbstractAuthenticationAct
     protected void doExecute(@Nonnull final ProfileRequestContext profileRequestContext,
             @Nonnull final AuthenticationContext authenticationContext) {
 
-        
         final ShibbolethSpAuthenticationContext shibbolethContext = authenticationContext
                 .getSubcontext(ShibbolethSpAuthenticationContext.class);
         if (shibbolethContext == null || shibbolethContext.getIdp() == null) {
             log.debug("{} could not get shib proxy context and provider id", getLogPrefix());
             ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EVENTID_MISSING_SHIBSPCONTEXT);
-            
+
             return;
         }
         RelyingPartyContext rpCtx = profileRequestContext.getSubcontext(RelyingPartyContext.class, false);
         if (rpCtx == null || rpCtx.getRelyingPartyId() == null) {
             log.debug("{} could not get relying party context and sp entity id ", getLogPrefix());
             ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EVENTID_INVALID_RPCONTEXT);
-            
+
             return;
         }
 
@@ -195,7 +194,7 @@ public class SetRequestedAuthenticationContext extends AbstractAuthenticationAct
         if (providedMethod == null) {
             log.debug("{} could not get authentication method ", getLogPrefix());
             ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EVENTID_INVALID_SHIBSPCONTEXT);
-            
+
             return;
         }
 
@@ -211,7 +210,7 @@ public class SetRequestedAuthenticationContext extends AbstractAuthenticationAct
         }
 
         ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EVENTID_CONTINUE_STEPUP);
-        
+
     }
 
     /**
@@ -226,18 +225,18 @@ public class SetRequestedAuthenticationContext extends AbstractAuthenticationAct
      * @return The new mapped value if it exists. If not, null.
      */
     private Principal getExactMapping(String idp, String sp, Principal method) {
-        
+
         if (idp == null || sp == null || method == null || authMethodMap == null) {
-            
+
             return null;
         }
         log.debug("{} searching a match for triplet {},{} and {}", getLogPrefix(), idp, sp, method.getName());
         if (authMethodMap.containsKey(idp) && authMethodMap.get(idp) != null && authMethodMap.get(idp).containsKey(sp)
                 && authMethodMap.get(idp).get(sp) != null && authMethodMap.get(idp).get(sp).containsKey(method)) {
-            
+
             return authMethodMap.get(idp).get(sp).get(method);
         }
-        
+
         return null;
     }
 
@@ -253,16 +252,17 @@ public class SetRequestedAuthenticationContext extends AbstractAuthenticationAct
      * @return method if there is a mapping, otherwise a null.
      */
     private Principal getDefaultMapping(String idp, String sp, Principal method) {
-        
+
         if (idp == null || sp == null || method == null || defaultValueMap == null) {
             return null;
         }
-        log.debug("{} searching a match for pair {} and {}, provided method is {}", getLogPrefix(), idp, sp, method.getName());
+        log.debug("{} searching a match for pair {} and {}, provided method is {}", getLogPrefix(), idp, sp,
+                method.getName());
         if (defaultValueMap.containsKey(idp) && defaultValueMap.get(idp) != null
                 && defaultValueMap.get(idp).contains(sp)) {
             return method;
         }
-        
+
         return null;
     }
 

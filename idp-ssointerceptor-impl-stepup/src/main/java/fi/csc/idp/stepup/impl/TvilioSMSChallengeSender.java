@@ -39,19 +39,20 @@ public class TvilioSMSChallengeSender implements ChallengeSender {
     @Nonnull
     private final Logger log = LoggerFactory.getLogger(TvilioSMSChallengeSender.class);
 
-    /** SID of the tvilio account.*/
+    /** SID of the tvilio account. */
     private String accountSid;
-    /** authentication token of the tvilio account.*/
+    /** authentication token of the tvilio account. */
     private String authToken;
-    /** message sent to the user, including the challenge.*/
+    /** message sent to the user, including the challenge. */
     private String message;
-    /** the FROM number used, must be configured to tvilio.*/
+    /** the FROM number used, must be configured to tvilio. */
     private String senderNumber;
 
     /**
      * Set the FROM number used.
      * 
-     * @param number FROM number.
+     * @param number
+     *            FROM number.
      */
     public void setSenderNumber(String number) {
         this.senderNumber = number;
@@ -60,7 +61,8 @@ public class TvilioSMSChallengeSender implements ChallengeSender {
     /**
      * Set the message. Assumed to contain %s for placing the challenge.
      * 
-     * @param msg Message sent to the client.
+     * @param msg
+     *            Message sent to the client.
      */
     public void setMessage(String msg) {
         this.message = msg;
@@ -69,17 +71,19 @@ public class TvilioSMSChallengeSender implements ChallengeSender {
     /**
      * Tvilio account SID.
      * 
-     * @param sid of the account
+     * @param sid
+     *            of the account
      */
     public void setAccountSid(String sid) {
-        
+
         this.accountSid = sid;
     }
 
     /**
      * Tvilio account authentication token.
      * 
-     * @param token authentication token.
+     * @param token
+     *            authentication token.
      */
     public void setAuthToken(String token) {
         this.authToken = token;
@@ -88,28 +92,29 @@ public class TvilioSMSChallengeSender implements ChallengeSender {
     /**
      * Send challenge to SMS receiver.
      * 
-     * @param challenge sent to the receiver
+     * @param challenge
+     *            sent to the receiver
      * @target receiver SMS number
      * @throw Exception if something unexpected occurred.
      */
     @Override
     public void send(String challenge, String target) throws Exception {
-        
-        if (accountSid == null || authToken == null || accountSid == null || message == null){
+
+        if (accountSid == null || authToken == null || accountSid == null || message == null) {
             log.error("tvilio parameters not set");
-            
+
             throw new Exception("bean not properly initialized");
         }
-        log.debug("Sending challenge {} to ",challenge,target);
+        log.debug("Sending challenge {} to ", challenge, target);
         Twilio.init(accountSid, authToken);
-        Message msg=Message.creator(new PhoneNumber(target), new PhoneNumber(senderNumber),
+        Message msg = Message.creator(new PhoneNumber(target), new PhoneNumber(senderNumber),
                 String.format(message, challenge)).create();
-        log.debug("Message status {}",msg.getStatus());
-        if (msg.getStatus() == Status.FAILED || msg.getStatus() == Status.UNDELIVERED){
+        log.debug("Message status {}", msg.getStatus());
+        if (msg.getStatus() == Status.FAILED || msg.getStatus() == Status.UNDELIVERED) {
             throw new Exception("Message sending failed");
         }
         log.debug("Challenge sending triggered");
-        
+
     }
 
 }

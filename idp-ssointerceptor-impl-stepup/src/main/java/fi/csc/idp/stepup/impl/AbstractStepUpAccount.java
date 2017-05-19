@@ -61,24 +61,24 @@ public abstract class AbstractStepUpAccount implements StepUpAccount {
     /** retry limit for trying to successfully verify. */
     private int retries = -1;
 
+    /** default constructor. */
+    public AbstractStepUpAccount() {
+        super();
+
+        this.editable = true;
+    }
+
     /**
      * Set 0 or a positive number for retries allowed. Negative number is
      * interpreted as infinite retries. 0 means one try, no retries.
      * 
-     * @param retries
-     *            allowed.
+     * @param limit
+     *            retries allowed.
      */
     public void setRetryLimit(int limit) {
         this.retries = limit;
     }
-
-    /** default constructor. */
-    public AbstractStepUpAccount() {
-        super();
-        
-        this.editable = true;
-    }
-
+    
     /**
      * Get the id of the account.
      * 
@@ -86,7 +86,7 @@ public abstract class AbstractStepUpAccount implements StepUpAccount {
      */
     @Override
     public long getId() {
-        
+
         return this.id;
     }
 
@@ -98,13 +98,13 @@ public abstract class AbstractStepUpAccount implements StepUpAccount {
      */
     @Override
     public void setId(long idValue) {
-        
+
         if (this.editable) {
             this.id = idValue;
         } else {
             log.warn("not supported");
         }
-        
+
     }
 
     /**
@@ -123,7 +123,7 @@ public abstract class AbstractStepUpAccount implements StepUpAccount {
      *            implementation
      */
     public void setChallengeGenerator(ChallengeGenerator generator) {
-        
+
         this.challengeGenerator = generator;
     }
 
@@ -134,7 +134,7 @@ public abstract class AbstractStepUpAccount implements StepUpAccount {
      *            implementation
      */
     public void setChallengeVerifier(ChallengeVerifier verifier) {
-        
+
         this.challengeVerifier = verifier;
     }
 
@@ -145,13 +145,13 @@ public abstract class AbstractStepUpAccount implements StepUpAccount {
      *            name of the account
      */
     public void setName(String accountName) {
-        
+
         if (this.editable) {
             this.name = accountName;
         } else {
             log.warn("not supported");
         }
-        
+
     }
 
     /**
@@ -161,7 +161,7 @@ public abstract class AbstractStepUpAccount implements StepUpAccount {
      */
     @Override
     public String getName() {
-        
+
         return this.name;
     }
 
@@ -172,7 +172,7 @@ public abstract class AbstractStepUpAccount implements StepUpAccount {
      */
     @Override
     public boolean isEditable() {
-        
+
         return this.editable;
     }
 
@@ -183,7 +183,7 @@ public abstract class AbstractStepUpAccount implements StepUpAccount {
      */
     @Override
     public boolean isVerified() {
-        
+
         return this.verified;
     }
 
@@ -191,7 +191,7 @@ public abstract class AbstractStepUpAccount implements StepUpAccount {
      * Set the status of user being verified.
      */
     protected void setVerified() {
-        
+
         this.verified = true;
     }
 
@@ -222,13 +222,13 @@ public abstract class AbstractStepUpAccount implements StepUpAccount {
      */
     @Override
     public void setEditable(boolean isEditable) {
-        
+
         if (this.editable) {
             this.editable = isEditable;
         } else {
             log.warn("not supported");
         }
-        
+
     }
 
     /**
@@ -239,13 +239,13 @@ public abstract class AbstractStepUpAccount implements StepUpAccount {
      */
     @Override
     public void setEnabled(boolean isEnabled) {
-        
+
         if (this.editable) {
             this.enabled = isEnabled;
         } else {
             log.warn("not supported");
         }
-        
+
     }
 
     /**
@@ -255,7 +255,7 @@ public abstract class AbstractStepUpAccount implements StepUpAccount {
      */
     @Override
     public boolean isEnabled() {
-        
+
         return this.enabled;
     }
 
@@ -267,13 +267,13 @@ public abstract class AbstractStepUpAccount implements StepUpAccount {
      */
     @Override
     public void sendChallenge() throws Exception {
-        
+
         challenge = null;
         if (challengeGenerator == null) {
             throw new Exception("Bean not configured with ChallengeGenerator");
         }
         challenge = challengeGenerator.generate(null);
-        
+
     }
 
     /**
@@ -284,20 +284,20 @@ public abstract class AbstractStepUpAccount implements StepUpAccount {
      */
     @Override
     public boolean verifyResponse(String response) throws Exception {
-        
+
         if (challenge == null) {
-            
+
             throw new Exception("null challenge defies logic");
         }
         if (challengeVerifier == null) {
-            
+
             throw new Exception("Bean not configured with ChallengeVerifier");
         }
         this.verified = challengeVerifier.verify(challenge, response, null);
         if (!this.verified) {
             verificationFailedCheck();
         }
-        
+
         return this.verified;
     }
 
@@ -309,13 +309,13 @@ public abstract class AbstractStepUpAccount implements StepUpAccount {
      */
     @Override
     public void setTarget(String accountTarget) {
-        
+
         if (this.editable) {
             this.target = accountTarget;
         } else {
             log.warn("not supported");
         }
-        
+
     }
 
     /**

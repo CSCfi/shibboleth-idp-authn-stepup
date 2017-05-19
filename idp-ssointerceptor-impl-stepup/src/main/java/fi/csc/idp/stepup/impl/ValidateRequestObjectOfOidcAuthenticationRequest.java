@@ -127,11 +127,11 @@ public class ValidateRequestObjectOfOidcAuthenticationRequest extends AbstractOi
      * Cleans old messages.
      */
     private void cleanMessages() {
-        
+
         msgLock.lock();
         if (usedMessages.size() < 100) {
             msgLock.unlock();
-            
+
             return;
         }
         long current = new Date().getTime();
@@ -139,12 +139,13 @@ public class ValidateRequestObjectOfOidcAuthenticationRequest extends AbstractOi
             Map.Entry<String, DateTime> usedMessage = it.next();
             long sent = usedMessage.getValue().toDate().getTime();
             if (current - sent > 2 * eventWindow) {
-                log.debug("{} removing {} {} from the list of used verification messages", getLogPrefix(), usedMessage.getKey(), usedMessage.getValue());
+                log.debug("{} removing {} {} from the list of used verification messages", getLogPrefix(),
+                        usedMessage.getKey(), usedMessage.getValue());
                 it.remove();
             }
         }
         msgLock.unlock();
-        
+
     }
 
     /**
@@ -159,7 +160,7 @@ public class ValidateRequestObjectOfOidcAuthenticationRequest extends AbstractOi
      *             if something unexpected happens.
      */
     private List<JSONObject> getProviderRSAJWK(InputStream is) throws ParseException, IOException {
-        
+
         List<JSONObject> keys = new ArrayList<JSONObject>();
         JSONObject json = JSONObjectUtils.parse(IOUtils.readInputStreamToString(is,
                 java.nio.charset.Charset.forName("UTF8")));
@@ -168,22 +169,22 @@ public class ValidateRequestObjectOfOidcAuthenticationRequest extends AbstractOi
             // not a keyset? If it is is a RSA key we are happy
             JSONObject k = json;
             if ("RSA".equals(k.get("kty"))) {
-                log.debug("{} adding verification key {}",getLogPrefix(), k.toString());
+                log.debug("{} adding verification key {}", getLogPrefix(), k.toString());
                 keys.add(k);
             }
-            
+
             return keys;
         }
         for (Object key : keyList) {
             JSONObject k = (JSONObject) key;
             // in case of many keys, we pick all RSA signature keys
             if ("sig".equals(k.get("use")) && "RSA".equals(k.get("kty"))) {
-                log.debug("{} adding verification key {}",getLogPrefix(), k.toString());
-                
+                log.debug("{} adding verification key {}", getLogPrefix(), k.toString());
+
                 keys.add(k);
             }
         }
-        
+
         return keys;
     }
 
@@ -199,7 +200,7 @@ public class ValidateRequestObjectOfOidcAuthenticationRequest extends AbstractOi
      * @return true if successfully verified, otherwise false
      */
     private boolean verifyJWT(OidcStepUpContext oidcCtx, JWT jwt, String clientID) {
-        
+
         // Check jwt is signed jwt
         if (this.noSignatureVerify) {
             log.warn("JWT signature not checked, do not use in production");
@@ -209,14 +210,14 @@ public class ValidateRequestObjectOfOidcAuthenticationRequest extends AbstractOi
         try {
             signedJWT = SignedJWT.parse(jwt.serialize());
         } catch (ParseException e) {
-            log.error("request does not contain signed request object " + clientID);
+            log.error("{} request does not contain signed request object {}", getLogPrefix(), clientID);
             getOidcCtx().setErrorCode("invalid_request");
             getOidcCtx().setErrorDescription("request does not contain signed request object");
             return false;
         }
         // check we have key
         if (!jwkSetUris.containsKey(clientID)) {
-            log.error("No jwk set uri defined for client " + clientID);
+            log.error("{} no jwk set uri defined for client {}", getLogPrefix(), clientID);
             getOidcCtx().setErrorCode("invalid_client");
             getOidcCtx().setErrorDescription("Client has not registered keyset uri");
             return false;
@@ -225,7 +226,7 @@ public class ValidateRequestObjectOfOidcAuthenticationRequest extends AbstractOi
         try {
             jwkSetUri = new URI(jwkSetUris.get(clientID));
         } catch (URISyntaxException e) {
-            log.error("Client keyset unreadable " + clientID);
+            log.error("{} client keyset unreadable ", getLogPrefix(), clientID);
             getOidcCtx().setErrorCode("invalid_client");
             getOidcCtx().setErrorDescription("Client keyset unreadable");
             return false;
@@ -233,7 +234,7 @@ public class ValidateRequestObjectOfOidcAuthenticationRequest extends AbstractOi
         try {
             List<JSONObject> keys = getProviderRSAJWK(jwkSetUri.toURL().openStream());
             if (keys == null || keys.size() == 0) {
-                log.error("Client has no suitable keys in keyset " + clientID);
+                log.error("{} client has no suitable keys in keyset {}", getLogPrefix(), clientID);
                 getOidcCtx().setErrorCode("invalid_client");
                 getOidcCtx().setErrorDescription("Client has no suitable keys in keyset");
                 return false;
@@ -242,17 +243,18 @@ public class ValidateRequestObjectOfOidcAuthenticationRequest extends AbstractOi
                 RSAPublicKey providerKey = RSAKey.parse(key).toRSAPublicKey();
                 RSASSAVerifier verifier = new RSASSAVerifier(providerKey);
                 if (signedJWT.verify(verifier)) {
-                    
+
                     return true;
                 }
             }
-            log.error("client " + clientID + " JWT signature verification failed for " + signedJWT.getParsedString());
+            log.error("{} client {} JWT signature verification failed for {}", getLogPrefix(), clientID,
+                    signedJWT.getParsedString());
             getOidcCtx().setErrorCode("invalid_request");
             getOidcCtx().setErrorDescription("request object signature verification failed");
-            
+
             return false;
         } catch (ParseException | IOException | JOSEException e) {
-            log.error("unable to verify signed jwt " + clientID);
+            log.error("{} unable to verify signed jwt {}", getLogPrefix(), clientID);
             getOidcCtx().setErrorCode("invalid_request");
             getOidcCtx().setErrorDescription("unable to verify signed jwt");
             return false;
@@ -274,72 +276,74 @@ public class ValidateRequestObjectOfOidcAuthenticationRequest extends AbstractOi
      *             if fails to parse claims
      */
     private boolean validateRequestObject(OidcStepUpContext oidcCtx, AuthenticationRequest req) throws ParseException {
-        
+
         String clientID = (String) req.getRequestObject().getJWTClaimsSet().getClaim("client_id");
         if (clientID == null || !req.getClientID().getValue().equals(clientID)) {
-            log.error("request object: client id is mandatory and should match parameter value");
+            log.error("{} request object: client id is mandatory and should match parameter value", getLogPrefix());
             getOidcCtx().setErrorCode("invalid_request");
             getOidcCtx().setErrorDescription("request object not containing correct client id");
-            
+
             return false;
         }
         String responseType = (String) req.getRequestObject().getJWTClaimsSet().getClaim("response_type");
         if (responseType == null || !req.getResponseType().equals(new ResponseType(responseType))) {
-            log.error("request object: response type is mandatory and should match parameter value");
+            log.error("{} request object: response type is mandatory and should match parameter value", getLogPrefix());
             getOidcCtx().setErrorCode("invalid_request");
             getOidcCtx().setErrorDescription("request object not containing correct response type");
-            
+
             return false;
         }
         String iss = (String) req.getRequestObject().getJWTClaimsSet().getClaim("iss");
         if (iss == null || !req.getClientID().getValue().equals(iss)) {
-            log.error("request object: signed request object should contain iss claim with client id as value");
+            log.error("{} request object: signed request object should contain iss claim with client id as value",
+                    getLogPrefix());
             getOidcCtx().setErrorCode("invalid_request");
             getOidcCtx().setErrorDescription("request object not containing iss claim with client id as value");
-            
+
             return false;
         }
         String aud = (String) req.getRequestObject().getJWTClaimsSet().getStringListClaim("aud").get(0);
         if (aud == null || !aud.equals(getOidcCtx().getIssuer())) {
-            log.error("request object: signed request object should contain aud claim with op issuer as value");
+            log.error("{} request object: signed request object should contain aud claim with op issuer as value",
+                    getLogPrefix());
             getOidcCtx().setErrorCode("invalid_request");
             getOidcCtx().setErrorDescription("request object not containing aud claim with op issuer as value");
-            
+
             return false;
         }
         Date iat = req.getRequestObject().getJWTClaimsSet().getDateClaim("iat");
         if (iat == null) {
-            log.error("request object: iat is required in request object");
+            log.error("{} request object: iat is required in request object", getLogPrefix());
             getOidcCtx().setErrorCode("invalid_request");
             getOidcCtx().setErrorDescription("request object not containing iat");
-            
+
             return false;
         }
         // check event window
         long sent = iat.getTime();
         long current = new Date().getTime();
         if (current - sent > eventWindow) {
-            log.error("id token too old: " + current + "/" + sent);
+            log.error("{} id token too old: {}/{}", getLogPrefix(), current, sent);
             getOidcCtx().setErrorCode("invalid_request");
             getOidcCtx().setErrorDescription("id token too old");
-            
+
             return false;
         }
         State state = State.parse(req.getRequestObject().getJWTClaimsSet().getStringClaim("state"));
         if (state == null) {
-            log.error("request object: state is required in request object");
+            log.error("{} request object: state is required in request object", getLogPrefix());
             getOidcCtx().setErrorCode("invalid_request");
             getOidcCtx().setErrorDescription("request object not containing state");
-            
+
             return false;
         }
 
         JSONObject claims = (JSONObject) req.getRequestObject().getJWTClaimsSet().getClaim("claims");
         if (claims == null) {
-            log.error("request object: signed request object needs to have claims");
+            log.error("{} request object: signed request object needs to have claims", getLogPrefix());
             getOidcCtx().setErrorCode("invalid_request");
             getOidcCtx().setErrorDescription("request object not containing claims");
-            
+
             return false;
         }
         JWTClaimsSet idToken = null;
@@ -348,10 +352,10 @@ public class ValidateRequestObjectOfOidcAuthenticationRequest extends AbstractOi
         } catch (Exception e) {
         }
         if (idToken == null) {
-            log.error("request object: signed request object needs to have id token");
+            log.error("{} request object: signed request object needs to have id token", getLogPrefix());
             getOidcCtx().setErrorCode("invalid_request");
             getOidcCtx().setErrorDescription("request object not containing idtoken");
-            
+
             return false;
         }
         // check replay
@@ -360,15 +364,15 @@ public class ValidateRequestObjectOfOidcAuthenticationRequest extends AbstractOi
             msgLock.unlock();
             getOidcCtx().setErrorCode("invalid_request");
             getOidcCtx().setErrorDescription("request object already used");
-            
+
             return false;
         }
         cleanMessages();
-        log.debug("{} adding {} {} to the list of used verification messages",getLogPrefix(),state,iat);
+        log.debug("{} adding {} {} to the list of used verification messages", getLogPrefix(), state, iat);
         usedMessages.put(state.getValue(), new DateTime(iat));
         msgLock.unlock();
         getOidcCtx().setIdToken(idToken);
-        
+
         return true;
 
     }
@@ -395,16 +399,13 @@ public class ValidateRequestObjectOfOidcAuthenticationRequest extends AbstractOi
         if (getOidcCtx().getRequest().getRequestObject() == null) {
             getOidcCtx().setErrorCode("invalid_request");
             getOidcCtx().setErrorDescription("request does not contain request object");
-            
+
             log.error("{} request does not contain request object", getLogPrefix());
             ActionSupport.buildEvent(profileRequestContext, OidcProcessingEventIds.EVENTID_ERROR_OIDC);
             return;
         }
         if (!verifyJWT(getOidcCtx(), getOidcCtx().getRequest().getRequestObject(), getOidcCtx().getRequest()
                 .getClientID().getValue())) {
-            log.error("verify failed");
-            // verify is expected to fill reason
-            
             log.error("{} verify failed {}:{}", getLogPrefix(), getOidcCtx().getErrorCode(), getOidcCtx()
                     .getErrorDescription());
             ActionSupport.buildEvent(profileRequestContext, OidcProcessingEventIds.EVENTID_ERROR_OIDC);
@@ -412,15 +413,11 @@ public class ValidateRequestObjectOfOidcAuthenticationRequest extends AbstractOi
         }
         try {
             if (!validateRequestObject(getOidcCtx(), getOidcCtx().getRequest())) {
-                log.error("validation failed");
-                // verify is expected to fill reason
                 log.error("{} validation failed", getLogPrefix());
                 ActionSupport.buildEvent(profileRequestContext, OidcProcessingEventIds.EVENTID_ERROR_OIDC);
                 return;
             }
         } catch (ParseException e) {
-            log.error("request object parsing failed");
-            
             log.error("{} request object parsing failed", getLogPrefix());
             ActionSupport.buildEvent(profileRequestContext, OidcProcessingEventIds.EVENTID_ERROR_OIDC);
         }

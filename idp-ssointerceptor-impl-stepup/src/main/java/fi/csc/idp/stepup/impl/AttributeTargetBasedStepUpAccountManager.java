@@ -63,26 +63,27 @@ public class AttributeTargetBasedStepUpAccountManager extends AbstractStepUpAcco
      * 
      * @param attributeContext
      *            to look for the key value
-     * @throws Exception if something unexpected occurred.
+     * @throws Exception
+     *             if something unexpected occurred.
      */
     @Override
     public boolean initialize(AttributeContext attributeContext) throws Exception {
-        
+
         String target = null;
-        log.debug("Adding accounts of type {}",getName());
-        if (attributeContext == null){
+        log.debug("Adding accounts of type {}", getName());
+        if (attributeContext == null) {
             throw new Exception("Attribute context has to be set");
         }
-        if (attributeId == null){
+        if (attributeId == null) {
             throw new Exception("Attribute Id has to be set");
         }
-        if (getAccountID() == null){
+        if (getAccountID() == null) {
             throw new Exception("No account bean defined");
         }
         IdPAttribute attribute = attributeContext.getIdPAttributes().get(attributeId);
         if (attribute == null) {
             log.warn("Not able to create accounts, Attributes do not contain value for " + attributeId);
-            
+
             return false;
         }
         for (@SuppressWarnings("rawtypes")
@@ -90,7 +91,7 @@ public class AttributeTargetBasedStepUpAccountManager extends AbstractStepUpAcco
             if (value instanceof StringAttributeValue) {
                 target = ((StringAttributeValue) value).getValue();
                 if (target != null) {
-                    log.debug("Adding account with target value {}",target);
+                    log.debug("Adding account with target value {}", target);
                     StepUpAccount account = (StepUpAccount) getAppContext().getBean(getAccountID());
                     account.setTarget(target);
                     account.setEnabled(true);
@@ -100,13 +101,13 @@ public class AttributeTargetBasedStepUpAccountManager extends AbstractStepUpAcco
                         getAccounts().add(account);
                     } catch (Exception e) {
                         log.debug("Not able to add account during initialization");
-                        
+
                         return false;
                     }
                 }
             }
         }
-        
+
         return true;
     }
 }

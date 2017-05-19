@@ -69,7 +69,7 @@ public class CheckRequestedAuthenticationContext extends AbstractAuthenticationA
      */
 
     public <T extends Principal> void setStepupMethods(@Nonnull @NonnullElements final Collection<T> principals) {
-        
+
         ComponentSupport.ifInitializedThrowUnmodifiabledComponentException(this);
         Constraint.isNotNull(principals, "Principal collection cannot be null.");
         if (stepupPrincipals == null) {
@@ -77,21 +77,20 @@ public class CheckRequestedAuthenticationContext extends AbstractAuthenticationA
         }
         stepupPrincipals.getPrincipals().clear();
         stepupPrincipals.getPrincipals().addAll(Collections2.filter(principals, Predicates.notNull()));
-        
+
     }
 
     /** {@inheritDoc} */
     @Override
     protected void doExecute(@Nonnull final ProfileRequestContext profileRequestContext,
             @Nonnull final AuthenticationContext authenticationContext) {
-        
 
         final ShibbolethSpAuthenticationContext shibbolethContext = authenticationContext
                 .getSubcontext(ShibbolethSpAuthenticationContext.class);
         if (shibbolethContext == null) {
             log.debug("{} could not get shib proxy context", getLogPrefix());
             ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EVENTID_MISSING_SHIBSPCONTEXT);
-            
+
             return;
         }
 
@@ -101,12 +100,12 @@ public class CheckRequestedAuthenticationContext extends AbstractAuthenticationA
 
             log.debug("{} AuthnRequest did not contain a RequestedAuthnContext matching any StepUp", getLogPrefix());
             ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EVENTID_AUTHNCONTEXT_NOT_STEPUP);
-            
+
             return;
         }
 
         ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EVENTID_CONTINUE_STEPUP);
-        
+
     }
 
     /**
@@ -120,14 +119,14 @@ public class CheckRequestedAuthenticationContext extends AbstractAuthenticationA
      * @return true if the requested method requires step up.
      */
     private boolean stepupRequested(List<Principal> requestedPrincipals, Subject stPrincipals) {
-        
+
         for (Principal requestedPrincipal : requestedPrincipals) {
             if (stPrincipals.getPrincipals().contains(requestedPrincipal)) {
-                
+
                 return true;
             }
         }
-        
+
         return false;
     }
 

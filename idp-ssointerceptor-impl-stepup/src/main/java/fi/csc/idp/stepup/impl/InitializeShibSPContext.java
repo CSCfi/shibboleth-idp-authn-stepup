@@ -62,7 +62,7 @@ public class InitializeShibSPContext extends AbstractOidcProfileAction {
     protected void doExecute(@Nonnull final ProfileRequestContext profileRequestContext) {
         AuthenticationContext authnCtx = profileRequestContext.getSubcontext(AuthenticationContext.class, false);
         if (authnCtx == null) {
-            log.error("{} Unable to locate authentication context", getLogPrefix());
+            log.error("{} unable to locate authentication context", getLogPrefix());
             ActionSupport.buildEvent(profileRequestContext, EventIds.INVALID_PROFILE_CTX);
             return;
         }

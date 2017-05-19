@@ -106,7 +106,7 @@ public class AbstractStepUpAccountManager implements StepUpMethod {
      *            is method name
      */
     public void setName(String methodName) {
-        
+
         this.name = methodName;
     }
 
@@ -117,7 +117,7 @@ public class AbstractStepUpAccountManager implements StepUpMethod {
      */
     @Override
     public String getName() {
-        
+
         return name;
     }
 
@@ -128,7 +128,7 @@ public class AbstractStepUpAccountManager implements StepUpMethod {
      */
     @Override
     public boolean isEditable() {
-        
+
         return false;
     }
 
@@ -139,7 +139,7 @@ public class AbstractStepUpAccountManager implements StepUpMethod {
      */
     @Override
     public List<StepUpAccount> getAccounts() {
-        
+
         return accounts;
     }
 
@@ -150,7 +150,7 @@ public class AbstractStepUpAccountManager implements StepUpMethod {
      */
     @Override
     public StepUpAccount addAccount() throws Exception {
-        
+
         log.debug("Method not supported");
         return null;
     }
@@ -163,7 +163,7 @@ public class AbstractStepUpAccountManager implements StepUpMethod {
      */
     @Override
     public void removeAccount(StepUpAccount account) throws Exception {
-        
+
         log.debug("Method not supported");
     }
 
@@ -176,13 +176,13 @@ public class AbstractStepUpAccountManager implements StepUpMethod {
      */
     @Override
     public boolean initialize(AttributeContext attributeContext) throws Exception {
-        
+
         StepUpAccount account = (StepUpAccount) getAppContext().getBean(getAccountID());
         account.setEnabled(true);
         // Accounts cannot be stored and therefore also not edited
         account.setEditable(false);
         getAccounts().add(account);
-        
+
         return true;
     }
 
@@ -195,7 +195,7 @@ public class AbstractStepUpAccountManager implements StepUpMethod {
      */
     @Override
     public void updateAccount(StepUpAccount account) throws Exception {
-        
+
         log.debug("Method not supported");
     }
 

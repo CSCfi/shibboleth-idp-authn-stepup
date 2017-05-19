@@ -81,9 +81,9 @@ public class MailChallengeSender implements ChallengeSender {
      *            the value of the sender
      */
     public void setFromField(String fromField) {
-        
+
         this.from = fromField;
-        
+
     }
 
     /**
@@ -93,9 +93,9 @@ public class MailChallengeSender implements ChallengeSender {
      *            the value of the sender
      */
     public void setSubjectField(String subjectField) {
-        
+
         this.subject = subjectField;
-        
+
     }
 
     /**
@@ -105,9 +105,9 @@ public class MailChallengeSender implements ChallengeSender {
      *            is the username
      */
     public void setUserName(String accountUserName) {
-        
+
         this.userName = accountUserName;
-        
+
     }
 
     /**
@@ -117,9 +117,9 @@ public class MailChallengeSender implements ChallengeSender {
      *            is the Password
      */
     public void setPassword(String accountPassword) {
-        
+
         this.password = accountPassword;
-        
+
     }
 
     /**
@@ -129,9 +129,9 @@ public class MailChallengeSender implements ChallengeSender {
      *            SMTP Auth property
      */
     public void setSMTPAuth(String serverSMTPAuth) {
-        
+
         props.put("mail.smtp.auth", serverSMTPAuth);
-        
+
     }
 
     /**
@@ -141,9 +141,9 @@ public class MailChallengeSender implements ChallengeSender {
      *            SMTP TTLS Start property
      */
     public void setSMTPTtls(String serverSMTPTtls) {
-        
+
         props.put("mail.smtp.starttls.enable", serverSMTPTtls);
-        
+
     }
 
     /**
@@ -153,9 +153,9 @@ public class MailChallengeSender implements ChallengeSender {
      *            email server hostname
      */
     public void setHost(String hostName) {
-        
+
         props.put("mail.smtp.host", hostName);
-        
+
     }
 
     /**
@@ -165,9 +165,9 @@ public class MailChallengeSender implements ChallengeSender {
      *            port of email server
      */
     public void setPort(String serverPort) {
-        
+
         props.put("mail.smtp.port", serverPort);
-        
+
     }
 
     /**
@@ -177,9 +177,9 @@ public class MailChallengeSender implements ChallengeSender {
      *            template file replacing the default one
      */
     public void setTemplateFile(String fileName) {
-        
+
         this.templateFileName = fileName;
-        
+
     }
 
     /**
@@ -189,9 +189,9 @@ public class MailChallengeSender implements ChallengeSender {
      *            loader path to template file replacing the default one
      */
     public void setTemplatePath(String path) {
-        
+
         this.templateFilePath = path;
-        
+
     }
 
     /**
@@ -200,20 +200,20 @@ public class MailChallengeSender implements ChallengeSender {
      * @return template for challenge email
      */
     private Template getVelocityTemplate() {
-        
+
         VelocityEngine velocityEngine = new VelocityEngine();
         if (templateFileName != null && !templateFileName.isEmpty() && templateFilePath != null
                 && !templateFilePath.isEmpty()) {
             velocityEngine.setProperty(RuntimeConstants.RESOURCE_LOADER, "file");
             velocityEngine.setProperty(RuntimeConstants.FILE_RESOURCE_LOADER_PATH, templateFilePath);
             velocityEngine.init();
-            
+
             return velocityEngine.getTemplate(templateFileName);
         }
         velocityEngine.setProperty(RuntimeConstants.RESOURCE_LOADER, "classpath");
         velocityEngine.setProperty("classpath.resource.loader.class", ClasspathResourceLoader.class.getName());
         velocityEngine.init();
-        
+
         return velocityEngine.getTemplate(File.separator + "emails" + File.separator + "default.vm");
 
     }
@@ -222,7 +222,7 @@ public class MailChallengeSender implements ChallengeSender {
      * Initializes velocity template and mail session if not initialized yet.
      */
     private synchronized void init() {
-        
+
         if (template == null) {
             template = getVelocityTemplate();
         }
@@ -237,13 +237,13 @@ public class MailChallengeSender implements ChallengeSender {
                 session = Session.getInstance(props);
             }
         }
-        
+
     }
 
     @Override
     public void send(String challenge, String target) throws AddressException, MessagingException {
-        
-        log.debug("Sending challenge {} to {}",challenge,target);
+
+        log.debug("Sending challenge {} to {}", challenge, target);
         init();
         final VelocityContext velocityContext = new VelocityContext();
         velocityContext.put("otp", challenge);
@@ -263,7 +263,7 @@ public class MailChallengeSender implements ChallengeSender {
             throw e;
         }
         log.debug("Challenge sending triggered");
-        
+
     }
 
 }
