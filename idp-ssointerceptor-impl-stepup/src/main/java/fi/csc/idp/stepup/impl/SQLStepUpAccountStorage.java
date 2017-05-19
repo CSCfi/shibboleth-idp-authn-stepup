@@ -197,7 +197,7 @@ public class SQLStepUpAccountStorage implements StepUpAccountStorage {
             return null;
         }
         String result = encryptor.encrypt(parameter);
-        log.debug("encrypt(" + parameter + ")=" + result);
+        log.debug("Encrypt({})={}",parameter,result);
         
         return result;
     }
@@ -222,7 +222,7 @@ public class SQLStepUpAccountStorage implements StepUpAccountStorage {
             return null;
         }
         String result = encryptor.decrypt(parameter);
-        log.debug("decrypt(" + parameter + ")=" + result);
+        log.debug("Decrypt({})={}",parameter,result);
         
         return result;
     }
@@ -383,7 +383,7 @@ public class SQLStepUpAccountStorage implements StepUpAccountStorage {
     @Override
     public <T> List<StepUpAccount> getAccounts(String key, Class<T> aClass) throws Exception {
         
-        log.debug("About to read accounts for " + key);
+        log.debug("About to read accounts for {}", key);
         Connection conn = getDataSource().getConnection();
         List<StepUpAccount> accounts = new ArrayList<StepUpAccount>();
         PreparedStatement list = conn.prepareStatement(listStatement);

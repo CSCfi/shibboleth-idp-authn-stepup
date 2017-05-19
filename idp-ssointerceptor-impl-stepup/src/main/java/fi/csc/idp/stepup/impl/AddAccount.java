@@ -68,7 +68,7 @@ public class AddAccount extends AbstractAuthenticationAction {
             
             return;
         }
-        log.debug("Adding a stepup account of type " + stepUpMethodContext.getStepUpMethod().getName());
+        log.debug("{} adding a stepup account of type {}", getLogPrefix(), stepUpMethodContext.getStepUpMethod().getName());
         StepUpAccount account;
         try {
             account = stepUpMethodContext.getStepUpMethod().addAccount();

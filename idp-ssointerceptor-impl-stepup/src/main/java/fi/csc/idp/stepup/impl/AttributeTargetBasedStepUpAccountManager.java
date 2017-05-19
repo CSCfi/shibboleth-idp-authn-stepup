@@ -69,7 +69,7 @@ public class AttributeTargetBasedStepUpAccountManager extends AbstractStepUpAcco
     public boolean initialize(AttributeContext attributeContext) throws Exception {
         
         String target = null;
-        log.debug("Adding accounts of type " + getName());
+        log.debug("Adding accounts of type {}",getName());
         if (attributeContext == null){
             throw new Exception("Attribute context has to be set");
         }
@@ -90,7 +90,7 @@ public class AttributeTargetBasedStepUpAccountManager extends AbstractStepUpAcco
             if (value instanceof StringAttributeValue) {
                 target = ((StringAttributeValue) value).getValue();
                 if (target != null) {
-                    log.debug("Adding account with target value " + target);
+                    log.debug("Adding account with target value {}",target);
                     StepUpAccount account = (StepUpAccount) getAppContext().getBean(getAccountID());
                     account.setTarget(target);
                     account.setEnabled(true);

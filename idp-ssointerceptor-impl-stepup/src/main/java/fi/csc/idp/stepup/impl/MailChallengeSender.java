@@ -82,7 +82,6 @@ public class MailChallengeSender implements ChallengeSender {
      */
     public void setFromField(String fromField) {
         
-        log.debug("setting from to " + fromField);
         this.from = fromField;
         
     }
@@ -95,7 +94,6 @@ public class MailChallengeSender implements ChallengeSender {
      */
     public void setSubjectField(String subjectField) {
         
-        log.debug("setting subject to " + subjectField);
         this.subject = subjectField;
         
     }
@@ -108,7 +106,6 @@ public class MailChallengeSender implements ChallengeSender {
      */
     public void setUserName(String accountUserName) {
         
-        log.debug("setting account username to " + accountUserName);
         this.userName = accountUserName;
         
     }
@@ -121,7 +118,6 @@ public class MailChallengeSender implements ChallengeSender {
      */
     public void setPassword(String accountPassword) {
         
-        log.debug("setting account password to " + accountPassword);
         this.password = accountPassword;
         
     }
@@ -134,7 +130,6 @@ public class MailChallengeSender implements ChallengeSender {
      */
     public void setSMTPAuth(String serverSMTPAuth) {
         
-        log.debug("setting SMTP Auth to " + serverSMTPAuth);
         props.put("mail.smtp.auth", serverSMTPAuth);
         
     }
@@ -147,7 +142,6 @@ public class MailChallengeSender implements ChallengeSender {
      */
     public void setSMTPTtls(String serverSMTPTtls) {
         
-        log.debug("setting SMTP Start TLS to " + serverSMTPTtls);
         props.put("mail.smtp.starttls.enable", serverSMTPTtls);
         
     }
@@ -160,7 +154,6 @@ public class MailChallengeSender implements ChallengeSender {
      */
     public void setHost(String hostName) {
         
-        log.debug("setting host to " + hostName);
         props.put("mail.smtp.host", hostName);
         
     }
@@ -173,7 +166,6 @@ public class MailChallengeSender implements ChallengeSender {
      */
     public void setPort(String serverPort) {
         
-        log.debug("setting port to " + serverPort);
         props.put("mail.smtp.port", serverPort);
         
     }
@@ -186,7 +178,6 @@ public class MailChallengeSender implements ChallengeSender {
      */
     public void setTemplateFile(String fileName) {
         
-        log.debug("setting template filename to " + fileName);
         this.templateFileName = fileName;
         
     }
@@ -199,7 +190,6 @@ public class MailChallengeSender implements ChallengeSender {
      */
     public void setTemplatePath(String path) {
         
-        log.debug("setting path to template files " + path);
         this.templateFilePath = path;
         
     }
@@ -253,7 +243,7 @@ public class MailChallengeSender implements ChallengeSender {
     @Override
     public void send(String challenge, String target) throws AddressException, MessagingException {
         
-        log.debug("Sending challenge " + challenge + " to " + target);
+        log.debug("Sending challenge {} to {}",challenge,target);
         init();
         final VelocityContext velocityContext = new VelocityContext();
         velocityContext.put("otp", challenge);

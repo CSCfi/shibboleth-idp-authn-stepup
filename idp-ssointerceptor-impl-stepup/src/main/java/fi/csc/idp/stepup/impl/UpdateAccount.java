@@ -90,7 +90,7 @@ public class UpdateAccount extends AbstractExtractionAction {
         
         stepUpMethodContext = authenticationContext.getSubcontext(StepUpMethodContext.class);
         if (stepUpMethodContext == null) {
-            log.debug("{} Could not get shib proxy context", getLogPrefix());
+            log.debug("{} could not get shib proxy context", getLogPrefix());
             ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EVENTID_MISSING_STEPUPMETHODCONTEXT);
             
             return false;
@@ -106,14 +106,14 @@ public class UpdateAccount extends AbstractExtractionAction {
         
         final HttpServletRequest request = getHttpServletRequest();
         if (request == null) {
-            log.debug("{} Profile action does not contain an HttpServletRequest", getLogPrefix());
+            log.debug("{} profile action does not contain an HttpServletRequest", getLogPrefix());
             ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EXCEPTION);
             
             return;
         }
         final String updateValue = request.getParameter(updateParameter);
         if (updateValue == null) {
-            log.debug("No update value found", getLogPrefix());
+            log.debug("{} no update value found", getLogPrefix());
             ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EVENTID_INVALID_RESPONSE);
             
             return;
@@ -151,15 +151,15 @@ public class UpdateAccount extends AbstractExtractionAction {
         StepUpAccount updateAccount = null;
         StepUpMethod updateMethod = null;
         for (StepUpMethod suMethod : stepUpMethodContext.getStepUpMethods().keySet()) {
-            log.debug("Comparing method " + method + " to " + suMethod.getName());
+            log.debug("{} comparing method {} to {}",getLogPrefix(),  method, suMethod.getName());
             if (method.equals(suMethod.getName())) {
-                log.debug("located target method " + method);
+                log.debug("{} located target method {}",getLogPrefix(), method);
                 updateMethod = suMethod;
                 if (id >= 0) {
                     for (StepUpAccount account : suMethod.getAccounts()) {
-                        log.debug("Comparing account id " + id + " to " + account.getId());
+                        log.debug("{} comparing account id {} to {}",getLogPrefix(),id, account.getId());
                         if (account.getId() == id) {
-                            log.debug("located target account " + id);
+                            log.debug("{} located target account {}",getLogPrefix(), id);
                             updateAccount = account;
                             break;
                         }
@@ -169,7 +169,7 @@ public class UpdateAccount extends AbstractExtractionAction {
             }
         }
         try {
-            log.debug("running command " + command);
+            log.debug("{} running command {}", getLogPrefix(), command);
             accountCommand(command, updateAccount, updateMethod, request);
         } catch (Exception e) {
             log.debug("{} unexpected exception occurred", getLogPrefix());
@@ -178,7 +178,7 @@ public class UpdateAccount extends AbstractExtractionAction {
             
             return;
         }
-        log.debug("Update value to be interpreted is " + updateValue);
+        log.debug("{} update value to be interpreted is {}",getLogPrefix(), updateValue);
         ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EVENTID_CONTINUE_STEPUP);
         
     }

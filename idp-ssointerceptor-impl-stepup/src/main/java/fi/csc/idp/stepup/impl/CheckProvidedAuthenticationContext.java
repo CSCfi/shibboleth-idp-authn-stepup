@@ -90,7 +90,7 @@ public class CheckProvidedAuthenticationContext extends AbstractAuthenticationAc
         final ShibbolethSpAuthenticationContext shibbolethContext = authenticationContext
                 .getSubcontext(ShibbolethSpAuthenticationContext.class);
         if (shibbolethContext == null || shibbolethContext.getIdp() == null) {
-            log.debug("{} Could not get shib proxy context", getLogPrefix());
+            log.debug("{} could not get shib proxy context", getLogPrefix());
             ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EVENTID_MISSING_SHIBSPCONTEXT);
             
             return;
@@ -102,7 +102,7 @@ public class CheckProvidedAuthenticationContext extends AbstractAuthenticationAc
             providedMethod = new AuthnContextDeclRefPrincipal(shibbolethContext.getContextDecl());
         }
         if (providedMethod == null) {
-            log.debug("{} Could not get authentication method ", getLogPrefix());
+            log.debug("{} could not get authentication method ", getLogPrefix());
             ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EVENTID_INVALID_SHIBSPCONTEXT);
             
             return;

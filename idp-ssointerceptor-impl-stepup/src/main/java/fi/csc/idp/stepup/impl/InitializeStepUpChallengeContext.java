@@ -144,13 +144,13 @@ public class InitializeStepUpChallengeContext extends AbstractAuthenticationActi
 
         shibbolethContext = authenticationContext.getSubcontext(ShibbolethSpAuthenticationContext.class);
         if (shibbolethContext == null) {
-            log.debug("{} Could not get shib proxy context", getLogPrefix());
+            log.debug("{} could not get shib proxy context", getLogPrefix());
             ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EVENTID_MISSING_SHIBSPCONTEXT);
             
             return false;
         }
         if (stepUpMethods == null) {
-            log.debug("{} Bean not configured correctly, step up methods not set", getLogPrefix());
+            log.debug("{} bean not configured correctly, step up methods not set", getLogPrefix());
             ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EXCEPTION);
             
             return false;
@@ -170,28 +170,27 @@ public class InitializeStepUpChallengeContext extends AbstractAuthenticationActi
                 .hasNext();) {
             Entry<StepUpMethod, List<? extends Principal>> entry = it.next();
             StepUpMethod stepupMethod = entry.getKey();
-            log.debug("Initializing StepUp method and accounts for " + stepupMethod.getName());
+            log.debug("{} initializing StepUp method and accounts for {}",getLogPrefix(),stepupMethod.getName());
             try {
                 if (!stepupMethod.initialize(attributeContext)) {
-                    log.debug("Not able to initialize method " + stepupMethod.getName()
-                            + " removed from available methods");
+                    log.debug("{} not able to initialize method {} removed from available methods",getLogPrefix(), stepupMethod.getName());
                     it.remove();
                 }
             } catch (Exception e) {
-                log.debug("Something unexpected happened", getLogPrefix());
+                log.error("{} something unexpected happened", getLogPrefix());
                 log.error(e.getMessage());
                 ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EXCEPTION);
                 
                 return;
             }
         }
-        log.debug("Setting " + stepUpMethods.size() + " stepup methods to context");
+        log.debug("{} setting {} stepup methods to context",getLogPrefix(),stepUpMethods.size());
         stepUpMethodContext.setStepUpMethods(stepUpMethods);
         for (Entry<StepUpMethod, List<? extends Principal>> entry : stepUpMethods.entrySet()) {
             if (CollectionUtils.intersection(entry.getValue(), 
                     shibbolethContext.getInitialRequestedContext()).size() > 0) {
                 // We set the last iterated method as the method
-                log.debug("Setting method " + entry.getKey().getName() + " as default method");
+                log.debug("{} setting method {} as default method",getLogPrefix(),entry.getKey().getName());
                 stepUpMethodContext.setStepUpMethod(entry.getKey());
                 // That method has accounts
                 try {
@@ -199,9 +198,9 @@ public class InitializeStepUpChallengeContext extends AbstractAuthenticationActi
                         for (StepUpAccount account : entry.getKey().getAccounts()) {
                             // and the account is enabled
                             if (account.isEnabled()) {
-                                log.debug("Setting a default stepup account");
-                                log.debug("Account type is " + entry.getKey().getName());
-                                log.debug("Account name is " + (account.getName() == null ? "" : account.getName()));
+                                log.debug("{} setting a default stepup account",getLogPrefix());
+                                log.debug("Account type is {}",entry.getKey().getName());
+                                log.debug("Account name is {}",(account.getName() == null ? "" : account.getName()));
                                 stepUpMethodContext.setStepUpAccount(account);
                                 
                                 ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EVENTID_CONTINUE_STEPUP);
@@ -210,7 +209,7 @@ public class InitializeStepUpChallengeContext extends AbstractAuthenticationActi
                         }
                     }
                 } catch (Exception e) {
-                    log.debug("Something unexpected happened", getLogPrefix());
+                    log.debug("{} something unexpected happened", getLogPrefix());
                     log.error(e.getMessage());
                     ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EXCEPTION);
                     

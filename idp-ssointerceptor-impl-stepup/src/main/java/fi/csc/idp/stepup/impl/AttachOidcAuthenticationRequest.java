@@ -95,10 +95,10 @@ public class AttachOidcAuthenticationRequest extends AbstractProfileAction {
         }
         OidcStepUpContext oidcCtx = new OidcStepUpContext();
         profileRequestContext.addSubcontext(oidcCtx);
-        log.debug("Attaching inbound message to oidc stepup context {}",
+        log.debug("{} attaching inbound message to oidc stepup context {}",getLogPrefix(),
                 ((AuthenticationRequest) message).toQueryString());
         oidcCtx.setRequest((AuthenticationRequest) message);
-        log.debug("Setting issuer value to oidc stepup context {}", issuer);
+        log.debug("{} setting issuer value to oidc stepup context {}",getLogPrefix(), issuer);
         oidcCtx.setIssuer(issuer);
     }
 

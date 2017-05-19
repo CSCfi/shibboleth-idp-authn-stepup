@@ -184,7 +184,7 @@ public class RespondOidcMFARequest extends AbstractOidcProfileAction {
                     .getRedirectionURI(), new ErrorObject(getOidcCtx().getErrorCode(), getOidcCtx()
                     .getErrorDescription()), getOidcCtx().getRequest().getState(), getOidcCtx().getRequest()
                     .getResponseMode());
-            log.debug("constructed response:" + resp.toURI());
+            log.debug("{} constructed response: {}",getLogPrefix(),resp.toURI());
             getOidcCtx().setResponse(resp.toURI());
             srCtx.getRequestContext().getFlowScope().put(redirect, resp.toURI().toString());
             return;
@@ -238,7 +238,7 @@ public class RespondOidcMFARequest extends AbstractOidcProfileAction {
         State state = req.getState();
         AuthenticationSuccessResponse resp = new AuthenticationSuccessResponse(req.getRedirectionURI(), code, jwt,
                 null, state, null, req.getResponseMode());
-        log.debug("constructed response:" + resp.toURI());
+        log.debug("{} constructed response: {}",getLogPrefix(),resp.toURI());
         getOidcCtx().setResponse(resp.toURI());
         srCtx.getRequestContext().getFlowScope().put(redirect, resp.toURI().toString());
     }

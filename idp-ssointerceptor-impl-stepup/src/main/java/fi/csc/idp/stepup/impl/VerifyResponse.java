@@ -62,13 +62,13 @@ public class VerifyResponse extends AbstractExtractionAction {
         
         stepUpMethodContext = authenticationContext.getSubcontext(StepUpMethodContext.class);
         if (stepUpMethodContext == null) {
-            log.debug("{} Could not get shib proxy context", getLogPrefix());
+            log.debug("{} could not get shib proxy context", getLogPrefix());
             ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EVENTID_MISSING_STEPUPMETHODCONTEXT);
             
             return false;
         }
         if (stepUpMethodContext.getStepUpAccount() == null) {
-            log.debug("There is no chosen stepup account for user", getLogPrefix());
+            log.debug("{} there is no chosen stepup account for user", getLogPrefix());
             ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EVENTID_INVALID_USER);
             
             return false;
@@ -84,18 +84,18 @@ public class VerifyResponse extends AbstractExtractionAction {
         
         try {
             if (!stepUpMethodContext.getStepUpAccount().verifyResponse(null)) {
-                log.debug("User presented wrong response to  challenge", getLogPrefix());
+                log.debug("{} user presented wrong response to  challenge", getLogPrefix());
                 ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EVENTID_INVALID_RESPONSE);
                 
                 return;
             }
         } catch (FailureLimitReachedException e) {
-            log.debug("{} User response failed too many times", getLogPrefix());
+            log.debug("{} user response failed too many times", getLogPrefix());
             ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EVENTID_RESPONSE_LIMIT);
             
             return;
         } catch (Exception e) {
-            log.debug("User response evaluation failed", getLogPrefix());
+            log.debug("{} user response evaluation failed", getLogPrefix());
             ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EVENTID_INVALID_RESPONSE);
             
             return;

@@ -70,11 +70,11 @@ public class InitializeShibSPContext extends AbstractOidcProfileAction {
                 new ShibbolethSpAuthenticationContext(), true);
         List<Principal> requested = new ArrayList<Principal>();
         if (getOidcCtx().getRequest().getACRValues() == null) {
-            log.debug("no acr set in request");
+            log.debug("{} no acr set in request", getLogPrefix());
             return;
         }
         for (ACR acr : getOidcCtx().getRequest().getACRValues()) {
-            log.debug("Setting acr " + acr + " as requested AuthnContextClassRef");
+            log.debug("{} setting acr {} as requested AuthnContextClassRef", acr);
             requested.add(new AuthnContextClassRefPrincipal(acr.getValue()));
         }
         if (requested.size() > 0) {

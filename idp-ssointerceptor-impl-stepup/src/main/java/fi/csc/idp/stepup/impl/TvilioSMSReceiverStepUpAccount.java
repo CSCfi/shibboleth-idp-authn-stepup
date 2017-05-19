@@ -139,8 +139,7 @@ public class TvilioSMSReceiverStepUpAccount extends ChallengeSenderStepUpAccount
             Map.Entry<String, DateTime> usedMessage = it.next();
             long sent = usedMessage.getValue().toDate().getTime();
             if (current - sent > 2 * eventWindow) {
-                log.debug("Removing " + usedMessage.getKey() + " " + usedMessage.getValue()
-                        + " from the list of used verification messages");
+                log.debug("Removing {} {} from the list of used verification messages",usedMessage.getKey(),usedMessage.getValue());
                 it.remove();
             }
         }
@@ -162,53 +161,52 @@ public class TvilioSMSReceiverStepUpAccount extends ChallengeSenderStepUpAccount
     @Override
     public boolean verifyResponse(String response) throws Exception {
         
-        log.debug("Verificating totp response " + response);
+        log.debug("Verificating totp response {}",response);
         Twilio.init(accountSid, authToken);
 
         // We fetch all messages of past 24h
         DateTime rangeDateSentStart = new DateTime().minusDays(1);
-        log.debug("Searching for messages sent since " + rangeDateSentStart.toString());
+        log.debug("Searching for messages sent since {}",rangeDateSentStart.toString());
         for (int i = 0; i < numberOfChecks; i++) {
-            log.debug("locating messages");
+            log.debug("Locating messages");
             ResourceSet<Message> messages = Message.reader().setFrom(new PhoneNumber(getTarget()))
                     .setDateSent(rangeDateSentStart).read();
             for (Message message : messages) {
-                log.debug("message sid " + message.getSid());
+                log.debug("Message sid {}",message.getSid());
                 // has to be received by us, doublecheck
                 if (!(message.getDirection() == Direction.INBOUND)) {
-                    log.debug("message discarded, not inbound");
+                    log.debug("Message discarded, not inbound");
                     continue;
                 }
                 // has to match target, doublecheck
-                log.debug("located message from " + message.getFrom());
-                log.debug("Comparing to " + getTarget());
+                log.debug("Located message from {}", message.getFrom());
+                log.debug("Comparing to {}", getTarget());
                 if (!message.getFrom().equals(new PhoneNumber(getTarget()))) {
-                    log.debug("message discarded, not sent by user");
+                    log.debug("Message discarded, not sent by user");
                     continue;
                 }
                 long sent = message.getDateSent().toDate().getTime();
                 long current = new Date().getTime();
-                log.debug("message sent " + message.getDateSent().toDate());
+                log.debug("Message sent {}", message.getDateSent().toDate());
                 // message has to have been sent no more that eventWindow time
                 // before check
                 if (current - sent > eventWindow) {
-                    log.debug("message discarded, too old message");
+                    log.debug("Message discarded, too old message");
                     continue;
                 }
                 if (getChallenge().length() > 0 && (!getChallenge().equals(message.getBody()))) {
-                    log.debug("message discarded, challenge not replied");
+                    log.debug("Message discarded, challenge not replied");
                     continue;
                 }
                 
                 msgLock.lock();
                 if (usedMessages.containsKey(message.getSid())) {
                     msgLock.unlock();
-                    log.debug("message discarded, already used");
+                    log.debug("Message discarded, already used");
                     continue;
                 }
                 cleanMessages();
-                log.debug("Adding " + message.getSid() + " " + message.getDateSent()
-                        + " to the list of used verification messages");
+                log.debug("Adding {} {} to the list of used verification messages", message.getSid(),message.getDateSent() );
                 usedMessages.put(message.getSid(), message.getDateSent());
                 msgLock.unlock();
                 setVerified();

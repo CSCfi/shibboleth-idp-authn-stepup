@@ -100,11 +100,11 @@ public class TvilioSMSChallengeSender implements ChallengeSender {
             
             throw new Exception("bean not properly initialized");
         }
-        log.debug("Sending challenge " + challenge + " to " + target);
+        log.debug("Sending challenge {} to ",challenge,target);
         Twilio.init(accountSid, authToken);
         Message msg=Message.creator(new PhoneNumber(target), new PhoneNumber(senderNumber),
                 String.format(message, challenge)).create();
-        log.debug("message status "+msg.getStatus());
+        log.debug("Message status {}",msg.getStatus());
         if (msg.getStatus() == Status.FAILED || msg.getStatus() == Status.UNDELIVERED){
             throw new Exception("Message sending failed");
         }

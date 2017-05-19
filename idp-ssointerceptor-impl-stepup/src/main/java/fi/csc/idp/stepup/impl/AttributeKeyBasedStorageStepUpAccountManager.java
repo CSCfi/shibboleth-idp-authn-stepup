@@ -214,7 +214,7 @@ public class AttributeKeyBasedStorageStepUpAccountManager extends AbstractStepUp
     public boolean initialize(AttributeContext attributeContext) throws Exception {
 
         
-        log.debug("Adding accounts of type " + getName());
+        log.debug("Adding accounts of type {}", getName());
         key = null;
         getAccounts().clear();
         if (stepUpAccountStorage == null) {
@@ -246,11 +246,11 @@ public class AttributeKeyBasedStorageStepUpAccountManager extends AbstractStepUp
                     log.warn("No attribute value for " + attributeId);
                     continue;
                 }
-                log.debug("Adding accounts with key value " + key);
+                log.debug("Adding accounts with key value {}",key);
                 List<StepUpAccount> accounts = stepUpAccountStorage.getAccounts(key,
                         getAppContext().getBean(getAccountID()).getClass());
                 if (accounts != null && accounts.size() > 0) {
-                    log.debug("Adding " + accounts.size() + " accounts with key value " + key);
+                    log.debug("Adding {} accounts with key value {}", accounts.size(), key);
                     getAccounts().addAll(accounts);
                 }
             }

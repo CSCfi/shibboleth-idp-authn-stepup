@@ -139,8 +139,7 @@ public class ValidateRequestObjectOfOidcAuthenticationRequest extends AbstractOi
             Map.Entry<String, DateTime> usedMessage = it.next();
             long sent = usedMessage.getValue().toDate().getTime();
             if (current - sent > 2 * eventWindow) {
-                log.debug("Removing " + usedMessage.getKey() + " " + usedMessage.getValue()
-                        + " from the list of used verification messages");
+                log.debug("{} removing {} {} from the list of used verification messages", getLogPrefix(), usedMessage.getKey(), usedMessage.getValue());
                 it.remove();
             }
         }
@@ -169,7 +168,7 @@ public class ValidateRequestObjectOfOidcAuthenticationRequest extends AbstractOi
             // not a keyset? If it is is a RSA key we are happy
             JSONObject k = json;
             if ("RSA".equals(k.get("kty"))) {
-                log.debug("adding verification key " + k.toString());
+                log.debug("{} adding verification key {}",getLogPrefix(), k.toString());
                 keys.add(k);
             }
             
@@ -179,7 +178,7 @@ public class ValidateRequestObjectOfOidcAuthenticationRequest extends AbstractOi
             JSONObject k = (JSONObject) key;
             // in case of many keys, we pick all RSA signature keys
             if ("sig".equals(k.get("use")) && "RSA".equals(k.get("kty"))) {
-                log.debug("adding verification key " + k.toString());
+                log.debug("{} adding verification key {}",getLogPrefix(), k.toString());
                 
                 keys.add(k);
             }
@@ -365,7 +364,7 @@ public class ValidateRequestObjectOfOidcAuthenticationRequest extends AbstractOi
             return false;
         }
         cleanMessages();
-        log.debug("Adding " + state + " " + iat + " to the list of used verification messages");
+        log.debug("{} adding {} {} to the list of used verification messages",getLogPrefix(),state,iat);
         usedMessages.put(state.getValue(), new DateTime(iat));
         msgLock.unlock();
         getOidcCtx().setIdToken(idToken);

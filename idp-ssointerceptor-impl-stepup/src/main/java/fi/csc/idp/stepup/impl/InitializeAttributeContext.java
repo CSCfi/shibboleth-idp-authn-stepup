@@ -119,7 +119,7 @@ public class InitializeAttributeContext extends AbstractOidcProfileAction {
                     log.warn("claim " + key + " did not contain any values");
                     continue;
                 }
-                log.debug("Creating attribute " + claimToAttribute.get(key) + " with value(s):");
+                log.debug("{} creating attribute {} with value(s):", getLogPrefix(), claimToAttribute.get(key));
                 IdPAttribute attribute = new IdPAttribute(claimToAttribute.get(key));
                 List<StringAttributeValue> stringAttributeValues = new ArrayList<StringAttributeValue>();
                 for (String value : values) {

@@ -81,12 +81,12 @@ public class InitializeRelyingPartyContext extends AbstractOidcProfileAction {
     protected void doExecute(@Nonnull final ProfileRequestContext profileRequestContext) {
         final RelyingPartyContext rpContext = relyingPartyContextCreationStrategy.apply(profileRequestContext);
         if (rpContext == null) {
-            log.debug("{} Unable to locate or create RelyingPartyContext", getLogPrefix());
+            log.debug("{} unable to locate or create RelyingPartyContext", getLogPrefix());
             ActionSupport.buildEvent(profileRequestContext, IdPEventIds.INVALID_RELYING_PARTY_CTX);
             return;
         }
 
-        log.debug("{} Attaching RelyingPartyContext for rp {}", getLogPrefix(), getOidcCtx().getRequest().getClientID()
+        log.debug("{} attaching RelyingPartyContext for rp {}", getLogPrefix(), getOidcCtx().getRequest().getClientID()
                 .getValue());
         rpContext.setVerified(getOidcCtx().isRedirectUriValidated());
         rpContext.setRelyingPartyId(getOidcCtx().getRequest().getClientID().getValue());

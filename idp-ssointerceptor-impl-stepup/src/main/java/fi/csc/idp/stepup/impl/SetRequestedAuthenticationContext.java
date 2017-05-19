@@ -173,14 +173,14 @@ public class SetRequestedAuthenticationContext extends AbstractAuthenticationAct
         final ShibbolethSpAuthenticationContext shibbolethContext = authenticationContext
                 .getSubcontext(ShibbolethSpAuthenticationContext.class);
         if (shibbolethContext == null || shibbolethContext.getIdp() == null) {
-            log.debug("{} Could not get shib proxy context and provider id", getLogPrefix());
+            log.debug("{} could not get shib proxy context and provider id", getLogPrefix());
             ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EVENTID_MISSING_SHIBSPCONTEXT);
             
             return;
         }
         RelyingPartyContext rpCtx = profileRequestContext.getSubcontext(RelyingPartyContext.class, false);
         if (rpCtx == null || rpCtx.getRelyingPartyId() == null) {
-            log.debug("{} Could not get relying party context and sp entity id ", getLogPrefix());
+            log.debug("{} could not get relying party context and sp entity id ", getLogPrefix());
             ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EVENTID_INVALID_RPCONTEXT);
             
             return;
@@ -193,7 +193,7 @@ public class SetRequestedAuthenticationContext extends AbstractAuthenticationAct
             providedMethod = new AuthnContextDeclRefPrincipal(shibbolethContext.getContextDecl());
         }
         if (providedMethod == null) {
-            log.debug("{} Could not get authentication method ", getLogPrefix());
+            log.debug("{} could not get authentication method ", getLogPrefix());
             ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EVENTID_INVALID_SHIBSPCONTEXT);
             
             return;
@@ -204,7 +204,7 @@ public class SetRequestedAuthenticationContext extends AbstractAuthenticationAct
             mappedMethod = getDefaultMapping(shibbolethContext.getIdp(), rpCtx.getRelyingPartyId(), providedMethod);
         }
         if (mappedMethod != null) {
-            log.debug("Setting matching principal to {}", mappedMethod.getName());
+            log.debug("{} setting matching principal to {}", getLogPrefix(), mappedMethod.getName());
             RequestedPrincipalContext reqPrincipalContext = authenticationContext.getSubcontext(
                     RequestedPrincipalContext.class, true);
             reqPrincipalContext.setMatchingPrincipal(mappedMethod);
@@ -231,7 +231,7 @@ public class SetRequestedAuthenticationContext extends AbstractAuthenticationAct
             
             return null;
         }
-        log.debug("Searching a match for triplet {},{} and {}", idp, sp, method.getName());
+        log.debug("{} searching a match for triplet {},{} and {}", getLogPrefix(), idp, sp, method.getName());
         if (authMethodMap.containsKey(idp) && authMethodMap.get(idp) != null && authMethodMap.get(idp).containsKey(sp)
                 && authMethodMap.get(idp).get(sp) != null && authMethodMap.get(idp).get(sp).containsKey(method)) {
             
@@ -257,7 +257,7 @@ public class SetRequestedAuthenticationContext extends AbstractAuthenticationAct
         if (idp == null || sp == null || method == null || defaultValueMap == null) {
             return null;
         }
-        log.debug("Searching a match for pair {} and {}, provided method is {}", idp, sp, method.getName());
+        log.debug("{} searching a match for pair {} and {}, provided method is {}", getLogPrefix(), idp, sp, method.getName());
         if (defaultValueMap.containsKey(idp) && defaultValueMap.get(idp) != null
                 && defaultValueMap.get(idp).contains(sp)) {
             return method;
