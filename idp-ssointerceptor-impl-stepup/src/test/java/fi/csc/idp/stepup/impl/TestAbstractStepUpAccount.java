@@ -1,32 +1,32 @@
 package fi.csc.idp.stepup.impl;
 
-
 import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import fi.csc.idp.stepup.api.ChallengeGenerator;
 import fi.csc.idp.stepup.api.ChallengeVerifier;
+import fi.csc.idp.stepup.api.FailureLimitReachedException;
 
 public class TestAbstractStepUpAccount {
 
     private TestStepUpAccount testStepUpAccount;
     private ChallengeGen challengeGen;
     private ChallengeVer challengeVer;
-    
+
     @BeforeMethod
-    public void setUp()  {
+    public void setUp() {
         testStepUpAccount = new TestStepUpAccount();
         challengeGen = new ChallengeGen();
         challengeVer = new ChallengeVer();
     }
 
-    /** test default behavior*/
+    /** test default behavior */
     @Test
-    public void testUnitialized() throws Exception  {
+    public void testUnitialized() throws Exception {
         Assert.assertNull(testStepUpAccount.getChallenge());
         Assert.assertNull(testStepUpAccount.getName());
-        Assert.assertEquals(testStepUpAccount.getId(),0);
+        Assert.assertEquals(testStepUpAccount.getId(), 0);
         Assert.assertNull(testStepUpAccount.getTarget());
         Assert.assertTrue(testStepUpAccount.isEditable());
         Assert.assertTrue(!testStepUpAccount.isEnabled());
@@ -39,6 +39,7 @@ public class TestAbstractStepUpAccount {
         testStepUpAccount.setEnabled(true);
         testStepUpAccount.setEditable(false);
     }
+
     private void setValues2() {
         testStepUpAccount.setTarget("target2");
         testStepUpAccount.setName("name2");
@@ -46,30 +47,52 @@ public class TestAbstractStepUpAccount {
         testStepUpAccount.setEnabled(false);
         testStepUpAccount.setEditable(true);
     }
-    
-    /** test setters behavior*/
+
+    /** test setters behavior */
     @Test
-    public void testSetters() throws Exception  {
+    public void testSetters() throws Exception {
         setValues();
-        Assert.assertEquals(testStepUpAccount.getTarget(),"target");
-        Assert.assertEquals(testStepUpAccount.getName(),"name");
-        Assert.assertEquals(testStepUpAccount.getId(),1);
+        Assert.assertEquals(testStepUpAccount.getTarget(), "target");
+        Assert.assertEquals(testStepUpAccount.getName(), "name");
+        Assert.assertEquals(testStepUpAccount.getId(), 1);
         Assert.assertTrue(testStepUpAccount.isEnabled());
         Assert.assertTrue(!testStepUpAccount.isEditable());
-        //editing disabled, should not have any impact
+        // editing disabled, should not have any impact
         setValues2();
-        Assert.assertEquals(testStepUpAccount.getTarget(),"target");
-        Assert.assertEquals(testStepUpAccount.getName(),"name");
-        Assert.assertEquals(testStepUpAccount.getId(),1);
+        Assert.assertEquals(testStepUpAccount.getTarget(), "target");
+        Assert.assertEquals(testStepUpAccount.getName(), "name");
+        Assert.assertEquals(testStepUpAccount.getId(), 1);
         Assert.assertTrue(testStepUpAccount.isEnabled());
         Assert.assertTrue(!testStepUpAccount.isEditable());
-        
+
     }
-    
-    /** test challenge sender/generator behavior*/
+
     @Test
-    public void testChallengeGenerator()   {
-        boolean exceptionOccurred=false;
+    public void testRetrylimit() throws FailureLimitReachedException {
+        // uninitialized should not throw exception, ever
+        int i = 0;
+        int limit = 10;
+        for (; i < limit; i++) {
+            testStepUpAccount.verificationFailedCheck();
+        }
+        i = 0;
+        testStepUpAccount.setRetryLimit(limit);
+        for (; i < limit * 2; i++) {
+            try {
+                testStepUpAccount.verificationFailedCheck();
+            } catch (FailureLimitReachedException e) {
+                break;
+
+            }
+        }
+        // with 10 retries there is 11 tries
+        Assert.assertEquals(i, limit);
+    }
+
+    /** test challenge sender/generator behavior */
+    @Test
+    public void testChallengeGenerator() {
+        boolean exceptionOccurred = false;
         try {
             testStepUpAccount.sendChallenge();
         } catch (Exception e) {
@@ -86,11 +109,11 @@ public class TestAbstractStepUpAccount {
         Assert.assertTrue(!exceptionOccurred);
         Assert.assertEquals("challengeGenerated", testStepUpAccount.getChallenge());
     }
-    
-    /** test challenge verification behavior*/
+
+    /** test challenge verification behavior */
     @Test
-    public void testChallengeVerificator()   {
-        boolean exceptionOccurred=false;
+    public void testChallengeVerificator() {
+        boolean exceptionOccurred = false;
         try {
             testStepUpAccount.verifyResponse("response");
         } catch (Exception e) {
@@ -108,29 +131,27 @@ public class TestAbstractStepUpAccount {
         }
         Assert.assertTrue(!exceptionOccurred);
     }
-    
-        
+
     class TestStepUpAccount extends AbstractStepUpAccount {
-        
-        
+
     }
-    
+
     class ChallengeGen implements ChallengeGenerator {
 
         @Override
         public String generate(String target) throws Exception {
             return "challengeGenerated";
         }
-        
+
     }
-    
+
     class ChallengeVer implements ChallengeVerifier {
 
         @Override
         public boolean verify(String challenge, String response, String target) {
-            return response.equals("response")&&challenge.equals("challengeGenerated");
+            return response.equals("response") && challenge.equals("challengeGenerated");
         }
-        
+
     }
- 
+
 }
