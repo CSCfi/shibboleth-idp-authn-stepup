@@ -73,8 +73,6 @@ public class GenerateStepUpChallenge extends AbstractAuthenticationAction {
 
             return;
         }
-        ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EVENTID_CONTINUE_STEPUP);
-
     }
 
 }

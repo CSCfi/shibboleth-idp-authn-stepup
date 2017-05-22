@@ -4,6 +4,12 @@
 	xsi:schemaLocation="http://www.springframework.org/schema/webflow http://www.springframework.org/schema/webflow/spring-webflow.xsd"
 	parent="intercept.abstract">
 
+
+	<!-- Event though project structure suggests this is not a proper authentication 
+		flow. This flow performs mfa when invoked either from mfa oidc handler or 
+		by mfa interceptor. Successful termination via "proceed" end-state suggests 
+		that the user has been authenticated using mfa. -->
+
 	<!-- Rudimentary impediment to direct execution of subflow. -->
 	<input name="calledAsSubflow" type="boolean" required="true" />
 
@@ -11,22 +17,14 @@
 
 	<action-state id="InitializeStepUp">
 		<evaluate expression="InitializeStepUpChallengeContext" />
-		<transition on="ContinueStepUp" to="StepUp" />
-		<!-- internal eventid mapping error -->
-		<transition to="DisplayCondolences" />
-	</action-state>
-
-	<action-state id="StepUp">
 		<evaluate expression="GenerateStepUpChallenge" />
-		<!-- user does not meet preconditions to perform stepup, try executing 
-			registration -->
+		<evaluate expression="'proceed'" />
 		<transition on="InvalidUser" to="InitializeRegistration">
 			<set name="flowScope.regAction" value="'AddAccount'" type="string" />
 		</transition>
-		<transition on="ContinueStepUp" to="DirectToCorrectResponseType" />
-		<!-- REPLACE WITH GENERIC ERROR DISPLAY -->
-		<transition to="DisplayCondolences" />
+		<transition on="proceed" to="DirectToCorrectResponseType" />
 	</action-state>
+
 
 	<action-state id="DirectToCorrectResponseType">
 		<on-entry>
@@ -44,21 +42,16 @@
 				type="string" />
 		</transition>
 		<transition on="yes" to="PollInformation" />
-		<!-- REPLACE WITH GENERIC ERROR DISPLAY -->
-		<transition to="DisplayCondolences" />
 	</action-state>
 
-	<!-- TODO.. this action should reinit the authentication -->
 	<action-state id="AddAccount">
-		<on-entry>
-			<evaluate expression="InitializeStepUpChallengeContext" />
-		</on-entry>
+		<evaluate expression="InitializeStepUpChallengeContext" />
 		<evaluate expression="AddAccount" />
-		<transition on="ContinueStepUp" to="DisplayEnd">
+		<evaluate expression="'proceed'" />
+		<transition on="proceed" to="DisplayEnd">
 			<set name="flowScope.viewName" value="flowRequestContext.activeFlow.id+'-performed'"
 				type="string" />
 		</transition>
-		<transition to="DisplayCondolences" />
 	</action-state>
 
 	<action-state id="VerifyPasswordFromFormRequest">
@@ -66,27 +59,28 @@
 			<set name="flowScope.verifyResponseFailed" value="false" type="boolean" />
 		</on-entry>
 		<evaluate expression="VerifyPasswordFromFormRequest" />
-		<transition on="ContinueStepUp" to="proceed" />
-		<transition to="DisplayChallenge">
+		<evaluate expression="'proceed'" />
+		<transition on="proceed" to="proceed" />
+		<transition on="StepUpWrongResponse" to="DisplayChallenge">
 			<set name="flowScope.verifyResponseFailed" value="true" type="boolean" />
 		</transition>
+		<transition on="StepUpLimitReached" to="DisplayWrongResponse" />
 	</action-state>
 
 	<action-state id="UpdateAccount">
 		<evaluate expression="UpdateAccount" />
-		<transition on="ContinueStepUp" to="ManageAccounts">
+		<evaluate expression="'proceed'" />
+		<transition on="proceed" to="ManageAccounts">
 			<set name="flowScope.accountUpdated" value="true" type="boolean" />
 		</transition>
-		<transition to="DisplayCondolences" />
 	</action-state>
 
 	<action-state id="VerifyResponse">
 		<evaluate expression="VerifyResponse" />
-		<transition on="ContinueStepUp" to="proceed" />
-		<transition to="DisplayWrongResponse">
-			<set name="flowScope.proceedAction" value="'InitializeStepUp'"
-				type="string" />
-		</transition>
+		<evaluate expression="'proceed'" />
+		<transition on="proceed" to="proceed" />
+		<!-- Multiple tries not supported yet for backend check -->
+		<transition on="StepUpWrongResponse" to="DisplayWrongResponse" />
 	</action-state>
 
 	<!-- this action may be used if execution requires backend still to check 
@@ -101,39 +95,34 @@
 			expression="authenticationContext.getSubcontext(T(fi.csc.idp.stepup.api.StepUpMethodContext)).getStepUpAccount().isVerified() == true" />
 		<transition on="no" to="DisplayCondolences" />
 		<transition on="yes" to="proceed" />
-		<!-- REPLACE WITH GENERIC ERROR DISPLAY -->
-		<transition to="DisplayCondolences" />
 	</action-state>
 
 	<!-- stepup execution STOP -->
 
 	<!-- registration execution START -->
-	<!-- TODO.. try to get rid of separate registration steps -->
 
 	<action-state id="InitializeRegistration">
 		<evaluate expression="InitializeRegistrationStepUpChallengeContext" />
-		<transition on="ContinueStepUp" to="DisplayInformation">
+		<evaluate expression="'proceed'" />
+		<transition on="proceed" to="DisplayInformation">
 			<set name="flowScope.viewName" value="flowRequestContext.activeFlow.id+'-startregister'"
 				type="string" />
 			<set name="flowScope.proceedAction" value="'RegistrationStepUp'"
 				type="string" />
 		</transition>
-		<!-- internal eventid mapping error -->
-		<transition to="DisplayCondolences" />
 	</action-state>
 
 	<action-state id="RegistrationStepUp">
 		<evaluate expression="GenerateStepUpChallenge" />
+		<evaluate expression="'proceed'" />
 		<!-- user does not meet preconditions to perform stepup -->
 		<transition on="InvalidUser" to="DisplayCondolences" />
-		<transition on="ContinueStepUp" to="DisplayChallenge">
+		<transition on="proceed" to="DisplayChallenge">
 			<set name="flowScope.viewName" value="flowRequestContext.activeFlow.id+'-register'"
 				type="string" />
 			<set name="flowScope.proceedAction" value="'VerifyRegistrationPasswordFromFormRequest'"
 				type="string" />
 		</transition>
-		<!-- REPLACE WITH GENERIC ERROR DISPLAY -->
-		<transition to="DisplayCondolences" />
 	</action-state>
 
 	<action-state id="VerifyRegistrationPasswordFromFormRequest">
@@ -141,10 +130,12 @@
 			<set name="flowScope.verifyRegResponseFailed" value="false" type="boolean" />
 		</on-entry>
 		<evaluate expression="VerifyPasswordFromFormRequest" />
-		<transition on="ContinueStepUp" to="#{flowScope.regAction}" />
-		<transition to="DisplayChallenge">
-			<set name="flowScope.verifyRegResponseFailed" value="true" type="boolean" />
+		<evaluate expression="'proceed'" />
+		<transition on="proceed" to="#{flowScope.regAction}" />
+		<transition on="StepUpWrongResponse" to="DisplayChallenge">
+			<set name="flowScope.verifyResponseFailed" value="true" type="boolean" />
 		</transition>
+		<transition on="StepUpLimitReached" to="DisplayWrongResponse" />
 	</action-state>
 
 	<!-- registration execution END -->
@@ -362,7 +353,7 @@
 				expression="flowRequestContext.getExternalContext().getNativeResponse()"
 				result="viewScope.response" />
 		</on-render>
-		<!-- Is not continuing enough? -->
+		<transition to="HandleErrorLocally" />
 	</view-state>
 
 	<view-state id="DisplayWrongResponse"
@@ -389,11 +380,36 @@
 				expression="flowRequestContext.getExternalContext().getNativeResponse()"
 				result="viewScope.response" />
 		</on-render>
+		<transition to="HandleErrorLocally" />
 	</view-state>
 
 	<!-- views END -->
 
+	<!-- Passthrough state if an exception is thrown. -->
+	<action-state id="LogRuntimeException">
+		<on-entry>
+			<evaluate
+				expression="T(org.slf4j.LoggerFactory).getLogger('net.shibboleth.idp.saml.profile').error('Uncaught runtime exception', flowExecutionException.getCause())" />
+		</on-entry>
+		<evaluate expression="'RuntimeException'" />
+		<transition to="DisplayCondolences" />
+	</action-state>
+
+	<!-- end state after error display -->
+	<end-state id="HandleErrorLocally">
+		<on-entry>
+			<evaluate expression="RecordResponseComplete" />
+		</on-entry>
+	</end-state>
+
+	<!-- Successful end state -->
 	<end-state id="proceed" />
+
+	<!-- all unhandled non proceed results are turned into errors -->
+	<global-transitions>
+		<transition on-exception="java.lang.RuntimeException" to="LogRuntimeException" />
+		<transition on="#{!'proceed'.equals(currentEvent.id)}" to="DisplayCondolences" />
+	</global-transitions>
 
 	<bean-import resource="mfa-beans.xml" />
 

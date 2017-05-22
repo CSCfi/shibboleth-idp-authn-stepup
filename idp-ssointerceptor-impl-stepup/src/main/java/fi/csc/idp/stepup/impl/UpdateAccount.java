@@ -106,28 +106,24 @@ public class UpdateAccount extends AbstractExtractionAction {
         if (request == null) {
             log.debug("{} profile action does not contain an HttpServletRequest", getLogPrefix());
             ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EXCEPTION);
-
             return;
         }
         final String updateValue = request.getParameter(updateParameter);
         if (updateValue == null) {
             log.debug("{} no update value found", getLogPrefix());
             ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EVENTID_INVALID_RESPONSE);
-
             return;
         }
         String[] updateCommand = updateValue.split(":");
         if (updateCommand.length != 3) {
             log.debug("{} the command should have 3 parts", getLogPrefix());
             ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EXCEPTION);
-
             return;
         }
         String method = updateCommand[0];
         if (method == null || method.isEmpty()) {
             log.debug("{} method cannot be empty or null", getLogPrefix());
             ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EXCEPTION);
-
             return;
         }
         long id = -1;
@@ -142,7 +138,6 @@ public class UpdateAccount extends AbstractExtractionAction {
         if (command == null || command.isEmpty()) {
             log.debug("{} command cannot be empty or null", getLogPrefix());
             ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EXCEPTION);
-
             return;
         }
         // locating account
@@ -173,12 +168,9 @@ public class UpdateAccount extends AbstractExtractionAction {
             log.debug("{} unexpected exception occurred", getLogPrefix());
             log.error(e.getMessage());
             ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EXCEPTION);
-
             return;
         }
         log.debug("{} update value to be interpreted is {}", getLogPrefix(), updateValue);
-        ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EVENTID_CONTINUE_STEPUP);
-
     }
 
     // Checkstyle: CyclomaticComplexity OFF
@@ -234,7 +226,6 @@ public class UpdateAccount extends AbstractExtractionAction {
             method.removeAccount(account);
             break;
         default:
-
             throw new Exception("Unsupported command");
         }
 

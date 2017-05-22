@@ -10,6 +10,7 @@ import org.opensaml.profile.context.ProfileRequestContext;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.webflow.execution.Event;
 import org.springframework.webflow.execution.RequestContext;
+import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -116,7 +117,7 @@ public class TestVerifyResponse {
         ctx.addSubcontext(stepUpContext, true);
         action.initialize();
         final Event event = action.execute(src);
-        ActionTestingSupport.assertEvent(event, StepUpEventIds.EVENTID_CONTINUE_STEPUP);
+        Assert.assertNull(event);
     }
 
 }

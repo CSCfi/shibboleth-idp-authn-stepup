@@ -63,13 +63,11 @@ public class VerifyResponse extends AbstractExtractionAction {
         if (stepUpMethodContext == null) {
             log.debug("{} could not get shib proxy context", getLogPrefix());
             ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EVENTID_MISSING_STEPUPMETHODCONTEXT);
-
             return false;
         }
         if (stepUpMethodContext.getStepUpAccount() == null) {
             log.debug("{} there is no chosen stepup account for user", getLogPrefix());
             ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EVENTID_INVALID_USER);
-
             return false;
         }
         return super.doPreExecute(profileRequestContext, authenticationContext);
@@ -84,7 +82,6 @@ public class VerifyResponse extends AbstractExtractionAction {
             if (!stepUpMethodContext.getStepUpAccount().verifyResponse(null)) {
                 log.debug("{} user presented wrong response to  challenge", getLogPrefix());
                 ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EVENTID_INVALID_RESPONSE);
-
                 return;
             }
         } catch (FailureLimitReachedException e) {
@@ -95,11 +92,8 @@ public class VerifyResponse extends AbstractExtractionAction {
         } catch (Exception e) {
             log.debug("{} user response evaluation failed", getLogPrefix());
             ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EVENTID_INVALID_RESPONSE);
-
             return;
         }
-        ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EVENTID_CONTINUE_STEPUP);
-
     }
 
 }

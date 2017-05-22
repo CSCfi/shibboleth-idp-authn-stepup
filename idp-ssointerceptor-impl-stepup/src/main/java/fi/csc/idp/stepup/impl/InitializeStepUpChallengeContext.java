@@ -137,7 +137,6 @@ public class InitializeStepUpChallengeContext extends AbstractAuthenticationActi
         if (attributeContext == null) {
             log.error("{} unable to locate attribute context", getLogPrefix());
             ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EVENTID_MISSING_ATTRIBUTECONTEXT);
-
             return false;
         }
 
@@ -145,13 +144,12 @@ public class InitializeStepUpChallengeContext extends AbstractAuthenticationActi
         if (shibbolethContext == null) {
             log.debug("{} could not get shib proxy context", getLogPrefix());
             ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EVENTID_MISSING_SHIBSPCONTEXT);
-
             return false;
         }
+
         if (stepUpMethods == null) {
             log.debug("{} bean not configured correctly, step up methods not set", getLogPrefix());
             ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EXCEPTION);
-
             return false;
         }
 
@@ -180,7 +178,6 @@ public class InitializeStepUpChallengeContext extends AbstractAuthenticationActi
                 log.error("{} something unexpected happened", getLogPrefix());
                 log.error(e.getMessage());
                 ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EXCEPTION);
-
                 return;
             }
         }
@@ -201,8 +198,6 @@ public class InitializeStepUpChallengeContext extends AbstractAuthenticationActi
                                 log.debug("Account type is {}", entry.getKey().getName());
                                 log.debug("Account name is {}", (account.getName() == null ? "" : account.getName()));
                                 stepUpMethodContext.setStepUpAccount(account);
-
-                                ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EVENTID_CONTINUE_STEPUP);
                                 return;
                             }
                         }
@@ -211,15 +206,12 @@ public class InitializeStepUpChallengeContext extends AbstractAuthenticationActi
                     log.debug("{} something unexpected happened", getLogPrefix());
                     log.error(e.getMessage());
                     ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EXCEPTION);
-
                     return;
                 }
 
             }
         }
         // No default account automatically chosen
-
-        ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EVENTID_CONTINUE_STEPUP);
     }
     // Checkstyle: CyclomaticComplexity ON
 }

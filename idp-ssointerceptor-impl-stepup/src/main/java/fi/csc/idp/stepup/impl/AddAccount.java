@@ -59,13 +59,11 @@ public class AddAccount extends AbstractAuthenticationAction {
         if (stepUpMethodContext == null) {
             log.error("{} could not get shib proxy context", getLogPrefix());
             ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EVENTID_MISSING_STEPUPMETHODCONTEXT);
-
             return;
         }
         if (stepUpMethodContext.getStepUpMethod() == null) {
             log.error("{} no default stepup method available for user", getLogPrefix());
             ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EVENTID_INVALID_USER);
-
             return;
         }
         log.debug("{} adding a stepup account of type {}", getLogPrefix(), stepUpMethodContext.getStepUpMethod()
@@ -76,19 +74,15 @@ public class AddAccount extends AbstractAuthenticationAction {
         } catch (Exception e) {
             log.error("{} account creation failed for unexpected reason", getLogPrefix());
             ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EXCEPTION);
-
             return;
         }
         if (account == null) {
             log.error("{} could not create new stepup account for user", getLogPrefix());
             ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EXCEPTION);
-
             return;
         }
         // We set the account as active
         stepUpMethodContext.setStepUpAccount(account);
-        ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EVENTID_CONTINUE_STEPUP);
-
     }
 
 }

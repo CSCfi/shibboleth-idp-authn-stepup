@@ -84,7 +84,7 @@ public class TestGenerateStepUpChallenge {
         action.initialize();
         final Event event = action.execute(src);
         Assert.assertEquals("challengeGenerated", sentChallenge);
-        ActionTestingSupport.assertEvent(event, StepUpEventIds.EVENTID_CONTINUE_STEPUP);
+        Assert.assertNull(event);
     }
 
     class ChallengeGen implements ChallengeGenerator {

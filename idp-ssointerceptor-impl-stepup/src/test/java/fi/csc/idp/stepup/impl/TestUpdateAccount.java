@@ -198,7 +198,7 @@ public class TestUpdateAccount {
         action.initialize();
         final Event event = action.execute(src);
         Assert.assertEquals(method.getAccounts().get(0).getName(), "newname");
-        ActionTestingSupport.assertEvent(event, StepUpEventIds.EVENTID_CONTINUE_STEPUP);
+        Assert.assertNull(event);
     }
 
     /**
@@ -224,7 +224,7 @@ public class TestUpdateAccount {
         action.initialize();
         final Event event = action.execute(src);
         Assert.assertEquals(method.getAccounts().size(), 2);
-        ActionTestingSupport.assertEvent(event, StepUpEventIds.EVENTID_CONTINUE_STEPUP);
+        Assert.assertNull(event);
     }
 
     class MockMethod implements StepUpMethod {
