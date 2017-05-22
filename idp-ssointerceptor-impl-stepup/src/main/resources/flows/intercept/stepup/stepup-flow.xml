@@ -10,31 +10,25 @@
 	<action-state id="CheckNeed">
 		<evaluate expression="CheckRequestedAuthenticationContext" />
 		<!-- As stepup is not requested we move to setting the method -->
+		<evaluate expression="'proceed'" />
 		<transition on="AuthnContextNotStepUp" to="SetMethod" />
-		<!-- As stepup is requested we first check if it is provided already -->
-		<transition on="ContinueStepUp" to="CheckProvidedAuthenticationContext" />
-		<!-- internal eventid mapping error -->
-		<transition to="DisplayCondolences" />
+		<transition on="proceed" to="CheckProvidedAuthenticationContext" />
 	</action-state>
 
 	<action-state id="SetMethod">
 		<!-- We set the authentication metohd to mapped value if it exists -->
 		<evaluate expression="SetRequestedAuthenticationContext" />
-		<!-- end stepup manipulation -->
-		<transition on="ContinueStepUp" to="proceed" />
-		<!-- internal eventid mapping error -->
-		<transition to="DisplayCondolences" />
+		<evaluate expression="'proceed'" />
+		<transition on="proceed" to="proceed" />
 	</action-state>
 
 	<action-state id="CheckProvidedAuthenticationContext">
 		<evaluate expression="CheckProvidedAuthenticationContext" />
+		<evaluate expression="'proceed'" />
 		<!-- actions states that provided authentication method value can be regarded 
 			as step up -->
 		<transition on="AuthnContextStepUp" to="proceed" />
-		<!-- provided value cannot be regarded as stepup, move to stepuup -->
-		<transition on="ContinueStepUp" to="PerformStepUp" />
-		<!-- internal eventid mapping error -->
-		<transition to="DisplayCondolences" />
+		<transition on="proceed" to="PerformStepUp" />
 	</action-state>
 
 	<subflow-state id="PerformStepUp" subflow="authn/mfa">
@@ -42,7 +36,52 @@
 		<transition to="proceed" />
 	</subflow-state>
 
+	<!-- Error and end handling starts -->
+
+	<!-- Error view -->
+	<view-state id="DisplayError" view="#{flowRequestContext.activeFlow.id}-error">
+		<on-render>
+			<evaluate expression="environment" result="viewScope.environment" />
+			<evaluate expression="opensamlProfileRequestContext" result="viewScope.profileRequestContext" />
+			<evaluate
+				expression="T(net.shibboleth.utilities.java.support.codec.HTMLEncoder)"
+				result="viewScope.encoder" />
+			<evaluate
+				expression="flowRequestContext.getExternalContext().getNativeRequest()"
+				result="viewScope.request" />
+			<evaluate
+				expression="flowRequestContext.getExternalContext().getNativeResponse()"
+				result="viewScope.response" />
+		</on-render>
+		<transition to="HandleErrorLocally" />
+	</view-state>
+
+	<!-- end state after error display -->
+	<end-state id="HandleErrorLocally">
+		<on-entry>
+			<evaluate expression="RecordResponseComplete" />
+		</on-entry>
+	</end-state>
+
+	<!-- Passthrough state if an exception is thrown. -->
+	<action-state id="LogRuntimeException">
+		<on-entry>
+			<evaluate
+				expression="T(org.slf4j.LoggerFactory).getLogger('net.shibboleth.idp.saml.profile').error('Uncaught runtime exception', flowExecutionException.getCause())" />
+		</on-entry>
+		<evaluate expression="'RuntimeException'" />
+		<transition to="DisplayError" />
+	</action-state>
+
+	<!-- Successful end state -->
 	<end-state id="proceed" />
+
+	<!-- all unhandled non proceed results are turned into errors -->
+	<global-transitions>
+		<transition on-exception="java.lang.RuntimeException" to="LogRuntimeException" />
+		<transition on="#{!'proceed'.equals(currentEvent.id)}" to="DisplayError" />
+	</global-transitions>
+
 	<bean-import resource="stepup-beans.xml" />
 
 </flow>
