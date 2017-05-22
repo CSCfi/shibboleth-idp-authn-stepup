@@ -12,6 +12,7 @@ import net.shibboleth.utilities.java.support.component.ComponentInitializationEx
 import org.opensaml.profile.context.ProfileRequestContext;
 import org.springframework.webflow.execution.Event;
 import org.springframework.webflow.execution.RequestContext;
+import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -85,7 +86,7 @@ public class TestCheckProvidedAuthenticationContext {
         ctx.addSubcontext(sCtx,true);
         action.initialize();
         final Event event=action.execute(src);
-        ActionTestingSupport.assertEvent(event, StepUpEventIds.EVENTID_CONTINUE_STEPUP);
+        Assert.assertNull(event);
     }
     
     /**  Test a case where there is not any whitelisted values for idp  */
@@ -102,7 +103,7 @@ public class TestCheckProvidedAuthenticationContext {
         action.setTrustedStepupProviders(stepupProviders);
         action.initialize();
         final Event event=action.execute(src);
-        ActionTestingSupport.assertEvent(event, StepUpEventIds.EVENTID_CONTINUE_STEPUP);
+        Assert.assertNull(event);
     }
     
     /**  Test a case where there is not matching value for idp  */
@@ -119,7 +120,7 @@ public class TestCheckProvidedAuthenticationContext {
         action.setTrustedStepupProviders(stepupProviders);
         action.initialize();
         final Event event=action.execute(src);
-        ActionTestingSupport.assertEvent(event, StepUpEventIds.EVENTID_CONTINUE_STEPUP);
+        Assert.assertNull(event);
     }
     
     /**  Test a case where there is matching value for idp  */

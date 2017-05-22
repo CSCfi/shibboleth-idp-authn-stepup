@@ -2,7 +2,6 @@ package fi.csc.idp.stepup.impl;
 
 import java.security.Principal;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import net.shibboleth.utilities.java.support.component.ComponentInitializationException;
@@ -10,6 +9,7 @@ import net.shibboleth.utilities.java.support.component.ComponentInitializationEx
 import org.opensaml.profile.context.ProfileRequestContext;
 import org.springframework.webflow.execution.Event;
 import org.springframework.webflow.execution.RequestContext;
+import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -69,7 +69,8 @@ public class TestCheckRequestedAuthenticationContext {
     /**  Test that action copes with shibboleth context having no initial requested principals list present */
     @Test public void testPartialShibbolethContext() throws ComponentInitializationException {
         AuthenticationContext ctx=(AuthenticationContext)prc.addSubcontext(new AuthenticationContext(), true);
-        ctx.addSubcontext(new ShibbolethSpAuthenticationContext(),true);
+        ShibbolethSpAuthenticationContext shibspCtx=(ShibbolethSpAuthenticationContext)ctx.addSubcontext(new ShibbolethSpAuthenticationContext(),true);
+        shibspCtx.setIdp("idp");
         action.initialize();
         final Event event=action.execute(src);
         ActionTestingSupport.assertEvent(event, StepUpEventIds.EVENTID_AUTHNCONTEXT_NOT_STEPUP);
@@ -79,6 +80,7 @@ public class TestCheckRequestedAuthenticationContext {
     @Test public void testNoRequested() throws ComponentInitializationException {
         AuthenticationContext ctx=(AuthenticationContext)prc.addSubcontext(new AuthenticationContext(), true);
         ShibbolethSpAuthenticationContext shibspCtx=(ShibbolethSpAuthenticationContext)ctx.addSubcontext(new ShibbolethSpAuthenticationContext(),true);
+        shibspCtx.setIdp("idp");
         shibspCtx.setInitialRequestedContext(new ArrayList<Principal>());
         action.initialize();
         final Event event=action.execute(src);
@@ -99,7 +101,7 @@ public class TestCheckRequestedAuthenticationContext {
         stepups.add(decl2);
         stepups.add(class3);
         stepups.add(class4);
-        
+        shibspCtx.setIdp("idp");
         shibspCtx.setInitialRequestedContext(requested);
         action.setStepupMethods(stepups);
         action.initialize();
@@ -111,6 +113,7 @@ public class TestCheckRequestedAuthenticationContext {
     @Test public void testMatchingPrincipals() throws ComponentInitializationException {
         AuthenticationContext ctx=(AuthenticationContext)prc.addSubcontext(new AuthenticationContext(), true);
         ShibbolethSpAuthenticationContext shibspCtx=(ShibbolethSpAuthenticationContext)ctx.addSubcontext(new ShibbolethSpAuthenticationContext(),true);
+        shibspCtx.setIdp("idp");
         AuthnContextClassRefPrincipal localClass4=new AuthnContextClassRefPrincipal("test4");
         List<Principal> requested=new ArrayList<Principal>();
         List<Principal> stepups=new ArrayList<Principal>();
@@ -123,7 +126,7 @@ public class TestCheckRequestedAuthenticationContext {
         action.setStepupMethods(stepups);
         action.initialize();
         final Event event=action.execute(src);
-        ActionTestingSupport.assertEvent(event, StepUpEventIds.EVENTID_CONTINUE_STEPUP);
+        Assert.assertNull(event);
     }
     
 }

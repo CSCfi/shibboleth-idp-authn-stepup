@@ -110,7 +110,7 @@ public class TestSetRequestedAuthenticationContext {
         reqPrincipalContext.setMatchingPrincipal(initialRef);
         final Event event=action.execute(src);
         Assert.assertEquals(initialRef,reqPrincipalContext.getMatchingPrincipal());      
-        ActionTestingSupport.assertEvent(event, StepUpEventIds.EVENTID_CONTINUE_STEPUP);
+        Assert.assertNull(event);
     }
     
     private  Map<String,List<String>> getEmptyDefaultMap(){
@@ -177,7 +177,7 @@ public class TestSetRequestedAuthenticationContext {
         reqPrincipalContext.setMatchingPrincipal(initialRef);
         final Event event=action.execute(src);
         Assert.assertEquals(initialRef,reqPrincipalContext.getMatchingPrincipal());      
-        ActionTestingSupport.assertEvent(event, StepUpEventIds.EVENTID_CONTINUE_STEPUP);
+        Assert.assertNull(event);
     }
     
     /**  test action with basic success case, initialized but only with broken default map  */
@@ -195,7 +195,7 @@ public class TestSetRequestedAuthenticationContext {
         reqPrincipalContext.setMatchingPrincipal(initialRef);
         final Event event=action.execute(src);
         Assert.assertEquals(initialRef,reqPrincipalContext.getMatchingPrincipal());      
-        ActionTestingSupport.assertEvent(event, StepUpEventIds.EVENTID_CONTINUE_STEPUP);
+        Assert.assertNull(event);
     }
     
     /**  test action with basic success case, mapping instructs to use the value provided by idp  */
@@ -214,7 +214,7 @@ public class TestSetRequestedAuthenticationContext {
         reqPrincipalContext.setMatchingPrincipal(initialRef);
         final Event event=action.execute(src);
         Assert.assertEquals(sCtx.getContextClass(),reqPrincipalContext.getMatchingPrincipal().getName());      
-        ActionTestingSupport.assertEvent(event, StepUpEventIds.EVENTID_CONTINUE_STEPUP);
+        Assert.assertNull(event);
     }
     
     /**  test action with basic success case, method mapping is empty but default is valid  */
@@ -234,7 +234,7 @@ public class TestSetRequestedAuthenticationContext {
         reqPrincipalContext.setMatchingPrincipal(initialRef);
         final Event event=action.execute(src);
         Assert.assertEquals(sCtx.getContextClass(),reqPrincipalContext.getMatchingPrincipal().getName());      
-        ActionTestingSupport.assertEvent(event, StepUpEventIds.EVENTID_CONTINUE_STEPUP);
+        Assert.assertNull(event);
     }
     
     /**  test action with basic success case, method mapping is empty but default is valid  */
@@ -254,7 +254,7 @@ public class TestSetRequestedAuthenticationContext {
         reqPrincipalContext.setMatchingPrincipal(initialRef);
         final Event event=action.execute(src);
         Assert.assertEquals(sCtx.getContextClass(),reqPrincipalContext.getMatchingPrincipal().getName());      
-        ActionTestingSupport.assertEvent(event, StepUpEventIds.EVENTID_CONTINUE_STEPUP);
+        Assert.assertNull(event);
     }
     
     /**  test action with success case, method mapping and default exist and are valid  */
@@ -274,6 +274,6 @@ public class TestSetRequestedAuthenticationContext {
         reqPrincipalContext.setMatchingPrincipal(initialRef);
         final Event event=action.execute(src);
         Assert.assertEquals("IdPResponse2",reqPrincipalContext.getMatchingPrincipal().getName());      
-        ActionTestingSupport.assertEvent(event, StepUpEventIds.EVENTID_CONTINUE_STEPUP);
+        Assert.assertNull(event);
     }
 }

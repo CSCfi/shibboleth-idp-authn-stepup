@@ -27,21 +27,15 @@ import java.security.Principal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import javax.annotation.Nonnull;
-
-import net.shibboleth.idp.authn.AbstractAuthenticationAction;
 import net.shibboleth.idp.authn.context.AuthenticationContext;
 import net.shibboleth.idp.saml.authn.principal.AuthnContextClassRefPrincipal;
 import net.shibboleth.idp.saml.authn.principal.AuthnContextDeclRefPrincipal;
-
 import org.opensaml.profile.action.ActionSupport;
 import org.opensaml.profile.context.ProfileRequestContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import fi.csc.idp.stepup.api.StepUpEventIds;
-import fi.okm.mpass.shibboleth.authn.context.ShibbolethSpAuthenticationContext;
 
 /**
  * This action is performed always in a phase where need for step up has already
@@ -54,7 +48,7 @@ import fi.okm.mpass.shibboleth.authn.context.ShibbolethSpAuthenticationContext;
  * 
  */
 @SuppressWarnings("rawtypes")
-public class CheckProvidedAuthenticationContext extends AbstractAuthenticationAction {
+public class CheckProvidedAuthenticationContext extends AbstractShibSPAction {
 
     /** Class logger. */
     @Nonnull
@@ -86,37 +80,26 @@ public class CheckProvidedAuthenticationContext extends AbstractAuthenticationAc
     protected void doExecute(@Nonnull final ProfileRequestContext profileRequestContext,
             @Nonnull final AuthenticationContext authenticationContext) {
 
-        final ShibbolethSpAuthenticationContext shibbolethContext = authenticationContext
-                .getSubcontext(ShibbolethSpAuthenticationContext.class);
-        if (shibbolethContext == null || shibbolethContext.getIdp() == null) {
-            log.debug("{} could not get shib proxy context", getLogPrefix());
-            ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EVENTID_MISSING_SHIBSPCONTEXT);
-
-            return;
-        }
         Principal providedMethod = null;
-        if (shibbolethContext.getContextClass() != null) {
-            providedMethod = new AuthnContextClassRefPrincipal(shibbolethContext.getContextClass());
-        } else if (shibbolethContext.getContextDecl() != null) {
-            providedMethod = new AuthnContextDeclRefPrincipal(shibbolethContext.getContextDecl());
+        if (getShibSPCtx().getContextClass() != null) {
+            providedMethod = new AuthnContextClassRefPrincipal(getShibSPCtx().getContextClass());
+        } else if (getShibSPCtx().getContextDecl() != null) {
+            providedMethod = new AuthnContextDeclRefPrincipal(getShibSPCtx().getContextDecl());
         }
         if (providedMethod == null) {
-            log.debug("{} could not get authentication method ", getLogPrefix());
+            log.error("{} could not get authentication method ", getLogPrefix());
             ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EVENTID_INVALID_SHIBSPCONTEXT);
-
             return;
         }
-        if (trustedStepupProviders == null || !trustedStepupProviders.containsKey(shibbolethContext.getIdp())) {
-            ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EVENTID_CONTINUE_STEPUP);
-
+        if (trustedStepupProviders == null || !trustedStepupProviders.containsKey(getShibSPCtx().getIdp())) {
             return;
         }
-        if (trustedStepupProviders.get(shibbolethContext.getIdp()).contains(providedMethod)) {
+        if (trustedStepupProviders.get(getShibSPCtx().getIdp()).contains(providedMethod)) {
             // The provided value is treated as step up, step up not performed
             ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EVENTID_AUTHNCONTEXT_STEPUP);
             return;
         }
-        ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EVENTID_CONTINUE_STEPUP);
+        return;
 
     }
 

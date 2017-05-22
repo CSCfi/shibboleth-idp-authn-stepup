@@ -28,7 +28,6 @@ import java.util.Collection;
 import java.util.List;
 import javax.annotation.Nonnull;
 import javax.security.auth.Subject;
-import net.shibboleth.idp.authn.AbstractAuthenticationAction;
 import net.shibboleth.idp.authn.context.AuthenticationContext;
 import net.shibboleth.utilities.java.support.annotation.constraint.NonnullElements;
 import net.shibboleth.utilities.java.support.component.ComponentSupport;
@@ -40,7 +39,6 @@ import org.slf4j.LoggerFactory;
 import com.google.common.base.Predicates;
 import com.google.common.collect.Collections2;
 import fi.csc.idp.stepup.api.StepUpEventIds;
-import fi.okm.mpass.shibboleth.authn.context.ShibbolethSpAuthenticationContext;
 
 /**
  * An action that checks if step up authentication is requested.
@@ -48,7 +46,7 @@ import fi.okm.mpass.shibboleth.authn.context.ShibbolethSpAuthenticationContext;
  */
 
 @SuppressWarnings("rawtypes")
-public class CheckRequestedAuthenticationContext extends AbstractAuthenticationAction {
+public class CheckRequestedAuthenticationContext extends AbstractShibSPAction {
 
     /** Class logger. */
     @Nonnull
@@ -85,27 +83,13 @@ public class CheckRequestedAuthenticationContext extends AbstractAuthenticationA
     protected void doExecute(@Nonnull final ProfileRequestContext profileRequestContext,
             @Nonnull final AuthenticationContext authenticationContext) {
 
-        final ShibbolethSpAuthenticationContext shibbolethContext = authenticationContext
-                .getSubcontext(ShibbolethSpAuthenticationContext.class);
-        if (shibbolethContext == null) {
-            log.debug("{} could not get shib proxy context", getLogPrefix());
-            ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EVENTID_MISSING_SHIBSPCONTEXT);
-
-            return;
-        }
-
-        if (shibbolethContext.getInitialRequestedContext() == null
-                || shibbolethContext.getInitialRequestedContext().isEmpty()
-                || !stepupRequested(shibbolethContext.getInitialRequestedContext(), stepupPrincipals)) {
-
-            log.debug("{} AuthnRequest did not contain a RequestedAuthnContext matching any StepUp", getLogPrefix());
+        if (getShibSPCtx().getInitialRequestedContext() == null
+                || getShibSPCtx().getInitialRequestedContext().isEmpty()
+                || !stepupRequested(getShibSPCtx().getInitialRequestedContext(), stepupPrincipals)) {
+            log.error("{} AuthnRequest did not contain a RequestedAuthnContext matching any StepUp", getLogPrefix());
             ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EVENTID_AUTHNCONTEXT_NOT_STEPUP);
-
             return;
         }
-
-        ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EVENTID_CONTINUE_STEPUP);
-
     }
 
     /**
@@ -122,11 +106,9 @@ public class CheckRequestedAuthenticationContext extends AbstractAuthenticationA
 
         for (Principal requestedPrincipal : requestedPrincipals) {
             if (stPrincipals.getPrincipals().contains(requestedPrincipal)) {
-
                 return true;
             }
         }
-
         return false;
     }
 
