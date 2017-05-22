@@ -56,14 +56,7 @@
 		<transition to="HandleErrorLocally" />
 	</view-state>
 
-	<!-- end state after error display -->
-	<end-state id="HandleErrorLocally">
-		<on-entry>
-			<evaluate expression="RecordResponseComplete" />
-		</on-entry>
-	</end-state>
-
-	<!-- Passthrough state if an exception is thrown. -->
+    <!-- Passthrough state if an exception is thrown. -->
 	<action-state id="LogRuntimeException">
 		<on-entry>
 			<evaluate
@@ -72,6 +65,13 @@
 		<evaluate expression="'RuntimeException'" />
 		<transition to="DisplayError" />
 	</action-state>
+	
+	<!-- end state after error display -->
+	<end-state id="HandleErrorLocally">
+		<on-entry>
+			<evaluate expression="RecordResponseComplete" />
+		</on-entry>
+	</end-state>
 
 	<!-- Successful end state -->
 	<end-state id="proceed" />
