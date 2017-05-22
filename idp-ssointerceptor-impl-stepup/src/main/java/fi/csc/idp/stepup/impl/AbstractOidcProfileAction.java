@@ -54,7 +54,7 @@ abstract class AbstractOidcProfileAction extends AbstractProfileAction {
      * @return oidc context
      */
     @Nonnull
-    public OidcStepUpContext getOidcCtx() {
+    protected OidcStepUpContext getOidcCtx() {
         return oidcCtx;
     }
 
