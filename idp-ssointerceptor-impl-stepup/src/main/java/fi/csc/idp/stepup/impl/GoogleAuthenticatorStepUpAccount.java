@@ -74,7 +74,13 @@ public class GoogleAuthenticatorStepUpAccount extends AbstractStepUpAccount {
 
         log.debug("Verificating totp response {}", response);
         GoogleAuthenticator gAuth = new GoogleAuthenticator();
-        int code = Integer.parseInt(response);
+        int code;
+        try {
+            code = Integer.parseInt(response);
+        } catch (NumberFormatException e) {
+            verificationFailedCheck();
+            return false;
+        }
         boolean verified = gAuth.authorize(getTarget(), code);
         if (verified) {
             setVerified();
