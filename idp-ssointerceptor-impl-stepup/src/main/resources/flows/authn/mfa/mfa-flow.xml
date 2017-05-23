@@ -74,15 +74,7 @@
 			<set name="flowScope.accountUpdated" value="true" type="boolean" />
 		</transition>
 	</action-state>
-
-	<action-state id="VerifyResponse">
-		<evaluate expression="VerifyResponse" />
-		<evaluate expression="'proceed'" />
-		<transition on="proceed" to="proceed" />
-		<!-- Multiple tries not supported yet for backend check -->
-		<transition on="StepUpWrongResponse" to="DisplayWrongResponse" />
-	</action-state>
-
+    
 	<!-- this action may be used if execution requires backend still to check 
 		authentication status -->
 	<action-state id="VerifyAccountStatusVerified">
