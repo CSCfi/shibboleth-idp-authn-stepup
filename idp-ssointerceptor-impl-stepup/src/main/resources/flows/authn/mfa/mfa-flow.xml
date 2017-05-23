@@ -5,10 +5,10 @@
 	parent="intercept.abstract">
 
 
-	<!-- Event though project structure suggests this is not a proper authentication 
-		flow. This flow performs mfa when invoked either from mfa oidc handler or 
-		by mfa interceptor. Successful termination via "proceed" end-state suggests 
-		that the user has been authenticated using mfa. -->
+	<!-- Even though project structure suggests something else this is not a 
+		proper authentication flow. This flow performs mfa when invoked either from 
+		mfa oidc handler or by mfa interceptor. Successful termination via "proceed" 
+		end-state suggests that the user has been authenticated using mfa. -->
 
 	<!-- Rudimentary impediment to direct execution of subflow. -->
 	<input name="calledAsSubflow" type="boolean" required="true" />
@@ -74,7 +74,7 @@
 			<set name="flowScope.accountUpdated" value="true" type="boolean" />
 		</transition>
 	</action-state>
-    
+
 	<!-- this action may be used if execution requires backend still to check 
 		authentication status -->
 	<action-state id="VerifyAccountStatusVerified">
