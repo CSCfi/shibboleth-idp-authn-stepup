@@ -157,7 +157,7 @@
 
 	<bean id="SMSStepUpAccount" class="fi.csc.idp.stepup.impl.ChallengeSenderStepUpAccount"
 		scope="prototype" p:ChallengeGenerator-ref="ChallengeGenerator"
-		p:ChallengeVerifier-ref="EqualVerifier" p:ChallengeSender-ref="SMSChallengeSender">
+		p:ChallengeVerifier-ref="EqualVerifier" p:ChallengeSender-ref="SMSChallengeSender" p:retryLimit="2">
 	</bean>
 
 	<bean id="SMSReceiverStepUpAccount" class="fi.csc.idp.stepup.impl.TvilioSMSReceiverStepUpAccount"
