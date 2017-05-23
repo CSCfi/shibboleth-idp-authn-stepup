@@ -99,6 +99,7 @@ public class VerifyPasswordFromFormRequest extends AbstractStepUpMethodAction {
             if (!getStepUpMethodCtx().getStepUpAccount().verifyResponse(challengeResponse)) {
                 log.debug("{} user presented wrong response to  challenge", getLogPrefix());
                 ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EVENTID_INVALID_RESPONSE);
+                Thread.sleep(3000);
                 return;
             }
         } catch (FailureLimitReachedException e) {
