@@ -91,6 +91,7 @@
     - { src: "{{ remote_user_home }}/stepup-proxy/idp-ssointerceptor-impl-stepup/src/main/resources/views/authn/mfa-startregister.vm", dest: "{{ idp_home }}/views/authn/mfa-startregister.vm" }
     - { src: "{{ remote_user_home }}/stepup-proxy/idp-ssointerceptor-impl-stepup/src/main/resources/views/authn/mfa.vm", dest: "{{ idp_home }}/views/authn/mfa.vm" }
     - { src: "{{ remote_user_home }}/stepup-proxy/idp-ssointerceptor-impl-stepup/src/main/resources/views/authn/mfa-wrongresponse.vm", dest: "{{ idp_home }}/views/authn/mfa-wrongresponse.vm" }
+    - { src: "{{ remote_user_home }}/stepup-proxy/idp-ssointerceptor-impl-stepup/src/main/resources/views/intercept/stepup-error.vm", dest: "{{ idp_home }}/views/intercept/stepup-error.vm" }
 
 - name: Copy stepup dependency twilio-7.1.0.jar for bulding new idp.war
   copy:
