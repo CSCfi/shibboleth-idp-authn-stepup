@@ -25,26 +25,21 @@ package fi.csc.idp.stepup.impl;
 
 import javax.annotation.Nonnull;
 import javax.servlet.http.HttpServletRequest;
-
-import net.shibboleth.idp.authn.AbstractExtractionAction;
 import net.shibboleth.idp.authn.context.AuthenticationContext;
 import net.shibboleth.utilities.java.support.annotation.constraint.NotEmpty;
-
 import org.opensaml.profile.action.ActionSupport;
 import org.opensaml.profile.context.ProfileRequestContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import fi.csc.idp.stepup.api.FailureLimitReachedException;
 import fi.csc.idp.stepup.api.StepUpEventIds;
-import fi.csc.idp.stepup.api.StepUpMethodContext;
 
 /**
  * An action that verifies user challenge response.
  * 
  */
 @SuppressWarnings("rawtypes")
-public class VerifyPasswordFromFormRequest extends AbstractExtractionAction {
+public class VerifyPasswordFromFormRequest extends AbstractStepUpMethodAction {
 
     /** Class logger. */
     @Nonnull
@@ -52,9 +47,8 @@ public class VerifyPasswordFromFormRequest extends AbstractExtractionAction {
 
     /** Challenge response parameter. */
     private String challengeResponseParameter = "j_challengeResponse";
-
-    /** proxy StepUp Context. */
-    private StepUpMethodContext stepUpMethodContext;
+    /** Challenge response. */
+    private String challengeResponse;
 
     /**
      * Sets the parameter the response is read from.
@@ -67,24 +61,32 @@ public class VerifyPasswordFromFormRequest extends AbstractExtractionAction {
     }
 
     /** {@inheritDoc} */
-    @SuppressWarnings("unchecked")
-    /** {@inheritDoc} */
     @Override
     protected boolean doPreExecute(@Nonnull final ProfileRequestContext profileRequestContext,
             @Nonnull final AuthenticationContext authenticationContext) {
 
-        stepUpMethodContext = authenticationContext.getSubcontext(StepUpMethodContext.class);
-        if (stepUpMethodContext == null) {
-            log.debug("{} could not get shib proxy context", getLogPrefix());
-            ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EVENTID_MISSING_STEPUPMETHODCONTEXT);
+        if (!super.doPreExecute(profileRequestContext, authenticationContext)) {
             return false;
         }
-        if (stepUpMethodContext.getStepUpAccount() == null) {
+        if (getStepUpMethodCtx().getStepUpAccount() == null) {
             log.debug("{} there is no chosen stepup account for user", getLogPrefix());
             ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EVENTID_INVALID_USER);
             return false;
         }
-        return super.doPreExecute(profileRequestContext, authenticationContext);
+        final HttpServletRequest request = getHttpServletRequest();
+        if (request == null) {
+            log.debug("{} profile action does not contain an HttpServletRequest", getLogPrefix());
+            ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EXCEPTION);
+            return false;
+        }
+        challengeResponse = request.getParameter(challengeResponseParameter);
+        if (challengeResponse == null) {
+            log.debug("{} user did not present response to challenge", getLogPrefix());
+            ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EVENTID_INVALID_RESPONSE);
+            return false;
+        }
+        challengeResponse = challengeResponse.trim();
+        return true;
     }
 
     /** {@inheritDoc} */
@@ -92,22 +94,9 @@ public class VerifyPasswordFromFormRequest extends AbstractExtractionAction {
     protected void doExecute(@Nonnull final ProfileRequestContext profileRequestContext,
             @Nonnull final AuthenticationContext authenticationContext) {
 
-        final HttpServletRequest request = getHttpServletRequest();
-        if (request == null) {
-            log.debug("{} profile action does not contain an HttpServletRequest", getLogPrefix());
-            ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EXCEPTION);
-            return;
-        }
-        final String challengeResponse = request.getParameter(challengeResponseParameter);
-        if (challengeResponse == null) {
-            log.debug("{} user did not present response to challenge", getLogPrefix());
-            ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EVENTID_INVALID_RESPONSE);
-
-            return;
-        }
         log.debug("{} user challenge response was {}", getLogPrefix(), challengeResponse);
         try {
-            if (!stepUpMethodContext.getStepUpAccount().verifyResponse(challengeResponse)) {
+            if (!getStepUpMethodCtx().getStepUpAccount().verifyResponse(challengeResponse)) {
                 log.debug("{} user presented wrong response to  challenge", getLogPrefix());
                 ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EVENTID_INVALID_RESPONSE);
                 return;

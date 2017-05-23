@@ -24,17 +24,12 @@
 package fi.csc.idp.stepup.impl;
 
 import javax.annotation.Nonnull;
-
-import net.shibboleth.idp.authn.AbstractAuthenticationAction;
 import net.shibboleth.idp.authn.context.AuthenticationContext;
-
 import org.opensaml.profile.action.ActionSupport;
 import org.opensaml.profile.context.ProfileRequestContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import fi.csc.idp.stepup.api.StepUpEventIds;
-import fi.csc.idp.stepup.api.StepUpMethodContext;
 import fi.csc.idp.stepup.api.StepUpAccount;
 
 /**
@@ -44,7 +39,7 @@ import fi.csc.idp.stepup.api.StepUpAccount;
  */
 
 @SuppressWarnings("rawtypes")
-public class AddAccount extends AbstractAuthenticationAction {
+public class AddAccount extends AbstractStepUpMethodAction {
 
     /** Class logger. */
     @Nonnull
@@ -52,25 +47,30 @@ public class AddAccount extends AbstractAuthenticationAction {
 
     /** {@inheritDoc} */
     @Override
+    protected boolean doPreExecute(@Nonnull final ProfileRequestContext profileRequestContext,
+            @Nonnull final AuthenticationContext authenticationContext) {
+
+        if (!super.doPreExecute(profileRequestContext, authenticationContext)) {
+            return false;
+        }
+        if (getStepUpMethodCtx().getStepUpMethod() == null) {
+            log.error("{} no default stepup method available for user", getLogPrefix());
+            ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EVENTID_INVALID_USER);
+            return false;
+        }
+        return true;
+    }
+
+    /** {@inheritDoc} */
+    @Override
     protected void doExecute(@Nonnull final ProfileRequestContext profileRequestContext,
             @Nonnull final AuthenticationContext authenticationContext) {
 
-        StepUpMethodContext stepUpMethodContext = authenticationContext.getSubcontext(StepUpMethodContext.class);
-        if (stepUpMethodContext == null) {
-            log.error("{} could not get shib proxy context", getLogPrefix());
-            ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EVENTID_MISSING_STEPUPMETHODCONTEXT);
-            return;
-        }
-        if (stepUpMethodContext.getStepUpMethod() == null) {
-            log.error("{} no default stepup method available for user", getLogPrefix());
-            ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EVENTID_INVALID_USER);
-            return;
-        }
-        log.debug("{} adding a stepup account of type {}", getLogPrefix(), stepUpMethodContext.getStepUpMethod()
+        log.debug("{} adding a stepup account of type {}", getLogPrefix(), getStepUpMethodCtx().getStepUpMethod()
                 .getName());
         StepUpAccount account;
         try {
-            account = stepUpMethodContext.getStepUpMethod().addAccount();
+            account = getStepUpMethodCtx().getStepUpMethod().addAccount();
         } catch (Exception e) {
             log.error("{} account creation failed for unexpected reason", getLogPrefix());
             ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EXCEPTION);
@@ -82,7 +82,7 @@ public class AddAccount extends AbstractAuthenticationAction {
             return;
         }
         // We set the account as active
-        stepUpMethodContext.setStepUpAccount(account);
+        getStepUpMethodCtx().setStepUpAccount(account);
     }
 
 }

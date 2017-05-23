@@ -25,27 +25,22 @@ package fi.csc.idp.stepup.impl;
 
 import javax.annotation.Nonnull;
 import javax.servlet.http.HttpServletRequest;
-
-import net.shibboleth.idp.authn.AbstractExtractionAction;
 import net.shibboleth.idp.authn.context.AuthenticationContext;
 import net.shibboleth.utilities.java.support.annotation.constraint.NotEmpty;
-
 import org.opensaml.profile.action.ActionSupport;
 import org.opensaml.profile.context.ProfileRequestContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import fi.csc.idp.stepup.api.StepUpAccount;
 import fi.csc.idp.stepup.api.StepUpEventIds;
 import fi.csc.idp.stepup.api.StepUpMethod;
-import fi.csc.idp.stepup.api.StepUpMethodContext;
 
 /**
- * An action that updates a account. This is a dummy version still.
+ * An action that updates a account. 
  * 
  */
 @SuppressWarnings("rawtypes")
-public class UpdateAccount extends AbstractExtractionAction {
+public class UpdateAccount extends AbstractStepUpMethodAction {
 
     /** Class logger. */
     @Nonnull
@@ -56,10 +51,7 @@ public class UpdateAccount extends AbstractExtractionAction {
 
     /** name parameter. */
     private String nameParameter = "j_name";
-
-    /** proxy StepUp Context. */
-    private StepUpMethodContext stepUpMethodContext;
-
+   
     /**
      * Sets the parameter the response is read from.
      * 
@@ -80,23 +72,7 @@ public class UpdateAccount extends AbstractExtractionAction {
         this.nameParameter = parameter;
     }
 
-    /** {@inheritDoc} */
-    @SuppressWarnings("unchecked")
-    /** {@inheritDoc} */
-    @Override
-    protected boolean doPreExecute(@Nonnull final ProfileRequestContext profileRequestContext,
-            @Nonnull final AuthenticationContext authenticationContext) {
-
-        stepUpMethodContext = authenticationContext.getSubcontext(StepUpMethodContext.class);
-        if (stepUpMethodContext == null) {
-            log.debug("{} could not get shib proxy context", getLogPrefix());
-            ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EVENTID_MISSING_STEPUPMETHODCONTEXT);
-
-            return false;
-        }
-        return super.doPreExecute(profileRequestContext, authenticationContext);
-    }
-
+    
     /** {@inheritDoc} */
     @Override
     protected void doExecute(@Nonnull final ProfileRequestContext profileRequestContext,
@@ -143,7 +119,7 @@ public class UpdateAccount extends AbstractExtractionAction {
         // locating account
         StepUpAccount updateAccount = null;
         StepUpMethod updateMethod = null;
-        for (StepUpMethod suMethod : stepUpMethodContext.getStepUpMethods().keySet()) {
+        for (StepUpMethod suMethod : getStepUpMethodCtx().getStepUpMethods().keySet()) {
             log.debug("{} comparing method {} to {}", getLogPrefix(), method, suMethod.getName());
             if (method.equals(suMethod.getName())) {
                 log.debug("{} located target method {}", getLogPrefix(), method);

@@ -24,27 +24,42 @@
 package fi.csc.idp.stepup.impl;
 
 import javax.annotation.Nonnull;
+import net.shibboleth.idp.authn.AbstractAuthenticationAction;
 import net.shibboleth.idp.authn.context.AuthenticationContext;
 import org.opensaml.profile.action.ActionSupport;
 import org.opensaml.profile.context.ProfileRequestContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import fi.csc.idp.stepup.api.FailureLimitReachedException;
 import fi.csc.idp.stepup.api.StepUpEventIds;
+import fi.csc.idp.stepup.api.StepUpMethodContext;
 
 /**
- * An action that verifies user challenge response. This is for a case of
- * verifying the response from backend. No direct user input is used.
+ * Abstract class for stepup method actions. Locates StepUpMethodContext
+ * context. If no context is found a error event is triggered.
  * 
  */
 @SuppressWarnings("rawtypes")
-public class VerifyResponse extends AbstractStepUpMethodAction {
+abstract class AbstractStepUpMethodAction extends AbstractAuthenticationAction {
 
     /** Class logger. */
     @Nonnull
-    private final Logger log = LoggerFactory.getLogger(VerifyResponse.class);
+    private final Logger log = LoggerFactory.getLogger(AbstractStepUpMethodAction.class);
+
+    /** StepUpMethodContext Ctx. */
+    private StepUpMethodContext stepUpMethodCtx;
+
+    /**
+     * Returns the StepUpMethodContext context.
+     * 
+     * @return StepUpMethodContext context
+     */
+    @Nonnull
+    protected StepUpMethodContext getStepUpMethodCtx() {
+        return stepUpMethodCtx;
+    }
 
     /** {@inheritDoc} */
+    @SuppressWarnings("unchecked")
     @Override
     protected boolean doPreExecute(@Nonnull final ProfileRequestContext profileRequestContext,
             @Nonnull final AuthenticationContext authenticationContext) {
@@ -52,35 +67,13 @@ public class VerifyResponse extends AbstractStepUpMethodAction {
         if (!super.doPreExecute(profileRequestContext, authenticationContext)) {
             return false;
         }
-        if (getStepUpMethodCtx().getStepUpAccount() == null) {
-            log.debug("{} there is no chosen stepup account for user", getLogPrefix());
-            ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EVENTID_INVALID_USER);
+        stepUpMethodCtx = authenticationContext.getSubcontext(StepUpMethodContext.class);
+        if (stepUpMethodCtx == null) {
+            log.error("{} could not get stepup method context", getLogPrefix());
+            ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EVENTID_MISSING_STEPUPMETHODCONTEXT);
             return false;
         }
         return true;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    protected void doExecute(@Nonnull final ProfileRequestContext profileRequestContext,
-            @Nonnull final AuthenticationContext authenticationContext) {
-
-        try {
-            if (!getStepUpMethodCtx().getStepUpAccount().verifyResponse(null)) {
-                log.debug("{} user presented wrong response to  challenge", getLogPrefix());
-                ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EVENTID_INVALID_RESPONSE);
-                return;
-            }
-        } catch (FailureLimitReachedException e) {
-            log.debug("{} user response failed too many times", getLogPrefix());
-            ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EVENTID_RESPONSE_LIMIT);
-
-            return;
-        } catch (Exception e) {
-            log.debug("{} user response evaluation failed", getLogPrefix());
-            ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EVENTID_INVALID_RESPONSE);
-            return;
-        }
     }
 
 }

@@ -24,14 +24,12 @@
 package fi.csc.idp.stepup.impl;
 
 import javax.annotation.Nonnull;
-import net.shibboleth.idp.authn.AbstractAuthenticationAction;
 import net.shibboleth.idp.authn.context.AuthenticationContext;
 import org.opensaml.profile.action.ActionSupport;
 import org.opensaml.profile.context.ProfileRequestContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import fi.csc.idp.stepup.api.StepUpEventIds;
-import fi.csc.idp.stepup.api.StepUpMethodContext;
 
 /**
  * An action that generates and sends the step-up challenge.
@@ -39,7 +37,7 @@ import fi.csc.idp.stepup.api.StepUpMethodContext;
  */
 
 @SuppressWarnings("rawtypes")
-public class GenerateStepUpChallenge extends AbstractAuthenticationAction {
+public class GenerateStepUpChallenge extends AbstractStepUpMethodAction {
 
     /** Class logger. */
     @Nonnull
@@ -47,25 +45,28 @@ public class GenerateStepUpChallenge extends AbstractAuthenticationAction {
 
     /** {@inheritDoc} */
     @Override
+    protected boolean doPreExecute(@Nonnull final ProfileRequestContext profileRequestContext,
+            @Nonnull final AuthenticationContext authenticationContext) {
+
+        if (!super.doPreExecute(profileRequestContext, authenticationContext)) {
+            return false;
+        }
+        if (getStepUpMethodCtx().getStepUpAccount() == null) {
+            log.debug("{} there is no chosen stepup account for user", getLogPrefix());
+            ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EVENTID_INVALID_USER);
+            return false;
+        }
+        return true;
+    }
+
+    /** {@inheritDoc} */
+    @Override
     protected void doExecute(@Nonnull final ProfileRequestContext profileRequestContext,
             @Nonnull final AuthenticationContext authenticationContext) {
 
-        StepUpMethodContext stepUpMethodContext = authenticationContext.getSubcontext(StepUpMethodContext.class);
-        if (stepUpMethodContext == null) {
-            log.debug("{} could not get shib proxy context", getLogPrefix());
-            ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EVENTID_MISSING_STEPUPMETHODCONTEXT);
-
-            return;
-        }
-        if (stepUpMethodContext.getStepUpAccount() == null) {
-            log.debug("{} there is no chosen stepup account for user", getLogPrefix());
-            ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EVENTID_INVALID_USER);
-
-            return;
-        }
         try {
             // StepUp account is instructed to send challenge to user
-            stepUpMethodContext.getStepUpAccount().sendChallenge();
+            getStepUpMethodCtx().getStepUpAccount().sendChallenge();
         } catch (Exception e) {
             log.error(e.getMessage());
             log.debug("{} unable to generate/pass challenge using", getLogPrefix());
