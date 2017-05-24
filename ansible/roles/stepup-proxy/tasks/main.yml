@@ -12,7 +12,7 @@
   become_user: "{{ build_user }}"
 
 - name: StepUp Proxy maven clean package
-  command: mvn -f stepup-proxy/idp-stepup-parent/pom.xml clean package
+  command: mvn -f stepup-proxy/pom.xml clean package
   become: yes
   become_user: "{{ build_user }}"
 

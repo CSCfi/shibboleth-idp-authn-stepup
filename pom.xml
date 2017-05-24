@@ -24,12 +24,12 @@
 	</parent>
 	<groupId>fi.csc.idp.stepup</groupId>
 	<artifactId>idp-stepup-parent</artifactId>
-	<version>1.0-SNAPSHOT</version>
+	<version>0.9.0-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
 	<modules>
-		<module>../idp-ssointerceptor-api-stepup</module>
-		<module>../idp-ssointerceptor-impl-stepup</module>
+		<module>idp-ssointerceptor-api-stepup</module>
+		<module>idp-ssointerceptor-impl-stepup</module>
 	</modules>
 
 	<properties>
@@ -74,7 +74,7 @@
 			<dependency>
 				<groupId>com.nimbusds</groupId>
 				<artifactId>oauth2-oidc-sdk</artifactId>
-				<version>5.18.1</version>
+				<version>5.26</version>
 			</dependency>
 			<dependency>
 				<groupId>net.shibboleth.idp</groupId>
@@ -99,7 +99,7 @@
 			<dependency>
 				<groupId>fi.csc.idp.stepup</groupId>
 				<artifactId>idp-ssointerceptor-api-stepup</artifactId>
-				<version>1.0-SNAPSHOT</version>
+				<version>0.9.0-SNAPSHOT</version>
 			</dependency>
 			<dependency>
 				<groupId>org.apache.velocity</groupId>
@@ -109,7 +109,7 @@
 			<dependency>
 				<groupId>fi.okm.mpass</groupId>
 				<artifactId>idp-authn-api-shibsp</artifactId>
-				<version>1.0-SNAPSHOT</version>
+				<version>0.9.0</version>
 			</dependency>
 			<dependency>
 				<groupId>com.warrenstrange</groupId>
