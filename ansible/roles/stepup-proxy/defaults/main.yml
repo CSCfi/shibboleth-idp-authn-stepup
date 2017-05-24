@@ -2,6 +2,6 @@
 # how stepup project versions the products
 stepup_version: 0.9.0
 # the version to checkout from github
-stepup_co_version: stepup-0.9.0
+stepup_co_version: stepup-v0.9.0
 #environment variables to source for building shibboleth idp package
 environment_file: /etc/default/shibboleth

@@ -20,11 +20,11 @@
 	<parent>
 		<groupId>fi.csc.idp.stepup</groupId>
 		<artifactId>idp-stepup-parent</artifactId>
-		<version>0.9.0</version>
+		<version>0.9.0-SNAPSHOT</version>
 		<relativePath>..</relativePath>
 	</parent>
 	<packaging>jar</packaging>
-	<version>0.9.0</version>
+	<version>0.9.0-SNAPSHOT</version>
 	<name>idp-ssointerceptor-impl-stepup</name>
 	<dependencies>
 		<dependency>

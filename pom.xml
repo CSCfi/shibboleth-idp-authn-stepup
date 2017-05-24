@@ -23,7 +23,7 @@
 	</parent>
 	<groupId>fi.csc.idp.stepup</groupId>
 	<artifactId>idp-stepup-parent</artifactId>
-	<version>0.9.0</version>
+	<version>0.9.0-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
 	<modules>
@@ -71,7 +71,7 @@
         	<url>https://github.com/CSCfi/stepup-proxy</url>
         	<connection>scm:git:git://github.com/CSCfi/stepup-proxy.git</connection>
         	<developerConnection>scm:git:https://github.com/CSCfi/stepup-proxy</developerConnection>
-        	<tag>0.9.0</tag>
+        	<tag>HEAD</tag>
         </scm>
 
 
