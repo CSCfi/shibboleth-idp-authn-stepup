@@ -1,10 +1,11 @@
 ---
 
-- name: Verify maven and unzip are installed
+- name: Verify necessary packages are installed
   yum: name={{ item }} state=installed
   with_items:
     - maven
     - unzip
+    - java-1.8.0-openjdk-devel
 
 - name: Checkout StepUp Proxy
   git: repo=https://github.com/CSCfi/stepup-proxy version={{ stepup_co_version }} dest="{{ remote_user_home }}/stepup-proxy"
@@ -233,33 +234,33 @@
     mode: 0644
     remote_src: yes
     
-- name: load current httpclient to support Twilio
-  get_url:
-    url: http://www-eu.apache.org/dist//httpcomponents/httpclient/binary/httpcomponents-client-4.5.3-bin.zip
-    dest: "{{ remote_user_home }}"
+#- name: load current httpclient to support Twilio
+#  get_url:
+#    url: http://www-eu.apache.org/dist//httpcomponents/httpclient/binary/httpcomponents-client-4.5.3-bin.zip
+#    dest: "{{ remote_user_home }}"
 
-- unarchive:
-    src: "{{ remote_user_home }}/httpcomponents-client-4.5.3-bin.zip"
-    dest: "{{ remote_user_home }}"
-    remote_src: True
+#- unarchive:
+#    src: "{{ remote_user_home }}/httpcomponents-client-4.5.3-bin.zip"
+#    dest: "{{ remote_user_home }}"
+#    remote_src: True
 
 # TODO: use wildcard
-- copy:
-    src: "{{ remote_user_home }}/httpcomponents-client-4.5.3/lib/{{ item }}"
-    dest: "{{ idp_home }}/webapp/WEB-INF/lib/"
-    remote_src: True
-  with_items:
-    - httpcore-4.4.6.jar
-    - httpclient-cache-4.5.3.jar
-    - httpclient-4.5.3.jar
+#- copy:
+#    src: "{{ remote_user_home }}/httpcomponents-client-4.5.3/lib/{{ item }}"
+#    dest: "{{ idp_home }}/webapp/WEB-INF/lib/"
+#    remote_src: True
+#  with_items:
+#    - httpcore-4.4.6.jar
+#    - httpclient-cache-4.5.3.jar
+#    - httpclient-4.5.3.jar
 
-- shell: "ls /opt/shibboleth-idp/webapp/WEB-INF/lib/httpc*-4.3*"
-  register: old_httpclient
+#- shell: "ls /opt/shibboleth-idp/webapp/WEB-INF/lib/httpc*-4.3*"
+#  register: old_httpclient
   
-- file:
-    path: "{{ item }}"
-    state: absent
-  with_items: "{{ old_httpclient.stdout_lines }}"
+#- file:
+#    path: "{{ item }}"
+#    state: absent
+#  with_items: "{{ old_httpclient.stdout_lines }}"
   
 #add copy of basic set of dependencies
 

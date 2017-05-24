@@ -11,7 +11,7 @@
   become_user: "{{ build_user }}"
 
 - name: MPASSid maven clean install
-  command: mvn -f MPASSid-proxy/pom.xml clean install
+  command: mvn -f MPASSid-proxy/pom.xml clean install -DskipTests=true
   become: yes
   become_user: "{{ build_user }}"
 
