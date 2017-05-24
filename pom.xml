@@ -23,7 +23,7 @@
 	</parent>
 	<groupId>fi.csc.idp.stepup</groupId>
 	<artifactId>idp-stepup-parent</artifactId>
-	<version>0.9.1-SNAPSHOT</version>
+	<version>0.9.0-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
 	<modules>
@@ -106,7 +106,7 @@
 			<dependency>
 				<groupId>fi.csc.idp.stepup</groupId>
 				<artifactId>idp-ssointerceptor-api-stepup</artifactId>
-				<version>0.9.1-SNAPSHOT</version>
+				<version>0.9.0-SNAPSHOT</version>
 			</dependency>
 			<dependency>
 				<groupId>org.apache.velocity</groupId>
