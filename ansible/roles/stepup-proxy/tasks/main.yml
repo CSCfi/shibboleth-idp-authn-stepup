@@ -17,7 +17,6 @@
   become: yes
   become_user: "{{ build_user }}"
 
-<<<<<<< HEAD
 - name: Ensure "{{ idp_home }}/flows/oidc/mfarequest/" dir exists
   file: path="{{ idp_home }}/flows/oidc/mfarequest/" state=directory
 
@@ -273,6 +272,4 @@
   service:
     name: shibboleth-idp
     state: restarted
-=======
->>>>>>> 2f2ae95b671d439015e3171239463ba13d29d9da
 
