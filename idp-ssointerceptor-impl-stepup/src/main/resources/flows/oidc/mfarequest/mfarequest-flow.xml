@@ -1,97 +1,81 @@
+<flow xmlns="http://www.springframework.org/schema/webflow" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.springframework.org/schema/webflow http://www.springframework.org/schema/webflow/spring-webflow.xsd">
 
-<flow xmlns="http://www.springframework.org/schema/webflow"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://www.springframework.org/schema/webflow http://www.springframework.org/schema/webflow/spring-webflow.xsd">
+    <action-state id="InitializeProfileRequestContext">
+        <evaluate expression="InitializeProfileRequestContext" />
+        <evaluate expression="'proceed'" />
+        <transition on="proceed" to="DecodeMessage" />
+    </action-state>
 
-	<action-state id="InitializeProfileRequestContext">
-		<evaluate expression="InitializeProfileRequestContext" />
-		<evaluate expression="'proceed'" />
-		<transition on="proceed" to="DecodeMessage" />
-	</action-state>
+    <action-state id="DecodeMessage">
+        <evaluate expression="DecodeMessage" />
+        <evaluate expression="AttachOidcAuthenticationRequest" />
+        <evaluate expression="VerifyClientRedirectUriOfOidcAuthenticationRequest" />
+        <evaluate expression="ValidateRequestObjectOfOidcAuthenticationRequest" />
+        <evaluate expression="InitializeRelyingPartyContext" />
+        <evaluate expression="InitializeAttributeContext" />
+        <evaluate expression="'proceed'" />
+        <transition on="proceed" to="PostInitialSetup" />
+    </action-state>
 
-	<action-state id="DecodeMessage">
-		<evaluate expression="DecodeMessage" />
-		<evaluate expression="AttachOidcAuthenticationRequest" />
-		<evaluate expression="VerifyClientRedirectUriOfOidcAuthenticationRequest" />
-		<evaluate expression="ValidateRequestObjectOfOidcAuthenticationRequest" />
-		<evaluate expression="InitializeRelyingPartyContext" />
-		<evaluate expression="InitializeAttributeContext" />
-		<evaluate expression="'proceed'" />
-		<transition on="proceed" to="PostInitialSetup" />
-	</action-state>
-
-	<action-state id="PostInitialSetup">
-		<evaluate expression="InitializeAuthenticationContext" />
-		<evaluate expression="InitializeShibSPContext" />
-		<evaluate expression="'proceed'" />
-		<transition on="proceed" to="Stepup" />
-	</action-state>
-
-	<subflow-state id="Stepup" subflow="authn/mfa">
-		<input name="calledAsSubflow" value="true" />
-		<transition to="FormResponse" />
-	</subflow-state>
-
-	<action-state id="FormResponse">
-		<evaluate expression="RespondOidcMFARequest" />
-		<evaluate expression="'proceed'" />
-		<transition on="proceed" to="end" />
-	</action-state>
-
-	<!-- Error views, handling and end states -->
-
-	<view-state id="DisplayError" view="#{flowRequestContext.activeFlow.id}-error">
-		<on-render>
-			<evaluate expression="environment" result="viewScope.environment" />
-			<evaluate expression="opensamlProfileRequestContext" result="viewScope.profileRequestContext" />
-			<evaluate
-				expression="opensamlProfileRequestContext.getSubcontext(T(fi.csc.idp.stepup.api.OidcStepUpContext))"
-				result="viewScope.oidcStepUpContext" />
-			<evaluate
-				expression="T(net.shibboleth.utilities.java.support.codec.HTMLEncoder)"
-				result="viewScope.encoder" />
-			<evaluate
-				expression="flowRequestContext.getExternalContext().getNativeRequest()"
-				result="viewScope.request" />
-			<evaluate
-				expression="flowRequestContext.getExternalContext().getNativeResponse()"
-				result="viewScope.response" />
-		</on-render>
-		<transition to="HandleErrorLocally" />
-	</view-state>
-
-
-	<!-- Passthrough state if an exception is thrown. -->
-	<action-state id="LogRuntimeException">
-		<on-entry>
-			<evaluate
-				expression="T(org.slf4j.LoggerFactory).getLogger('net.shibboleth.idp.saml.profile').error('Uncaught runtime exception', flowExecutionException.getCause())" />
-		</on-entry>
-		<evaluate expression="'RuntimeException'" />
-		<transition to="HandleError" />
-	</action-state>
-
-	<!-- Should error be returned or handled locally -->
-	<decision-state id="HandleError">
-		<if test="currentEvent.id.equals('ErrorOidc')" then="FormResponse"
-			else="DisplayError" />
-	</decision-state>
-
-	<end-state id="end"
-		view="externalRedirect:#{opensamlProfileRequestContext.getSubcontext(T(fi.csc.idp.stepup.api.OidcStepUpContext)).getResponse().toString()}"></end-state>
-
-	<!-- end state after error display -->
-	<end-state id="HandleErrorLocally">
-		<on-entry>
-			<evaluate expression="RecordResponseComplete" />
-		</on-entry>
-	</end-state>
-
-	<!-- all unhandled non proceed results are turned into errors -->
-	<global-transitions>
-		<transition on-exception="java.lang.RuntimeException" to="LogRuntimeException" />
-		<transition on="#{!'proceed'.equals(currentEvent.id)}" to="HandleError" />
-	</global-transitions>
-
-	<bean-import resource="mfarequest-beans.xml" />
+    <action-state id="PostInitialSetup">
+        <evaluate expression="InitializeAuthenticationContext" />
+        <evaluate expression="InitializeShibSPContext" />
+        <evaluate expression="'proceed'" />
+        <transition on="proceed" to="Stepup" />
+    </action-state>
+ 
+    <subflow-state id="Stepup" subflow="authn/mfa">
+        <input name="calledAsSubflow" value="true" />
+        <transition to="FormResponse" />
+    </subflow-state>
+ 
+    <action-state id="FormResponse">
+        <evaluate expression="RespondOidcMFARequest" />
+        <evaluate expression="'proceed'" />
+        <transition on="proceed" to="end" />
+    </action-state>
+ 
+    <!-- Error views, handling and end states -->
+    <view-state id="DisplayError" view="#{flowRequestContext.activeFlow.id}-error">
+        <on-render>
+            <evaluate expression="environment" result="viewScope.environment" />
+            <evaluate expression="opensamlProfileRequestContext" result="viewScope.profileRequestContext" />
+            <evaluate expression="opensamlProfileRequestContext.getSubcontext(T(fi.csc.idp.stepup.api.OidcStepUpContext))" result="viewScope.oidcStepUpContext" />
+            <evaluate expression="T(net.shibboleth.utilities.java.support.codec.HTMLEncoder)" result="viewScope.encoder" />
+            <evaluate expression="flowRequestContext.getExternalContext().getNativeRequest()" result="viewScope.request" />
+            <evaluate expression="flowRequestContext.getExternalContext().getNativeResponse()" result="viewScope.response" />
+        </on-render>
+        <transition to="HandleErrorLocally" />
+    </view-state>
+ 
+    <!-- Passthrough state if an exception is thrown. -->
+    <action-state id="LogRuntimeException">
+        <on-entry>
+            <evaluate expression="T(org.slf4j.LoggerFactory).getLogger('net.shibboleth.idp.saml.profile').error('Uncaught runtime exception', flowExecutionException.getCause())" />
+        </on-entry>
+        <evaluate expression="'RuntimeException'" />
+        <transition to="HandleError" />
+    </action-state>
+ 
+    <!-- Should error be returned or handled locally -->
+    <decision-state id="HandleError">
+        <if test="currentEvent.id.equals('ErrorOidc')" then="FormResponse" else="DisplayError" />
+    </decision-state>
+    <end-state id="end" view="externalRedirect:#{opensamlProfileRequestContext.getSubcontext(T(fi.csc.idp.stepup.api.OidcStepUpContext)).getResponse().toString()}"></end-state>
+ 
+    <!-- end state after error display -->
+    <end-state id="HandleErrorLocally">
+        <on-entry>
+            <evaluate expression="RecordResponseComplete" />
+        </on-entry>
+    </end-state>
+ 
+    <!-- all unhandled non proceed results are turned into errors -->
+    <global-transitions>
+        <transition on-exception="java.lang.RuntimeException" to="LogRuntimeException" />
+        <transition on="#{!'proceed'.equals(currentEvent.id)}" to="HandleError" />
+    </global-transitions>
+ 
+    <bean-import resource="../../../system/flows/saml/security-beans.xml" />
+    <bean-import resource="mfarequest-beans.xml" />
 </flow>
