@@ -113,10 +113,10 @@
     mode: 0644
     remote_src: yes
 
-- name: Copy stepup dependency oauth2-oidc-sdk-5.18.1.jar for bulding new idp.war
+- name: Copy stepup dependency oauth2-oidc-sdk-5.26.jar for bulding new idp.war
   copy:
-    src: "{{ remote_user_home }}/stepup-proxy/idp-ssointerceptor-impl-stepup/target/dependency/oauth2-oidc-sdk-5.18.1.jar"
-    dest: "{{ idp_home }}/edit-webapp/WEB-INF/lib/oauth2-oidc-sdk-5.18.1.jar"
+    src: "{{ remote_user_home }}/stepup-proxy/idp-ssointerceptor-impl-stepup/target/dependency/oauth2-oidc-sdk-5.26.jar"
+    dest: "{{ idp_home }}/edit-webapp/WEB-INF/lib/oauth2-oidc-sdk-5.26.jar"
     owner: root
     group: root
     mode: 0644
