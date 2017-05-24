@@ -1,7 +1,7 @@
 ---
-# how mpass project versions the products
-stepup_version: 0.9.0-SNAPSHOT
+# how stepup project versions the products
+stepup_version: 0.9.0
 # the version to checkout from github
-stepup_co_version: master
+stepup_co_version: 0.9.0
 #environment variables to source for building shibboleth idp package
 environment_file: /etc/default/shibboleth
