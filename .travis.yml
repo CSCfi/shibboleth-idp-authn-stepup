@@ -3,11 +3,8 @@ jdk:
 - oraclejdk8
 before_script:
 - git clone https://github.com/Digipalvelutehdas/MPASSid-proxy
-- cd MPASSid-proxy
-- git checkout tags/MPASSid-proxy-0.9.0
-- mvn install
-- cd ..
+- mvn install -f MPASSid-proxy/pom.xml
 script: 
-- mvn package pom.xml
+- mvn package
 after_success:
 - mvn clean cobertura:cobertura coveralls:report
