@@ -112,10 +112,10 @@
     mode: 0644
     remote_src: yes
 
-- name: Copy stepup dependency oauth2-oidc-sdk-5.26.jar for bulding new idp.war
+- name: Copy stepup dependency oauth2-oidc-sdk-5.18.1jar for bulding new idp.war
   copy:
-    src: "{{ remote_user_home }}/stepup-proxy/idp-ssointerceptor-impl-stepup/target/dependency/oauth2-oidc-sdk-5.26.jar"
-    dest: "{{ idp_home }}/edit-webapp/WEB-INF/lib/oauth2-oidc-sdk-5.26.jar"
+    src: "{{ remote_user_home }}/stepup-proxy/idp-ssointerceptor-impl-stepup/target/dependency/oauth2-oidc-sdk-5.18.1.jar"
+    dest: "{{ idp_home }}/edit-webapp/WEB-INF/lib/oauth2-oidc-sdk-5.18.1.jar"
     owner: root
     group: root
     mode: 0644
@@ -144,10 +144,10 @@
     mode: 0644
     remote_src: yes
 
-- name: Copy stepup dependency json-smart-2.3.jar for bulding new idp.war
+- name: Copy stepup dependency json-smart-1.3.1.jar for bulding new idp.war
   copy:
-    src: "{{ remote_user_home }}/stepup-proxy/idp-ssointerceptor-impl-stepup/target/dependency/json-smart-2.3.jar"
-    dest: "{{ idp_home }}/edit-webapp/WEB-INF/lib/json-smart-2.3.jar"
+    src: "{{ remote_user_home }}/stepup-proxy/idp-ssointerceptor-impl-stepup/target/dependency/json-smart-1.3.1.jar"
+    dest: "{{ idp_home }}/edit-webapp/WEB-INF/lib/json-smart-1.3.1.jar"
     owner: root
     group: root
     mode: 0644
@@ -189,10 +189,10 @@
     mode: 0644
     remote_src: yes
 
-- name: Copy stepup dependency commons-lang3-3.5.jar for bulding new idp.war
+- name: Copy stepup dependency commons-lang3-3.4.jar for bulding new idp.war
   copy:
-    src: "{{ remote_user_home }}/stepup-proxy/idp-ssointerceptor-impl-stepup/target/dependency/commons-lang3-3.5.jar"
-    dest: "{{ idp_home }}/edit-webapp/WEB-INF/lib/commons-lang3-3.5.jar"
+    src: "{{ remote_user_home }}/stepup-proxy/idp-ssointerceptor-impl-stepup/target/dependency/commons-lang3-3.4.jar"
+    dest: "{{ idp_home }}/edit-webapp/WEB-INF/lib/commons-lang3-3.4.jar"
     owner: root
     group: root
     mode: 0644
@@ -234,33 +234,33 @@
     mode: 0644
     remote_src: yes
     
-#- name: load current httpclient to support Twilio
-#  get_url:
-#    url: http://www-eu.apache.org/dist//httpcomponents/httpclient/binary/httpcomponents-client-4.5.3-bin.zip
-#    dest: "{{ remote_user_home }}"
+- name: load current httpclient to support Twilio
+  get_url:
+    url: http://www-eu.apache.org/dist//httpcomponents/httpclient/binary/httpcomponents-client-4.5.3-bin.zip
+    dest: "{{ remote_user_home }}"
 
-#- unarchive:
-#    src: "{{ remote_user_home }}/httpcomponents-client-4.5.3-bin.zip"
-#    dest: "{{ remote_user_home }}"
-#    remote_src: True
+- unarchive:
+    src: "{{ remote_user_home }}/httpcomponents-client-4.5.3-bin.zip"
+    dest: "{{ remote_user_home }}"
+    remote_src: True
 
 # TODO: use wildcard
-#- copy:
-#    src: "{{ remote_user_home }}/httpcomponents-client-4.5.3/lib/{{ item }}"
-#    dest: "{{ idp_home }}/webapp/WEB-INF/lib/"
-#    remote_src: True
-#  with_items:
-#    - httpcore-4.4.6.jar
-#    - httpclient-cache-4.5.3.jar
-#    - httpclient-4.5.3.jar
+- copy:
+    src: "{{ remote_user_home }}/httpcomponents-client-4.5.3/lib/{{ item }}"
+    dest: "{{ idp_home }}/webapp/WEB-INF/lib/"
+    remote_src: True
+  with_items:
+    - httpcore-4.4.6.jar
+    - httpclient-cache-4.5.3.jar
+    - httpclient-4.5.3.jar
 
-#- shell: "ls /opt/shibboleth-idp/webapp/WEB-INF/lib/httpc*-4.3*"
-#  register: old_httpclient
+- shell: "ls /opt/shibboleth-idp/webapp/WEB-INF/lib/httpc*-4.3*"
+  register: old_httpclient
   
-#- file:
-#    path: "{{ item }}"
-#    state: absent
-#  with_items: "{{ old_httpclient.stdout_lines }}"
+- file:
+    path: "{{ item }}"
+    state: absent
+  with_items: "{{ old_httpclient.stdout_lines }}"
   
 #add copy of basic set of dependencies
 
