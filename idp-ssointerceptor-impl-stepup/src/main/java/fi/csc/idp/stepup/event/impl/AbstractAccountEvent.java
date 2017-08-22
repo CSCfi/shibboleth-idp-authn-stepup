@@ -20,52 +20,45 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+package fi.csc.idp.stepup.event.impl;
 
-package fi.csc.idp.stepup.impl;
+/** base class for account events. */
+public abstract class AbstractAccountEvent extends AbstractEvent {
 
-import javax.annotation.Nonnull;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import fi.csc.idp.stepup.api.ChallengeSender;
-
-/**
- * Class implementing Step Up Account of type Challenge Sender. This includes
- * types like SMS, Email etc.
- */
-public class ChallengeSenderStepUpAccount extends AbstractStepUpAccount {
-
-    /** Class logger. */
-    @Nonnull
-    private final Logger log = LoggerFactory.getLogger(ChallengeSenderStepUpAccount.class);
-
-    /** Challenge Sender implementation. */
-    private ChallengeSender challengeSender;
+    /** type of the event, for instance bean id of the account. */
+    private final String type;
+    /** key of the event, for instance account holder id. */
+    private final String key;
 
     /**
-     * Set the Challenge Sender implementation.
+     * Constructor.
      * 
-     * @param sender
-     *            Challenge Sender implementation
+     * @param accountType
+     *            type of the event, for instance bean id of the account
+     * @param accountKey
+     *            key of the event, for instance account holder id
      */
-    public void setChallengeSender(ChallengeSender sender) {
-        this.challengeSender = sender;
+    public AbstractAccountEvent(String accountType, String accountKey) {
+        type = accountType;
+        key = accountKey;
     }
 
     /**
-     * Send Challenge using the configured implementation.
+     * Get type of the account.
      * 
-     * @throws Exception
-     *             if something unexpected occurred.
+     * @return account type.
      */
-    @Override
-    public void doSendChallenge() throws Exception {
-        if (challengeSender == null) {
-            throw new Exception("Bean not configured with ChallengeSender");
-        }
-        challengeSender.send(getChallenge(), getTarget());
+    public String getType() {
+        return type;
+    }
 
+    /**
+     * Get key of the account.
+     * 
+     * @return account key.
+     */
+    public String getKey() {
+        return key;
     }
 
 }

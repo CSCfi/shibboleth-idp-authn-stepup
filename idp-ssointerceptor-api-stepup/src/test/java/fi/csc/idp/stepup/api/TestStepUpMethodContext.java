@@ -11,6 +11,8 @@ import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
+import fi.csc.idp.stepup.event.api.AccountRestrictorAction;
+
 public class TestStepUpMethodContext {
 
     private StepUpMethodContext stepUpMethodContext;
@@ -155,6 +157,11 @@ public class TestStepUpMethodContext {
         public boolean isVerified() {
             // TODO Auto-generated method stub
             return false;
+        }
+        
+        @Override
+        public void setAccountRestrictor(AccountRestrictorAction restrictor){
+            // TODO Auto-generated method stub            
         }
 
     }

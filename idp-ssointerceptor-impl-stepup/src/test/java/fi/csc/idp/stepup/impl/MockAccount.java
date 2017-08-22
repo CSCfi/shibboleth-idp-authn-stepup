@@ -23,8 +23,9 @@
 
 package fi.csc.idp.stepup.impl;
 
-import fi.csc.idp.stepup.api.FailureLimitReachedException;
+import fi.csc.idp.stepup.api.LimitReachedException;
 import fi.csc.idp.stepup.api.StepUpAccount;
+import fi.csc.idp.stepup.event.api.AccountRestrictorAction;
 
 public class MockAccount implements StepUpAccount {
 
@@ -83,7 +84,7 @@ public class MockAccount implements StepUpAccount {
         }
         boolean resp=correctResponse.equals(response);
         if (resp == false && noRetries){
-            throw new FailureLimitReachedException("failure limit reached");
+            throw new LimitReachedException("failure limit reached");
         }
         return resp;
     }
@@ -101,6 +102,11 @@ public class MockAccount implements StepUpAccount {
     public boolean isVerified() {
         // TODO Auto-generated method stub
         return false;
+    }
+    
+    @Override
+    public void setAccountRestrictor(AccountRestrictorAction restrictor){
+        // TODO Auto-generated method stub            
     }
 
 }

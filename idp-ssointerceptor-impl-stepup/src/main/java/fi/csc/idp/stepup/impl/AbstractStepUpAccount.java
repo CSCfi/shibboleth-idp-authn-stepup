@@ -30,8 +30,9 @@ import org.slf4j.LoggerFactory;
 
 import fi.csc.idp.stepup.api.ChallengeGenerator;
 import fi.csc.idp.stepup.api.ChallengeVerifier;
-import fi.csc.idp.stepup.api.FailureLimitReachedException;
+import fi.csc.idp.stepup.api.LimitReachedException;
 import fi.csc.idp.stepup.api.StepUpAccount;
+import fi.csc.idp.stepup.event.api.AccountRestrictorAction;
 
 /** Helper class for StepUpAccount implementations. */
 public abstract class AbstractStepUpAccount implements StepUpAccount {
@@ -58,8 +59,8 @@ public abstract class AbstractStepUpAccount implements StepUpAccount {
     private boolean enabled;
     /** user has been verified. */
     private boolean verified;
-    /** retry limit for trying to successfully verify. */
-    private int retries = -1;
+    /** interface to control account usage. */
+    private AccountRestrictorAction accountRestrictorAction;
 
     /** default constructor. */
     public AbstractStepUpAccount() {
@@ -68,17 +69,6 @@ public abstract class AbstractStepUpAccount implements StepUpAccount {
         this.editable = true;
     }
 
-    /**
-     * Set 0 or a positive number for retries allowed. Negative number is
-     * interpreted as infinite retries. 0 means one try, no retries.
-     * 
-     * @param limit
-     *            retries allowed.
-     */
-    public void setRetryLimit(int limit) {
-        this.retries = limit;
-    }
-    
     /**
      * Get the id of the account.
      * 
@@ -188,32 +178,6 @@ public abstract class AbstractStepUpAccount implements StepUpAccount {
     }
 
     /**
-     * Set the status of user being verified.
-     */
-    protected void setVerified() {
-
-        this.verified = true;
-    }
-
-    /**
-     * Method to check if account failure limit is reached after failed
-     * authentication.
-     * 
-     * 
-     * @throws FailureLimitReachedException
-     *             if account limit is reached.
-     */
-    protected void verificationFailedCheck() throws FailureLimitReachedException {
-        if (this.retries < 0) {
-            return;
-        }
-        if (this.retries == 0) {
-            throw new FailureLimitReachedException("Account verification retry limit reached");
-        }
-        this.retries--;
-    }
-
-    /**
      * Set the account editable/non editable. Non editable account cannot be
      * modified.
      * 
@@ -268,37 +232,74 @@ public abstract class AbstractStepUpAccount implements StepUpAccount {
     @Override
     public void sendChallenge() throws Exception {
 
-        challenge = null;
-        if (challengeGenerator == null) {
-            throw new Exception("Bean not configured with ChallengeGenerator");
+        if (accountRestrictorAction != null) {
+            // We are adding a new "try" event
+            accountRestrictorAction.addAttempt();
+            // Let's see if account use limit is already reached by that.
+            long pause = accountRestrictorAction.limitReached();
+            if (pause > 0) {
+                log.warn("Account limits reached for account {}, must wait for {}ms", target, pause);
+                throw new LimitReachedException("Account verification retry limit reached");
+            }
         }
-        challenge = challengeGenerator.generate(null);
-
+        challenge = null;
+        if (challengeGenerator != null) {
+            challenge = challengeGenerator.generate(null);
+        }
+        doSendChallenge();
     }
+
+    /**
+     * Override to implement the challenge sending.
+     * 
+     * @throws Exception
+     *             if something unexpected occurs.
+     */
+    protected abstract void doSendChallenge() throws Exception;
 
     /**
      * Verify the response to challenge.
      * 
+     * @param response
+     *            response to be verified.
      * @throws Exception
      *             if something unexpected occurred
      */
     @Override
     public boolean verifyResponse(String response) throws Exception {
+        this.verified = doVerifyResponse(response);
+        if (accountRestrictorAction != null) {
+            // We add a failure event
+            if (!this.verified) {
+                accountRestrictorAction.addFailure();
+            }
+            long pause = accountRestrictorAction.limitReached();
+            if (pause > 0) {
+                log.warn("Account limits reached for account {}, must wait for {}ms", target, pause);
+                throw new LimitReachedException("Account verification retry limit reached");
+            }
 
+        }
+        return this.verified;
+    }
+
+    /**
+     * Override to implement different challenge verification.
+     * 
+     * @param response
+     *            response to check against challenge.
+     * @return true if challenge response was valid.
+     * @throws Exception
+     *             if something unexpected occurs.
+     */
+    protected boolean doVerifyResponse(String response) throws Exception {
         if (challenge == null) {
-
             throw new Exception("null challenge defies logic");
         }
         if (challengeVerifier == null) {
-
             throw new Exception("Bean not configured with ChallengeVerifier");
         }
-        this.verified = challengeVerifier.verify(challenge, response, null);
-        if (!this.verified) {
-            verificationFailedCheck();
-        }
-
-        return this.verified;
+        return challengeVerifier.verify(challenge, response, null);
     }
 
     /**
@@ -326,6 +327,15 @@ public abstract class AbstractStepUpAccount implements StepUpAccount {
     @Override
     public String getTarget() {
         return this.target;
+    }
+
+    /**
+     * Set the restrictor for the account.
+     * 
+     */
+    @Override
+    public void setAccountRestrictor(AccountRestrictorAction restrictor) {
+        accountRestrictorAction = restrictor;
     }
 
 }

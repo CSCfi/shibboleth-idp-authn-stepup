@@ -160,7 +160,7 @@ public class TvilioSMSReceiverStepUpAccount extends ChallengeSenderStepUpAccount
      *             if something unexpected occurred
      */
     @Override
-    public boolean verifyResponse(String response) throws Exception {
+    public boolean doVerifyResponse(String response) throws Exception {
 
         log.debug("Verificating totp response {}", response);
         Twilio.init(accountSid, authToken);
@@ -211,7 +211,6 @@ public class TvilioSMSReceiverStepUpAccount extends ChallengeSenderStepUpAccount
                         message.getDateSent());
                 usedMessages.put(message.getSid(), message.getDateSent());
                 msgLock.unlock();
-                setVerified();
                 return true;
             }
             if (numberOfChecks > 0) {
@@ -219,8 +218,6 @@ public class TvilioSMSReceiverStepUpAccount extends ChallengeSenderStepUpAccount
             }
 
         }
-
-        verificationFailedCheck();
         return false;
     }
 

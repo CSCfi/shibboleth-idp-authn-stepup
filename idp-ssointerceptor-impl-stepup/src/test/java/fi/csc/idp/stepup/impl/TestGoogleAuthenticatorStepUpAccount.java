@@ -23,7 +23,7 @@ public class TestGoogleAuthenticatorStepUpAccount {
     @Test
     public void testSending() throws Exception {
         /** dummy method, must work uninitialized */
-        gaStepUpAccount.sendChallenge();
+        gaStepUpAccount.doSendChallenge();
     }
 
     public void testFailingVerification() throws Exception {

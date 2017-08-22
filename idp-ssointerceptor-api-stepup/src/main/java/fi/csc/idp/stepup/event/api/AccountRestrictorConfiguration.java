@@ -20,52 +20,24 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+package fi.csc.idp.stepup.event.api;
 
-package fi.csc.idp.stepup.impl;
-
-import javax.annotation.Nonnull;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import fi.csc.idp.stepup.api.ChallengeSender;
-
-/**
- * Class implementing Step Up Account of type Challenge Sender. This includes
- * types like SMS, Email etc.
- */
-public class ChallengeSenderStepUpAccount extends AbstractStepUpAccount {
-
-    /** Class logger. */
-    @Nonnull
-    private final Logger log = LoggerFactory.getLogger(ChallengeSenderStepUpAccount.class);
-
-    /** Challenge Sender implementation. */
-    private ChallengeSender challengeSender;
+/** Restrictor configuration interface. */
+public interface AccountRestrictorConfiguration {
 
     /**
-     * Set the Challenge Sender implementation.
+     * Set type of the account for tracking purposes.
      * 
-     * @param sender
-     *            Challenge Sender implementation
+     * @param accountType
+     *            type of the account.
      */
-    public void setChallengeSender(ChallengeSender sender) {
-        this.challengeSender = sender;
-    }
+    public void setType(String accountType);
 
     /**
-     * Send Challenge using the configured implementation.
+     * Set account key value for tracking purposes.
      * 
-     * @throws Exception
-     *             if something unexpected occurred.
+     * @param accountKey
+     *            key of the account.
      */
-    @Override
-    public void doSendChallenge() throws Exception {
-        if (challengeSender == null) {
-            throw new Exception("Bean not configured with ChallengeSender");
-        }
-        challengeSender.send(getChallenge(), getTarget());
-
-    }
-
+    public void setKey(String accountKey);
 }

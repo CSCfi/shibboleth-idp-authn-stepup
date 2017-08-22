@@ -23,14 +23,14 @@
 
 package fi.csc.idp.stepup.api;
 
-/** Exception class indicating account authentication failure limit was reached. */
+/** Exception class indicating account use or failure limit was reached. */
 @SuppressWarnings("serial")
-public class FailureLimitReachedException extends Exception {
+public class LimitReachedException extends Exception {
 
     /**
      * Constructor.
      */
-    public FailureLimitReachedException() {
+    public LimitReachedException() {
     }
 
     /**
@@ -39,7 +39,7 @@ public class FailureLimitReachedException extends Exception {
      * @param message
      *            exception msg
      */
-    public FailureLimitReachedException(String message) {
+    public LimitReachedException(String message) {
         super(message);
     }
 
@@ -49,7 +49,7 @@ public class FailureLimitReachedException extends Exception {
      * @param cause
      *            exception cause
      */
-    public FailureLimitReachedException(Throwable cause) {
+    public LimitReachedException(Throwable cause) {
         super(cause);
     }
 
@@ -61,7 +61,7 @@ public class FailureLimitReachedException extends Exception {
      * @param cause
      *            exception cause.
      */
-    public FailureLimitReachedException(String message, Throwable cause) {
+    public LimitReachedException(String message, Throwable cause) {
         super(message, cause);
     }
 
@@ -77,7 +77,7 @@ public class FailureLimitReachedException extends Exception {
      * @param writableStackTrace
      *            stacktrace writable on/off
      */
-    public FailureLimitReachedException(String message, Throwable cause, boolean enableSuppression,
+    public LimitReachedException(String message, Throwable cause, boolean enableSuppression,
             boolean writableStackTrace) {
         super(message, cause, enableSuppression, writableStackTrace);
     }

@@ -20,52 +20,25 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+package fi.csc.idp.stepup.event.api;
 
-package fi.csc.idp.stepup.impl;
-
-import javax.annotation.Nonnull;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import fi.csc.idp.stepup.api.ChallengeSender;
-
-/**
- * Class implementing Step Up Account of type Challenge Sender. This includes
- * types like SMS, Email etc.
- */
-public class ChallengeSenderStepUpAccount extends AbstractStepUpAccount {
-
-    /** Class logger. */
-    @Nonnull
-    private final Logger log = LoggerFactory.getLogger(ChallengeSenderStepUpAccount.class);
-
-    /** Challenge Sender implementation. */
-    private ChallengeSender challengeSender;
+/** interface for adding status events and verifying event threshold. */
+public interface AccountRestrictorAction {
 
     /**
-     * Set the Challenge Sender implementation.
-     * 
-     * @param sender
-     *            Challenge Sender implementation
+     * Adds a attempt event. Account challenge is generated.
      */
-    public void setChallengeSender(ChallengeSender sender) {
-        this.challengeSender = sender;
-    }
-
+    public void addAttempt();
+    
     /**
-     * Send Challenge using the configured implementation.
-     * 
-     * @throws Exception
-     *             if something unexpected occurred.
+     * Adds a failure event. Challenge response has failed.
      */
-    @Override
-    public void doSendChallenge() throws Exception {
-        if (challengeSender == null) {
-            throw new Exception("Bean not configured with ChallengeSender");
-        }
-        challengeSender.send(getChallenge(), getTarget());
-
-    }
-
+    public void addFailure();
+    
+    /**
+     * Returns estimation in ms until next account action would be under threshold.
+     * 
+     * @return ms until next event
+     */
+    public long limitReached();
 }

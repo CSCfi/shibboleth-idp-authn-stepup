@@ -21,21 +21,14 @@ public class TestChallengeSenderStepUpAccount {
     @Test
     public void testUnitialized() {
         boolean exception = false;
-        boolean exception2 = false;
-        try {
-            challengeSenderStepUpAccount.sendChallenge();
-        } catch (Exception e) {
-            exception = true;
-            Assert.assertEquals("Bean not configured with ChallengeGenerator", e.getMessage());
-        }
         try {
             challengeSenderStepUpAccount.setChallengeGenerator(new ChallengeGen());
             challengeSenderStepUpAccount.sendChallenge();
         } catch (Exception e) {
-            exception2 = true;
+            exception = true;
             Assert.assertEquals("Bean not configured with ChallengeSender", e.getMessage());
         }
-        Assert.assertTrue(exception && exception2);
+        Assert.assertTrue(exception);
     }
 
     public void test() throws Exception {
