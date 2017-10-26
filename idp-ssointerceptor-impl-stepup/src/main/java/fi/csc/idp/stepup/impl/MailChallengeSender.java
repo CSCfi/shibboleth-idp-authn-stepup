@@ -247,6 +247,7 @@ public class MailChallengeSender implements ChallengeSender {
         init();
         final VelocityContext velocityContext = new VelocityContext();
         velocityContext.put("otp", challenge);
+        subject = String.format(subject, challenge);
         StringWriter writer = new StringWriter();
         template.merge(velocityContext, writer);
         Message message = new MimeMessage(session);

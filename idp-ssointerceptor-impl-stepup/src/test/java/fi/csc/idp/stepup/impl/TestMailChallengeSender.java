@@ -40,7 +40,7 @@ public class TestMailChallengeSender {
         mailChallengeSender.setSMTPAuth("false");
         mailChallengeSender.setSMTPTtls("true");
         mailChallengeSender.setPort(new Integer(mailServer.getSmtp().getPort()).toString());
-        mailChallengeSender.setSubjectField("subjectField");
+        mailChallengeSender.setSubjectField("subjectField %s");
         mailChallengeSender.setUserName("from");
         mailChallengeSender.setPassword("password");
 
@@ -50,7 +50,7 @@ public class TestMailChallengeSender {
         Assert.assertEquals(mailServer.getReceivedMessages().length, 100);
         Assert.assertEquals(GreenMailUtil.getBody(mailServer.getReceivedMessages()[0]).trim().replaceAll("\\s", ""),
                 "Dearrecipient,yourfinalpasswordtoaccesstheserviceis0.Pleasedonotreplytothisautomaticallygeneratedmessage.");
-        Assert.assertEquals(mailServer.getReceivedMessages()[0].getSubject(), "subjectField");
+        Assert.assertEquals(mailServer.getReceivedMessages()[0].getSubject(), "subjectField 0");
 
     }
 
