@@ -55,7 +55,6 @@
 				expression="flowRequestContext.getExternalContext().getNativeResponse()"
 				result="viewScope.response" />
 		</on-render>
-		<transition to="HandleErrorLocally" />
 	</view-state>
 
 	<!-- Passthrough state if an exception is thrown. -->
@@ -75,13 +74,6 @@
 	</decision-state>
 	<end-state id="end"
 		view="externalRedirect:#{opensamlProfileRequestContext.getSubcontext(T(fi.csc.idp.stepup.api.OidcStepUpContext)).getResponse().toString()}"></end-state>
-
-	<!-- end state after error display -->
-	<end-state id="HandleErrorLocally">
-		<on-entry>
-			<evaluate expression="RecordResponseComplete" />
-		</on-entry>
-	</end-state>
 
 	<!-- all unhandled non proceed results are turned into errors -->
 	<global-transitions>

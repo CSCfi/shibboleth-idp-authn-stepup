@@ -53,7 +53,6 @@
 				expression="flowRequestContext.getExternalContext().getNativeResponse()"
 				result="viewScope.response" />
 		</on-render>
-		<transition to="HandleErrorLocally" />
 	</view-state>
 
 	<!-- Passthrough state if an exception is thrown. -->
@@ -65,13 +64,6 @@
 		<evaluate expression="'RuntimeException'" />
 		<transition to="DisplayError" />
 	</action-state>
-
-	<!-- end state after error display -->
-	<end-state id="HandleErrorLocally">
-		<on-entry>
-			<evaluate expression="RecordResponseComplete" />
-		</on-entry>
-	</end-state>
 
 	<!-- Successful end state -->
 	<end-state id="proceed" />

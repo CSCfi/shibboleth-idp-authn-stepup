@@ -345,7 +345,6 @@
 				expression="flowRequestContext.getExternalContext().getNativeResponse()"
 				result="viewScope.response" />
 		</on-render>
-		<transition to="HandleErrorLocally" />
 	</view-state>
 
 	<view-state id="DisplayWrongResponse"
@@ -372,7 +371,6 @@
 				expression="flowRequestContext.getExternalContext().getNativeResponse()"
 				result="viewScope.response" />
 		</on-render>
-		<transition to="HandleErrorLocally" />
 	</view-state>
 
 	<!-- views END -->
@@ -386,13 +384,6 @@
 		<evaluate expression="'RuntimeException'" />
 		<transition to="DisplayCondolences" />
 	</action-state>
-
-	<!-- end state after error display -->
-	<end-state id="HandleErrorLocally">
-		<on-entry>
-			<evaluate expression="RecordResponseComplete" />
-		</on-entry>
-	</end-state>
 
 	<!-- Successful end state -->
 	<end-state id="proceed" />

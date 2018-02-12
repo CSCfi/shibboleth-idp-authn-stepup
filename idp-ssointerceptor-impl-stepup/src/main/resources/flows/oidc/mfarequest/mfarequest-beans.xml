@@ -100,7 +100,4 @@
 	<bean id="JWTPrivateKey" class="net.shibboleth.ext.spring.factory.PrivateKeyFactoryBean"
 		p:resource="../../../credentials/oidcjwkprivatekey.pem" />
 
-	<bean id="RecordResponseComplete" class="net.shibboleth.idp.profile.impl.RecordResponseComplete"
-		scope="prototype" />
-
 </beans>
