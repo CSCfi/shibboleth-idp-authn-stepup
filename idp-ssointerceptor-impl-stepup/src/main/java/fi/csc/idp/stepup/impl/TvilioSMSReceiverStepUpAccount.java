@@ -207,7 +207,7 @@ public class TvilioSMSReceiverStepUpAccount extends ChallengeSenderStepUpAccount
         for (int i = 0; i < numberOfChecks; i++) {
             log.debug("Locating messages");
             ResourceSet<Message> messages =
-                    Message.reader().setFrom(new PhoneNumber(getTarget())).setDateSent(rangeDateSentStart).read();
+                    Message.reader().setDateSent(rangeDateSentStart).read();
             for (Message message : messages) {
                 log.debug("Message sid {}", message.getSid());
                 // has to be received by us, doublecheck
