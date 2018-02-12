@@ -43,13 +43,13 @@ import com.twilio.rest.api.v2010.account.Message.Direction;
 import com.twilio.type.PhoneNumber;
 
 /**
- * Step Up Account implementation expecting a SMS response from target to be
- * found in tvilio service.
+ * Step Up Account implementation expecting a SMS response from target to be found in tvilio service.
  */
 public class TvilioSMSReceiverStepUpAccount extends ChallengeSenderStepUpAccount {
 
     /** contains messages already used for verification. */
     private static Map<String, DateTime> usedMessages = new HashMap<String, DateTime>();
+
     /** lock to access usedMessages. */
     private static Lock msgLock = new ReentrantLock();
 
@@ -59,24 +59,39 @@ public class TvilioSMSReceiverStepUpAccount extends ChallengeSenderStepUpAccount
 
     /** SID of the tvilio account. */
     private String accountSid;
+
     /** authentication token of the tvilio account. */
     private String authToken;
+
     /**
-     * time window in ms for authentication event to be acceptable. Value is
-     * used for filtering sms's and for checking the timestamp of a found
-     * message.
+     * time window in ms for authentication event to be acceptable. Value is used for filtering sms's and for checking
+     * the timestamp of a found message.
      */
     private long eventWindow = 30000;
+
     /** how many times sms are checked for successful match. */
     private int numberOfChecks = 10;
+
     /** interval in ms between sms checks. */
     private int intervalOfChecks = 1000;
+
+    /** Maximum number of digits to match (from last one) in phone numbers. 0 means all must match. */
+    private int cmpMax = 0;
+
+    /**
+     * Sets maximum number of digits to match (from last one) in phone numbers. 0 or under means all must match.
+     * 
+     * @param cmpMax maximum number of digits to match (from last one) in phone numbers. 0 or under means all must
+     *            match.
+     */
+    public void setCmpMax(int cmpMax) {
+        this.cmpMax = cmpMax;
+    }
 
     /**
      * Tvilio account SID.
      * 
-     * @param sid
-     *            of the account
+     * @param sid of the account
      */
     public void setAccountSid(String sid) {
 
@@ -86,8 +101,7 @@ public class TvilioSMSReceiverStepUpAccount extends ChallengeSenderStepUpAccount
     /**
      * Tvilio account authentication token.
      * 
-     * @param token
-     *            authentication token.
+     * @param token authentication token.
      */
     public void setAuthToken(String token) {
         this.authToken = token;
@@ -96,8 +110,7 @@ public class TvilioSMSReceiverStepUpAccount extends ChallengeSenderStepUpAccount
     /**
      * Set the event window in ms for authentication response to be acceptable.
      * 
-     * @param window
-     *            in ms
+     * @param window in ms
      */
     public void setEventWindow(long window) {
         this.eventWindow = window;
@@ -106,8 +119,7 @@ public class TvilioSMSReceiverStepUpAccount extends ChallengeSenderStepUpAccount
     /**
      * Set the number of times sms reply is searched for.
      * 
-     * @param number
-     *            number of times sms is searched for
+     * @param number number of times sms is searched for
      */
     public void setNumberOfChecks(int number) {
         this.numberOfChecks = number;
@@ -116,8 +128,7 @@ public class TvilioSMSReceiverStepUpAccount extends ChallengeSenderStepUpAccount
     /**
      * Set the interval between sms searches in milliseconds.
      * 
-     * @param interval
-     *            interval is ms
+     * @param interval interval is ms
      */
     public void setIntervalOfChecks(int interval) {
         this.intervalOfChecks = interval;
@@ -149,15 +160,40 @@ public class TvilioSMSReceiverStepUpAccount extends ChallengeSenderStepUpAccount
     }
 
     /**
-     * Verify targets response can be found from tvilio. Response can be used
-     * only once successfully.
+     * Compare two phone numbers.
+     * 
+     * @param number1 first phone number to compare.
+     * @param number2 second phone number to compare.
+     * @return true if both of the numbers are not null and match. cmpMax parameter may restrict the comparison to last
+     *         n digits.
+     */
+    private boolean cmpNumbers(PhoneNumber number1, PhoneNumber number2) {
+        if (number1 == null || number2 == null) {
+            return false;
+        }
+        if (cmpMax < 1) {
+            return number1.equals(number2);
+        }
+        String first = number1.toString();
+        String second = number2.toString();
+        if (cmpMax < first.length()) {
+            first = first.substring(first.length() - cmpMax, first.length() - 1);
+        }
+        if (cmpMax < second.length()) {
+            second = second.substring(second.length() - cmpMax, second.length() - 1);
+        }
+        log.debug("comparing {} to {}", first, second);
+        return first.equals(second);
+
+    }
+
+    /**
+     * Verify targets response can be found from tvilio. Response can be used only once successfully.
      *
      *
-     * @param response
-     *            is ignored.
+     * @param response is ignored.
      * @return true if response was verified successfully
-     * @throws Exception
-     *             if something unexpected occurred
+     * @throws Exception if something unexpected occurred
      */
     @Override
     public boolean doVerifyResponse(String response) throws Exception {
@@ -170,8 +206,8 @@ public class TvilioSMSReceiverStepUpAccount extends ChallengeSenderStepUpAccount
         log.debug("Searching for messages sent since {}", rangeDateSentStart.toString());
         for (int i = 0; i < numberOfChecks; i++) {
             log.debug("Locating messages");
-            ResourceSet<Message> messages = Message.reader().setFrom(new PhoneNumber(getTarget()))
-                    .setDateSent(rangeDateSentStart).read();
+            ResourceSet<Message> messages =
+                    Message.reader().setFrom(new PhoneNumber(getTarget())).setDateSent(rangeDateSentStart).read();
             for (Message message : messages) {
                 log.debug("Message sid {}", message.getSid());
                 // has to be received by us, doublecheck
@@ -182,7 +218,7 @@ public class TvilioSMSReceiverStepUpAccount extends ChallengeSenderStepUpAccount
                 // has to match target, doublecheck
                 log.debug("Located message from {}", message.getFrom());
                 log.debug("Comparing to {}", getTarget());
-                if (!message.getFrom().equals(new PhoneNumber(getTarget()))) {
+                if (!cmpNumbers(message.getFrom(), new PhoneNumber(getTarget()))) {
                     log.debug("Message discarded, not sent by user");
                     continue;
                 }
