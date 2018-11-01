@@ -85,6 +85,30 @@ public class TestAbstractStepUpAccount {
 
     }
 
+    /** test account serialization */
+	@Test
+	public void testSerialization() {
+		TestStepUpAccount account = new TestStepUpAccount();
+		// Uninitialized account
+		account.deserializeAccountInformation(testStepUpAccount.serializeAccountInformation());
+		Assert.assertEquals(testStepUpAccount.getTarget(), account.getTarget());
+		Assert.assertEquals(testStepUpAccount.getName(), account.getName());
+		Assert.assertEquals(testStepUpAccount.getId(), account.getId());
+		Assert.assertEquals(testStepUpAccount.isEnabled(), account.isEnabled());
+		Assert.assertEquals(testStepUpAccount.isEditable(), account.isEditable());
+		// Initialized account
+		testStepUpAccount.setTarget("Target");
+		testStepUpAccount.setName("Name");
+		testStepUpAccount.setId(101010L);
+		testStepUpAccount.setEnabled(true);
+		testStepUpAccount.setEditable(false);
+		account.deserializeAccountInformation(testStepUpAccount.serializeAccountInformation());
+		Assert.assertEquals(testStepUpAccount.getTarget(), account.getTarget());
+		Assert.assertEquals(testStepUpAccount.getName(), account.getName());
+		Assert.assertEquals(testStepUpAccount.getId(), account.getId());
+		Assert.assertEquals(testStepUpAccount.isEnabled(), account.isEnabled());
+		Assert.assertEquals(testStepUpAccount.isEditable(), account.isEditable());
+	}
     
     /** test challenge verification behavior */
     @Test
