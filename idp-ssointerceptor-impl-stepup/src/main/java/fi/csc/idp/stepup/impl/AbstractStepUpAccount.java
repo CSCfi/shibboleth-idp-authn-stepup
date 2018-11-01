@@ -33,6 +33,9 @@ import fi.csc.idp.stepup.api.ChallengeVerifier;
 import fi.csc.idp.stepup.api.LimitReachedException;
 import fi.csc.idp.stepup.api.StepUpAccount;
 import fi.csc.idp.stepup.event.api.AccountRestrictorAction;
+import net.minidev.json.JSONObject;
+import net.minidev.json.parser.JSONParser;
+import net.minidev.json.parser.ParseException;
 
 /** Helper class for StepUpAccount implementations. */
 public abstract class AbstractStepUpAccount implements StepUpAccount {
@@ -337,5 +340,43 @@ public abstract class AbstractStepUpAccount implements StepUpAccount {
     public void setAccountRestrictor(AccountRestrictorAction restrictor) {
         accountRestrictorAction = restrictor;
     }
+    
+	/**
+	 * Serialize the account information to string for storing it.
+	 * 
+	 * @return serialized account.
+	 */
+	public String serializeAccountInformation() {
+		JSONObject serializedAccount = new JSONObject();
+		serializedAccount.put("id", getId());
+		serializedAccount.put("name", getName());
+		serializedAccount.put("target", getTarget());
+		serializedAccount.put("enabled", isEnabled());
+		serializedAccount.put("editable", isEditable());
+		return serializedAccount.toJSONString();
+	}
+
+	/**
+	 * Initialize the account from serialized account information.
+	 * 
+	 * @param serializedAccount
+	 *            serialized account information
+	 * @return true if information successfully read, otherwise false.
+	 * @throws ParseException
+	 */
+	public boolean deserializeAccountInformation(String serializedAccountInformation) {
+		try {
+			JSONObject serializedAccount = (JSONObject) new JSONParser(JSONParser.MODE_PERMISSIVE)
+					.parse(serializedAccountInformation);
+			setId(((Integer) serializedAccount.get("id")).longValue());
+			setName((String) serializedAccount.get("name"));
+			setTarget((String) serializedAccount.get("target"));
+			setEnabled((boolean) serializedAccount.get("enabled"));
+			setEditable((boolean) serializedAccount.get("editable"));
+			return true;
+		} catch (ParseException e) {
+			return false;
+		}
+	}
 
 }
