@@ -128,6 +128,7 @@ public class TestValidateRequestObjectOfOidcAuthenticationRequest {
         }
         JWT requestObject = new SignedJWT(new JWSHeader.Builder(jwsAlgorithm).keyID(keyID).build(), claimsRequest);
         KeyPairGenerator keyGen = KeyPairGenerator.getInstance("RSA");
+        keyGen.initialize(2048);
         KeyPair pair = keyGen.generateKeyPair();
         PrivateKey signPrvKey = pair.getPrivate();
         ((SignedJWT) requestObject).sign((JWSSigner) new RSASSASigner(signPrvKey));
