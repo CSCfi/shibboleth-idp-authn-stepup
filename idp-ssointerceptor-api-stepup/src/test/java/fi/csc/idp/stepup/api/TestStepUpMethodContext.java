@@ -164,6 +164,18 @@ public class TestStepUpMethodContext {
             // TODO Auto-generated method stub            
         }
 
+		@Override
+		public String serializeAccountInformation() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public boolean deserializeAccountInformation(String serializedAccountInformation) {
+			// TODO Auto-generated method stub
+			return false;
+		}
+
     }
 
 }
