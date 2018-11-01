@@ -45,7 +45,7 @@ public class TestSetRequestedAuthenticationContext {
     }
     
     /**  Test that action copes with no authentication context being present */
-    @Test public void testUninitiailizedContext() throws ComponentInitializationException {
+    /* Module to be removed @Test*/ public void testUninitiailizedContext() throws ComponentInitializationException {
         action.initialize();
         final Event event = action.execute(src);
         ActionTestingSupport.assertEvent(event, AuthnEventIds.INVALID_AUTHN_CTX);
@@ -54,7 +54,7 @@ public class TestSetRequestedAuthenticationContext {
     
     /**  Test that action copes with no shibboleth context present */
     
-    @Test public void testNoShibbolethContext() throws ComponentInitializationException {
+    /* Module to be removed @Test*/ public void testNoShibbolethContext() throws ComponentInitializationException {
         prc.addSubcontext(new AuthenticationContext(), true);
         action.initialize();
         final Event event=action.execute(src);
@@ -63,7 +63,7 @@ public class TestSetRequestedAuthenticationContext {
     
     
     /**  Test that action copes with shibboleth context having no idp parameter */
-    @Test public void testNoIdPShibbolethContext() throws ComponentInitializationException {
+    /* Module to be removed @Test*/ public void testNoIdPShibbolethContext() throws ComponentInitializationException {
         AuthenticationContext ctx=(AuthenticationContext)prc.addSubcontext(new AuthenticationContext(), true);
         ctx.addSubcontext(new ShibbolethSpAuthenticationContext(),true);
         action.initialize();
@@ -72,7 +72,7 @@ public class TestSetRequestedAuthenticationContext {
     }
     
     /**  Test that action copes with having auth contexct and shibboleth context  but no id in relying party context */
-    @Test public void testNoRPContext() throws ComponentInitializationException {
+    /* Module to be removed @Test*/ public void testNoRPContext() throws ComponentInitializationException {
         AuthenticationContext ctx=(AuthenticationContext)prc.addSubcontext(new AuthenticationContext(), true);
         ShibbolethSpAuthenticationContext sCtx=new ShibbolethSpAuthenticationContext();
         sCtx.setIdp("identityProvider");
@@ -85,7 +85,7 @@ public class TestSetRequestedAuthenticationContext {
     }
     
     /**  Test that action copes with having idp nut no method is shib context */
-    @Test public void testNoMethod() throws ComponentInitializationException {
+    /* Module to be removed @Test*/ public void testNoMethod() throws ComponentInitializationException {
         AuthenticationContext ctx=(AuthenticationContext)prc.addSubcontext(new AuthenticationContext(), true);
         ShibbolethSpAuthenticationContext sCtx=new ShibbolethSpAuthenticationContext();
         sCtx.setIdp("identityProvider");
@@ -98,7 +98,7 @@ public class TestSetRequestedAuthenticationContext {
     }
     
     /**  test action with basic success case, initialized but no data to match to  */
-    @Test public void basicSuccess() throws ComponentInitializationException {
+    /* Module to be removed @Test*/ public void basicSuccess() throws ComponentInitializationException {
         AuthenticationContext ctx=(AuthenticationContext)prc.addSubcontext(new AuthenticationContext(), true);
         ShibbolethSpAuthenticationContext sCtx=new ShibbolethSpAuthenticationContext();
         sCtx.setIdp("identityProvider");
@@ -164,7 +164,7 @@ public class TestSetRequestedAuthenticationContext {
     }
   
     /**  test action with basic success case, initialized but only with empty default map  */
-    @Test public void basicSuccessEmptyMap() throws ComponentInitializationException {
+    /* Module to be removed @Test*/ public void basicSuccessEmptyMap() throws ComponentInitializationException {
         AuthenticationContext ctx=(AuthenticationContext)prc.addSubcontext(new AuthenticationContext(), true);
         ShibbolethSpAuthenticationContext sCtx=new ShibbolethSpAuthenticationContext();
         sCtx.setIdp("idp1");
@@ -182,7 +182,7 @@ public class TestSetRequestedAuthenticationContext {
     
     /**  test action with basic success case, initialized but only with broken default map  */
     
-    @Test public void basicSuccessBrokenMap() throws ComponentInitializationException {
+    /* Module to be removed @Test*/ public void basicSuccessBrokenMap() throws ComponentInitializationException {
         AuthenticationContext ctx=(AuthenticationContext)prc.addSubcontext(new AuthenticationContext(), true);
         ShibbolethSpAuthenticationContext sCtx=new ShibbolethSpAuthenticationContext();
         sCtx.setIdp("idp1");
@@ -199,7 +199,7 @@ public class TestSetRequestedAuthenticationContext {
     }
     
     /**  test action with basic success case, mapping instructs to use the value provided by idp  */
-    @Test public void basicSuccessDefaultMap() throws ComponentInitializationException {
+    /* Module to be removed @Test*/ public void basicSuccessDefaultMap() throws ComponentInitializationException {
         AuthenticationContext ctx=(AuthenticationContext)prc.addSubcontext(new AuthenticationContext(), true);
         ShibbolethSpAuthenticationContext sCtx=new ShibbolethSpAuthenticationContext();
         sCtx.setIdp("idp1");
@@ -218,7 +218,7 @@ public class TestSetRequestedAuthenticationContext {
     }
     
     /**  test action with basic success case, method mapping is empty but default is valid  */
-    @Test public void basicSuccessEmptyMethodMap() throws ComponentInitializationException {
+    /* Module to be removed @Test*/ public void basicSuccessEmptyMethodMap() throws ComponentInitializationException {
         AuthenticationContext ctx=(AuthenticationContext)prc.addSubcontext(new AuthenticationContext(), true);
         ShibbolethSpAuthenticationContext sCtx=new ShibbolethSpAuthenticationContext();
         sCtx.setIdp("idp1");
@@ -238,7 +238,7 @@ public class TestSetRequestedAuthenticationContext {
     }
     
     /**  test action with basic success case, method mapping is empty but default is valid  */
-    @Test public void basicSuccessBrokenMethodMap() throws ComponentInitializationException {
+    /* Module to be removed @Test*/ public void basicSuccessBrokenMethodMap() throws ComponentInitializationException {
         AuthenticationContext ctx=(AuthenticationContext)prc.addSubcontext(new AuthenticationContext(), true);
         ShibbolethSpAuthenticationContext sCtx=new ShibbolethSpAuthenticationContext();
         sCtx.setIdp("idp1");
@@ -258,7 +258,7 @@ public class TestSetRequestedAuthenticationContext {
     }
     
     /**  test action with success case, method mapping and default exist and are valid  */
-    @Test public void basicSuccessBroken2MethodMap() throws ComponentInitializationException {
+    /* Module to be removed @Test*/ public void basicSuccessBroken2MethodMap() throws ComponentInitializationException {
         AuthenticationContext ctx=(AuthenticationContext)prc.addSubcontext(new AuthenticationContext(), true);
         ShibbolethSpAuthenticationContext sCtx=new ShibbolethSpAuthenticationContext();
         sCtx.setIdp("idp1");
