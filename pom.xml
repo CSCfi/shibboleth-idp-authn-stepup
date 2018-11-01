@@ -19,7 +19,7 @@
 	<parent>
 		<groupId>net.shibboleth.idp</groupId>
 		<artifactId>idp-parent</artifactId>
-		<version>3.2.1</version>
+		<version>3.4.0</version>
 	</parent>
 	<groupId>fi.csc.idp.stepup</groupId>
 	<artifactId>idp-stepup-parent</artifactId>
@@ -36,7 +36,7 @@
 		<maven.compiler.version>3.2</maven.compiler.version>
 		<maven.compiler.source>1.7</maven.compiler.source>
 		<maven.compiler.target>1.7</maven.compiler.target>
-		<shib.idp.version>3.2.1</shib.idp.version>
+		<shib.idp.version>3.4.0</shib.idp.version>
 		<checkstyle.configLocation>
 			conf/checkstyle.xml
 		</checkstyle.configLocation>
@@ -81,7 +81,7 @@
 			<dependency>
 				<groupId>com.nimbusds</groupId>
 				<artifactId>oauth2-oidc-sdk</artifactId>
-				<version>5.45</version>
+				<version>5.64.4</version>
 			</dependency>
 			<dependency>
 				<groupId>net.shibboleth.idp</groupId>
@@ -170,6 +170,12 @@
 				<version>1.5.0</version>
 				<scope>test</scope>
 			</dependency>
+                        <dependency>
+                                <groupId>org.opensaml</groupId>
+                                <artifactId>opensaml-storage-impl</artifactId>
+                                <version>${shib.idp.version}</version>
+                                <scope>test</scope>
+                        </dependency>
 		</dependencies>
 	</dependencyManagement>
 
@@ -182,11 +188,6 @@
 					<version>2.7</version>
 				</plugin>
 
-				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-checkstyle-plugin</artifactId>
-					<version>${checkstyle.version}</version>
-				</plugin>
 				<plugin>
 					<groupId>org.eluder.coveralls</groupId>
 					<artifactId>coveralls-maven-plugin</artifactId>
@@ -214,31 +215,6 @@
 					<aggregate>true</aggregate>
 				</configuration>
 			</plugin>
-			<!-- Checkstyle configuration for checkstyle:* goals called directly from 
-				the command line. -->
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-checkstyle-plugin</artifactId>
-				<configuration>
-					<configLocation>${checkstyle.configLocation}</configLocation>
-				</configuration>
-				<executions>
-					<execution>
-						<id>validate</id>
-						<phase>package</phase>
-						<configuration>
-							<configLocation>${checkstyle.configLocation}</configLocation>
-							<encoding>UTF-8</encoding>
-							<consoleOutput>true</consoleOutput>
-							<failsOnError>true</failsOnError>
-							<linkXRef>false</linkXRef>
-						</configuration>
-						<goals>
-							<goal>check</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
                         <plugin>
                 		<groupId>org.apache.maven.plugins</groupId>
                 		<artifactId>maven-release-plugin</artifactId>
@@ -248,20 +224,4 @@
             		</plugin>
 		</plugins>
 	</build>
-	<reporting>
-		<plugins>
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>cobertura-maven-plugin</artifactId>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-checkstyle-plugin</artifactId>
-				<version>${checkstyle.version}</version>
-				<configuration>
-					<configLocation>${checkstyle.configLocation}</configLocation>
-				</configuration>
-			</plugin>
-		</plugins>
-	</reporting>
 </project>
