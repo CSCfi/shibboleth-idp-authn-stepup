@@ -23,6 +23,7 @@
 package fi.csc.idp.stepup.api;
 
 import fi.csc.idp.stepup.event.api.AccountRestrictorAction;
+import net.minidev.json.parser.ParseException;
 
 /** Interface implemented by accounts. */
 public interface StepUpAccount {
@@ -145,5 +146,18 @@ public interface StepUpAccount {
      * @param restrictor Account restrictor.
      */
     public void setAccountRestrictor(AccountRestrictorAction restrictor);
+    
+    /**
+     * Serialize the account information to string for storing it.
+     * @return serialized account.
+     */
+    public String serializeAccountInformation();
+    
+    /**
+     * Initialize the account from serialized account information.
+     * @param serializedAccount serialized account information
+     * @return true if information successfully read, otherwise false.
+     */
+    public boolean deserializeAccountInformation(String serializedAccountInformation); 
 
 }
