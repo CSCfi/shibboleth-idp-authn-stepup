@@ -111,6 +111,11 @@ public final class StepUpEventIds {
     @Nonnull
     @NotEmpty
     public static final String EVENTID_RESPONSE_LIMIT = "StepUpLimitReached";
+    
+    /** event id for case of no user information. */
+    @Nonnull
+    @NotEmpty
+    public static final String EVENTID_NO_USER = "NoUser";
 
     /** private constructor to prohibit use of it. */
     private StepUpEventIds() {
