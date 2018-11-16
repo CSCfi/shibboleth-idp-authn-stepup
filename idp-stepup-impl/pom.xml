@@ -16,7 +16,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>fi.csc.idp.stepup</groupId>
-	<artifactId>idp-ssointerceptor-impl-stepup</artifactId>
+	<artifactId>idp-stepup-impl</artifactId>
 	<parent>
 		<groupId>fi.csc.idp.stepup</groupId>
 		<artifactId>idp-stepup-parent</artifactId>
@@ -25,7 +25,7 @@
 	</parent>
 	<packaging>jar</packaging>
 	<version>0.9.4-SNAPSHOT</version>
-	<name>idp-ssointerceptor-impl-stepup</name>
+	<name>idp-stepup-impl</name>
 	<dependencies>
                 <dependency>
                         <groupId>com.google.code.gson</groupId>
@@ -62,7 +62,7 @@
 		</dependency>
 		<dependency>
 			<groupId>fi.csc.idp.stepup</groupId>
-			<artifactId>idp-ssointerceptor-api-stepup</artifactId>
+			<artifactId>idp-stepup-api</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.velocity</groupId>
