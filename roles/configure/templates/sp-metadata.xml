@@ -1,0 +1,112 @@
+<!--
+This is example metadata only. Do *NOT* supply it as is without review,
+and do *NOT* provide it in real time to your partners.
+ -->
+<md:EntityDescriptor xmlns:md="urn:oasis:names:tc:SAML:2.0:metadata" ID="_8d688ef91f0b096d2e032819fcb579f462d087d2" entityID="https://stepup-devel.local/shibboleth">
+
+  <md:Extensions xmlns:alg="urn:oasis:names:tc:SAML:metadata:algsupport">
+    <alg:DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha512"/>
+    <alg:DigestMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#sha384"/>
+    <alg:DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha256"/>
+    <alg:DigestMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#sha224"/>
+    <alg:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1"/>
+    <alg:SigningMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#ecdsa-sha512"/>
+    <alg:SigningMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#ecdsa-sha384"/>
+    <alg:SigningMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#ecdsa-sha256"/>
+    <alg:SigningMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#ecdsa-sha224"/>
+    <alg:SigningMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#rsa-sha512"/>
+    <alg:SigningMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#rsa-sha384"/>
+    <alg:SigningMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"/>
+    <alg:SigningMethod Algorithm="http://www.w3.org/2009/xmldsig11#dsa-sha256"/>
+    <alg:SigningMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#ecdsa-sha1"/>
+    <alg:SigningMethod Algorithm="http://www.w3.org/2000/09/xmldsig#rsa-sha1"/>
+    <alg:SigningMethod Algorithm="http://www.w3.org/2000/09/xmldsig#dsa-sha1"/>
+  </md:Extensions>
+
+  <md:SPSSODescriptor protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol">
+    <md:Extensions>
+      <init:RequestInitiator xmlns:init="urn:oasis:names:tc:SAML:profiles:SSO:request-init" Binding="urn:oasis:names:tc:SAML:profiles:SSO:request-init" Location="https://192.168.0.150/Shibboleth.sso/Login"/>
+    </md:Extensions>
+    <md:KeyDescriptor use="signing">
+      <ds:KeyInfo xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
+        <ds:KeyName>stepup-devel.local</ds:KeyName>
+        <ds:X509Data>
+          <ds:X509SubjectName>CN=stepup-devel.local</ds:X509SubjectName>
+          <ds:X509Certificate>MIID/TCCAmWgAwIBAgIJAIs736hxEnm2MA0GCSqGSIb3DQEBCwUAMB0xGzAZBgNV
+BAMTEnN0ZXB1cC1kZXZlbC5sb2NhbDAeFw0xODEwMzAxNjExMjhaFw0yODEwMjcx
+NjExMjhaMB0xGzAZBgNVBAMTEnN0ZXB1cC1kZXZlbC5sb2NhbDCCAaIwDQYJKoZI
+hvcNAQEBBQADggGPADCCAYoCggGBAKeDG/I15RLFqtLWA/mTxUH15CfNc7/tFvv9
+idhwM3llO0QSGiTFMoNgEa7OS9IE924vRrpD+bRZMIhmWw02gOmkJ/ojZHeo4Rjn
+3XN9oaNaam1gxVGeSfRMHUt3OqvWuPwTCVP2XvM37hk58RZYftGnnuKuikSe4thv
+0QToR86vLSmckdg2dok/OLO3mpYNVYf+mcSNfuOkdwiggRSrfI4rBTtB5+7lRg0P
+pBdHHAd/G4+qeLmvCnFuGm3T4O4lcpKExXsP8xPfyJIcJ1nhb4jRlwgiJ12oETUo
+dOexqwIxmWNWpdojRpd+M2XrS83HxUSsN08YD4+81CJuXh4diFabRekDLUHpBaQF
+v5eAy9ehGlKrdp0G+sd5+/x3K3MzP1JZgztMymIsteOVU80rHDPlHXBz2Ul+I1oS
+LPLFXikWNflcty7GiuC9Z5nVCihJPpSm1eHSq+YtxzQr5R72iPdakgIYdeu2ek7m
+yyYMqeEFJ8bGvfeGa0NXQ2zbQ69RgwIDAQABo0AwPjAdBgNVHREEFjAUghJzdGVw
+dXAtZGV2ZWwubG9jYWwwHQYDVR0OBBYEFHZnk7/k+ou0J2EmxZCjF7IF70FMMA0G
+CSqGSIb3DQEBCwUAA4IBgQAeMWzFir1rgZZwz7kTyNUyBc0STjTWkyHa9nfXBvPs
+gJAeHMsApzYJgFNwllZ8mQuJpXI9SaE0C/gAfbesggqKhJDZlit6K1v5u7ZOVB57
+yDHXIDnINwLQC+kXIlMOEM4cydVCxZ8OVtT7QxZc11G+OyQnC5NKRUOPQqAuY8g6
+/0RDrAcDoH+Pi2/+7VYGRxJu1xZktVkKC8uQ+tlzWYcrkUA+7RoP38AqG3/TgWjp
+6jdk0P1i7lRuBL5COt+EZfQM/ioXWv9eIlWCuwZ5AG1lZhOhKFMmR6vTL0GGX+2X
+XSQcBs/ZijobBIWwWuWk8CEfSR9oMjTVo5smNF2l5akrWEFOBz2JbzlpcUGp0RgN
+6vQV/3IIfLdrWXmgOcnN2NNQXrY5LQMFeIim+r755vgWpJGZ8HnUrppbMrMVtaoU
+l3tydz4MF596kAKgdkCRYWyp8X2L50h0SX7VA5raPT6nyAAJoMhNJDcmGWA+lpym
+qAzSaqFvGl/tbgExS0AWVe8=
+</ds:X509Certificate>
+        </ds:X509Data>
+      </ds:KeyInfo>
+    </md:KeyDescriptor>
+    <md:KeyDescriptor use="encryption">
+      <ds:KeyInfo xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
+        <ds:KeyName>stepup-devel.local</ds:KeyName>
+        <ds:X509Data>
+          <ds:X509SubjectName>CN=stepup-devel.local</ds:X509SubjectName>
+          <ds:X509Certificate>MIID/TCCAmWgAwIBAgIJANn26T3R4VobMA0GCSqGSIb3DQEBCwUAMB0xGzAZBgNV
+BAMTEnN0ZXB1cC1kZXZlbC5sb2NhbDAeFw0xODEwMzAxNjExMjlaFw0yODEwMjcx
+NjExMjlaMB0xGzAZBgNVBAMTEnN0ZXB1cC1kZXZlbC5sb2NhbDCCAaIwDQYJKoZI
+hvcNAQEBBQADggGPADCCAYoCggGBAPfScxdmEyik4wD/FCuULbiM0RIbcg3d+pHG
+A+6T5OuFqPMm2pWJtVD9LLTXUN3pMfdMFNK0LHbKR8SGJ5GD7F9M8TiY52DMGaJ3
+s+AQoU3OTL7xKfWbEE7Gm7G9qA77ApYlb0Nz/s5OjXhB62A1WzYl37wTGs+WRTlC
+ggrYkDeS+VVGd0WxauG8kot3viIrzvFzZ0zQlkBM2zALXZI5+nDjA8yXnd1Gecve
+fTCKBacjEHUkCAav8fX244Yk+gu51QRAylnRg7a5ZVoV1m05ePfDF+BCwpXqi01S
+5almlqxhIWFB1IP7wcOxz1OFfNwfC2jr1R2hbyz+cHHPntkdmpe6fIxIx/M2C2a2
+rBt1f9RV1KqjWKirKDJBD5S4QOUlnKPQfwFTz5e8BO4xYxrOT6pTCiYilOhKH6Rc
+Ef3WiJbpyW4EUawQsIUz/EOFbhFH9HTnpHx+il8gsgViGcgR/4225KvlcoiPgAXU
+L7U24acz0/rgsglXb1CShWRfTfRU4QIDAQABo0AwPjAdBgNVHREEFjAUghJzdGVw
+dXAtZGV2ZWwubG9jYWwwHQYDVR0OBBYEFE81jh5w92AmvHgrG+h8T57q6mM9MA0G
+CSqGSIb3DQEBCwUAA4IBgQA8GDbt8FEaLARhZfxgB5sCGSkEN1ep3gJtAnQUTsbA
+Ui9jbjXBXbEcyIKaUVnvM55yeHGfPzUVsa4/IF2Tv9ZXfDjUBmgeyhBEzs+Wprva
+CYdyblaWKHWofqe2BAdCqaAAaG6X3mi+LfoZPI3Md+tgomahqe7dHphFM7LifvO8
+FAgA5hMq9WVpGA29S3l5PPTso5y3aYIQwsrbUDCt5b0GgMVIG2uhDHJhYoXyCa/9
+GUxWoCSaKElcuWaTKcWBiTqfUsCY+PUu3mZTL2ToCthxZjmF/hC1+SarPZwZFbV1
+3Fs+l/pDb3H7zk+trWQCYkpFjALpFX+O3hs/gL5wJBOlKlGQuWgGjVoDP6j0lkTJ
+UKiNmthXc8TjIT3Pd3G8z5bt09OahghBfz4LVxdFR5Ga9QyYBKBPISXNQ4ae88Hh
+krHSyHBrIYC1ESbS243GDUlUxOddPmjEFJ09jDn52KPG7nBN8E1FiPdqqWj4xuuU
+2+gRSgpGgIq0mu+hQy8C3vk=
+</ds:X509Certificate>
+        </ds:X509Data>
+      </ds:KeyInfo>
+      <md:EncryptionMethod Algorithm="http://www.w3.org/2009/xmlenc11#aes128-gcm"/>
+      <md:EncryptionMethod Algorithm="http://www.w3.org/2009/xmlenc11#aes192-gcm"/>
+      <md:EncryptionMethod Algorithm="http://www.w3.org/2009/xmlenc11#aes256-gcm"/>
+      <md:EncryptionMethod Algorithm="http://www.w3.org/2001/04/xmlenc#aes128-cbc"/>
+      <md:EncryptionMethod Algorithm="http://www.w3.org/2001/04/xmlenc#aes192-cbc"/>
+      <md:EncryptionMethod Algorithm="http://www.w3.org/2001/04/xmlenc#aes256-cbc"/>
+      <md:EncryptionMethod Algorithm="http://www.w3.org/2001/04/xmlenc#tripledes-cbc"/>
+      <md:EncryptionMethod Algorithm="http://www.w3.org/2009/xmlenc11#rsa-oaep"/>
+      <md:EncryptionMethod Algorithm="http://www.w3.org/2001/04/xmlenc#rsa-oaep-mgf1p"/>
+    </md:KeyDescriptor>
+    <md:ArtifactResolutionService Binding="urn:oasis:names:tc:SAML:2.0:bindings:SOAP" Location="https://192.168.0.150/Shibboleth.sso/Artifact/SOAP" index="1"/>
+    <md:SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:SOAP" Location="https://192.168.0.150/Shibboleth.sso/SLO/SOAP"/>
+    <md:SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" Location="https://192.168.0.150/Shibboleth.sso/SLO/Redirect"/>
+    <md:SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="https://192.168.0.150/Shibboleth.sso/SLO/POST"/>
+    <md:SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Artifact" Location="https://192.168.0.150/Shibboleth.sso/SLO/Artifact"/>
+    <md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="https://192.168.0.150/Shibboleth.sso/SAML2/POST" index="1"/>
+    <md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST-SimpleSign" Location="https://192.168.0.150/Shibboleth.sso/SAML2/POST-SimpleSign" index="2"/>
+    <md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Artifact" Location="https://192.168.0.150/Shibboleth.sso/SAML2/Artifact" index="3"/>
+    <md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:PAOS" Location="https://192.168.0.150/Shibboleth.sso/SAML2/ECP" index="4"/>
+  </md:SPSSODescriptor>
+
+</md:EntityDescriptor>

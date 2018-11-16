@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<EntityDescriptor  xmlns="urn:oasis:names:tc:SAML:2.0:metadata" xmlns:ds="http://www.w3.org/2000/09/xmldsig#" xmlns:shibmd="urn:mace:shibboleth:metadata:1.0" xmlns:xml="http://www.w3.org/XML/1998/namespace" xmlns:mdui="urn:oasis:names:tc:SAML:metadata:ui" xmlns:req-attr="urn:oasis:names:tc:SAML:protocol:ext:req-attr" entityID="https://stepup-devel.local/idp/shibboleth">
+    <IDPSSODescriptor protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol urn:oasis:names:tc:SAML:1.1:protocol urn:mace:shibboleth:1.0">
+
+        <Extensions>
+            <shibmd:Scope regexp="false">csc.fi</shibmd:Scope>
+        </Extensions>
+        <KeyDescriptor use="signing">
+            <ds:KeyInfo>
+                    <ds:X509Data>
+                        <ds:X509Certificate>
+MIIC4jCCAcoCCQDfCtffq64NNzANBgkqhkiG9w0BAQsFADAzMRYwFAYDVQQDDA0x
+OTIuMTY4LjAuMTUwMQwwCgYDVQQKDANDU0MxCzAJBgNVBAYTAkZJMB4XDTE4MDcy
+NDA3MTAwNFoXDTI4MDcyMTA3MTAwNFowMzEWMBQGA1UEAwwNMTkyLjE2OC4wLjE1
+MDEMMAoGA1UECgwDQ1NDMQswCQYDVQQGEwJGSTCCASIwDQYJKoZIhvcNAQEBBQAD
+ggEPADCCAQoCggEBAKPWnY1sq9QYKkrjlPHZn7o4OoPxc4KWd+u4+0PuAOzymY8k
+wnF5onXVTPw+ZCopiQ3dyPLU6WFB/CiwQN/S+WxcJa5fX6FXtcsOHe9oOu2jD1xL
+pHyg3CZ9Di/BKPA3C9XeiIzN3wlhvRhuwBdgiZffHnFMBIbjeNRA9TqGOKrbnqWz
+C0SoXf41de5Ii5PuRAquitW/BckNgTXRg59LyYxYkKtl7u1ZXkV9JbwjoocsMXjB
+b5SN81sF40P9V6kp2WmhhZ799p1C0+BjK58zCZP4MsddgphDAh+j+hyD8nMgn1er
+TOXxJ6SYsTg0PNv7PF2BVpPUqiwC81bf/3Ww/78CAwEAATANBgkqhkiG9w0BAQsF
+AAOCAQEAVLYboDJpLou0dMCstKVyUpIieRL5yJQMny1YuQ+IfHDgcYmXkHoqB9/V
+ZNw6hN8VaJmB5TetLb7UR969FLVnugS1MvoZPW6KwGkJvQE/J9JDXHggHylG+i0Q
+mD0pK46Zpz1RgZAtHraLc9mOS1ukLaWZThzOJs/adreJJdQktIKu35eWB+oBtrZG
+UvnPHGRD9s3vRikEny/LazduxMSzAKMlm0v3xl3dFhVx1jFz1d8Na1ZtCIaVzCHj
+z7cyUDKZkB+LGo0OaWOCWNCtIY13yMKtTBWSAWPPNrtUVhmirxz5wbgOCG4uzTzQ
+vBTKX3e5LHK0FGZGKVZLm28T/B29HA==
+                        </ds:X509Certificate>
+                    </ds:X509Data>
+            </ds:KeyInfo>
+
+        </KeyDescriptor>
+
+        <SingleSignOnService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" req-attr:supportsRequestedAttributes="true" Location="https://stepup-devel.local/idp/profile/SAML2/POST/SSO"/>
+        <SingleSignOnService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST-SimpleSign" req-attr:supportsRequestedAttributes="true" Location="https://stepup-devel.local/idp/profile/SAML2/POST-SimpleSign/SSO"/>
+        <SingleSignOnService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" req-attr:supportsRequestedAttributes="true" Location="https://192.168.0.150/idp/profile/SAML2/Redirect/SSO"/>
+
+    </IDPSSODescriptor>
+</EntityDescriptor>

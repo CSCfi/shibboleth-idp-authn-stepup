@@ -1,0 +1,5 @@
+---
+#environment variables to source for building shibboleth idp package
+environment_file: /etc/default/shibboleth-idp
+build_user: vagrant
+idp_home: /opt/shibboleth-idp
