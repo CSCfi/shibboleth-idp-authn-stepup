@@ -38,6 +38,12 @@
                 scope="prototype" p:httpServletRequest-ref="shibboleth.HttpServletRequest" />
         </constructor-arg>
     </bean>
+
+    <bean id="ValidateToken" class="fi.csc.idp.stepup.api.profile.impl.ValidateToken" scope="prototype"
+        p:tokenValidator-ref="UserInfoTokenValidator" />
+        
+    <bean id="UserInfoTokenValidator" class="fi.csc.idp.stepup.api.profile.impl.UserInfoTokenValidator"
+        p:httpClient-ref="shibboleth.NonCachingHttpClient" p:userInfoEndpoint="https://testop.funet.fi/idp/profile/oidc/userinfo"/>
     
     <bean id="ReadAccount" class="fi.csc.idp.stepup.api.profile.impl.ReadAccount" scope="prototype" />
     
@@ -68,7 +74,5 @@
     <bean id="RecordResponseComplete"
         class="net.shibboleth.idp.profile.impl.RecordResponseComplete"
         scope="prototype" />
-        
-     
 
 </beans>
