@@ -65,6 +65,7 @@ public class ValueTokenValidator implements TokenValidator {
 		if (matchPattern == null) {
 			return true;
 		}
+		log.debug("Matching {} to {}",matchPattern, key);
 		Pattern regex = Pattern.compile(matchPattern);
 		Matcher m = regex.matcher(key);
 		return m.matches();
