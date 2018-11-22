@@ -36,38 +36,37 @@ import fi.csc.idp.stepup.api.TokenValidator;
  */
 public class ValueTokenValidator implements TokenValidator {
 
-	/** Class logger. */
-	@Nonnull
-	private final Logger log = LoggerFactory.getLogger(ValueTokenValidator.class);
+    /** Class logger. */
+    @Nonnull
+    private final Logger log = LoggerFactory.getLogger(ValueTokenValidator.class);
 
-	/** Validation map the response is compared to. */
-	private Map<String, String> validationMap;
+    /** Validation map the response is compared to. */
+    private Map<String, String> validationMap;
 
-	/**
-	 * Validation map the key is compared to.
-	 * 
-	 * @param validationMap
-	 *            validation map the response is compared to.
-	 */
-	public void setValidationMap(Map<String, String> validationMap) {
-		this.validationMap = validationMap;
-	}
+    /**
+     * Validation map the key is compared to.
+     * 
+     * @param validationMap validation map the response is compared to.
+     */
+    public void setValidationMap(Map<String, String> validationMap) {
+        this.validationMap = validationMap;
+    }
 
-	@Override
-	public boolean validate(String token, String key) {
-		if (validationMap == null || token == null || key == null) {
-			return false;
-		}
-		if (!validationMap.containsKey(token)) {
-			return false;
-		}
-		String matchPattern = validationMap.get(token);
-		if (matchPattern == null) {
-			return true;
-		}
-		log.debug("Matching {} to {}",matchPattern, key);
-		Pattern regex = Pattern.compile(matchPattern);
-		Matcher m = regex.matcher(key);
-		return m.matches();
-	}
+    @Override
+    public boolean validate(String token, String key) {
+        if (validationMap == null || token == null || key == null) {
+            return false;
+        }
+        if (!validationMap.containsKey(token)) {
+            return false;
+        }
+        String matchPattern = validationMap.get(token);
+        if (matchPattern == null) {
+            return true;
+        }
+        log.debug("Matching {} to {}", matchPattern, key);
+        Pattern regex = Pattern.compile(matchPattern);
+        Matcher m = regex.matcher(key);
+        return m.matches();
+    }
 }

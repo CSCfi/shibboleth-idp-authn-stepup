@@ -116,6 +116,11 @@ public final class StepUpEventIds {
     @Nonnull
     @NotEmpty
     public static final String EVENTID_NO_USER = "NoUser";
+    
+    /** event id for case of unauthorized access. */
+    @Nonnull
+    @NotEmpty
+    public static final String EVENTID_FORBIDDEN = "Forbidden";
 
     /** private constructor to prohibit use of it. */
     private StepUpEventIds() {

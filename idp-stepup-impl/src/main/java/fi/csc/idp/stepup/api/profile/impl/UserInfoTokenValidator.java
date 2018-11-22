@@ -50,135 +50,129 @@ import net.shibboleth.utilities.java.support.logic.Constraint;
 import net.shibboleth.utilities.java.support.primitive.StringSupport;
 
 /**
- * Validates access token by performing userinfo request and by comparing the
- * response to a map.
+ * Validates access token by performing userinfo request and by comparing the response to a map.
  */
 public class UserInfoTokenValidator implements TokenValidator {
 
-	/** Class logger. */
-	@Nonnull
-	private final Logger log = LoggerFactory.getLogger(UserInfoTokenValidator.class);
+    /** Class logger. */
+    @Nonnull
+    private final Logger log = LoggerFactory.getLogger(UserInfoTokenValidator.class);
 
-	/** HTTP Client used to post the data. */
-	@NonnullAfterInit
-	private HttpClient httpClient;
+    /** HTTP Client used to post the data. */
+    @NonnullAfterInit
+    private HttpClient httpClient;
 
-	/** URL to the userinfo endpoint. */
-	@NonnullAfterInit
-	@NotEmpty
-	private String userInfoEndpoint;
+    /** URL to the userinfo endpoint. */
+    @NonnullAfterInit
+    @NotEmpty
+    private String userInfoEndpoint;
 
-	/** HTTP client security parameters. */
-	@Nullable
-	private HttpClientSecurityParameters httpClientSecurityParameters;
+    /** HTTP client security parameters. */
+    @Nullable
+    private HttpClientSecurityParameters httpClientSecurityParameters;
 
-	/** Validation map the response is compared to. */
-	private Map<String, Object> validationMap;
+    /** Validation map the response is compared to. */
+    private Map<String, Object> validationMap;
 
-	/**
-	 * Set the {@link HttpClient} to use.
-	 * 
-	 * @param client
-	 *            client to use
-	 */
-	public void setHttpClient(@Nonnull final HttpClient client) {
-		httpClient = Constraint.isNotNull(client, "HttpClient cannot be null");
-	}
+    /**
+     * Set the {@link HttpClient} to use.
+     * 
+     * @param client client to use
+     */
+    public void setHttpClient(@Nonnull final HttpClient client) {
+        httpClient = Constraint.isNotNull(client, "HttpClient cannot be null");
+    }
 
-	/**
-	 * Set the userinfo endpoint to get response from.
-	 * 
-	 * @param url
-	 *            userinfo endpoint to get response from
-	 */
-	public void setUserInfoEndpoint(@Nonnull @NotEmpty final String url) {
-		userInfoEndpoint = Constraint.isNotNull(StringSupport.trimOrNull(url),
-				"UserInfo endpoint cannot be null or empty");
-	}
+    /**
+     * Set the userinfo endpoint to get response from.
+     * 
+     * @param url userinfo endpoint to get response from
+     */
+    public void setUserInfoEndpoint(@Nonnull @NotEmpty final String url) {
+        userInfoEndpoint =
+                Constraint.isNotNull(StringSupport.trimOrNull(url), "UserInfo endpoint cannot be null or empty");
+    }
 
-	/**
-	 * Set the optional client security parameters.
-	 * 
-	 * @param params
-	 *            the new client security parameters
-	 */
-	public void setHttpClientSecurityParameters(@Nullable final HttpClientSecurityParameters params) {
-		httpClientSecurityParameters = params;
-	}
+    /**
+     * Set the optional client security parameters.
+     * 
+     * @param params the new client security parameters
+     */
+    public void setHttpClientSecurityParameters(@Nullable final HttpClientSecurityParameters params) {
+        httpClientSecurityParameters = params;
+    }
 
-	/**
-	 * Validation map the response is compared to.
-	 * 
-	 * @param validationMap
-	 *            alidation map the response is compared to.
-	 */
-	public void setValidationMap(Map<String, Object> validationMap) {
-		this.validationMap = validationMap;
-	}
+    /**
+     * Validation map the response is compared to.
+     * 
+     * @param validationMap alidation map the response is compared to.
+     */
+    public void setValidationMap(Map<String, Object> validationMap) {
+        this.validationMap = validationMap;
+    }
 
-	public JSONObject getUserInfoResponse(String accessToken) throws ClientProtocolException, IOException,
-			ParseException, net.minidev.json.parser.ParseException, ComponentInitializationException {
-		if (httpClient == null || userInfoEndpoint == null) {
-			throw new ComponentInitializationException("HttpClient and UserInfoEndpoint cannot be null");
-		}
-		final HttpGet httpRequest = new HttpGet(userInfoEndpoint);
-		final HttpClientContext httpContext = buildHttpContext(httpRequest);
-		httpRequest.setHeader("Authorization", "Bearer " + accessToken);
-		final HttpResponse response = httpClient.execute(httpRequest, httpContext);
-		HttpClientSecuritySupport.checkTLSCredentialEvaluated(httpContext, httpRequest.getURI().getScheme());
-		if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
-			String responseString = EntityUtils.toString(response.getEntity());
-			log.debug("success response {}", responseString);
-			return (JSONObject) new JSONParser(JSONParser.DEFAULT_PERMISSIVE_MODE).parse(responseString);
-		}
-		log.error("Endpoint returned with HTTP status {}", response.getStatusLine().getStatusCode());
-		return null;
-	}
+    public JSONObject getUserInfoResponse(String accessToken) throws ClientProtocolException, IOException,
+            ParseException, net.minidev.json.parser.ParseException, ComponentInitializationException {
+        if (httpClient == null || userInfoEndpoint == null) {
+            throw new ComponentInitializationException("HttpClient and UserInfoEndpoint cannot be null");
+        }
+        final HttpGet httpRequest = new HttpGet(userInfoEndpoint);
+        final HttpClientContext httpContext = buildHttpContext(httpRequest);
+        httpRequest.setHeader("Authorization", "Bearer " + accessToken);
+        final HttpResponse response = httpClient.execute(httpRequest, httpContext);
+        HttpClientSecuritySupport.checkTLSCredentialEvaluated(httpContext, httpRequest.getURI().getScheme());
+        if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
+            String responseString = EntityUtils.toString(response.getEntity());
+            log.debug("success response {}", responseString);
+            return (JSONObject) new JSONParser(JSONParser.DEFAULT_PERMISSIVE_MODE).parse(responseString);
+        }
+        log.error("Endpoint returned with HTTP status {}", response.getStatusLine().getStatusCode());
+        return null;
+    }
 
-	/**
-	 * Build the {@link HttpClientContext} instance to be used by the HttpClient.
-	 * 
-	 * @param request
-	 *            the HTTP client request
-	 * @return the client context instance
-	 */
-	@Nonnull
-	private HttpClientContext buildHttpContext(@Nonnull final HttpUriRequest request) {
-		final HttpClientContext clientContext = HttpClientContext.create();
-		HttpClientSecuritySupport.marshalSecurityParameters(clientContext, httpClientSecurityParameters, false);
-		HttpClientSecuritySupport.addDefaultTLSTrustEngineCriteria(clientContext, request);
-		return clientContext;
-	}
+    /**
+     * Build the {@link HttpClientContext} instance to be used by the HttpClient.
+     * 
+     * @param request the HTTP client request
+     * @return the client context instance
+     */
+    @Nonnull
+    private HttpClientContext buildHttpContext(@Nonnull final HttpUriRequest request) {
+        final HttpClientContext clientContext = HttpClientContext.create();
+        HttpClientSecuritySupport.marshalSecurityParameters(clientContext, httpClientSecurityParameters, false);
+        HttpClientSecuritySupport.addDefaultTLSTrustEngineCriteria(clientContext, request);
+        return clientContext;
+    }
 
-	@Override
-	public boolean validate(String token, String key) {
-		JSONObject response = null;
-		try {
-			response = getUserInfoResponse(token);
-		} catch (ParseException | IOException | net.minidev.json.parser.ParseException
-				| ComponentInitializationException e) {
-			log.error("Error parsing response {}", e.getMessage());
-			return false;
-		}
-		if (response == null) {
-			log.debug("No success response to validate");
-			return false;
-		}
-		if (validationMap != null) {
-			for (String validationKey : validationMap.keySet()) {
-				if (!response.containsKey(validationKey)) {
-					log.debug("Response not containing required field {}", validationKey);
-					return false;
-				}
-				if (validationMap.get(validationKey) != null
-						&& !validationMap.get(validationKey).equals(response.get(validationKey))) {
-					log.debug("For validation field {} response contained value {} instead of {}", validationKey,
-							response.get(validationKey), validationMap.get(validationKey));
-					return false;
-				}
-			}
-		}
-		log.debug("access token validated");
-		return true;
-	}
+    @Override
+    public boolean validate(String token, String key) {
+        JSONObject response = null;
+        try {
+            response = getUserInfoResponse(token);
+        } catch (ParseException | IOException | net.minidev.json.parser.ParseException
+                | ComponentInitializationException e) {
+            log.error("Error parsing response {}", e.getMessage());
+            return false;
+        }
+        if (response == null) {
+            log.debug("No success response to validate");
+            return false;
+        }
+        if (validationMap != null) {
+            for (String validationKey : validationMap.keySet()) {
+                if (!response.containsKey(validationKey)) {
+                    log.debug("Response not containing required field {}", validationKey);
+                    return false;
+                }
+                if (validationMap.get(validationKey) != null
+                        && !validationMap.get(validationKey).equals(response.get(validationKey))) {
+                    log.debug("For validation field {} response contained value {} instead of {}", validationKey,
+                            response.get(validationKey), validationMap.get(validationKey));
+                    return false;
+                }
+            }
+        }
+        log.debug("access token validated");
+        return true;
+    }
 }

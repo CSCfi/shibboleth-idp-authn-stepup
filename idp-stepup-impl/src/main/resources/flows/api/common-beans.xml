@@ -52,13 +52,12 @@
         <property name="eventContextLookupStrategy">
             <bean class="net.shibboleth.idp.profile.context.navigate.WebFlowCurrentEventLookupFunction" />
         </property>
-        <!-- 
         <property name="mappedErrors">
             <map value-type="java.lang.Integer">
-                <entry key="#{T(org.opensaml.profile.action.EventIds).UNABLE_TO_DECODE}" value="400" />
+                <entry key="#{T(fi.csc.idp.stepup.api.StepUpEventIds).EVENTID_NO_USER}" value="400" />
+                <entry key="#{T(fi.csc.idp.stepup.api.StepUpEventIds).EVENTID_FORBIDDEN}" value="403" />
             </map>        
         </property>
-         -->
     </bean>
 
     <bean id="BuildApiResponse" class="fi.csc.idp.stepup.api.profile.impl.BuildApiResponse"

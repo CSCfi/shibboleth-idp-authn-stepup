@@ -51,16 +51,17 @@ public class SetResponseStatusCodeFromEvent extends AbstractProfileAction {
     /** Class logger. */
     @Nonnull
     private final Logger log = LoggerFactory.getLogger(SetResponseStatusCodeFromEvent.class);
-    
+
     /** Strategy function for access to {@link EventContext} to check. */
-    @Nonnull private Function<ProfileRequestContext,EventContext> eventContextLookupStrategy;
-    
+    @Nonnull
+    private Function<ProfileRequestContext, EventContext> eventContextLookupStrategy;
+
     /** Map of eventIds to status codes. */
     private Map<String, Integer> mappedErrors;
-    
+
     /** The status code for unmapped events. */
     private int defaultCode;
-    
+
     /** Constructor. */
     public SetResponseStatusCodeFromEvent() {
         eventContextLookupStrategy = new CurrentOrPreviousEventLookup();
@@ -71,14 +72,14 @@ public class SetResponseStatusCodeFromEvent extends AbstractProfileAction {
     /**
      * Set lookup strategy for {@link EventContext} to check.
      * 
-     * @param strategy  lookup strategy
+     * @param strategy lookup strategy
      */
-    public void setEventContextLookupStrategy(@Nonnull final Function<ProfileRequestContext,EventContext> strategy) {
+    public void setEventContextLookupStrategy(@Nonnull final Function<ProfileRequestContext, EventContext> strategy) {
         ComponentSupport.ifInitializedThrowUnmodifiabledComponentException(this);
-        
+
         eventContextLookupStrategy = Constraint.isNotNull(strategy, "EventContext lookup strategy cannot be null");
     }
-    
+
     /**
      * Set the status code for unmapped events.
      * 
@@ -87,7 +88,7 @@ public class SetResponseStatusCodeFromEvent extends AbstractProfileAction {
     public void setDefaultCode(final int code) {
         defaultCode = code;
     }
-    
+
     /**
      * Set map of eventIds to status codes.
      * 
@@ -97,7 +98,7 @@ public class SetResponseStatusCodeFromEvent extends AbstractProfileAction {
         ComponentSupport.ifInitializedThrowUnmodifiabledComponentException(this);
         mappedErrors = Constraint.isNotNull(errors, "Mapped errors cannot be null");
     }
-    
+
     /** {@inheritDoc} */
     @Override
     protected void doExecute(@Nonnull final ProfileRequestContext profileRequestContext) {
@@ -114,5 +115,6 @@ public class SetResponseStatusCodeFromEvent extends AbstractProfileAction {
             log.debug("{} No mapping found for {}, default status code {} set", getLogPrefix(), event, defaultCode);
             getHttpServletResponse().setStatus(defaultCode);
         }
+        // If there is response message we include that
     }
 }
