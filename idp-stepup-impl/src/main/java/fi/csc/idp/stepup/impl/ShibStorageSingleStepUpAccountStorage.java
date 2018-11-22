@@ -38,7 +38,8 @@ import org.opensaml.storage.StorageRecord;
  * Shibboleth storage implementation of Step Up Account storage. Capable of storing only one account per user. Treats
  * add and update operations as the same.
  */
-public class ShibStorageSingleStepUpAccountStorage implements StepUpAccountStorage {
+public class ShibStorageSingleStepUpAccountStorage extends AbstractStepUpAccountStorage
+        implements StepUpAccountStorage {
 
     /** Storage service to use. */
     private StorageService storage;
@@ -64,8 +65,10 @@ public class ShibStorageSingleStepUpAccountStorage implements StepUpAccountStora
         Constraint.isNotNull(storage, "StorageService cannot be null");
         Constraint.isNotNull(account, "Account cannot be null");
         Constraint.isNotNull(key, "Key cannot be null");
-        if (!storage.create(STORAGE_CONTEXT, key, account.serializeAccountInformation(), null)
-                && !storage.update(STORAGE_CONTEXT, key, account.serializeAccountInformation(), null)) {
+        if (!storage.create(STORAGE_CONTEXT, encryptKey(key), encryptTarget(account.serializeAccountInformation()),
+                null)
+                && !storage.update(STORAGE_CONTEXT, encryptKey(key),
+                        encryptTarget(account.serializeAccountInformation()), null)) {
             throw new Exception("Unable to add account");
         }
     }
@@ -75,7 +78,7 @@ public class ShibStorageSingleStepUpAccountStorage implements StepUpAccountStora
         Constraint.isNotNull(storage, "StorageService cannot be null");
         Constraint.isNotNull(account, "Account cannot be null");
         Constraint.isNotNull(key, "Key cannot be null");
-        storage.delete(STORAGE_CONTEXT, key);
+        storage.delete(STORAGE_CONTEXT, encryptKey(key));
     }
 
     @Override
@@ -83,7 +86,7 @@ public class ShibStorageSingleStepUpAccountStorage implements StepUpAccountStora
         Constraint.isNotNull(storage, "StorageService cannot be null");
         Constraint.isNotNull(account, "Account cannot be null");
         Constraint.isNotNull(key, "Key cannot be null");
-        add(account, key);
+        add(account, encryptKey(key));
 
     }
 
@@ -93,17 +96,18 @@ public class ShibStorageSingleStepUpAccountStorage implements StepUpAccountStora
         Constraint.isNotNull(aClass, "Class cannot be null");
         Constraint.isNotNull(key, "Key cannot be null");
         List<StepUpAccount> accounts = new ArrayList<StepUpAccount>();
-        @SuppressWarnings("rawtypes") StorageRecord entry = storage.read(STORAGE_CONTEXT, key);
+        @SuppressWarnings("rawtypes") StorageRecord entry = storage.read(STORAGE_CONTEXT, encryptKey(key));
         if (entry != null) {
             Object obj = aClass.newInstance();
             if (!(obj instanceof StepUpAccount)) {
                 throw new Exception("Unable to instantiate StepUpAccount");
             }
             StepUpAccount stepUpAccount = (StepUpAccount) obj;
-            if (stepUpAccount.deserializeAccountInformation(entry.getValue())) {
+            if (stepUpAccount.deserializeAccountInformation(decryptTarget(entry.getValue()))) {
                 accounts.add(stepUpAccount);
             } else {
-                throw new Exception("Unable to deserialize StepUpAccount from value " + entry.getValue());
+                throw new Exception(
+                        "Unable to deserialize StepUpAccount from value " + decryptTarget(entry.getValue()));
             }
         }
         return accounts;
