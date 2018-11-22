@@ -72,7 +72,7 @@ public class UserInfoTokenValidator implements TokenValidator {
     private HttpClientSecurityParameters httpClientSecurityParameters;
 
     /** Validation map the response is compared to. */
-    private Map<String, Object> validationMap;
+    private Map<String, String> validationMap;
 
     /**
      * Set the {@link HttpClient} to use.
@@ -107,7 +107,7 @@ public class UserInfoTokenValidator implements TokenValidator {
      * 
      * @param validationMap alidation map the response is compared to.
      */
-    public void setValidationMap(Map<String, Object> validationMap) {
+    public void setValidationMap(Map<String, String> validationMap) {
         this.validationMap = validationMap;
     }
 

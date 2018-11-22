@@ -40,10 +40,22 @@
     </bean>
 
     <bean id="ValidateToken" class="fi.csc.idp.stepup.api.profile.impl.ValidateToken" scope="prototype"
-        p:tokenValidator-ref="UserInfoTokenValidator" />
-        
+    p:tokenValidator-ref="ValueTokenValidator" />
+
+    <bean id="ValueTokenValidator" class="fi.csc.idp.stepup.api.profile.impl.ValueTokenValidator"
+        p:validationMap-ref="exampleTokenMap" />
+
+    <util:map id="exampleTokenMap">
+        <entry key="token" value="^[A-Za-z0-9._%+-]+@testdomain.com$" />
+    </util:map>
+
     <bean id="UserInfoTokenValidator" class="fi.csc.idp.stepup.api.profile.impl.UserInfoTokenValidator"
-        p:httpClient-ref="shibboleth.NonCachingHttpClient" p:userInfoEndpoint="https://testop.funet.fi/idp/profile/oidc/userinfo"/>
+        p:httpClient-ref="shibboleth.NonCachingHttpClient" p:userInfoEndpoint="https://example.com/userinfo"
+        p:validationMap-ref="exampleUserInfoMap" />
+
+    <util:map id="exampleUserInfoMap">
+        <entry key="claimName" value="claimStringValue" />
+    </util:map>
     
     <bean id="ReadAccount" class="fi.csc.idp.stepup.api.profile.impl.ReadAccount" scope="prototype" />
     
