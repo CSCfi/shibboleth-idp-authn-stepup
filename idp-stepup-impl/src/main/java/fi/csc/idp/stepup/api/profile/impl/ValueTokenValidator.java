@@ -53,8 +53,8 @@ public class ValueTokenValidator implements TokenValidator {
     }
 
     @Override
-    public boolean validate(String token, String key) {
-        if (validationMap == null || token == null || key == null) {
+    public boolean validate(String token, String targetUser, boolean selfServiceAction) {
+        if (validationMap == null || token == null || targetUser == null) {
             return false;
         }
         if (!validationMap.containsKey(token)) {
@@ -64,9 +64,9 @@ public class ValueTokenValidator implements TokenValidator {
         if (matchPattern == null) {
             return true;
         }
-        log.debug("Matching {} to {}", matchPattern, key);
+        log.debug("Matching {} to {}", matchPattern, targetUser);
         Pattern regex = Pattern.compile(matchPattern);
-        Matcher m = regex.matcher(key);
+        Matcher m = regex.matcher(targetUser);
         return m.matches();
     }
 }

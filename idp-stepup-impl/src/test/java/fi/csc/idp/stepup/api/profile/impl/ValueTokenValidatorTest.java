@@ -43,7 +43,7 @@ public class ValueTokenValidatorTest {
 	@Test
 	public void testInitialStateNoMap() {
 		// If map is not set we always get false
-		Assert.assertFalse(valueTokenValidator.validate("token", "key"));
+		Assert.assertFalse(valueTokenValidator.validate("token", "key", false));
 	}
 
 	@Test
@@ -51,7 +51,7 @@ public class ValueTokenValidatorTest {
 		validationMap.put("not_token", "value");
 		// If there is no hit in the map we should get false
 		valueTokenValidator.setValidationMap(validationMap);
-		Assert.assertFalse(valueTokenValidator.validate("token", "key"));
+		Assert.assertFalse(valueTokenValidator.validate("token", "key", false));
 	}
 
 	@Test
@@ -60,7 +60,7 @@ public class ValueTokenValidatorTest {
 		validationMap.put("token", null);
 		// If there is hit with null value we should get true always
 		valueTokenValidator.setValidationMap(validationMap);
-		Assert.assertTrue(valueTokenValidator.validate("token", "key"));
+		Assert.assertTrue(valueTokenValidator.validate("token", "key", false));
 	}
 	
 	@Test
@@ -69,7 +69,7 @@ public class ValueTokenValidatorTest {
 		validationMap.put("token", "^[a-zA-Z0-9_.+-]+@(?:(?:[a-zA-Z0-9-]+\\.)?[a-zA-Z]+\\.)?(example|example2)\\.com$");
 		// If there is hit with null value we should get true always
 		valueTokenValidator.setValidationMap(validationMap);
-		Assert.assertFalse(valueTokenValidator.validate("token", "eppn@example3.com"));
+		Assert.assertFalse(valueTokenValidator.validate("token", "eppn@example3.com", false));
 	}
 	
 	@Test
@@ -78,7 +78,7 @@ public class ValueTokenValidatorTest {
 		validationMap.put("token", "^[a-zA-Z0-9_.+-]+@(?:(?:[a-zA-Z0-9-]+\\.)?[a-zA-Z]+\\.)?(example|example2)\\.com$");
 		// If there is hit with null value we should get true always
 		valueTokenValidator.setValidationMap(validationMap);
-		Assert.assertTrue(valueTokenValidator.validate("token", "eppn@example.com"));
+		Assert.assertTrue(valueTokenValidator.validate("token", "eppn@example.com", false));
 	}
 
 }

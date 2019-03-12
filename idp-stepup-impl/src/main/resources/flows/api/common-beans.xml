@@ -39,11 +39,11 @@
         </constructor-arg>
     </bean>
 
-    <bean id="ValidateToken" class="fi.csc.idp.stepup.api.profile.impl.ValidateToken" scope="prototype"
-    p:tokenValidator-ref="ValueTokenValidator" />
-
     <bean id="ValueTokenValidator" class="fi.csc.idp.stepup.api.profile.impl.ValueTokenValidator"
         p:validationMap-ref="exampleTokenMap" />
+        
+    <bean id="ValidateToken" class="fi.csc.idp.stepup.api.profile.impl.ValidateToken" scope="prototype"
+        p:tokenValidator-ref="ValueTokenValidator" />
 
     <util:map id="exampleTokenMap">
         <entry key="token" value="^[A-Za-z0-9._%+-]+@testdomain.com$" />

@@ -44,6 +44,18 @@ public class ValidateToken extends AbstractApiAction {
 
     /** Token validator. */
     private TokenValidator tokenValidator;
+    
+    /** Whether we are validating token for self-service action.*/
+    private boolean selfServiceAction;
+
+    /**
+     * Set whether we are validating token for self-service action.
+     * 
+     * @param readAction Whether we are validating token for self-service action
+     */
+    public void setSelfServiceAction(boolean selfServiceAction) {
+        this.selfServiceAction = selfServiceAction;
+    }
 
     /**
      * Set token validator.
@@ -62,7 +74,7 @@ public class ValidateToken extends AbstractApiAction {
             ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EXCEPTION);
             return;
         }
-        if (!tokenValidator.validate(getRequest().getToken(), getRequest().getUserId())) {
+        if (!tokenValidator.validate(getRequest().getToken(), getRequest().getUserId(), selfServiceAction)) {
             // Form response
             response.put("userid", getRequest().getUserId());
             response.put("error", "token not validated to manage userid");

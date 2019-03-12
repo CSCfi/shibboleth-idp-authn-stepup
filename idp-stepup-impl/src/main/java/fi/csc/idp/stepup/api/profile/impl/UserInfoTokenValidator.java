@@ -41,6 +41,7 @@ import org.opensaml.security.httpclient.HttpClientSecuritySupport;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import fi.csc.idp.stepup.api.TokenValidator;
+import net.minidev.json.JSONArray;
 import net.minidev.json.JSONObject;
 import net.minidev.json.parser.JSONParser;
 import net.shibboleth.utilities.java.support.annotation.constraint.NonnullAfterInit;
@@ -145,7 +146,7 @@ public class UserInfoTokenValidator implements TokenValidator {
     }
 
     @Override
-    public boolean validate(String token, String key) {
+    public boolean validate(String token, String targetUser, boolean selfServiceAction) {
         JSONObject response = null;
         try {
             response = getUserInfoResponse(token);
@@ -158,21 +159,46 @@ public class UserInfoTokenValidator implements TokenValidator {
             log.debug("No success response to validate");
             return false;
         }
+        if (selfServiceAction) {
+            if (targetUser.equals(response.get("sub"))){
+                log.debug("Self service actions for user {}", targetUser);
+                return true;
+            }
+        }
         if (validationMap != null) {
             for (String validationKey : validationMap.keySet()) {
                 if (!response.containsKey(validationKey)) {
                     log.debug("Response not containing required field {}", validationKey);
                     return false;
                 }
-                if (validationMap.get(validationKey) != null
-                        && !validationMap.get(validationKey).equals(response.get(validationKey))) {
-                    log.debug("For validation field {} response contained value {} instead of {}", validationKey,
-                            response.get(validationKey), validationMap.get(validationKey));
+                if (validationMap.get(validationKey) == null) {
+                    log.debug("Response contained required field {}", validationKey);
+                    return true;
+                }
+                Object validationObject = response.get(validationKey);
+                if (validationObject instanceof String) {
+                    if (validationMap.get(validationKey).equals(validationObject)) {
+                        log.debug("claim {} value matches value {}, token validated for action", validationKey, validationMap.get(validationKey));
+                        return true;
+                    }
+                    log.debug("claim {} value {} did not match value {}, token not validated for action", validationKey, validationObject, validationMap.get(validationKey));
+                    return false;
+                }
+                if (validationObject instanceof JSONArray) {
+                    if (((JSONArray)validationObject).contains(validationMap.get(validationKey))) {
+                        log.debug("claim {} contains value {}, token validated for action", validationKey, validationMap.get(validationKey));
+                        return true;
+                    }
+                    log.debug("claim {} not containing value {}, token validated for action", validationKey, validationMap.get(validationKey));
                     return false;
                 }
             }
+        }else {
+            log.debug("Token validated, no validation map");
+            return true;
         }
-        log.debug("access token validated");
-        return true;
+        //Should not ever come here unless map is empty
+        log.debug("Token not validated, undetermined state");
+        return false;
     }
 }
