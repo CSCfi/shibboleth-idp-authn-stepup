@@ -67,7 +67,8 @@ public class TestAddAccount {
         ActionTestingSupport.assertEvent(event, StepUpEventIds.EVENTID_INVALID_USER);
     }
 
-    /** Test that action copes with account creation failing */
+    
+    /** Test that action copes with account creation failing 
     @Test
     public void testAccountCreationFails() throws ComponentInitializationException {
         AuthenticationContext ctx = (AuthenticationContext) prc.addSubcontext(new AuthenticationContext(), true);
@@ -78,7 +79,7 @@ public class TestAddAccount {
         ActionTestingSupport.assertEvent(event, StepUpEventIds.EXCEPTION);
     }
 
-    /** Test that action copes with account creation throwing error */
+    /** Test that action copes with account creation throwing error 
     @Test
     public void testAccountThrowsError() throws ComponentInitializationException {
         AuthenticationContext ctx = (AuthenticationContext) prc.addSubcontext(new AuthenticationContext(), true);
@@ -89,7 +90,7 @@ public class TestAddAccount {
         ActionTestingSupport.assertEvent(event, StepUpEventIds.EXCEPTION);
     }
 
-    /** Test that action is able to succeed */
+    /** Test that action is able to succeed 
     @Test
     public void testAccountCreationSucceeds() throws ComponentInitializationException {
         AuthenticationContext ctx = (AuthenticationContext) prc.addSubcontext(new AuthenticationContext(), true);
@@ -100,7 +101,9 @@ public class TestAddAccount {
         Assert.assertNull(event);
     }
 
+    */
     /** helper classes for testing -> */
+    /*
     class method3 extends method {
         @Override
         public StepUpAccount addAccount() throws Exception {
@@ -114,7 +117,9 @@ public class TestAddAccount {
             throw new Exception("terrible");
         }
     }
+    */
 
+    /*
     class method implements StepUpMethod {
 
         List<StepUpAccount> accounts = new ArrayList<StepUpAccount>();
@@ -159,5 +164,6 @@ public class TestAddAccount {
         }
 
     }
+    */
 
 }

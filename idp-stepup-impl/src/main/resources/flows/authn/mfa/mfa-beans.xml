@@ -73,9 +73,12 @@
 	<bean id="GoogleAuthStepUpManager"
 		class="fi.csc.idp.stepup.impl.AttributeKeyBasedStorageStepUpAccountManager"
 		scope="prototype" p:name="TOTP" p:attributeId="INTeppn"
-		p:accountLimit="1" p:autoRemove="true" p:stepUpAccountStorage-ref="GAStepUpAccountStorage"
+		p:accountLimit="1" p:autoRemove="true" p:stepUpAccountStorage-ref="ShibStorageAccountStorage"
 		p:accountID="GoogleAuthenticatorStepUpAccount">
 	</bean>
+    
+    <bean id="ShibStorageAccountStorage" class="fi.csc.idp.stepup.impl.ShibStorageSingleStepUpAccountStorage"
+        p:Storage-ref="shibboleth.StorageService" />
 
 	<!-- Hikari as datasource example -->
 	<bean id="HikariConfig" class="com.zaxxer.hikari.HikariConfig">
@@ -124,6 +127,9 @@
 		<constructor-arg value="bar" />
 	</bean>
 
+    <bean id="ValidateStepupAuthentication"  class="fi.csc.idp.stepup.impl.ValidateStepupAuthentication"
+        scope="prototype"/>
+        
 	<bean id="LogStepUpManager" class="fi.csc.idp.stepup.impl.DefaultStepUpAccountManager"
 		scope="prototype" p:name="Logfile" p:AccountID="LogStepUpAccount">
 	</bean>

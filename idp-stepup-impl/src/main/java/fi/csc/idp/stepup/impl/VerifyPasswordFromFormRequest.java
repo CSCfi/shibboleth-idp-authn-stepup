@@ -31,7 +31,6 @@ import org.opensaml.profile.action.ActionSupport;
 import org.opensaml.profile.context.ProfileRequestContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import fi.csc.idp.stepup.api.LimitReachedException;
 import fi.csc.idp.stepup.api.StepUpEventIds;
 
 /**
@@ -102,10 +101,6 @@ public class VerifyPasswordFromFormRequest extends AbstractStepUpMethodAction {
                 Thread.sleep(3000);
                 return;
             }
-        } catch (LimitReachedException e) {
-            log.debug("{} user response failed too many times", getLogPrefix());
-            ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EVENTID_RESPONSE_LIMIT);
-            return;
         } catch (Exception e) {
             log.debug("{} user response evaluation failed", getLogPrefix());
             ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EXCEPTION);

@@ -36,7 +36,7 @@ import fi.csc.idp.stepup.api.StepUpEventIds;
 import fi.csc.idp.stepup.api.StepUpMethod;
 
 /**
- * An action that updates a account. 
+ * An action that updates a account.
  * 
  */
 @SuppressWarnings("rawtypes")
@@ -51,12 +51,11 @@ public class UpdateAccount extends AbstractStepUpMethodAction {
 
     /** name parameter. */
     private String nameParameter = "j_name";
-   
+
     /**
      * Sets the parameter the response is read from.
      * 
-     * @param parameter
-     *            name for response
+     * @param parameter name for response
      */
     public void setUpdateParameter(@Nonnull @NotEmpty String parameter) {
         this.updateParameter = parameter;
@@ -65,14 +64,12 @@ public class UpdateAccount extends AbstractStepUpMethodAction {
     /**
      * Sets the parameter the name is read from.
      * 
-     * @param parameter
-     *            name for name
+     * @param parameter name for name
      */
     public void setNameParameter(@Nonnull @NotEmpty String parameter) {
         this.nameParameter = parameter;
     }
 
-    
     /** {@inheritDoc} */
     @Override
     protected void doExecute(@Nonnull final ProfileRequestContext profileRequestContext,
@@ -119,22 +116,20 @@ public class UpdateAccount extends AbstractStepUpMethodAction {
         // locating account
         StepUpAccount updateAccount = null;
         StepUpMethod updateMethod = null;
-        for (StepUpMethod suMethod : getStepUpMethodCtx().getStepUpMethods().keySet()) {
-            log.debug("{} comparing method {} to {}", getLogPrefix(), method, suMethod.getName());
-            if (method.equals(suMethod.getName())) {
-                log.debug("{} located target method {}", getLogPrefix(), method);
-                updateMethod = suMethod;
-                if (id >= 0) {
-                    for (StepUpAccount account : suMethod.getAccounts()) {
-                        log.debug("{} comparing account id {} to {}", getLogPrefix(), id, account.getId());
-                        if (account.getId() == id) {
-                            log.debug("{} located target account {}", getLogPrefix(), id);
-                            updateAccount = account;
-                            break;
-                        }
+        StepUpMethod suMethod = getStepUpMethodCtx().getStepUpMethod();
+        log.debug("{} comparing method {} to {}", getLogPrefix(), method, suMethod.getName());
+        if (method.equals(suMethod.getName())) {
+            log.debug("{} located target method {}", getLogPrefix(), method);
+            updateMethod = suMethod;
+            if (id >= 0) {
+                for (StepUpAccount account : suMethod.getAccounts()) {
+                    log.debug("{} comparing account id {} to {}", getLogPrefix(), id, account.getId());
+                    if (account.getId() == id) {
+                        log.debug("{} located target account {}", getLogPrefix(), id);
+                        updateAccount = account;
+                        break;
                     }
                 }
-                break;
             }
         }
         try {
@@ -153,16 +148,11 @@ public class UpdateAccount extends AbstractStepUpMethodAction {
     /**
      * Method performs account operations.
      * 
-     * @param command
-     *            StepUpAccount or StepUpMethod command
-     * @param account
-     *            the operation is targeting
-     * @param method
-     *            the operation is targeting
-     * @param request
-     *            for reading user input
-     * @throws Exception
-     *             if something unexpected occurs
+     * @param command StepUpAccount or StepUpMethod command
+     * @param account the operation is targeting
+     * @param method the operation is targeting
+     * @param request for reading user input
+     * @throws Exception if something unexpected occurs
      */
     private void accountCommand(String command, StepUpAccount account, StepUpMethod method, HttpServletRequest request)
             throws Exception {
@@ -174,35 +164,35 @@ public class UpdateAccount extends AbstractStepUpMethodAction {
             throw new Exception("Account operations requires account");
         }
         switch (command) {
-        case StepUpAccount.DISABLE:
-            account.setEnabled(false);
-            method.updateAccount(account);
-            break;
-        case StepUpAccount.ENABLE:
-            account.setEnabled(true);
-            method.updateAccount(account);
-            break;
-        case StepUpAccount.SET_EDITABLE:
-            account.setEditable(true);
-            method.updateAccount(account);
-            break;
-        case StepUpAccount.SET_NOT_EDITABLE:
-            account.setEditable(false);
-            method.updateAccount(account);
-            break;
-        case StepUpAccount.SET_NAME:
-            final String name = request.getParameter(nameParameter);
-            account.setName(name);
-            method.updateAccount(account);
-            break;
-        case StepUpMethod.ADD_ACCOUNT:
-            method.addAccount();
-            break;
-        case StepUpMethod.REMOVE_ACCOUNT:
-            method.removeAccount(account);
-            break;
-        default:
-            throw new Exception("Unsupported command");
+            case StepUpAccount.DISABLE:
+                account.setEnabled(false);
+                method.updateAccount(account);
+                break;
+            case StepUpAccount.ENABLE:
+                account.setEnabled(true);
+                method.updateAccount(account);
+                break;
+            case StepUpAccount.SET_EDITABLE:
+                account.setEditable(true);
+                method.updateAccount(account);
+                break;
+            case StepUpAccount.SET_NOT_EDITABLE:
+                account.setEditable(false);
+                method.updateAccount(account);
+                break;
+            case StepUpAccount.SET_NAME:
+                final String name = request.getParameter(nameParameter);
+                account.setName(name);
+                method.updateAccount(account);
+                break;
+            case StepUpMethod.ADD_ACCOUNT:
+                method.addAccount();
+                break;
+            case StepUpMethod.REMOVE_ACCOUNT:
+                method.removeAccount(account);
+                break;
+            default:
+                throw new Exception("Unsupported command");
         }
 
     }

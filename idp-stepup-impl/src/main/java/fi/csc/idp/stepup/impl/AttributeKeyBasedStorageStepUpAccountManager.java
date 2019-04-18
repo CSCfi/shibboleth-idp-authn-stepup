@@ -23,6 +23,7 @@
 
 package fi.csc.idp.stepup.impl;
 
+import java.util.Collection;
 import java.util.List;
 
 import javax.annotation.Nonnull;
@@ -31,17 +32,14 @@ import javax.annotation.Nonnull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.nimbusds.openid.connect.sdk.ClaimsRequest.Entry;
+
 import fi.csc.idp.stepup.api.StepUpAccount;
 import fi.csc.idp.stepup.api.StepUpAccountStorage;
-import net.shibboleth.idp.attribute.IdPAttribute;
-import net.shibboleth.idp.attribute.IdPAttributeValue;
-import net.shibboleth.idp.attribute.StringAttributeValue;
-import net.shibboleth.idp.attribute.context.AttributeContext;
 
 /**
- * Class implementing Step Up Account manager for accounts stored by key found
- * in attribute values.
- * */
+ * Class implementing Step Up Account manager for accounts stored by key found in attribute values.
+ */
 public class AttributeKeyBasedStorageStepUpAccountManager extends AbstractStepUpAccountManager {
 
     /** Class logger. */
@@ -66,8 +64,7 @@ public class AttributeKeyBasedStorageStepUpAccountManager extends AbstractStepUp
     /**
      * Set the implementation of storage functionality.
      * 
-     * @param storage
-     *            functionality
+     * @param storage functionality
      */
     public void setStepUpAccountStorage(StepUpAccountStorage storage) {
         this.stepUpAccountStorage = storage;
@@ -76,30 +73,26 @@ public class AttributeKeyBasedStorageStepUpAccountManager extends AbstractStepUp
     /**
      * Set the attribute id containing the value for the key.
      * 
-     * @param id
-     *            of the attribute containing the value of key
+     * @param id of the attribute containing the value of key
      */
     public void setAttributeId(String id) {
         this.attributeId = id;
     }
 
     /**
-     * Set the limit for maximum number of accounts allowed. Default is no
-     * limit. Values below 1 are ignored.
+     * Set the limit for maximum number of accounts allowed. Default is no limit. Values below 1 are ignored.
      * 
-     * @param limit
-     *            maximum number of accounts.
+     * @param limit maximum number of accounts.
      */
     public void setAccountLimit(int limit) {
         this.accountLimit = limit;
     }
 
     /**
-     * Setting automatic removal of accounts on will cause deleting old account
-     * if new account requires the space due to account limits.
+     * Setting automatic removal of accounts on will cause deleting old account if new account requires the space due to
+     * account limits.
      * 
-     * @param remove
-     *            true if old accounts make way automatically for new
+     * @param remove true if old accounts make way automatically for new
      */
     public void setAutoRemove(boolean remove) {
         this.autoRemove = remove;
@@ -110,8 +103,7 @@ public class AttributeKeyBasedStorageStepUpAccountManager extends AbstractStepUp
      * 
      * 
      * @return new account. Null if account limits have been reached.
-     * @throws Exception
-     *             if something unexpected occurred.
+     * @throws Exception if something unexpected occurred.
      */
     @Override
     public StepUpAccount addAccount() throws Exception {
@@ -140,10 +132,8 @@ public class AttributeKeyBasedStorageStepUpAccountManager extends AbstractStepUp
     /**
      * Method checks the operation can be performed.
      * 
-     * @param account
-     *            the account to be operated.
-     * @throws Exception
-     *             if operation cannot be performed.
+     * @param account the account to be operated.
+     * @throws Exception if operation cannot be performed.
      */
     private void preCheck(StepUpAccount account) throws Exception {
 
@@ -162,8 +152,7 @@ public class AttributeKeyBasedStorageStepUpAccountManager extends AbstractStepUp
     /**
      * Update a editable account.
      * 
-     * @param account
-     *            to be updated.
+     * @param account to be updated.
      * @throws Exception
      */
     @Override
@@ -177,8 +166,7 @@ public class AttributeKeyBasedStorageStepUpAccountManager extends AbstractStepUp
     /**
      * Remove a editable account.
      * 
-     * @param account
-     *            to be removd.
+     * @param account to be removd.
      * @throws Exception
      */
     @Override
@@ -204,14 +192,12 @@ public class AttributeKeyBasedStorageStepUpAccountManager extends AbstractStepUp
     // Checkstyle: CyclomaticComplexity OFF
 
     /**
-     * Initializes accounts by reading the value for key, using that to read
-     * accounts from storage.
+     * Initializes accounts by reading the value for key, using that to read accounts from storage.
      * 
-     * @param attributeContext
-     *            to look for the key value
+     * @param attributeContext to look for the key value
      */
     @Override
-    public boolean initialize(AttributeContext attributeContext) throws Exception {
+    public boolean initialize(Collection<Entry> entry) throws Exception {
 
         log.debug("Adding accounts of type {}", getName());
         key = null;
@@ -219,8 +205,8 @@ public class AttributeKeyBasedStorageStepUpAccountManager extends AbstractStepUp
         if (stepUpAccountStorage == null) {
             throw new Exception("repository implementation not set, cannot add accounts");
         }
-        if (attributeContext == null) {
-            throw new Exception("Attribute context has to be set");
+        if (entry == null) {
+            throw new Exception("requested id token claims cannot be null");
         }
         if (attributeId == null) {
             throw new Exception("Attribute Id has to be set");
@@ -228,35 +214,22 @@ public class AttributeKeyBasedStorageStepUpAccountManager extends AbstractStepUp
         if (getAccountID() == null) {
             throw new Exception("No account bean defined");
         }
-        IdPAttribute attribute = attributeContext.getIdPAttributes().get(attributeId);
-        if (attribute == null) {
-            log.warn("Not able to create accounts, Attributes do not contain value for " + attributeId);
-
-            return false;
-        }
-        for (@SuppressWarnings("rawtypes")
-        final IdPAttributeValue value : attribute.getValues()) {
-            if (value instanceof StringAttributeValue) {
-                // We process only the first non null string type attribute
-                // value found
-                // Key is expected to be a single value string attribute
-                key = ((StringAttributeValue) value).getValue();
+        for (Entry claim : entry) {
+            if (attributeId.equals(claim.getClaimName())) {
+                key = claim.getValue();
                 if (key == null) {
                     log.warn("No attribute value for " + attributeId);
                     continue;
                 }
-                log.debug("Adding accounts with key value {}", key);
-                List<StepUpAccount> accounts = stepUpAccountStorage.getAccounts(key,
-                        getAppContext().getBean(getAccountID()).getClass());
+                List<StepUpAccount> accounts =
+                        stepUpAccountStorage.getAccounts(key, getAppContext().getBean(getAccountID()).getClass());
                 if (accounts != null && accounts.size() > 0) {
                     log.debug("Adding {} accounts with key value {}", accounts.size(), key);
                     getAccounts().addAll(accounts);
                 }
             }
         }
-
         return true;
     }
 
-    // Checkstyle: CyclomaticComplexity OFF
 }

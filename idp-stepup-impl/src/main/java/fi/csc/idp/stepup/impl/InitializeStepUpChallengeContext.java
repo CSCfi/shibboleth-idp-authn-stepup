@@ -23,195 +23,147 @@
 
 package fi.csc.idp.stepup.impl;
 
-import java.security.Principal;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
+import java.text.ParseException;
+import java.util.Collection;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import net.shibboleth.idp.attribute.context.AttributeContext;
-import net.shibboleth.idp.authn.AbstractAuthenticationAction;
+import net.shibboleth.idp.authn.AuthnEventIds;
 import net.shibboleth.idp.authn.context.AuthenticationContext;
+import net.shibboleth.utilities.java.support.component.ComponentSupport;
 import net.shibboleth.utilities.java.support.logic.Constraint;
 
-import org.apache.commons.collections.CollectionUtils;
+import org.geant.idpextension.oidc.profile.impl.AbstractOIDCResponseAction;
 import org.opensaml.messaging.context.navigate.ChildContextLookup;
 import org.opensaml.profile.action.ActionSupport;
 import org.opensaml.profile.context.ProfileRequestContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import net.shibboleth.idp.profile.context.RelyingPartyContext;
-
 import com.google.common.base.Function;
-import com.google.common.base.Functions;
+import com.nimbusds.openid.connect.sdk.ClaimsRequest;
 
-import fi.csc.idp.stepup.api.StepUpAccount;
+import com.nimbusds.openid.connect.sdk.ClaimsRequest.Entry;
 import fi.csc.idp.stepup.api.StepUpEventIds;
 import fi.csc.idp.stepup.api.StepUpMethod;
 import fi.csc.idp.stepup.api.StepUpMethodContext;
-import fi.okm.mpass.shibboleth.authn.context.ShibbolethSpAuthenticationContext;
-
-/**
- * An action that initializes step up methods and accounts. Each of the
- * configured methods are initialized. Among the initialized methods a first
- * suitable account and methods are chosen as defaults based on requested
- * authentication context. If there is no suitable account any of the suitable
- * methods is chosen as default method.
- * 
- */
 
 @SuppressWarnings("rawtypes")
-public class InitializeStepUpChallengeContext extends AbstractAuthenticationAction {
+public class InitializeStepUpChallengeContext extends AbstractOIDCResponseAction {
 
     /** Class logger. */
     @Nonnull
     private final Logger log = LoggerFactory.getLogger(InitializeStepUpChallengeContext.class);
 
-    /** Context to look attributes for. */
+    /** StepUp Method. */
+    private StepUpMethod stepUpMethod;
+
+    /**
+     * Strategy used to extract, and create if necessary, the {@link AuthenticationContext} from the
+     * {@link ProfileRequestContext}.
+     */
     @Nonnull
-    private Function<ProfileRequestContext, AttributeContext> attributeContextLookupStrategy;
+    private Function<ProfileRequestContext, AuthenticationContext> authnCtxLookupStrategy;
 
-    /** AttributeContext to filter. */
+    /** AuthenticationContext to operate on. */
     @Nullable
-    private AttributeContext attributeContext;
+    private AuthenticationContext authnContext;
 
-    /** proxy authentication context. */
-    private ShibbolethSpAuthenticationContext shibbolethContext;
+    /** Initialization claims. */
+    @Nullable
+    Collection<Entry> claims;
 
-    /** StepUp Methods. */
-    private Map<StepUpMethod, List<? extends Principal>> stepUpMethods;
+    /**
+     * Set the context lookup strategy.
+     * 
+     * @param strategy lookup strategy function for {@link AuthenticationContext}.
+     */
+    public void setAuthenticationContextLookupStrategy(
+            @Nonnull final Function<ProfileRequestContext, AuthenticationContext> strategy) {
+        ComponentSupport.ifInitializedThrowUnmodifiabledComponentException(this);
+        authnCtxLookupStrategy = Constraint.isNotNull(strategy, "Strategy cannot be null");
+    }
 
     /** Constructor. */
     public InitializeStepUpChallengeContext() {
-
-        attributeContextLookupStrategy = Functions.compose(new ChildContextLookup<>(AttributeContext.class),
-                new ChildContextLookup<ProfileRequestContext, RelyingPartyContext>(RelyingPartyContext.class));
-
+        authnCtxLookupStrategy = new ChildContextLookup<>(AuthenticationContext.class);
     }
 
     /**
-     * Set the stepup method and supported authentication contextes.
+     * Set the stepup method used.
      * 
-     * @param methods
-     *            stepup methods in a map
+     * @param methods stepup method used
      */
 
-    public void setStepUpMethods(@Nonnull Map<StepUpMethod, List<? extends Principal>> methods) {
-
-        this.stepUpMethods = new LinkedHashMap<StepUpMethod, List<? extends Principal>>();
-        for (Map.Entry<StepUpMethod, List<? extends Principal>> entry : methods.entrySet()) {
-            this.stepUpMethods.put(entry.getKey(), entry.getValue());
-        }
-
+    public void setStepUpMethod(StepUpMethod method) {
+        stepUpMethod = method;
     }
 
-    /**
-     * Set the lookup strategy for the {@link AttributeContext}.
-     * 
-     * @param strategy
-     *            lookup strategy
-     */
-
-    public void setAttributeContextLookupStrategy(
-            @Nonnull final Function<ProfileRequestContext, AttributeContext> strategy) {
-
-        attributeContextLookupStrategy = Constraint.isNotNull(strategy,
-                "AttributeContext lookup strategy cannot be null");
-
-    }
-
-    // Checkstyle: CyclomaticComplexity OFF
-    /** {@inheritDoc} */
-    @SuppressWarnings("unchecked")
     /** {@inheritDoc} */
     @Override
-    protected boolean doPreExecute(@Nonnull final ProfileRequestContext profileRequestContext,
-            @Nonnull final AuthenticationContext authenticationContext) {
-
-        attributeContext = attributeContextLookupStrategy.apply(profileRequestContext);
-        if (attributeContext == null) {
-            log.error("{} unable to locate attribute context", getLogPrefix());
-            ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EVENTID_MISSING_ATTRIBUTECONTEXT);
+    protected boolean doPreExecute(@Nonnull final ProfileRequestContext profileRequestContext) {
+        if (!super.doPreExecute(profileRequestContext)) {
+            log.error("{} pre-execute failed ", getLogPrefix());
             return false;
         }
-
-        shibbolethContext = authenticationContext.getSubcontext(ShibbolethSpAuthenticationContext.class);
-        if (shibbolethContext == null) {
-            log.debug("{} could not get shib proxy context", getLogPrefix());
-            ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EVENTID_MISSING_SHIBSPCONTEXT);
-            return false;
-        }
-
-        if (stepUpMethods == null) {
-            log.debug("{} bean not configured correctly, step up methods not set", getLogPrefix());
+        if (stepUpMethod == null) {
+            log.error("{} bean not configured correctly, step up method not set", getLogPrefix());
             ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EXCEPTION);
             return false;
         }
-
-        return super.doPreExecute(profileRequestContext, authenticationContext);
+        authnContext = authnCtxLookupStrategy.apply(profileRequestContext);
+        if (authnContext == null) {
+            log.error("{} Authentication Context not available", getLogPrefix());
+            ActionSupport.buildEvent(profileRequestContext, AuthnEventIds.INVALID_AUTHN_CTX);
+            return false;
+        }
+        try {
+            // TODO:We want to store SUB to context to set it as uid
+            // uid is used to resolve both attributes (not necessarily ever other than SUB itself to echo it back)
+            // TODO: REFACTOR BLOCK
+            Object claimsRequest = null;
+            if (getOidcResponseContext().getRequestObject() != null) {
+                claimsRequest = getOidcResponseContext().getRequestObject().getJWTClaimsSet().getClaim("claims");
+            }
+            if (claimsRequest instanceof ClaimsRequest) {
+                log.debug("{} request object containing claims", getLogPrefix());
+                claims = ((ClaimsRequest) claimsRequest).getIDTokenClaims();
+            } else if (getOidcResponseContext().getRequestedClaims() != null) {
+                log.debug("{} locating claims parameter containing claims, to simplify initial testing",
+                        getLogPrefix());
+                claims = getOidcResponseContext().getRequestedClaims().getIDTokenClaims();
+            }
+            if (claims != null) {
+                log.debug("{} resolved claims from {}", getLogPrefix(),
+                        getOidcResponseContext().getRequestedClaims().toJSONObject().toString());
+            }
+        } catch (ParseException e) {
+            log.error("{} Failed parsing claims {}", getLogPrefix(), e);
+            ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EXCEPTION);
+        }
+        return true;
     }
 
     /** {@inheritDoc} */
     @Override
-    protected void doExecute(@Nonnull final ProfileRequestContext profileRequestContext,
-            @Nonnull final AuthenticationContext authenticationContext) {
+    protected void doExecute(@Nonnull final ProfileRequestContext profileRequestContext) {
 
-        StepUpMethodContext stepUpMethodContext = (StepUpMethodContext) authenticationContext.addSubcontext(
-                new StepUpMethodContext(), true);
-        for (Iterator<Entry<StepUpMethod, List<? extends Principal>>> it = stepUpMethods.entrySet().iterator(); it
-                .hasNext();) {
-            Entry<StepUpMethod, List<? extends Principal>> entry = it.next();
-            StepUpMethod stepupMethod = entry.getKey();
-            log.debug("{} initializing StepUp method and accounts for {}", getLogPrefix(), stepupMethod.getName());
-            try {
-                if (!stepupMethod.initialize(attributeContext)) {
-                    log.debug("{} not able to initialize method {} removed from available methods", getLogPrefix(),
-                            stepupMethod.getName());
-                    it.remove();
-                }
-            } catch (Exception e) {
-                log.error("{} something unexpected happened", getLogPrefix());
-                log.error(e.getMessage());
-                ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EXCEPTION);
-                return;
-            }
+        log.debug("{} Creating StepUpMethodContext", getLogPrefix());
+        StepUpMethodContext stepUpMethodContext =
+                (StepUpMethodContext) authnContext.addSubcontext(new StepUpMethodContext(), true);
+        try {
+            stepUpMethod.initialize(claims);
+        } catch (Exception e) {
+            log.error("{} Failed initializing stepup method {}", getLogPrefix(), e);
+            ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EXCEPTION);
+            return;
         }
-        log.debug("{} setting {} stepup methods to context", getLogPrefix(), stepUpMethods.size());
-        stepUpMethodContext.setStepUpMethods(stepUpMethods);
-        for (Entry<StepUpMethod, List<? extends Principal>> entry : stepUpMethods.entrySet()) {
-            if (CollectionUtils.intersection(entry.getValue(), shibbolethContext.getInitialRequestedContext()).size() > 0) {
-                // We set the last iterated method as the method
-                log.debug("{} setting method {} as default method", getLogPrefix(), entry.getKey().getName());
-                stepUpMethodContext.setStepUpMethod(entry.getKey());
-                // That method has accounts
-                try {
-                    if (entry.getKey().getAccounts() != null) {
-                        for (StepUpAccount account : entry.getKey().getAccounts()) {
-                            // and the account is enabled
-                            if (account.isEnabled()) {
-                                log.debug("{} setting a default stepup account", getLogPrefix());
-                                log.debug("Account type is {}", entry.getKey().getName());
-                                log.debug("Account name is {}", (account.getName() == null ? "" : account.getName()));
-                                stepUpMethodContext.setStepUpAccount(account);
-                                return;
-                            }
-                        }
-                    }
-                } catch (Exception e) {
-                    log.debug("{} something unexpected happened", getLogPrefix());
-                    log.error(e.getMessage());
-                    ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EXCEPTION);
-                    return;
-                }
-
-            }
+        log.debug("{} Setting method {}  to StepUpMethodContext", getLogPrefix(), stepUpMethod.getName());
+        stepUpMethodContext.setStepUpMethod(stepUpMethod);
+        // TODO: We will assume there will be only one account in method. Refactor StepUpMethod!
+        if (stepUpMethod.getAccounts().size() > 0) {
+            stepUpMethodContext.setStepUpAccount(stepUpMethod.getAccounts().get(0));
         }
-        // No default account automatically chosen
     }
-    // Checkstyle: CyclomaticComplexity ON
 }

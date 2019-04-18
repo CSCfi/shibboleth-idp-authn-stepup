@@ -23,7 +23,10 @@
 
 package fi.csc.idp.stepup.api;
 
+import java.util.Collection;
 import java.util.List;
+
+import com.nimbusds.openid.connect.sdk.ClaimsRequest.Entry;
 
 import net.shibboleth.idp.attribute.context.AttributeContext;
 
@@ -47,7 +50,7 @@ public interface StepUpMethod {
      *             if something unexpected occurred
      */
 
-    public boolean initialize(AttributeContext attributeContext) throws Exception;
+    public boolean initialize(Collection<Entry> entry) throws Exception;
 
     /**
      * Name of the Step Up method.

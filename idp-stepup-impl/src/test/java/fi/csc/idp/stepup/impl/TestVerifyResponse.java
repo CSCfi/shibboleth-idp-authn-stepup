@@ -17,7 +17,6 @@ import org.testng.annotations.Test;
 import fi.csc.idp.stepup.api.StepUpAccount;
 import fi.csc.idp.stepup.api.StepUpEventIds;
 import fi.csc.idp.stepup.api.StepUpMethodContext;
-import fi.okm.mpass.shibboleth.authn.context.ShibbolethSpAuthenticationContext;
 import net.shibboleth.idp.authn.AuthnEventIds;
 import net.shibboleth.idp.authn.context.AuthenticationContext;
 import net.shibboleth.idp.profile.ActionTestingSupport;
@@ -64,8 +63,6 @@ public class TestVerifyResponse {
     @Test
     public void testNoStepUpAccount() throws ComponentInitializationException {
         AuthenticationContext ctx = (AuthenticationContext) prc.addSubcontext(new AuthenticationContext(), true);
-        ShibbolethSpAuthenticationContext sCtx = new ShibbolethSpAuthenticationContext();
-        ctx.addSubcontext(sCtx, true);
         StepUpMethodContext stepUpContext = new StepUpMethodContext();
         ctx.addSubcontext(stepUpContext, true);
         action.initialize();
@@ -77,8 +74,6 @@ public class TestVerifyResponse {
     @Test
     public void testWrongResponse() throws ComponentInitializationException {
         AuthenticationContext ctx = (AuthenticationContext) prc.addSubcontext(new AuthenticationContext(), true);
-        ShibbolethSpAuthenticationContext sCtx = new ShibbolethSpAuthenticationContext();
-        ctx.addSubcontext(sCtx, true);
         StepUpMethodContext stepUpContext = new StepUpMethodContext();
         MockAccount ma = new MockAccount();
         stepUpContext.setStepUpAccount(ma);
@@ -88,28 +83,11 @@ public class TestVerifyResponse {
         ActionTestingSupport.assertEvent(event, StepUpEventIds.EVENTID_INVALID_RESPONSE);
     }
     
-    /** Test that action copes with wrong response when retry limit is reached */
-    @Test
-    public void testWrongResponseLimit() throws ComponentInitializationException {
-        AuthenticationContext ctx = (AuthenticationContext) prc.addSubcontext(new AuthenticationContext(), true);
-        ShibbolethSpAuthenticationContext sCtx = new ShibbolethSpAuthenticationContext();
-        ctx.addSubcontext(sCtx, true);
-        StepUpMethodContext stepUpContext = new StepUpMethodContext();
-        MockAccount ma = new MockAccount();
-        ma.noRetries=true;
-        stepUpContext.setStepUpAccount(ma);
-        ctx.addSubcontext(stepUpContext, true);
-        action.initialize();
-        final Event event = action.execute(src);
-        ActionTestingSupport.assertEvent(event, StepUpEventIds.EVENTID_RESPONSE_LIMIT);
-    }
-
+   
     /** Test that action copes with correct response */
     @Test
     public void testSuccess() throws ComponentInitializationException {
         AuthenticationContext ctx = (AuthenticationContext) prc.addSubcontext(new AuthenticationContext(), true);
-        ShibbolethSpAuthenticationContext sCtx = new ShibbolethSpAuthenticationContext();
-        ctx.addSubcontext(sCtx, true);
         StepUpMethodContext stepUpContext = new StepUpMethodContext();
         MockAccount ma = new MockAccount();
         ma.correctResponse = null;

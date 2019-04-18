@@ -93,25 +93,6 @@ public class StepUpMethodContext extends BaseContext {
         this.stepUpAccount = account;
     }
 
-    /**
-     * Get all step up methods by the supported authentication contexts.
-     * 
-     * @return map of step up methods and authentication contexts
-     */
-    public Map<StepUpMethod, List<? extends Principal>> getStepUpMethods() {
-        
-        return stepupMethods;
-    }
-
-    /**
-     * Set all step up methods by the supported authentication contexts.
-     * 
-     * @param stepUpMethods
-     *            map of step up methods and authentication contexts.
-     */
-    public void setStepUpMethods(Map<StepUpMethod, List<? extends Principal>> stepUpMethods) {
-        
-        this.stepupMethods = stepUpMethods;
-    }
+    
 
 }

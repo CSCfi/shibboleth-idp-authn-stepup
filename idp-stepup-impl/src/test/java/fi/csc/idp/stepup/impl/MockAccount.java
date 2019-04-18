@@ -23,7 +23,6 @@
 
 package fi.csc.idp.stepup.impl;
 
-import fi.csc.idp.stepup.api.LimitReachedException;
 
 public class MockAccount extends AbstractStepUpAccount {
 
@@ -42,9 +41,6 @@ public class MockAccount extends AbstractStepUpAccount {
             return true;
         }
         boolean resp = correctResponse.equals(response);
-        if (resp == false && noRetries) {
-            throw new LimitReachedException("failure limit reached");
-        }
         return resp;
     }
 

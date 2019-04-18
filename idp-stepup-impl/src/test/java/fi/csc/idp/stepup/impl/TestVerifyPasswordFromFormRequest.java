@@ -17,7 +17,6 @@ import org.testng.annotations.Test;
 import fi.csc.idp.stepup.api.StepUpAccount;
 import fi.csc.idp.stepup.api.StepUpEventIds;
 import fi.csc.idp.stepup.api.StepUpMethodContext;
-import fi.okm.mpass.shibboleth.authn.context.ShibbolethSpAuthenticationContext;
 import net.shibboleth.idp.authn.AuthnEventIds;
 import net.shibboleth.idp.authn.context.AuthenticationContext;
 import net.shibboleth.idp.profile.ActionTestingSupport;
@@ -64,8 +63,6 @@ public class TestVerifyPasswordFromFormRequest {
     @Test
     public void testNoStepUpAccount() throws ComponentInitializationException {
         AuthenticationContext ctx = (AuthenticationContext) prc.addSubcontext(new AuthenticationContext(), true);
-        ShibbolethSpAuthenticationContext sCtx = new ShibbolethSpAuthenticationContext();
-        ctx.addSubcontext(sCtx, true);
         StepUpMethodContext stepUpContext = new StepUpMethodContext();
         ctx.addSubcontext(stepUpContext, true);
         action.initialize();
@@ -77,8 +74,6 @@ public class TestVerifyPasswordFromFormRequest {
     @Test
     public void testNoServletRequest() throws ComponentInitializationException {
         AuthenticationContext ctx = (AuthenticationContext) prc.addSubcontext(new AuthenticationContext(), true);
-        ShibbolethSpAuthenticationContext sCtx = new ShibbolethSpAuthenticationContext();
-        ctx.addSubcontext(sCtx, true);
         StepUpMethodContext stepUpContext = new StepUpMethodContext();
         stepUpContext.setStepUpAccount(new MockAccount());
         ctx.addSubcontext(stepUpContext, true);
@@ -89,11 +84,6 @@ public class TestVerifyPasswordFromFormRequest {
 
     private void baseInit(MockAccount account) {
         AuthenticationContext ctx = (AuthenticationContext) prc.addSubcontext(new AuthenticationContext(), true);
-        ShibbolethSpAuthenticationContext sCtx = new ShibbolethSpAuthenticationContext();
-        List<Principal> requested = new ArrayList<Principal>();
-        requested.add(class1);
-        sCtx.setInitialRequestedContext(requested);
-        ctx.addSubcontext(sCtx, true);
         StepUpMethodContext stepUpContext = new StepUpMethodContext();
         if (account == null){
             account=new MockAccount();
@@ -128,19 +118,7 @@ public class TestVerifyPasswordFromFormRequest {
         ActionTestingSupport.assertEvent(event, StepUpEventIds.EVENTID_INVALID_RESPONSE);
     }
     
-    /** Test that action copes with user entering wrong response with limit reached */
-    @Test
-    public void testWrongResponseLimit() throws ComponentInitializationException {
-        MockAccount account=new MockAccount();
-        account.noRetries=true;
-        baseInit(account);
-        action.setChallengeResponseParameter("parameter_key");
-        action.initialize();
-        final Event event = action.execute(src);
-        ActionTestingSupport.assertEvent(event, StepUpEventIds.EVENTID_RESPONSE_LIMIT);
-    }
-    
-
+   
     /** Test that action copes with user entering correct response */
     @Test
     public void testCorrectResponse() throws ComponentInitializationException {

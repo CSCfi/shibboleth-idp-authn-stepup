@@ -19,7 +19,6 @@ import fi.csc.idp.stepup.api.StepUpAccount;
 import fi.csc.idp.stepup.api.StepUpEventIds;
 import fi.csc.idp.stepup.api.StepUpMethod;
 import fi.csc.idp.stepup.api.StepUpMethodContext;
-import fi.okm.mpass.shibboleth.authn.context.ShibbolethSpAuthenticationContext;
 import net.shibboleth.idp.attribute.context.AttributeContext;
 import net.shibboleth.idp.authn.AuthnEventIds;
 import net.shibboleth.idp.authn.context.AuthenticationContext;
@@ -43,7 +42,7 @@ public class TestInitializeStepUpChallengeContext {
         action = new InitializeStepUpChallengeContext();
     }
 
-    /** Test that action copes with no authentication context being present */
+    /** Test that action copes with no authentication context being present 
     @Test
     public void testUninitiailizedContext() throws ComponentInitializationException {
         action.initialize();
@@ -51,7 +50,7 @@ public class TestInitializeStepUpChallengeContext {
         ActionTestingSupport.assertEvent(event, AuthnEventIds.INVALID_AUTHN_CTX);
     }
 
-    /** Test that action copes with no Attribute context being present */
+    /** Test that action copes with no Attribute context being present 
     @Test
     public void testNoAttributeContext() throws ComponentInitializationException {
         prc.addSubcontext(new AuthenticationContext(), true);
@@ -60,7 +59,7 @@ public class TestInitializeStepUpChallengeContext {
         ActionTestingSupport.assertEvent(event, StepUpEventIds.EVENTID_MISSING_ATTRIBUTECONTEXT);
     }
 
-    /** Test that action copes with no shibboleth sp context present */
+    /** Test that action copes with no shibboleth sp context present 
     @Test
     public void testNoShibbolethContext() throws ComponentInitializationException {
         prc.addSubcontext(new AuthenticationContext(), true);
@@ -70,12 +69,12 @@ public class TestInitializeStepUpChallengeContext {
         final Event event = action.execute(src);
         ActionTestingSupport.assertEvent(event, StepUpEventIds.EVENTID_MISSING_SHIBSPCONTEXT);
     }
+    
 
-    /** Test that action copes with no step up methods defined */
+    /** Test that action copes with no step up methods defined 
     @Test
     public void testNoStepUpMethods() throws ComponentInitializationException {
         AuthenticationContext ctx = (AuthenticationContext) prc.addSubcontext(new AuthenticationContext(), true);
-        ctx.addSubcontext(new ShibbolethSpAuthenticationContext(), true);
         final AttributeContext attributeCtx = new AttributeContext();
         prc.getSubcontext(RelyingPartyContext.class).addSubcontext(attributeCtx);
         action.initialize();
@@ -83,7 +82,7 @@ public class TestInitializeStepUpChallengeContext {
         ActionTestingSupport.assertEvent(event, StepUpEventIds.EXCEPTION);
     }
 
-    /** Test that action copes with no matching step up methods defined */
+    /** Test that action copes with no matching step up methods defined 
     @Test
     public void testNoMatchingStepUpMethods() throws ComponentInitializationException {
         AuthenticationContext ctx = (AuthenticationContext) prc.addSubcontext(new AuthenticationContext(), true);
@@ -107,7 +106,7 @@ public class TestInitializeStepUpChallengeContext {
         Assert.assertNull(sumCtx.getStepUpAccount());
     }
 
-    /** Test that action copes with 4 methods and 2 of them matching defined */
+    /** Test that action copes with 4 methods and 2 of them matching defined 
     @Test
     public void testMatchingStepUpMethods() throws ComponentInitializationException {
         AuthenticationContext ctx = (AuthenticationContext) prc.addSubcontext(new AuthenticationContext(), true);
@@ -136,8 +135,10 @@ public class TestInitializeStepUpChallengeContext {
         Assert.assertNotNull(sumCtx.getStepUpMethod());
         Assert.assertNotNull(sumCtx.getStepUpAccount());
     }
-
+    */
     /** helper classes for testing -> */
+    
+    /*
     class method implements StepUpMethod {
 
         List<StepUpAccount> accounts = new ArrayList<StepUpAccount>();
@@ -181,5 +182,6 @@ public class TestInitializeStepUpChallengeContext {
         }
 
     }
+    */
 
 }

@@ -72,7 +72,7 @@ public class AddAccount extends AbstractStepUpMethodAction {
         try {
             account = getStepUpMethodCtx().getStepUpMethod().addAccount();
         } catch (Exception e) {
-            log.error("{} account creation failed for unexpected reason", getLogPrefix());
+            log.error("{} account creation failed for unexpected reason, {}", getLogPrefix(), e);
             ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EXCEPTION);
             return;
         }

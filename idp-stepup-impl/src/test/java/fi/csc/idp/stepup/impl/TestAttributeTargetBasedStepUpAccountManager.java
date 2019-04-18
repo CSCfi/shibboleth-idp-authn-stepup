@@ -36,6 +36,7 @@ public class TestAttributeTargetBasedStepUpAccountManager {
         return ctx;
     }
 
+    /*
     @Test
     public void testNoAttributeContext() {
         boolean exception = false;
@@ -46,8 +47,9 @@ public class TestAttributeTargetBasedStepUpAccountManager {
             Assert.assertEquals("Attribute context has to be set", e.getMessage());
         }
         Assert.assertEquals(exception, true);
-    }
+    }*/
 
+    /*
     @Test
     public void testNoAttributeId() {
         boolean exception = false;
@@ -91,5 +93,6 @@ public class TestAttributeTargetBasedStepUpAccountManager {
         Assert.assertEquals(attributeTargetBasedStepUpAccountManager.getAccounts().size(), 1);
 
     }
+    */
 
 }

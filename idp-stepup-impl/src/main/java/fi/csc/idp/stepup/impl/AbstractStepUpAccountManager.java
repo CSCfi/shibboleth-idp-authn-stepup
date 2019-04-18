@@ -24,16 +24,15 @@
 package fi.csc.idp.stepup.impl;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
-
 import javax.annotation.Nonnull;
-
-import net.shibboleth.idp.attribute.context.AttributeContext;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
+
+import com.nimbusds.openid.connect.sdk.ClaimsRequest.Entry;
 
 import fi.csc.idp.stepup.api.StepUpAccount;
 import fi.csc.idp.stepup.api.StepUpMethod;
@@ -175,7 +174,7 @@ public class AbstractStepUpAccountManager implements StepUpMethod {
      * @return true if successful
      */
     @Override
-    public boolean initialize(AttributeContext attributeContext) throws Exception {
+    public boolean initialize(Collection<Entry> entry) throws Exception {
 
         StepUpAccount account = (StepUpAccount) getAppContext().getBean(getAccountID());
         account.setEnabled(true);
