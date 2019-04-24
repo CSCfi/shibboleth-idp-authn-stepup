@@ -59,6 +59,7 @@
 			<set name="flowScope.verifyResponseFailed" value="false" type="boolean" />
 		</on-entry>
 		<evaluate expression="VerifyPasswordFromFormRequest" />
+        <evaluate expression="ValidateStepupAuthentication" />
 		<evaluate expression="'proceed'" />
 		<transition on="proceed" to="proceed" />
 		<transition on="StepUpWrongResponse" to="DisplayChallenge">
@@ -122,7 +123,7 @@
 			<set name="flowScope.verifyRegResponseFailed" value="false" type="boolean" />
 		</on-entry>
 		<evaluate expression="VerifyPasswordFromFormRequest" />
-		<evaluate expression="'proceed'" />
+        <evaluate expression="'proceed'" />
 		<transition on="proceed" to="#{flowScope.regAction}" />
 		<transition on="StepUpWrongResponse" to="DisplayChallenge">
 			<set name="flowScope.verifyResponseFailed" value="true" type="boolean" />
@@ -394,6 +395,6 @@
 		<transition on="#{!'proceed'.equals(currentEvent.id)}" to="DisplayCondolences" />
 	</global-transitions>
 
-	<bean-import resource="mfa-beans.xml" />
+	<bean-import resource="Stepup-beans.xml" />
 
 </flow>

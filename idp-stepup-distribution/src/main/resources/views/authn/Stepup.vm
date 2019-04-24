@@ -1,0 +1,51 @@
+#set ($stepupMethod = $stepUpMethodContext.getStepUpMethod())
+#set ($stepupAccount = $stepUpMethodContext.getStepUpAccount())
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>#springMessageText("idp.title", "Web Login Service")</title>
+    <link rel="stylesheet" type="text/css" href="$request.getContextPath()/css/main.css">
+  </head>
+  <body>
+    <div class="wrapper">
+      <div class="container">
+        <header>
+          <img src="$request.getContextPath()#springMessage("idp.logo")" alt="#springMessageText("idp.logo.alt-text", "logo")">
+        </header>
+        <div class="content">
+          <p>#springMessageText("idp.stepup.authmethod", "Authentication method"):$encoder.encodeForHTML($stepupMethod.getName())</>
+          #if ($stepupAccount.getName())
+            <p>#springMessageText("idp.stepup.authaccount", "Account"):$encoder.encodeForHTML($stepupAccount.getName())</>
+          #end
+          <p>#springMessageText("idp.stepup.TOTP", "Please provide your TOTP passcode.")</p>
+          <form action="$flowExecutionUrl" method="post">
+
+            <div class="form-element-wrapper">
+              <label for="loginhint">#springMessageText("idp.stepup.response", "Password")</label>
+              <input class="form-element form-field" id="loginhint" name="j_challengeResponse" type="text" value="" autofocus>
+            </div>
+            #if ($verifyResponseFailed == true)
+              <section>
+                <p class="form-element form-error">#springMessageText("idp.stepup.response.failed", "Incorrect password, please retry")</p>
+              </section>
+            #end
+            <div class="form-element-wrapper">
+              <button class="form-element form-button" type="submit" name="_eventId_proceed">#springMessageText("idp.stepup.login", "Login")</button>
+            </div>
+            <div class="form-element-wrapper">
+              <button class="form-element form-button" type="submit" name="_eventId_ManageAccounts">#springMessageText("idp.stepup.manage", "Manage accounts")</button>
+            </div>
+
+          </form>
+
+        </div>
+      </div>
+      <footer>
+        <div class="container container-footer">
+          <p class="footer-text">#springMessageText("idp.footer", "Insert your footer text here.")</p>
+        </div>
+      </footer>
+    </div>
+  </body>
+</html>
