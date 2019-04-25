@@ -14,12 +14,12 @@
     <bean class="net.shibboleth.ext.spring.config.IdentifiableBeanPostProcessor" />
 
     <bean id="InitializeStepUpChallengeContext" class="fi.csc.idp.stepup.impl.InitializeStepUpChallengeContext"
-        scope="prototype" p:stepUpMethod-ref="%{stepup.authenticationManager:GoogleAuthStepUpManager}"
+        scope="prototype" p:stepUpMethod-ref="#{'%{stepup.authenticationManager:GoogleAuthStepUpManager}'.trim()}"
         p:httpServletRequest-ref="shibboleth.HttpServletRequest" />
 
     <bean id="InitializeRegistrationStepUpChallengeContext"
         class="fi.csc.idp.stepup.impl.InitializeStepUpChallengeContext" scope="prototype"
-        p:stepUpMethod-ref="%{stepup.registration.authenticationManager:SMSStepUpManager}"
+        p:stepUpMethod-ref="#{'%{stepup.registration.authenticationManager:SMSStepUpManager}'.trim()}"
         p:httpServletRequest-ref="shibboleth.HttpServletRequest" />
 
     <bean id="ValidateStepupAuthentication" class="fi.csc.idp.stepup.impl.ValidateStepupAuthentication"
@@ -41,13 +41,13 @@
         p:httpServletRequest-ref="shibboleth.HttpServletRequest" />
 
     <bean id="GoogleAuthStepUpManager" class="fi.csc.idp.stepup.impl.AttributeKeyBasedStorageStepUpAccountManager"
-        scope="prototype" p:name="TOTP" p:attributeId="%{stepup.GoogleAuthStepUpManager.keyclaim:INTeppn}"
+        scope="prototype" p:name="TOTP" p:attributeId="#{'%{stepup.GoogleAuthStepUpManager.keyclaim:INTeppn}'.trim()}"
         p:accountLimit="1" p:autoRemove="true"
-        p:stepUpAccountStorage-ref="%{stepup.GoogleAuthStepUpManager.accountstore:ShibStorageAccountStorage}"
+        p:stepUpAccountStorage-ref="#{'%{stepup.GoogleAuthStepUpManager.accountstore:ShibStorageAccountStorage}'.trim()}"
         p:accountID="GoogleAuthenticatorStepUpAccount" />
 
     <bean id="ShibStorageAccountStorage" class="fi.csc.idp.stepup.impl.ShibStorageSingleStepUpAccountStorage"
-        p:Storage-ref="shibboleth.StorageService" />
+        p:Storage-ref="#{'%{stepup.ShibStorageAccountStorage.storageservice:shibboleth.StorageService}'.trim()}" />
 
     <!-- Hikari as datasource example -->
     <!-- <bean id="HikariConfig" class="com.zaxxer.hikari.HikariConfig"> <property name="dataSourceProperties"> <props> <prop 
@@ -65,15 +65,15 @@
         p:name="Logfile" p:AccountID="LogStepUpAccount" />
 
     <bean id="MailStepUpManager" class="fi.csc.idp.stepup.impl.AttributeTargetBasedStepUpAccountManager"
-        scope="prototype" p:name="Email" p:AttributeId="%{stepup.MailStepUpManager.keyclaim:INTmail}"
+        scope="prototype" p:name="Email" p:AttributeId="#{'%{stepup.MailStepUpManager.keyclaim:INTmail}'.trim()}"
         p:AccountID="EmailStepUpAccount" />
 
     <bean id="SMSStepUpManager" class="fi.csc.idp.stepup.impl.AttributeTargetBasedStepUpAccountManager"
-        scope="prototype" p:name="SMS Sender" p:AttributeId="%{stepup.SMSStepUpManager.keyclaim:INTmobile}"
+        scope="prototype" p:name="SMS Sender" p:AttributeId="#{'%{stepup.SMSStepUpManager.keyclaim:INTmobile}'.trim()}"
         p:AccountID="SMSStepUpAccount" />
 
     <bean id="SMSReceiverStepUpManager" class="fi.csc.idp.stepup.impl.AttributeTargetBasedStepUpAccountManager"
-        scope="prototype" p:name="SMS Receiver" p:AttributeId="%{stepup.SMSReceiverStepUpManager.keyclaim:INTmobile}"
+        scope="prototype" p:name="SMS Receiver" p:AttributeId="#{'%{stepup.SMSReceiverStepUpManager.keyclaim:INTmobile}'.trim()}"
         p:AccountID="SMSReceiverStepUpAccount" />
 
     <bean id="LogStepUpAccount" class="fi.csc.idp.stepup.impl.ChallengeSenderStepUpAccount" scope="prototype"
@@ -86,11 +86,11 @@
 
     <bean id="SMSStepUpAccount" class="fi.csc.idp.stepup.impl.ChallengeSenderStepUpAccount" scope="prototype"
         p:ChallengeGenerator-ref="ChallengeGenerator" p:ChallengeVerifier-ref="EqualVerifier"
-        p:ChallengeSender-ref="SMSChallengeSender" p:retryLimit="2" />
+        p:ChallengeSender-ref="SMSChallengeSender" />
 
     <bean id="SMSReceiverStepUpAccount" class="fi.csc.idp.stepup.impl.TvilioSMSReceiverStepUpAccount"
         scope="prototype" p:ChallengeGenerator-ref="EmptyChallengeGenerator" p:ChallengeVerifier-ref="EqualVerifier"
-        p:accountSid="%{stepup.SMSAccount.sid}" p:authToken="%{stepup.SMSAccount.token}" p:numberOfChecks="1"
+        p:accountSid="#{'%{stepup.SMSAccount.sid}'.trim()}" p:authToken="#{'%{stepup.SMSAccount.token}'.trim()}" p:numberOfChecks="1"
         p:eventWindow="3600000" p:ChallengeSender-ref="SMSEmptyChallengeSender" />
 
     <bean id="GoogleAuthenticatorStepUpAccount" class="fi.csc.idp.stepup.impl.GoogleAuthenticatorStepUpAccount"
@@ -99,18 +99,18 @@
     <bean id="LogChallengeSender" class="fi.csc.idp.stepup.impl.LogChallengeSender" />
 
     <bean id="MailChallengeSender" class="fi.csc.idp.stepup.impl.MailChallengeSender"
-        p:subjectField="%{stepup.mail.subject:OTP code}" p:fromField="%{stepup.mail.from:OTP account}"
-        p:host="%{stepup.mail.host:localhost}" p:port="%{stepup.mail.port:25}"
-        p:templatePath="%{stepup.mail.templatepath}" p:templateFile="%{stepup.mail.templatefile}"
-        p:sMTPAuth="%{stepup.mail.smtpauth:false}" p:sMTPTtls="%{stepup.mail.smtpttls:true}" />
+        p:subjectField="#{'%{stepup.mail.subject:OTP code}'.trim()}" p:fromField="#{'%{stepup.mail.from:OTP account}'.trim()}"
+        p:host="#{'%{stepup.mail.host:localhost}'.trim()}" p:port="#{'%{stepup.mail.port:25}'.trim()}"
+        p:templatePath="#{'%{stepup.mail.templatepath:}'.trim()}" p:templateFile="#{'%{stepup.mail.templatefile:}'.trim()}"
+        p:sMTPAuth="#{'%{stepup.mail.smtpauth:false}'.trim()}" p:sMTPTtls="#{'%{stepup.mail.smtpttls:true}'.trim()}" />
 
     <bean id="SMSChallengeSender" class="fi.csc.idp.stepup.impl.TvilioSMSChallengeSender"
-        p:senderNumber="%{stepup.SMSAccount.sender}" p:accountSid="%{stepup.SMSAccount.sid}"
-        p:authToken="%{stepup.SMSAccount.token}" p:message="The code to access the service is %s, reply with the code" />
+        p:senderNumber="#{'%{stepup.SMSAccount.sender}'.trim()}" p:accountSid="#{'%{stepup.SMSAccount.sid}'.trim()}"
+        p:authToken="#{'%{stepup.SMSAccount.token}'.trim()}" p:message="The code to access the service is %s, reply with the code" />
 
     <bean id="SMSEmptyChallengeSender" class="fi.csc.idp.stepup.impl.TvilioSMSChallengeSender"
-        p:senderNumber="%{stepup.SMSAccount.sender}" p:accountSid="%{stepup.SMSAccount.sid}"
-        p:authToken="%{stepup.SMSAccount.token}" p:message="Please reply to this message to gain access to service." />
+        p:senderNumber="#{'%{stepup.SMSAccount.sender}'.trim()}" p:accountSid="#{'%{stepup.SMSAccount.sid}'.trim()}"
+        p:authToken="#{'%{stepup.SMSAccount.token}'.trim()}" p:message="Please reply to this message to gain access to service." />
 
     <bean id="ChallengeGenerator" class="fi.csc.idp.stepup.impl.DigestChallengeGenerator" p:decimal="true" />
 

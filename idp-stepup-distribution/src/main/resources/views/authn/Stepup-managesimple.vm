@@ -5,7 +5,7 @@ For accounts only possibility to remove the account is presented.
 If flow indicated updates have happened the target is shown in plaintext and as qr code.
 -->
 
-#set ($stepupMethods = $stepUpMethodContext.getStepUpMethods())
+#set ($method = $stepUpMethodContext.getStepUpMethod())
 <!-- really should be set by account method -->
 #set ($qrLocation = "https://chart.googleapis.com/chart?chs=200x200&chld=M%%7C0&cht=qr&chl=otpauth://totp/%s@%s%%3Fsecret%%3D%s")
 #set ($proxyName = "Haka")
@@ -24,7 +24,6 @@ If flow indicated updates have happened the target is shown in plaintext and as 
           <img src="$request.getContextPath()#springMessage("idp.logo")" alt="#springMessageText("idp.logo.alt-text", "logo")">
         </header>
         <div style="width:100%">
-            #foreach ($mapEntry in $stepupMethods.entrySet())
                 #set ($method = $mapEntry.getKey())
             	#set ($methodName = $method.getName())
                  <!-- add new account -->
@@ -72,7 +71,6 @@ If flow indicated updates have happened the target is shown in plaintext and as 
                     <!-- remove button end -->
        	       	  #end
                 #end
-            #end 
           </div>
           <form action="$flowExecutionUrl" method="post">
             <div class="form-element-wrapper">
