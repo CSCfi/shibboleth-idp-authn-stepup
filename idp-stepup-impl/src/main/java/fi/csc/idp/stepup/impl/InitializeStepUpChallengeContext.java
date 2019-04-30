@@ -1,6 +1,6 @@
 /*
  * The MIT License
- * Copyright (c) 2015 CSC - IT Center for Science, http://www.csc.fi
+ * Copyright (c) 2015,2019 CSC - IT Center for Science, http://www.csc.fi
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -45,9 +45,17 @@ import com.google.common.base.Function;
 import com.nimbusds.openid.connect.sdk.ClaimsRequest;
 
 import com.nimbusds.openid.connect.sdk.ClaimsRequest.Entry;
+import com.nimbusds.openid.connect.sdk.claims.IDTokenClaimsSet;
+
 import fi.csc.idp.stepup.api.StepUpEventIds;
 import fi.csc.idp.stepup.api.StepUpMethod;
 import fi.csc.idp.stepup.api.StepUpMethodContext;
+
+/**
+ * Action initializes {@link StepUpChallengeContext} with a {@link StepUpMethod}. Action assumes the authentication
+ * request is a OIDC authentication request. Action extracts the requested claims of the OIDC Authentication request.
+ * The extracted claims are used to initialize the {@link StepUpMethod}.
+ */
 
 @SuppressWarnings("rawtypes")
 public class InitializeStepUpChallengeContext extends AbstractOIDCResponseAction {
@@ -72,7 +80,24 @@ public class InitializeStepUpChallengeContext extends AbstractOIDCResponseAction
 
     /** Initialization claims. */
     @Nullable
-    Collection<Entry> claims;
+    private Collection<Entry> claims;
+
+    /** Whether the claims must be in request object. */
+    @Nonnull
+    private boolean acceptOnlyRequestObjectClaims;
+
+    /** Subject for whom the request is made. */
+    @Nullable
+    private String subject;
+
+    /**
+     * Whether the claims must be in request object.
+     * 
+     * @param acceptOnlyRequestObjectClaims whether the claims must be in request object
+     */
+    public void setAcceptOnlyRequestObjectClaims(boolean acceptOnly) {
+        acceptOnlyRequestObjectClaims = acceptOnly;
+    }
 
     /**
      * Set the context lookup strategy.
@@ -100,6 +125,24 @@ public class InitializeStepUpChallengeContext extends AbstractOIDCResponseAction
         stepUpMethod = method;
     }
 
+    /**
+     * Resolve requested subject value from requested claims.
+     * 
+     * @param claims requested claims.
+     * @return subject value if located, otherwise null.
+     */
+    private String getSubject(Collection<Entry> claims) {
+        if (claims == null) {
+            return null;
+        }
+        for (Entry entry : claims) {
+            if (entry.getClaimName().equals(IDTokenClaimsSet.SUB_CLAIM_NAME)) {
+                return entry.getValue();
+            }
+        }
+        return null;
+    }
+
     /** {@inheritDoc} */
     @Override
     protected boolean doPreExecute(@Nonnull final ProfileRequestContext profileRequestContext) {
@@ -119,28 +162,24 @@ public class InitializeStepUpChallengeContext extends AbstractOIDCResponseAction
             return false;
         }
         try {
-            // TODO:We want to store SUB to context to set it as uid
-            // uid is used to resolve both attributes (not necessarily ever other than SUB itself to echo it back)
-            // TODO: REFACTOR BLOCK
-            Object claimsRequest = null;
-            if (getOidcResponseContext().getRequestObject() != null) {
-                claimsRequest = getOidcResponseContext().getRequestObject().getJWTClaimsSet().getClaim("claims");
-            }
-            if (claimsRequest instanceof ClaimsRequest) {
-                log.debug("{} request object containing claims", getLogPrefix());
-                claims = ((ClaimsRequest) claimsRequest).getIDTokenClaims();
-            } else if (getOidcResponseContext().getRequestedClaims() != null) {
-                log.debug("{} locating claims parameter containing claims, to simplify initial testing",
-                        getLogPrefix());
+            if (acceptOnlyRequestObjectClaims && getOidcResponseContext().getRequestObject() != null) {
+                Object claimsRequest = getOidcResponseContext().getRequestObject().getJWTClaimsSet().getClaim("claims");
+                if (claimsRequest instanceof ClaimsRequest) {
+                    log.debug("{} request object containing claims", getLogPrefix());
+                    claims = ((ClaimsRequest) claimsRequest).getIDTokenClaims();
+                }
+            } else if (!acceptOnlyRequestObjectClaims && getOidcResponseContext().getRequestedClaims() != null) {
                 claims = getOidcResponseContext().getRequestedClaims().getIDTokenClaims();
-            }
-            if (claims != null) {
-                log.debug("{} resolved claims from {}", getLogPrefix(),
-                        getOidcResponseContext().getRequestedClaims().toJSONObject().toString());
             }
         } catch (ParseException e) {
             log.error("{} Failed parsing claims {}", getLogPrefix(), e);
             ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EXCEPTION);
+        }
+        subject = getSubject(claims);
+        if (subject == null) {
+            log.error("{} no subject in request, unable to continue", getLogPrefix());
+            ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EVENTID_NO_USER);
+            return false;
         }
         return true;
     }
@@ -159,11 +198,10 @@ public class InitializeStepUpChallengeContext extends AbstractOIDCResponseAction
             ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EXCEPTION);
             return;
         }
-        log.debug("{} Setting method {}  to StepUpMethodContext", getLogPrefix(), stepUpMethod.getName());
+        log.debug("{} Setting method {}  to StepUpMethodContext for user {}", getLogPrefix(), stepUpMethod.getName(),
+                subject);
+        stepUpMethodContext.setSubject(subject);
         stepUpMethodContext.setStepUpMethod(stepUpMethod);
-        // TODO: We will assume there will be only one account in method. Refactor StepUpMethod!
-        if (stepUpMethod.getAccounts().size() > 0) {
-            stepUpMethodContext.setStepUpAccount(stepUpMethod.getAccounts().get(0));
-        }
+        stepUpMethodContext.setStepUpAccount(stepUpMethod.getAccount());
     }
 }

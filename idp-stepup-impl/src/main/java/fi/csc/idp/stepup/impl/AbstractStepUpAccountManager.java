@@ -1,6 +1,6 @@
 /*
  * The MIT License
- * Copyright (c) 2015 CSC - IT Center for Science, http://www.csc.fi
+ * Copyright (c) 2015,2019 CSC - IT Center for Science, http://www.csc.fi
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -43,12 +43,16 @@ public class AbstractStepUpAccountManager implements StepUpMethod {
     /** Class logger. */
     @Nonnull
     private final Logger log = LoggerFactory.getLogger(AbstractStepUpAccountManager.class);
+
     /** Name for the method. */
     private String name;
+
     /** Accounts of the method. */
     private List<StepUpAccount> accounts = new ArrayList<StepUpAccount>();
+
     /** bean id of account bean. */
     private String accountID;
+
     /** Application context. */
     @Autowired
     private ApplicationContext appContext;
@@ -63,8 +67,7 @@ public class AbstractStepUpAccountManager implements StepUpMethod {
     /**
      * Set application context for test cases.
      * 
-     * @param ctx
-     *            application context
+     * @param ctx application context
      */
     public void setAppContext(ApplicationContext ctx) {
         this.appContext = ctx;
@@ -82,8 +85,7 @@ public class AbstractStepUpAccountManager implements StepUpMethod {
     /**
      * Set the bean id of the class implementing the account.
      * 
-     * @param id
-     *            is bean id
+     * @param id is bean id
      */
     public void setAccountID(String id) {
         this.accountID = id;
@@ -101,8 +103,7 @@ public class AbstractStepUpAccountManager implements StepUpMethod {
     /**
      * Set the name of the method.
      * 
-     * @param methodName
-     *            is method name
+     * @param methodName is method name
      */
     public void setName(String methodName) {
 
@@ -157,8 +158,7 @@ public class AbstractStepUpAccountManager implements StepUpMethod {
     /**
      * Remove account. Not supported.
      * 
-     * @param account
-     *            to be removed.
+     * @param account to be removed.
      */
     @Override
     public void removeAccount(StepUpAccount account) throws Exception {
@@ -169,8 +169,7 @@ public class AbstractStepUpAccountManager implements StepUpMethod {
     /**
      * Add a one default account.
      * 
-     * @param attributeContext
-     *            , not used.
+     * @param attributeContext , not used.
      * @return true if successful
      */
     @Override
@@ -189,13 +188,26 @@ public class AbstractStepUpAccountManager implements StepUpMethod {
      * Update a account.
      * 
      * @param account
-     * @throws Exception
-     *             if something unexpected occurs
+     * @throws Exception if something unexpected occurs
      */
     @Override
     public void updateAccount(StepUpAccount account) throws Exception {
 
-        log.debug("Method not supported");
+        log.warn("Method not supported");
+    }
+
+    /**
+     * Get the default account.
+     * 
+     * @return the default account, may be null.
+     */
+    @Override
+    public StepUpAccount getAccount() {
+
+        if (getAccounts() != null && getAccounts().size() > 0) {
+            return getAccounts().get(0);
+        }
+        return null;
     }
 
 }

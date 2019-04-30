@@ -20,7 +20,7 @@
     <bean id="InitializeRegistrationStepUpChallengeContext"
         class="fi.csc.idp.stepup.impl.InitializeStepUpChallengeContext" scope="prototype"
         p:stepUpMethod-ref="#{'%{stepup.registration.authenticationManager:SMSStepUpManager}'.trim()}"
-        p:httpServletRequest-ref="shibboleth.HttpServletRequest" />
+        p:acceptOnlyRequestObjectClaims="true" p:httpServletRequest-ref="shibboleth.HttpServletRequest" />
 
     <bean id="ValidateStepupAuthentication" class="fi.csc.idp.stepup.impl.ValidateStepupAuthentication"
         scope="prototype" />
@@ -47,19 +47,14 @@
         p:accountID="GoogleAuthenticatorStepUpAccount" />
 
     <bean id="ShibStorageAccountStorage" class="fi.csc.idp.stepup.impl.ShibStorageSingleStepUpAccountStorage"
-        p:Storage-ref="#{'%{stepup.ShibStorageAccountStorage.storageservice:shibboleth.StorageService}'.trim()}" />
+        p:Storage-ref="#{'%{stepup.ShibStorageAccountStorage.storageservice:shibboleth.StorageService}'.trim()}"
+        p:encryptKey="TRUE" p:encryptTarget="TRUE" p:encryptor-ref="ShibStorageAccountStorageEncryptor" />
 
-    <!-- Hikari as datasource example -->
-    <!-- <bean id="HikariConfig" class="com.zaxxer.hikari.HikariConfig"> <property name="dataSourceProperties"> <props> <prop 
-        key="url">jdbc:mariadb://localhost:3306/totp</prop> <prop key="user">foo</prop> <prop key="password">bar</prop> </props> 
-        </property> <property name="dataSourceClassName" value="org.mariadb.jdbc.MySQLDataSource" /> </bean> <bean id="GADataSource" 
-        class="com.zaxxer.hikari.HikariDataSource"> <constructor-arg ref="HikariConfig" /> </bean> <bean id="MySqlAccountStorage" 
-        class="fi.csc.idp.stepup.impl.SQLStepUpAccountStorage" p:dataSource-ref="GADataSource" p:encryptKey="TRUE" p:encryptTarget="TRUE" 
-        p:encryptor-ref="GAAccountEncryptor"> <property name="listStatement"> <value> <![CDATA[ SELECT * FROM totp.ga WHERE user=? 
-        ]]> </value> </property> <property name="addStatement"> <value> <![CDATA[ INSERT INTO totp.ga (name,enabled,editable,target,user) 
-        VALUES(?,?,?,?,?) ]]> </value> </property> <property name="updateStatement"> <value> <![CDATA[ UPDATE totp.ga SET name=?,enabled=?,editable=?,target=?,user=? 
-        WHERE id=? ]]> </value> </property> </bean> <bean id="GAAccountEncryptor" class="org.springframework.security.crypto.encrypt.Encryptors" 
-        factory-method="queryableText"> <constructor-arg value="foo" /> <constructor-arg value="bar" /> </bean> -->
+    <bean id="ShibStorageAccountStorageEncryptor" class="org.springframework.security.crypto.encrypt.Encryptors"
+        factory-method="queryableText">
+        <constructor-arg value="key" />
+        <constructor-arg value="#{'%{stepup.ShibStorageAccountStorageEncryptor.encryptKey}'.trim()}" />
+    </bean>
 
     <bean id="LogStepUpManager" class="fi.csc.idp.stepup.impl.DefaultStepUpAccountManager" scope="prototype"
         p:name="Logfile" p:AccountID="LogStepUpAccount" />
@@ -73,7 +68,8 @@
         p:AccountID="SMSStepUpAccount" />
 
     <bean id="SMSReceiverStepUpManager" class="fi.csc.idp.stepup.impl.AttributeTargetBasedStepUpAccountManager"
-        scope="prototype" p:name="SMS Receiver" p:AttributeId="#{'%{stepup.SMSReceiverStepUpManager.keyclaim:INTmobile}'.trim()}"
+        scope="prototype" p:name="SMS Receiver"
+        p:AttributeId="#{'%{stepup.SMSReceiverStepUpManager.keyclaim:INTmobile}'.trim()}"
         p:AccountID="SMSReceiverStepUpAccount" />
 
     <bean id="LogStepUpAccount" class="fi.csc.idp.stepup.impl.ChallengeSenderStepUpAccount" scope="prototype"
@@ -90,8 +86,8 @@
 
     <bean id="SMSReceiverStepUpAccount" class="fi.csc.idp.stepup.impl.TvilioSMSReceiverStepUpAccount"
         scope="prototype" p:ChallengeGenerator-ref="EmptyChallengeGenerator" p:ChallengeVerifier-ref="EqualVerifier"
-        p:accountSid="#{'%{stepup.SMSAccount.sid}'.trim()}" p:authToken="#{'%{stepup.SMSAccount.token}'.trim()}" p:numberOfChecks="1"
-        p:eventWindow="3600000" p:ChallengeSender-ref="SMSEmptyChallengeSender" />
+        p:accountSid="#{'%{stepup.SMSAccount.sid}'.trim()}" p:authToken="#{'%{stepup.SMSAccount.token}'.trim()}"
+        p:numberOfChecks="1" p:eventWindow="3600000" p:ChallengeSender-ref="SMSEmptyChallengeSender" />
 
     <bean id="GoogleAuthenticatorStepUpAccount" class="fi.csc.idp.stepup.impl.GoogleAuthenticatorStepUpAccount"
         scope="prototype" />
@@ -99,18 +95,21 @@
     <bean id="LogChallengeSender" class="fi.csc.idp.stepup.impl.LogChallengeSender" />
 
     <bean id="MailChallengeSender" class="fi.csc.idp.stepup.impl.MailChallengeSender"
-        p:subjectField="#{'%{stepup.mail.subject:OTP code}'.trim()}" p:fromField="#{'%{stepup.mail.from:OTP account}'.trim()}"
-        p:host="#{'%{stepup.mail.host:localhost}'.trim()}" p:port="#{'%{stepup.mail.port:25}'.trim()}"
-        p:templatePath="#{'%{stepup.mail.templatepath:}'.trim()}" p:templateFile="#{'%{stepup.mail.templatefile:}'.trim()}"
-        p:sMTPAuth="#{'%{stepup.mail.smtpauth:false}'.trim()}" p:sMTPTtls="#{'%{stepup.mail.smtpttls:true}'.trim()}" />
+        p:subjectField="#{'%{stepup.mail.subject:OTP code}'.trim()}"
+        p:fromField="#{'%{stepup.mail.from:OTP account}'.trim()}" p:host="#{'%{stepup.mail.host:localhost}'.trim()}"
+        p:port="#{'%{stepup.mail.port:25}'.trim()}" p:templatePath="#{'%{stepup.mail.templatepath:}'.trim()}"
+        p:templateFile="#{'%{stepup.mail.templatefile:}'.trim()}" p:sMTPAuth="#{'%{stepup.mail.smtpauth:false}'.trim()}"
+        p:sMTPTtls="#{'%{stepup.mail.smtpttls:true}'.trim()}" />
 
     <bean id="SMSChallengeSender" class="fi.csc.idp.stepup.impl.TvilioSMSChallengeSender"
         p:senderNumber="#{'%{stepup.SMSAccount.sender}'.trim()}" p:accountSid="#{'%{stepup.SMSAccount.sid}'.trim()}"
-        p:authToken="#{'%{stepup.SMSAccount.token}'.trim()}" p:message="The code to access the service is %s, reply with the code" />
+        p:authToken="#{'%{stepup.SMSAccount.token}'.trim()}"
+        p:message="The code to access the service is %s, reply with the code" />
 
     <bean id="SMSEmptyChallengeSender" class="fi.csc.idp.stepup.impl.TvilioSMSChallengeSender"
         p:senderNumber="#{'%{stepup.SMSAccount.sender}'.trim()}" p:accountSid="#{'%{stepup.SMSAccount.sid}'.trim()}"
-        p:authToken="#{'%{stepup.SMSAccount.token}'.trim()}" p:message="Please reply to this message to gain access to service." />
+        p:authToken="#{'%{stepup.SMSAccount.token}'.trim()}"
+        p:message="Please reply to this message to gain access to service." />
 
     <bean id="ChallengeGenerator" class="fi.csc.idp.stepup.impl.DigestChallengeGenerator" p:decimal="true" />
 

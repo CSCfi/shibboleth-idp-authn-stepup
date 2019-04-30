@@ -1,6 +1,6 @@
 /*
  * The MIT License
- * Copyright (c) 2015 CSC - IT Center for Science, http://www.csc.fi
+ * Copyright (c) 2015,2019 CSC - IT Center for Science, http://www.csc.fi
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -28,78 +28,83 @@ import java.util.List;
 
 import com.nimbusds.openid.connect.sdk.ClaimsRequest.Entry;
 
-import net.shibboleth.idp.attribute.context.AttributeContext;
-
 /** interface for managing Step Up Methods. */
 public interface StepUpMethod {
 
-    /** string code for addAccount(). */
-    public static final String ADD_ACCOUNT = "addaccount";
+	/** string code for addAccount(). */
+	public static final String ADD_ACCOUNT = "addaccount";
 
-    /** string code for removeAccount(). */
-    public static final String REMOVE_ACCOUNT = "removeaccount";
+	/** string code for removeAccount(). */
+	public static final String REMOVE_ACCOUNT = "removeaccount";
 
-    /**
-     * This is called before any other calls to initialize the Step Up Method
-     * and possibly existing accounts.
-     * 
-     * @param attributeContext
-     *            may be used by initialization.
-     * @return true if initialization was successful.
-     * @throws Exception
-     *             if something unexpected occurred
-     */
+	/**
+	 * This is called before any other calls to initialize the Step Up Method and
+	 * possibly existing accounts.
+	 * 
+	 * @param attributeContext
+	 *            may be used by initialization.
+	 * @return true if initialization was successful.
+	 * @throws Exception
+	 *             if something unexpected occurred
+	 */
 
-    public boolean initialize(Collection<Entry> entry) throws Exception;
+	public boolean initialize(Collection<Entry> entry) throws Exception;
 
-    /**
-     * Name of the Step Up method.
-     * 
-     * @return name of the method.
-     */
-    public String getName();
+	/**
+	 * Name of the Step Up method.
+	 * 
+	 * @return name of the method.
+	 */
+	public String getName();
 
-    /**
-     * If accounts can be added or removed.
-     * 
-     * @return true if accounts can be added.
-     */
-    public boolean isEditable();
+	/**
+	 * If accounts can be added or removed.
+	 * 
+	 * @return true if accounts can be added.
+	 */
+	public boolean isEditable();
 
-    /**
-     * Existing accounts of the method.
-     * 
-     * @return list of accounts
-     */
-    public List<StepUpAccount> getAccounts();
+	/**
+	 * Existing accounts of the method.
+	 * 
+	 * @return list of accounts
+	 */
+	public List<StepUpAccount> getAccounts();
 
-    /**
-     * Adds a new account.
-     * 
-     * @return new account.
-     * @throws Exception
-     *             if something unexpected occurred
-     */
-    public StepUpAccount addAccount() throws Exception;
+	/**
+	 * Existing default account of the method.
+	 * 
+	 * @return account
+	 */
+	public StepUpAccount getAccount();
 
-    /**
-     * Remove a account.
-     * 
-     * @param account
-     *            to be removed.
-     * @throws Exception
-     *             if something unexpected occurred
-     */
-    public void removeAccount(StepUpAccount account) throws Exception;
+	/**
+	 * Adds a new account.
+	 * 
+	 * @return new account.
+	 * @throws Exception
+	 *             if something unexpected occurred
+	 */
+	public StepUpAccount addAccount() throws Exception;
 
-    /**
-     * Update a account.
-     * 
-     * @param account
-     *            to be updated.
-     * @throws Exception
-     *             if something unexpected occurred
-     */
-    public void updateAccount(StepUpAccount account) throws Exception;
+	/**
+	 * Remove a account.
+	 * 
+	 * @param account
+	 *            to be removed.
+	 * @throws Exception
+	 *             if something unexpected occurred
+	 */
+	public void removeAccount(StepUpAccount account) throws Exception;
+
+	/**
+	 * Update a account.
+	 * 
+	 * @param account
+	 *            to be updated.
+	 * @throws Exception
+	 *             if something unexpected occurred
+	 */
+	public void updateAccount(StepUpAccount account) throws Exception;
 
 }
