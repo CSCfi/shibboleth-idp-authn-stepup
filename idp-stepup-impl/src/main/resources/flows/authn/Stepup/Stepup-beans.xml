@@ -41,7 +41,7 @@
         p:httpServletRequest-ref="shibboleth.HttpServletRequest" />
 
     <bean id="GoogleAuthStepUpManager" class="fi.csc.idp.stepup.impl.AttributeKeyBasedStorageStepUpAccountManager"
-        scope="prototype" p:name="TOTP" p:attributeId="#{'%{stepup.GoogleAuthStepUpManager.keyclaim:INTeppn}'.trim()}"
+        scope="prototype" p:name="TOTP" p:attributeId="#{'%{stepup.GoogleAuthStepUpManager.keyclaim:otp_key}'.trim()}"
         p:accountLimit="1" p:autoRemove="true"
         p:stepUpAccountStorage-ref="#{'%{stepup.GoogleAuthStepUpManager.accountstore:ShibStorageAccountStorage}'.trim()}"
         p:accountID="GoogleAuthenticatorStepUpAccount" />
@@ -64,12 +64,12 @@
         p:AccountID="EmailStepUpAccount" />
 
     <bean id="SMSStepUpManager" class="fi.csc.idp.stepup.impl.AttributeTargetBasedStepUpAccountManager"
-        scope="prototype" p:name="SMS Sender" p:AttributeId="#{'%{stepup.SMSStepUpManager.keyclaim:INTmobile}'.trim()}"
+        scope="prototype" p:name="SMS Sender" p:AttributeId="#{'%{stepup.SMSStepUpManager.keyclaim:mobile}'.trim()}"
         p:AccountID="SMSStepUpAccount" />
 
     <bean id="SMSReceiverStepUpManager" class="fi.csc.idp.stepup.impl.AttributeTargetBasedStepUpAccountManager"
         scope="prototype" p:name="SMS Receiver"
-        p:AttributeId="#{'%{stepup.SMSReceiverStepUpManager.keyclaim:INTmobile}'.trim()}"
+        p:AttributeId="#{'%{stepup.SMSReceiverStepUpManager.keyclaim:mobile}'.trim()}"
         p:AccountID="SMSReceiverStepUpAccount" />
 
     <bean id="LogStepUpAccount" class="fi.csc.idp.stepup.impl.ChallengeSenderStepUpAccount" scope="prototype"
