@@ -1,5 +1,7 @@
 # stepup-proxy
-Authentation flow performing TOTP for the user and a API to manage the secrets. This module turns a Shibboleth OP (i.e. Shibboleth IdP shibboleth-idp-oidc-extension) to a stepup service authentication users already initially authenticated by client.
+Authentation flow performing TOTP for the user and a API to manage the TOTP secrets. This module turns a Shibboleth OP (i.e. Shibboleth IdP having shibboleth-idp-oidc-extension) to a stepup service. Service requests OTP code from users initially authenticated by the client.
+
+The flow of events is that the client creates a oidc authentication request to authenticate the user. The request contains in claims parameter the information necessary for the operaton. In standard use case this would be claims containing values for subject (always needed), key to users TOTP secret and phone number for bootstrapping the TOTP secret if such does not exist. The properties file can then be used to alter the behaviour. Once the user has been successfully authenticated the response is sent back.
 
 ## Prerequisite for installation
 - Shibboleth IdP 3.4+ 
@@ -60,5 +62,7 @@ We will resolve the subject from the request. For that we need to replace the de
     ]]></Script>
     <AttributeEncoder xsi:type="oidcext:OIDCString" name="sub" />
     </AttributeDefinition>
+    
+## Trust and configuring the client
+See Wiki.
 
-## Configuring the client
