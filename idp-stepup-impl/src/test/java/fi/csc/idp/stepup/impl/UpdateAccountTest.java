@@ -28,7 +28,7 @@ import net.shibboleth.idp.profile.RequestContextBuilder;
 import net.shibboleth.idp.profile.context.navigate.WebflowRequestContextProfileRequestContextLookup;
 import net.shibboleth.idp.saml.authn.principal.AuthnContextClassRefPrincipal;
 
-public class TestUpdateAccount {
+public class UpdateAccountTest {
 
     private UpdateAccount action;
 

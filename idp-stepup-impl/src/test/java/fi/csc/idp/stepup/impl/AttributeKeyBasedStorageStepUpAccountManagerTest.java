@@ -18,7 +18,7 @@ import org.testng.annotations.Test;
 import fi.csc.idp.stepup.api.StepUpAccount;
 import fi.csc.idp.stepup.api.StepUpAccountStorage;
 
-public class TestAttributeKeyBasedStorageStepUpAccountManager {
+public class AttributeKeyBasedStorageStepUpAccountManagerTest {
 
     private AttributeKeyBasedStorageStepUpAccountManager attributeKeyBasedStorageStepUpAccountManager;
 

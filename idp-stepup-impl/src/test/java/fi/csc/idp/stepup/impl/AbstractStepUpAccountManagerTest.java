@@ -8,7 +8,7 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 
-public class TestAbstractStepUpAccountManager {
+public class AbstractStepUpAccountManagerTest {
 
     private TestStepUpAccountManager testStepUpAccountManager;
     

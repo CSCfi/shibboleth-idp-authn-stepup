@@ -25,7 +25,7 @@ import org.hsqldb.persist.HsqlProperties;
 
 import fi.csc.idp.stepup.api.StepUpAccount;
 
-public class TestSQLStepUpAccountStorage {
+public class SQLStepUpAccountStorageTest {
 
     private SQLStepUpAccountStorage sqlStepUpAccountStorage;
     private Server server;

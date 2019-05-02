@@ -7,7 +7,7 @@ import org.testng.annotations.Test;
 import fi.csc.idp.stepup.api.ChallengeGenerator;
 import fi.csc.idp.stepup.api.ChallengeSender;
 
-public class TestChallengeSenderStepUpAccount {
+public class ChallengeSenderStepUpAccountTest {
 
     private ChallengeSenderStepUpAccount challengeSenderStepUpAccount;
     private String sentChallenge;

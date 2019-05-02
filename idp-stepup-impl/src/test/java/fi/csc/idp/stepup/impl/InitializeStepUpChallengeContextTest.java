@@ -28,7 +28,7 @@ import net.shibboleth.idp.profile.context.RelyingPartyContext;
 import net.shibboleth.idp.profile.context.navigate.WebflowRequestContextProfileRequestContextLookup;
 import net.shibboleth.idp.saml.authn.principal.AuthnContextClassRefPrincipal;
 
-public class TestInitializeStepUpChallengeContext {
+public class InitializeStepUpChallengeContextTest {
 
     private InitializeStepUpChallengeContext action;
     protected RequestContext src;

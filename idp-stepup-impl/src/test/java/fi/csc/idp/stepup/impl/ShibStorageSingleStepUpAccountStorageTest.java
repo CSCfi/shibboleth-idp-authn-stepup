@@ -28,7 +28,7 @@ import org.testng.annotations.Test;
 import java.util.List;
 import fi.csc.idp.stepup.api.StepUpAccount;
 
-public class TestShibStorageSingleStepUpAccountStorage {
+public class ShibStorageSingleStepUpAccountStorageTest {
 
     private ShibStorageSingleStepUpAccountStorage shibStepUpAccountStorage;
     

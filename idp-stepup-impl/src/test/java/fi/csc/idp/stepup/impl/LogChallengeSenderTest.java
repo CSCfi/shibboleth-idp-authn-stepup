@@ -4,7 +4,7 @@ package fi.csc.idp.stepup.impl;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-public class TestLogChallengeSender {
+public class LogChallengeSenderTest {
 
     private LogChallengeSender logChallengeSender;  
     

@@ -24,9 +24,9 @@ import net.shibboleth.idp.profile.RequestContextBuilder;
 import net.shibboleth.idp.profile.context.navigate.WebflowRequestContextProfileRequestContextLookup;
 import net.shibboleth.idp.saml.authn.principal.AuthnContextClassRefPrincipal;
 
-public class TestVerifyResponse {
+public class VerifyPasswordFromFormRequestTest {
 
-    private VerifyResponse action;
+    private VerifyPasswordFromFormRequest action;
 
     protected RequestContext src;
     @SuppressWarnings("rawtypes")
@@ -38,7 +38,7 @@ public class TestVerifyResponse {
     public void setUp() throws Exception {
         src = new RequestContextBuilder().buildRequestContext();
         prc = new WebflowRequestContextProfileRequestContextLookup().apply(src);
-        action = new VerifyResponse();
+        action = new VerifyPasswordFromFormRequest();
 
     }
 
@@ -70,32 +70,65 @@ public class TestVerifyResponse {
         ActionTestingSupport.assertEvent(event, StepUpEventIds.EVENTID_INVALID_USER);
     }
 
-    /** Test that action copes with wrong response */
+    /** Test that action copes with no servlet request present */
     @Test
-    public void testWrongResponse() throws ComponentInitializationException {
+    public void testNoServletRequest() throws ComponentInitializationException {
         AuthenticationContext ctx = (AuthenticationContext) prc.addSubcontext(new AuthenticationContext(), true);
         StepUpMethodContext stepUpContext = new StepUpMethodContext();
-        MockAccount ma = new MockAccount();
-        stepUpContext.setStepUpAccount(ma);
+        stepUpContext.setStepUpAccount(new MockAccount());
         ctx.addSubcontext(stepUpContext, true);
+        action.initialize();
+        final Event event = action.execute(src);
+        ActionTestingSupport.assertEvent(event, StepUpEventIds.EXCEPTION);
+    }
+
+    private void baseInit(MockAccount account) {
+        AuthenticationContext ctx = (AuthenticationContext) prc.addSubcontext(new AuthenticationContext(), true);
+        StepUpMethodContext stepUpContext = new StepUpMethodContext();
+        if (account == null){
+            account=new MockAccount();
+        }
+        stepUpContext.setStepUpAccount(account);
+        MockHttpServletRequest request = new MockHttpServletRequest();
+        request.addParameter("parameter_key", "response_failure");
+        request.addParameter("parameter_key2", "response_success");
+        action.setHttpServletRequest(request);
+        ctx.addSubcontext(stepUpContext, true);
+    }
+
+    /**
+     * Test that action copes with servlet having no challenge response
+     * parameter
+     */
+    @Test
+    public void testNoParameterInServletRequest() throws ComponentInitializationException {
+        baseInit(null);
+        action.initialize();
+        final Event event = action.execute(src);
+        ActionTestingSupport.assertEvent(event, StepUpEventIds.EVENTID_INVALID_RESPONSE);
+    }
+
+    /** Test that action copes with user entering wrong response */
+    @Test
+    public void testWrongResponse() throws ComponentInitializationException {
+        baseInit(null);
+        action.setChallengeResponseParameter("parameter_key");
         action.initialize();
         final Event event = action.execute(src);
         ActionTestingSupport.assertEvent(event, StepUpEventIds.EVENTID_INVALID_RESPONSE);
     }
     
    
-    /** Test that action copes with correct response */
+    /** Test that action copes with user entering correct response */
     @Test
-    public void testSuccess() throws ComponentInitializationException {
-        AuthenticationContext ctx = (AuthenticationContext) prc.addSubcontext(new AuthenticationContext(), true);
-        StepUpMethodContext stepUpContext = new StepUpMethodContext();
-        MockAccount ma = new MockAccount();
-        ma.correctResponse = null;
-        stepUpContext.setStepUpAccount(ma);
-        ctx.addSubcontext(stepUpContext, true);
+    public void testCorrectResponse() throws ComponentInitializationException {
+        baseInit(null);
+        action.setChallengeResponseParameter("parameter_key2");
         action.initialize();
         final Event event = action.execute(src);
         Assert.assertNull(event);
     }
 
+   
+   
 }

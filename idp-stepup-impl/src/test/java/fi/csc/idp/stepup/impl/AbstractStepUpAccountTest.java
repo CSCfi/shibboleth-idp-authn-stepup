@@ -10,7 +10,7 @@ import org.testng.annotations.Test;
 import fi.csc.idp.stepup.api.ChallengeGenerator;
 import fi.csc.idp.stepup.api.ChallengeVerifier;
 
-public class TestAbstractStepUpAccount {
+public class AbstractStepUpAccountTest {
 
     private TestStepUpAccount testStepUpAccount;
     private ChallengeGen challengeGen;
