@@ -16,7 +16,7 @@ First you need extract the archive and rebuild the package. Please not that you 
 
 Restart the Shibboleth IdP.
 
-## Configuring the OP
+## Basic Configuration
 Minimal instructions for the OP. See Wiki for detailed instructions.    
 ### Authentication flow
 You will need to create entry for the flow to general-authn.xml
