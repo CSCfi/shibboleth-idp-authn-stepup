@@ -134,6 +134,13 @@
 
             <!-- Test Dependencies -->
             <dependency>
+                <groupId>net.shibboleth.idp</groupId>
+                <artifactId>idp-profile-api</artifactId>
+                <version>${shib.idp.version}</version>
+                <scope>test</scope>
+                <type>test-jar</type>
+            </dependency>
+            <dependency>
                 <groupId>org.hsqldb</groupId>
                 <artifactId>hsqldb</artifactId>
                 <version>2.3.4</version>
