@@ -29,6 +29,7 @@ import java.util.Collection;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import net.minidev.json.JSONObject;
 import net.shibboleth.idp.authn.AuthnEventIds;
 import net.shibboleth.idp.authn.context.AuthenticationContext;
 import net.shibboleth.utilities.java.support.component.ComponentSupport;
@@ -164,10 +165,11 @@ public class InitializeStepUpChallengeContext extends AbstractOIDCResponseAction
         try {
             if (acceptOnlyRequestObjectClaims && getOidcResponseContext().getRequestObject() != null) {
                 Object claimsRequest = getOidcResponseContext().getRequestObject().getJWTClaimsSet().getClaim("claims");
-                if (claimsRequest instanceof ClaimsRequest) {
+                if (claimsRequest instanceof JSONObject) {
                     log.debug("{} request object containing claims", getLogPrefix());
-                    claims = ((ClaimsRequest) claimsRequest).getIDTokenClaims();
+                    claims = ClaimsRequest.parse((JSONObject) claimsRequest).getIDTokenClaims();
                 }
+
             } else if (!acceptOnlyRequestObjectClaims && getOidcResponseContext().getRequestedClaims() != null) {
                 claims = getOidcResponseContext().getRequestedClaims().getIDTokenClaims();
             }
