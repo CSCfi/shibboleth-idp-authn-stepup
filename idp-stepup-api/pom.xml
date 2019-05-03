@@ -14,7 +14,7 @@
     <parent>
         <groupId>fi.csc.idp.stepup</groupId>
         <artifactId>idp-stepup-parent</artifactId>
-        <version>0.10.0-SNAPSHOT</version>
+        <version>0.10.0</version>
         <relativePath>..</relativePath>
     </parent>
     <packaging>jar</packaging>
