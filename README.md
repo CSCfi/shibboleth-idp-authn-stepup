@@ -21,7 +21,7 @@ Include stepup.properties in idp.properties
     edit /opt/shibboleth-idp/conf/idp.properties
     
     # Load any additional property resources from a comma-delimited list
-idp.additionalProperties=/conf/ldap.properties, /conf/saml-nameid.properties, /conf/services.properties, /conf/authn/duo.properties, /conf/idp-oidc.properties, */conf/authn/stepup.properties*
+idp.additionalProperties=/conf/ldap.properties, /conf/saml-nameid.properties, /conf/services.properties, /conf/authn/duo.properties, /conf/idp-oidc.properties, /conf/authn/stepup.properties
 
 ## Basic Configuration
 Minimal instructions for the OP. See Wiki for detailed instructions.    
