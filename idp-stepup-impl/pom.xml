@@ -14,7 +14,7 @@
     <parent>
         <groupId>fi.csc.idp.stepup</groupId>
         <artifactId>idp-stepup-parent</artifactId>
-        <version>0.10.0</version>
+        <version>1.0.0-SNAPSHOT</version>
         <relativePath>..</relativePath>
     </parent>
     <packaging>jar</packaging>
@@ -78,7 +78,21 @@
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-crypto</artifactId>
         </dependency>
-        <!-- Test Dependencies -->
+        <dependency>
+          <groupId>org.testng</groupId>
+          <artifactId>testng</artifactId>
+          <scope>test</scope>
+        </dependency>
+        <dependency>
+          <groupId>org.springframework</groupId>
+          <artifactId>spring-test</artifactId>
+          <scope>test</scope>
+        </dependency>
+        <dependency>
+          <groupId>net.shibboleth.idp</groupId>
+          <artifactId>idp-profile-api</artifactId>
+          <type>test-jar</type>
+        </dependency>
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-core</artifactId>

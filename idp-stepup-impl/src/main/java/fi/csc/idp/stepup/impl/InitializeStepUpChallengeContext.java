@@ -42,7 +42,7 @@ import org.opensaml.profile.context.ProfileRequestContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.base.Function;
+import java.util.function.Function;
 import com.nimbusds.openid.connect.sdk.ClaimsRequest;
 
 import com.nimbusds.openid.connect.sdk.ClaimsRequest.Entry;
@@ -113,7 +113,7 @@ public class InitializeStepUpChallengeContext extends AbstractOIDCResponseAction
 
     /** Constructor. */
     public InitializeStepUpChallengeContext() {
-        authnCtxLookupStrategy = new ChildContextLookup<>(AuthenticationContext.class);
+        authnCtxLookupStrategy = new ChildContextLookup(AuthenticationContext.class);
     }
 
     /**

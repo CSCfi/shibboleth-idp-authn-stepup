@@ -14,7 +14,7 @@
     <parent>
         <groupId>fi.csc.idp.stepup</groupId>
         <artifactId>idp-stepup-parent</artifactId>
-        <version>0.10.0</version>
+        <version>1.0.0-SNAPSHOT</version>
         <relativePath>..</relativePath>
     </parent>
     <packaging>jar</packaging>
@@ -31,6 +31,11 @@
         <dependency>
             <groupId>com.nimbusds</groupId>
             <artifactId>oauth2-oidc-sdk</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.testng</groupId>
+            <artifactId>testng</artifactId>
+            <scope>test</scope>
         </dependency>
     </dependencies>
     <build>

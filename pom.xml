@@ -11,14 +11,9 @@
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <parent>
-        <groupId>net.shibboleth.idp</groupId>
-        <artifactId>idp-parent</artifactId>
-        <version>3.4.0</version>
-    </parent>
     <groupId>fi.csc.idp.stepup</groupId>
     <artifactId>idp-stepup-parent</artifactId>
-    <version>0.10.0</version>
+    <version>1.0.0-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <modules>
@@ -28,11 +23,14 @@
     </modules>
 
     <properties>
-        <shib.idp.oidc.extension.version>1.0.0</shib.idp.oidc.extension.version>
+        <shib.idp.oidc.extension.version>2.0.0</shib.idp.oidc.extension.version>
+        <spring.version>5.2.4.RELEASE</spring.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.source>1.7</maven.compiler.source>
-        <maven.compiler.target>1.7</maven.compiler.target>
-        <shib.idp.version>3.4.0</shib.idp.version>
+        <maven.compiler.source>11</maven.compiler.source>
+        <maven.compiler.target>11</maven.compiler.target>
+        <shib.idp.version>4.0.0</shib.idp.version>
+        <opensaml.version>4.0.0</opensaml.version>
+        <guava.version>28.2-jre</guava.version>
         <checkstyle.configLocation>
             conf/checkstyle.xml
         </checkstyle.configLocation>
@@ -70,9 +68,44 @@
         <tag>HEAD</tag>
     </scm>
 
-    <dependencyManagement>
-        <dependencies>
-            <!-- Compile Dependencies -->
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>javax.servlet</groupId>
+				<artifactId>javax.servlet-api</artifactId>
+				<version>3.1.0</version>
+			</dependency>
+			<dependency>
+				<groupId>com.google.code.findbugs</groupId>
+				<artifactId>jsr305</artifactId>
+				<version>3.0.2</version>
+			</dependency>
+			<dependency>
+				<groupId>com.google.guava</groupId>
+				<artifactId>guava</artifactId>
+				<version>${guava.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.mockito</groupId>
+				<artifactId>mockito-core</artifactId>
+				<version>3.6.28</version>
+				<scope>test</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.testng</groupId>
+				<artifactId>testng</artifactId>
+				<version>7.3.0</version>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework</groupId>
+				<artifactId>spring-test</artifactId>
+				<version>${spring.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>net.shibboleth.idp</groupId>
+				<version>${shib.idp.version}</version>
+				<artifactId>idp-profile-api</artifactId>
+			</dependency>
             <dependency>
                 <groupId>org.geant</groupId>
                 <version>${shib.idp.oidc.extension.version}</version>
@@ -126,49 +159,38 @@
             <dependency>
                 <groupId>org.springframework.security</groupId>
                 <artifactId>spring-security-crypto</artifactId>
-                <version>4.2.12.RELEASE</version>
+                <version>5.3.5.RELEASE</version>
             </dependency>
-            <!-- Provided Dependencies -->
-
-            <!-- Runtime Dependencies -->
-
-            <!-- Test Dependencies -->
             <dependency>
                 <groupId>net.shibboleth.idp</groupId>
                 <artifactId>idp-profile-api</artifactId>
                 <version>${shib.idp.version}</version>
-                <scope>test</scope>
                 <type>test-jar</type>
             </dependency>
             <dependency>
                 <groupId>org.hsqldb</groupId>
                 <artifactId>hsqldb</artifactId>
                 <version>2.3.4</version>
-                <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>junit</groupId>
                 <artifactId>junit</artifactId>
                 <version>3.8.1</version>
-                <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>org.mockito</groupId>
                 <artifactId>mockito-all</artifactId>
                 <version>1.10.19</version>
-                <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>com.icegreen</groupId>
                 <artifactId>greenmail</artifactId>
                 <version>1.5.0</version>
-                <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>org.opensaml</groupId>
                 <artifactId>opensaml-storage-impl</artifactId>
                 <version>${shib.idp.version}</version>
-                <scope>test</scope>
             </dependency>
         </dependencies>
     </dependencyManagement>

@@ -35,7 +35,7 @@ import org.opensaml.profile.context.navigate.CurrentOrPreviousEventLookup;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.base.Function;
+import java.util.function.Function;
 
 import net.shibboleth.idp.profile.AbstractProfileAction;
 import net.shibboleth.utilities.java.support.component.ComponentSupport;
