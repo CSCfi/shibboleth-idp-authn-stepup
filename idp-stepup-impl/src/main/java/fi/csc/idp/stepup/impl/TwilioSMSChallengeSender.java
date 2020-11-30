@@ -33,11 +33,11 @@ import org.slf4j.LoggerFactory;
 import fi.csc.idp.stepup.api.ChallengeSender;
 
 /** Class implemented for sending a challenge to sms account of the user. */
-public class TvilioSMSChallengeSender implements ChallengeSender {
+public class TwilioSMSChallengeSender implements ChallengeSender {
 
     /** Class logger. */
     @Nonnull
-    private final Logger log = LoggerFactory.getLogger(TvilioSMSChallengeSender.class);
+    private final Logger log = LoggerFactory.getLogger(TwilioSMSChallengeSender.class);
 
     /** SID of the tvilio account. */
     private String accountSid;
