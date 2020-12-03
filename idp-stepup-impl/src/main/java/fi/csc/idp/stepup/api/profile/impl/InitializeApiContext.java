@@ -1,6 +1,6 @@
 /*
  * The MIT License
- * Copyright (c) 2015 CSC - IT Center for Science, http://www.csc.fi
+ * Copyright (c) 2015-2020 CSC - IT Center for Science, http://www.csc.fi
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -25,7 +25,7 @@ package fi.csc.idp.stepup.api.profile.impl;
 
 import javax.annotation.Nonnull;
 
-import org.opensaml.profile.action.AbstractProfileAction;
+import net.shibboleth.idp.profile.AbstractProfileAction;
 import org.opensaml.profile.action.ActionSupport;
 import org.opensaml.profile.action.EventIds;
 import org.opensaml.profile.context.ProfileRequestContext;
@@ -38,8 +38,9 @@ import fi.csc.idp.stepup.api.StepUpAccountStorage;
 import fi.csc.idp.stepup.api.StepUpApiContext;
 import net.shibboleth.utilities.java.support.logic.Constraint;
 
-/** Action creating {@link StepUpApiContext} under {@link ProfileRequestContext}. */
-@SuppressWarnings("rawtypes")
+/**
+ * Action creating {@link StepUpApiContext} under {@link ProfileRequestContext}.
+ */
 public class InitializeApiContext extends AbstractProfileAction {
 
     /** Class logger. */
@@ -64,6 +65,15 @@ public class InitializeApiContext extends AbstractProfileAction {
     public void setStepUpAccountStorage(StepUpAccountStorage storage) {
         Constraint.isNotNull(storage, "StepUpAccountStorage must not be null or empty");
         this.storage = storage;
+    }
+
+    /**
+     * Set application context for test cases.
+     * 
+     * @param ctx application context
+     */
+    public void setAppContext(ApplicationContext ctx) {
+        this.appContext = ctx;
     }
 
     /**

@@ -1,6 +1,6 @@
 /*
  * The MIT License
- * Copyright (c) 2015 CSC - IT Center for Science, http://www.csc.fi
+ * Copyright (c) 2015-2020 CSC - IT Center for Science, http://www.csc.fi
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -35,7 +35,6 @@ import net.shibboleth.utilities.java.support.logic.Constraint;
 /**
  * This action validated access token.
  */
-@SuppressWarnings("rawtypes")
 public class ValidateToken extends AbstractApiAction {
 
     /** Class logger. */
@@ -44,8 +43,8 @@ public class ValidateToken extends AbstractApiAction {
 
     /** Token validator. */
     private TokenValidator tokenValidator;
-    
-    /** Whether we are validating token for self-service action.*/
+
+    /** Whether we are validating token for self-service action. */
     private boolean selfServiceAction;
 
     /**

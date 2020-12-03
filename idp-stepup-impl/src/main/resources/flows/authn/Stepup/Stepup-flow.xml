@@ -22,26 +22,12 @@
 		<transition on="InvalidUser" to="InitializeRegistration">
 			<set name="flowScope.regAction" value="'AddAccount'" type="string" />
 		</transition>
-		<transition on="proceed" to="DirectToCorrectResponseType" />
-	</action-state>
-
-
-	<action-state id="DirectToCorrectResponseType">
-		<on-entry>
-			<evaluate
-				expression="opensamlProfileRequestContext.getSubcontext(T(net.shibboleth.idp.authn.context.AuthenticationContext))"
-				result="flowScope.authenticationContext" />
-		</on-entry>
-		<!-- SMS Receiver is currently the only backchannel verification type -->
-		<evaluate
-			expression="authenticationContext.getSubcontext(T(fi.csc.idp.stepup.api.StepUpMethodContext)).getStepUpMethod().getName().equals('SMS Receiver') == true" />
-		<transition on="no" to="DisplayChallenge">
-			<set name="flowScope.viewName" value="flowRequestContext.activeFlow.id"
+		<transition on="proceed" to="DisplayChallenge" >
+		<set name="flowScope.viewName" value="flowRequestContext.activeFlow.id"
 				type="string" />
 			<set name="flowScope.proceedAction" value="'VerifyPasswordFromFormRequest'"
 				type="string" />
 		</transition>
-		<transition on="yes" to="PollInformation" />
 	</action-state>
 
 	<action-state id="AddAccount">
@@ -68,28 +54,14 @@
 		<transition on="StepUpLimitReached" to="DisplayWrongResponse" />
 	</action-state>
 
-	<action-state id="UpdateAccount">
-		<evaluate expression="UpdateAccount" />
+	<action-state id="AddOrRemoveAccount">
+		<evaluate expression="AddOrRemoveAccount" />
 		<evaluate expression="'proceed'" />
 		<transition on="proceed" to="ManageAccounts">
 			<set name="flowScope.accountUpdated" value="true" type="boolean" />
 		</transition>
 	</action-state>
-
-	<!-- this action may be used if execution requires backend still to check 
-		authentication status -->
-	<action-state id="VerifyAccountStatusVerified">
-		<on-entry>
-			<evaluate
-				expression="opensamlProfileRequestContext.getSubcontext(T(net.shibboleth.idp.authn.context.AuthenticationContext))"
-				result="flowScope.authenticationContext" />
-		</on-entry>
-		<evaluate
-			expression="authenticationContext.getSubcontext(T(fi.csc.idp.stepup.api.StepUpMethodContext)).getStepUpAccount().isVerified() == true" />
-		<transition on="no" to="DisplayCondolences" />
-		<transition on="yes" to="proceed" />
-	</action-state>
-
+    
 	<!-- stepup execution STOP -->
 
 	<!-- registration execution START -->
@@ -194,71 +166,6 @@
 		<transition on="proceed" to="#{flowScope.proceedAction}" />
 	</view-state>
 
-
-	<!-- TODO .. make these two poll view states to use parametrized views -->
-	<view-state id="PollInformation" view="#{flowRequestContext.activeFlow.id}-backend">
-		<on-render>
-			<evaluate expression="environment" result="viewScope.environment" />
-			<evaluate expression="opensamlProfileRequestContext" result="viewScope.profileRequestContext" />
-			<evaluate
-				expression="opensamlProfileRequestContext.getSubcontext(T(net.shibboleth.idp.authn.context.AuthenticationContext))"
-				result="viewScope.authenticationContext" />
-			<evaluate
-				expression="authenticationContext.getSubcontext(T(net.shibboleth.idp.authn.context.AuthenticationErrorContext))"
-				result="viewScope.authenticationErrorContext" />
-			<evaluate
-				expression="authenticationContext.getSubcontext(T(net.shibboleth.idp.authn.context.AuthenticationWarningContext))"
-				result="viewScope.authenticationWarningContext" />
-			<evaluate
-				expression="authenticationContext.getSubcontext(T(fi.csc.idp.stepup.api.StepUpMethodContext))"
-				result="viewScope.stepupMethodContext" />
-			<evaluate
-				expression="T(net.shibboleth.utilities.java.support.codec.HTMLEncoder)"
-				result="viewScope.encoder" />
-			<evaluate
-				expression="flowRequestContext.getExternalContext().getNativeRequest()"
-				result="viewScope.request" />
-			<evaluate
-				expression="flowRequestContext.getExternalContext().getNativeResponse()"
-				result="viewScope.response" />
-		</on-render>
-		<transition on="proceed" to="VerifyAccountStatusVerified" />
-		<transition on="retry" to="PollProgress" />
-	</view-state>
-
-	<view-state id="PollProgress"
-		view="#{flowRequestContext.activeFlow.id}-backend-progress">
-		<on-render>
-			<evaluate expression="environment" result="viewScope.environment" />
-			<evaluate expression="opensamlProfileRequestContext" result="viewScope.profileRequestContext" />
-			<evaluate
-				expression="opensamlProfileRequestContext.getSubcontext(T(net.shibboleth.idp.authn.context.AuthenticationContext))"
-				result="viewScope.authenticationContext" />
-			<evaluate
-				expression="authenticationContext.getSubcontext(T(net.shibboleth.idp.authn.context.AuthenticationErrorContext))"
-				result="viewScope.authenticationErrorContext" />
-			<evaluate
-				expression="authenticationContext.getSubcontext(T(net.shibboleth.idp.authn.context.AuthenticationWarningContext))"
-				result="viewScope.authenticationWarningContext" />
-			<evaluate
-				expression="authenticationContext.getSubcontext(T(fi.csc.idp.stepup.api.StepUpMethodContext))"
-				result="viewScope.stepupMethodContext" />
-			<evaluate
-				expression="T(net.shibboleth.utilities.java.support.codec.HTMLEncoder)"
-				result="viewScope.encoder" />
-			<evaluate
-				expression="flowRequestContext.getExternalContext().getNativeRequest()"
-				result="viewScope.request" />
-			<evaluate
-				expression="flowRequestContext.getExternalContext().getNativeResponse()"
-				result="viewScope.response" />
-		</on-render>
-		<transition on="proceed" to="VerifyAccountStatusVerified" />
-		<transition on="retry" to="PollProgress" />
-		<transition on="timeout" to="DisplayCondolences" />
-	</view-state>
-
-
 	<view-state id="DisplayEnd" view="#{flowScope.viewName}">
 		<on-render>
 			<evaluate expression="environment" result="viewScope.environment" />
@@ -319,7 +226,7 @@
 				result="viewScope.response" />
 		</on-render>
 		<transition on="proceed" to="InitializeStepUp" />
-		<transition on="update" to="UpdateAccount" />
+		<transition on="update" to="AddOrRemoveAccount" />
 	</view-state>
 
 	<view-state id="DisplayCondolences"

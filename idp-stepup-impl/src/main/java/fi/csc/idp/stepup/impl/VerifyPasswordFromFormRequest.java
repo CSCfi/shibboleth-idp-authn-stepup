@@ -1,6 +1,6 @@
 /*
  * The MIT License
- * Copyright (c) 2015 CSC - IT Center for Science, http://www.csc.fi
+ * Copyright (c) 2015-2020 CSC - IT Center for Science, http://www.csc.fi
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -35,9 +35,7 @@ import fi.csc.idp.stepup.api.StepUpEventIds;
 
 /**
  * An action that verifies user challenge response.
- * 
  */
-@SuppressWarnings("rawtypes")
 public class VerifyPasswordFromFormRequest extends AbstractStepUpMethodAction {
 
     /** Class logger. */
@@ -52,8 +50,7 @@ public class VerifyPasswordFromFormRequest extends AbstractStepUpMethodAction {
     /**
      * Sets the parameter the response is read from.
      * 
-     * @param parameter
-     *            name for response
+     * @param parameter name for response
      */
     public void setChallengeResponseParameter(@Nonnull @NotEmpty String parameter) {
         this.challengeResponseParameter = parameter;
@@ -107,5 +104,4 @@ public class VerifyPasswordFromFormRequest extends AbstractStepUpMethodAction {
             return;
         }
     }
-
 }

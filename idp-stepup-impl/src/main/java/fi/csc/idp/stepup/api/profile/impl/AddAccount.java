@@ -1,6 +1,6 @@
 /*
  * The MIT License
- * Copyright (c) 2015 CSC - IT Center for Science, http://www.csc.fi
+ * Copyright (c) 2015-2020 CSC - IT Center for Science, http://www.csc.fi
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -32,36 +32,36 @@ import fi.csc.idp.stepup.api.StepUpAccount;
 import fi.csc.idp.stepup.api.StepUpEventIds;
 
 /**
- * Actions adds account if not pre-existing and sets the response status.
+ * Actions adds account and sets the response status.
  */
-@SuppressWarnings("rawtypes")
 public class AddAccount extends AbstractApiAction {
 
     /** Class logger. */
     @Nonnull
     private final Logger log = LoggerFactory.getLogger(AddAccount.class);
-    
+
     /** {@inheritDoc} */
     @Override
     protected void doExecute(@Nonnull final ProfileRequestContext profileRequestContext) {
-        if (getCtx().getAccounts() != null && getCtx().getAccounts().size() > 0) {
-            if (getCtx().getAccounts().size() >= getRequest().getMaxAccounts()) {
-                if (!getRequest().getForceUpdate()) {
-                    // Form response
+        if (getCtx().getAccount().getTarget() != null) {
+            if (!getRequest().getForceUpdate()) {
+                // Form response
+                response.put("userid", getRequest().getUserId());
+                response.put("error", "Cannot add more accounts to user");
+                getCtx().setResponse(response);
+                log.error("{} Cannot add more accounts to user {}", getLogPrefix(), getRequest().getUserId());
+                ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EVENTID_FORBIDDEN);
+                return;
+            } else {
+                try {
+                    getCtx().getStorage().remove(getCtx().getAccount(), getRequest().getUserId());
+                } catch (Exception e) {
+                    log.error("{} Exception occurred while removing account {}", getLogPrefix(), e.getMessage());
                     response.put("userid", getRequest().getUserId());
-                    response.put("error", "Cannot add more accounts to user");
+                    response.put("error", "Internal error");
                     getCtx().setResponse(response);
-                    log.debug("{} Cannot add more accounts to user {}", getLogPrefix(), getRequest().getUserId());
-                    ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EVENTID_FORBIDDEN);
+                    ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EXCEPTION);
                     return;
-                } else {
-                    try {
-                        getCtx().getStorage().remove(getCtx().getAccounts().get(0), getRequest().getUserId());
-                    } catch (Exception e) {
-                        log.error("{} Exception occurred while removing account {}", getLogPrefix(), e.getMessage());
-                        ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EXCEPTION);
-                        return;
-                    }
                 }
             }
         }
@@ -73,6 +73,9 @@ public class AddAccount extends AbstractApiAction {
             getCtx().getStorage().add(account, getRequest().getUserId());
         } catch (Exception e) {
             log.error("{} Exception occurred while adding account {}", getLogPrefix(), e.getMessage());
+            response.put("userid", getRequest().getUserId());
+            response.put("error", "Internal error");
+            getCtx().setResponse(response);
             ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EXCEPTION);
             return;
         }
@@ -81,5 +84,4 @@ public class AddAccount extends AbstractApiAction {
         response.put("value", account.getTarget());
         getCtx().setResponse(response);
     }
-
 }

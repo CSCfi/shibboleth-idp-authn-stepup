@@ -1,6 +1,6 @@
 /*
  * The MIT License
- * Copyright (c) 2019 CSC - IT Center for Science, http://www.csc.fi
+ * Copyright (c) 2019-2020 CSC - IT Center for Science, http://www.csc.fi
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -38,7 +38,6 @@ import net.shibboleth.idp.authn.context.AuthenticationContext;
 import net.shibboleth.idp.authn.principal.UsernamePrincipal;
 
 /** This action populates principal with the subject value of the request. */
-@SuppressWarnings("rawtypes")
 public class ValidateStepupAuthentication extends AbstractValidationAction {
 
     /** Class logger. */
@@ -50,7 +49,6 @@ public class ValidateStepupAuthentication extends AbstractValidationAction {
     private String requestSubject;
 
     /** {@inheritDoc} */
-    @SuppressWarnings("unchecked")
     @Override
     protected boolean doPreExecute(@Nonnull final ProfileRequestContext profileRequestContext,
             @Nonnull final AuthenticationContext authenticationContext) {
@@ -58,8 +56,8 @@ public class ValidateStepupAuthentication extends AbstractValidationAction {
             log.error("{} pre-execute failed ", getLogPrefix());
             return false;
         }
-        StepUpMethodContext stepUpMethodContext =
-                (StepUpMethodContext) authenticationContext.getSubcontext(StepUpMethodContext.class, false);
+        StepUpMethodContext stepUpMethodContext = (StepUpMethodContext) authenticationContext
+                .getSubcontext(StepUpMethodContext.class, false);
         if (stepUpMethodContext == null) {
             log.error("{} StepUpMethodContext not available under AuthenticationContext", getLogPrefix());
             ActionSupport.buildEvent(profileRequestContext, AuthnEventIds.INVALID_AUTHN_CTX);
@@ -75,7 +73,6 @@ public class ValidateStepupAuthentication extends AbstractValidationAction {
     }
 
     /** {@inheritDoc} */
-    @SuppressWarnings("unchecked")
     @Override
     protected void doExecute(@Nonnull final ProfileRequestContext profileRequestContext,
             @Nonnull final AuthenticationContext authenticationContext) {

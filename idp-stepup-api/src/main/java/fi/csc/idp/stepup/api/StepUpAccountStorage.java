@@ -1,6 +1,6 @@
 /*
  * The MIT License
- * Copyright (c) 2015 CSC - IT Center for Science, http://www.csc.fi
+ * Copyright (c) 2015-2020 CSC - IT Center for Science, http://www.csc.fi
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,9 +23,8 @@
 
 package fi.csc.idp.stepup.api;
 
-import java.util.List;
 
-/** interface for managing storable accounts. */
+/** Interface for managing persistent accounts. */
 public interface StepUpAccountStorage {
 
     /**
@@ -54,19 +53,7 @@ public interface StepUpAccountStorage {
     void remove(final StepUpAccount account, String key) throws Exception;
 
     /**
-     * Update account stored by key.
-     * 
-     * @param account
-     *            that has been modified.
-     * @param key
-     *            the account has been stored by.
-     * @throws Exception
-     *             if something unexpected occurs.
-     */
-    void update(final StepUpAccount account, String key) throws Exception;
-
-    /**
-     * Get a list of accounts stored by key.
+     * Get account stored by key.
      * 
      * @param key
      *            the account has been stored by
@@ -75,9 +62,9 @@ public interface StepUpAccountStorage {
      *            StepUpAccount.
      * @param <T>
      *            Template for the implementation expected.
-     * @return list of accounts
+     * @return account
      * @throws Exception
      *             if something unexpected occurs.
      */
-    <T> List<StepUpAccount> getAccounts(String key, Class<T> aClass) throws Exception;
+    <T> StepUpAccount getAccount(String key, Class<T> aClass) throws Exception;
 }

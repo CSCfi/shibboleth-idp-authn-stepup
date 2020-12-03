@@ -1,6 +1,6 @@
 /*
  * The MIT License
- * Copyright (c) 2015 CSC - IT Center for Science, http://www.csc.fi
+ * Copyright (c) 2015-2020 CSC - IT Center for Science, http://www.csc.fi
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -42,10 +42,10 @@ import net.shibboleth.utilities.java.support.component.ComponentSupport;
 import net.shibboleth.utilities.java.support.logic.Constraint;
 
 /**
- * This action reads an event from the configured {@link EventContext} lookup strategy and sets the status code for
- * {@link HttpServletResponse} according to the attached configuration.
+ * This action reads an event from the configured {@link EventContext} lookup
+ * strategy and sets the status code for {@link HttpServletResponse} according
+ * to the attached configuration.
  */
-@SuppressWarnings("rawtypes")
 public class SetResponseStatusCodeFromEvent extends AbstractProfileAction {
 
     /** Class logger. */
@@ -115,6 +115,5 @@ public class SetResponseStatusCodeFromEvent extends AbstractProfileAction {
             log.debug("{} No mapping found for {}, default status code {} set", getLogPrefix(), event, defaultCode);
             getHttpServletResponse().setStatus(defaultCode);
         }
-        // If there is response message we include that
     }
 }

@@ -1,6 +1,6 @@
 /*
  * The MIT License
- * Copyright (c) 2015,2019 CSC - IT Center for Science, http://www.csc.fi
+ * Copyright (c) 2015-2020 CSC - IT Center for Science, http://www.csc.fi
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,9 +23,7 @@
 
 package fi.csc.idp.stepup.impl;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 import javax.annotation.Nonnull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,7 +35,7 @@ import com.nimbusds.openid.connect.sdk.ClaimsRequest.Entry;
 import fi.csc.idp.stepup.api.StepUpAccount;
 import fi.csc.idp.stepup.api.StepUpMethod;
 
-/** Helper class for Step Up Method implementations. */
+/** Base class for step up method/manager implementations. */
 public class AbstractStepUpAccountManager implements StepUpMethod {
 
     /** Class logger. */
@@ -47,8 +45,8 @@ public class AbstractStepUpAccountManager implements StepUpMethod {
     /** Name for the method. */
     private String name;
 
-    /** Accounts of the method. */
-    private List<StepUpAccount> accounts = new ArrayList<StepUpAccount>();
+    /** Account of the method. */
+    private StepUpAccount account;
 
     /** bean id of account bean. */
     private String accountID;
@@ -122,28 +120,6 @@ public class AbstractStepUpAccountManager implements StepUpMethod {
     }
 
     /**
-     * Get the editable status.
-     * 
-     * @return false
-     */
-    @Override
-    public boolean isEditable() {
-
-        return false;
-    }
-
-    /**
-     * Get the accounts.
-     * 
-     * @return the accounts
-     */
-    @Override
-    public List<StepUpAccount> getAccounts() {
-
-        return accounts;
-    }
-
-    /**
      * Add account.
      * 
      * @return null, adding not supported.
@@ -175,25 +151,8 @@ public class AbstractStepUpAccountManager implements StepUpMethod {
     @Override
     public boolean initialize(Collection<Entry> entry) throws Exception {
 
-        StepUpAccount account = (StepUpAccount) getAppContext().getBean(getAccountID());
-        account.setEnabled(true);
-        // Accounts cannot be stored and therefore also not edited
-        account.setEditable(false);
-        getAccounts().add(account);
-
+        account = (StepUpAccount) getAppContext().getBean(getAccountID());
         return true;
-    }
-
-    /**
-     * Update a account.
-     * 
-     * @param account
-     * @throws Exception if something unexpected occurs
-     */
-    @Override
-    public void updateAccount(StepUpAccount account) throws Exception {
-
-        log.warn("Method not supported");
     }
 
     /**
@@ -204,10 +163,12 @@ public class AbstractStepUpAccountManager implements StepUpMethod {
     @Override
     public StepUpAccount getAccount() {
 
-        if (getAccounts() != null && getAccounts().size() > 0) {
-            return getAccounts().get(0);
-        }
-        return null;
+        return account;
+    }
+
+    protected void setAccount(StepUpAccount account) {
+
+        this.account = account;
     }
 
 }

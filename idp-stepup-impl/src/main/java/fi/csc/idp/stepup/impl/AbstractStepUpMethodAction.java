@@ -1,6 +1,6 @@
 /*
  * The MIT License
- * Copyright (c) 2015 CSC - IT Center for Science, http://www.csc.fi
+ * Copyright (c) 2015-2020 CSC - IT Center for Science, http://www.csc.fi
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -34,11 +34,9 @@ import fi.csc.idp.stepup.api.StepUpEventIds;
 import fi.csc.idp.stepup.api.StepUpMethodContext;
 
 /**
- * Abstract class for stepup method actions. Locates StepUpMethodContext
+ * Base class for authentication actions that require access to step up method
  * context. If no context is found a error event is triggered.
- * 
  */
-@SuppressWarnings("rawtypes")
 abstract class AbstractStepUpMethodAction extends AbstractAuthenticationAction {
 
     /** Class logger. */
@@ -59,7 +57,6 @@ abstract class AbstractStepUpMethodAction extends AbstractAuthenticationAction {
     }
 
     /** {@inheritDoc} */
-    @SuppressWarnings("unchecked")
     @Override
     protected boolean doPreExecute(@Nonnull final ProfileRequestContext profileRequestContext,
             @Nonnull final AuthenticationContext authenticationContext) {

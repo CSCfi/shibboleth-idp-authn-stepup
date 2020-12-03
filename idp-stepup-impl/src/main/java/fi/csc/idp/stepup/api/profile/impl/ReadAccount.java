@@ -1,6 +1,6 @@
 /*
  * The MIT License
- * Copyright (c) 2015 CSC - IT Center for Science, http://www.csc.fi
+ * Copyright (c) 2015-2020 CSC - IT Center for Science, http://www.csc.fi
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -32,15 +32,15 @@ import fi.csc.idp.stepup.api.StepUpApiContext;
 import fi.csc.idp.stepup.api.StepUpEventIds;
 
 /**
- * This action reads accounts of the user and stores them to {@link StepUpApiContext}.
+ * This action reads accounts of the user and stores them to
+ * {@link StepUpApiContext}.
  */
-@SuppressWarnings("rawtypes")
 public class ReadAccount extends AbstractApiAction {
 
     /** Class logger. */
     @Nonnull
     private final Logger log = LoggerFactory.getLogger(ReadAccount.class);
-    
+
     /** {@inheritDoc} */
     @Override
     protected void doExecute(@Nonnull final ProfileRequestContext profileRequestContext) {
@@ -52,12 +52,15 @@ public class ReadAccount extends AbstractApiAction {
             return;
         }
         try {
-            getCtx().setAccounts(
-                    getCtx().getStorage().getAccounts(getRequest().getUserId(), getCtx().getAccount().getClass()));
+            getCtx().setAccount(
+                    getCtx().getStorage().getAccount(getRequest().getUserId(), getCtx().getAccount().getClass()));
             log.debug("{} Located {} user accounts for user {}", getLogPrefix(),
-                    getCtx().getAccounts() != null ? getCtx().getAccounts().size() : 0, getRequest().getUserId());
+                    getCtx().getAccount() == null ? 0 : getRequest().getUserId());
         } catch (Exception e) {
-            log.error("{} Failed reading user accounts: {}", getLogPrefix(), e.getMessage());
+            log.error("{} Failed reading user accounts", getLogPrefix(), e);
+            response.put("userid", getRequest().getUserId());
+            response.put("error", "Internal error");
+            getCtx().setResponse(response);
             ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EXCEPTION);
         }
     }

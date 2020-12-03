@@ -1,6 +1,6 @@
 /*
  * The MIT License
- * Copyright (c) 2015 CSC - IT Center for Science, http://www.csc.fi
+ * Copyright (c) 2015-2020 CSC - IT Center for Science, http://www.csc.fi
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -31,7 +31,8 @@ import com.nimbusds.openid.connect.sdk.ClaimsRequest.Entry;
 import fi.csc.idp.stepup.api.StepUpAccount;
 
 /**
- * Class implementing Step Up Account manager for accounts initialized by key found in attribute values.
+ * Class implementing step up account manager for accounts initialised by key
+ * found in attribute values.
  */
 public class AttributeTargetBasedStepUpAccountManager extends AbstractStepUpAccountManager {
 
@@ -52,7 +53,8 @@ public class AttributeTargetBasedStepUpAccountManager extends AbstractStepUpAcco
     }
 
     /**
-     * Initializes accounts by reading the value for key, using that to instantiate non editable accounts.
+     * Initialises account by reading the value for key, using that to instantiate
+     * non editable accounts.
      * 
      * @param attributeContext to look for the key value
      * @throws Exception if something unexpected occurred.
@@ -78,11 +80,9 @@ public class AttributeTargetBasedStepUpAccountManager extends AbstractStepUpAcco
                     log.debug("Adding account with target value {}", target);
                     StepUpAccount account = (StepUpAccount) getAppContext().getBean(getAccountID());
                     account.setTarget(target);
-                    account.setEnabled(true);
-                    // Accounts cannot be stored and therefore also not edited
-                    account.setEditable(false);
                     try {
-                        getAccounts().add(account);
+                        setAccount(account);
+                        break;
                     } catch (Exception e) {
                         log.debug("Not able to add account during initialization");
                         return false;

@@ -1,6 +1,6 @@
 /*
  * The MIT License
- * Copyright (c) 2015,2019 CSC - IT Center for Science, http://www.csc.fi
+ * Copyright (c) 2015-2020 CSC - IT Center for Science, http://www.csc.fi
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -30,85 +30,81 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Context for passing information of available Step Up Methods and activated
- * accounts.
+ * Context for that holds information specific to step up authentication flow.
  */
 public class StepUpMethodContext extends BaseContext {
 
-	/** Class logger. */
-	@Nonnull
-	private final Logger log = LoggerFactory.getLogger(StepUpMethodContext.class);
+    /** Class logger. */
+    @Nonnull
+    private final Logger log = LoggerFactory.getLogger(StepUpMethodContext.class);
 
-	/** Subject of the user. */
-	@Nullable
-	private String subject;
+    /** Subject of the user. */
+    @Nullable
+    private String subject;
 
-	/** Active StepUp account. */
-	private StepUpAccount stepUpAccount;
+    /** Active step up account. */
+    @Nullable
+    private StepUpAccount account;
 
-	/** Active StepUp method. */
-	private StepUpMethod stepUpMethod;
+    /** Active step up method. */
+    @Nullable
+    private StepUpMethod method;
 
-	/**
-	 * Get subject of the user.
-	 * 
-	 * @return subject of the user
-	 */
-	@Nullable
-	public String getSubject() {
-		return subject;
-	}
+    /**
+     * Get subject of the user.
+     * 
+     * @return subject of the user
+     */
+    @Nullable
+    public String getSubject() {
+        return subject;
+    }
 
-	/**
-	 * Set subject of the user.
-	 * 
-	 * @param sub
-	 *            subject of the user
-	 */
-	public void setSubject(@Nullable String sub) {
-		subject = sub;
-	}
+    /**
+     * Set subject of the user.
+     * 
+     * @param sub subject of the user
+     */
+    public void setSubject(@Nullable String sub) {
+        subject = sub;
+    }
 
-	/**
-	 * Get active step up method.
-	 * 
-	 * @return active method.
-	 */
-	public StepUpMethod getStepUpMethod() {
+    /**
+     * Get active step up method.
+     * 
+     * @return active method.
+     */
+    @Nullable
+    public StepUpMethod getStepUpMethod() {
+        return method;
+    }
 
-		return stepUpMethod;
-	}
+    /**
+     * Set active step up method.
+     * 
+     * @param method active step up method.
+     */
+    public void setStepUpMethod(@Nullable StepUpMethod method) {
+        this.method = method;
+    }
 
-	/**
-	 * Set active step up method.
-	 * 
-	 * @param method
-	 *            active step up method.
-	 */
-	public void setStepUpMethod(StepUpMethod method) {
+    /**
+     * Get active step up account.
+     * 
+     * @return active step up account.
+     */
+    @Nullable
+    public StepUpAccount getStepUpAccount() {
+        return account;
+    }
 
-		this.stepUpMethod = method;
-	}
-
-	/**
-	 * Get active step up account.
-	 * 
-	 * @return active step up account.
-	 */
-	public StepUpAccount getStepUpAccount() {
-
-		return stepUpAccount;
-	}
-
-	/**
-	 * Set active step up account.
-	 * 
-	 * @param account
-	 *            active stepup account
-	 */
-	public void setStepUpAccount(StepUpAccount account) {
-
-		this.stepUpAccount = account;
-	}
+    /**
+     * Set active step up account.
+     * 
+     * @param account active stepup account
+     */
+    public void setStepUpAccount(@Nullable StepUpAccount account) {
+        this.account = account;
+    }
 
 }

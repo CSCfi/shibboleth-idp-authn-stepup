@@ -28,7 +28,7 @@
     <bean id="AddAccount" class="fi.csc.idp.stepup.impl.AddAccount" scope="prototype"
         p:httpServletRequest-ref="shibboleth.HttpServletRequest" />
 
-    <bean id="UpdateAccount" class="fi.csc.idp.stepup.impl.UpdateAccount" scope="prototype"
+    <bean id="AddOrRemoveAccount" class="fi.csc.idp.stepup.impl.AddOrRemoveAccount" scope="prototype"
         p:httpServletRequest-ref="shibboleth.HttpServletRequest" />
 
     <bean id="GenerateStepUpChallenge" class="fi.csc.idp.stepup.impl.GenerateStepUpChallenge" scope="prototype"
@@ -36,9 +36,6 @@
 
     <bean id="VerifyPasswordFromFormRequest" class="fi.csc.idp.stepup.impl.VerifyPasswordFromFormRequest"
         scope="prototype" p:httpServletRequest-ref="shibboleth.HttpServletRequest" />
-
-    <bean id="VerifyResponse" class="fi.csc.idp.stepup.impl.VerifyResponse" scope="prototype"
-        p:httpServletRequest-ref="shibboleth.HttpServletRequest" />
 
     <bean id="GoogleAuthStepUpManager" class="fi.csc.idp.stepup.impl.AttributeKeyBasedStorageStepUpAccountManager"
         scope="prototype" p:name="TOTP" p:attributeId="#{'%{stepup.GoogleAuthStepUpManager.keyclaim:otp_key}'.trim()}"

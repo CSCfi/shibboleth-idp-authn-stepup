@@ -1,6 +1,6 @@
 /*
  * The MIT License
- * Copyright (c) 2015 CSC - IT Center for Science, http://www.csc.fi
+ * Copyright (c) 2015-2020 CSC - IT Center for Science, http://www.csc.fi
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,25 +22,23 @@
  */
 package fi.csc.idp.stepup.api;
 
-import java.util.List;
 import java.util.Map;
-
 import org.opensaml.messaging.context.BaseContext;
-
 import net.shibboleth.utilities.java.support.logic.Constraint;
 
 /**
- * Context for stepup api.
+ * Context for that holds information specific to step up API.
  */
 public class StepUpApiContext extends BaseContext {
 
 	/** Response map. */
 	private Map<String, Object> response;
 	
-	/** Stepup account.  */  
+	/** Step up account.  */  
 	private StepUpAccount account;
 	
-	/** Storage for the step up accounts. */
+
+    /** Storage for the step up accounts. */
     private StepUpAccountStorage storage;
 
 	/**
@@ -49,8 +47,8 @@ public class StepUpApiContext extends BaseContext {
 	 * @param storage storage for the step up accounts
 	 */
 	public StepUpApiContext(StepUpAccount account, StepUpAccountStorage storage) {
-		Constraint.isNotNull(account, "Stepup account must not be null");
-		Constraint.isNotNull(storage, "StepUpAccountStorage account must not be null");
+		Constraint.isNotNull(account, "Step up account must not be null");
+		Constraint.isNotNull(storage, "Step up account storage account must not be null");
 		this.account=account;
 		this.storage=storage;
 	}
@@ -81,32 +79,18 @@ public class StepUpApiContext extends BaseContext {
 	public void setResponse(Map<String, Object> response) {
 		this.response = response;
 	}
-
-	/** Accounts of the user. */
-	private List<StepUpAccount> accounts;
-
+	
 	/**
-	 * Get accounts of the user.
-	 * 
-	 * @return accounts of the user
+	 * Set account
+	 * @param account account to be set
 	 */
-	public List<StepUpAccount> getAccounts() {
-		return accounts;
-	}
-
-	/**
-	 * Set accounts of the user.
-	 * 
-	 * @param accounts
-	 *            accounts of the user
-	 */
-	public void setAccounts(List<StepUpAccount> accounts) {
-		this.accounts = accounts;
-	}
+	public void setAccount(StepUpAccount account) {
+        this.account = account;
+    }
 	
 	/**
 	 * Stepup account.
-	 * @return Stepup account.
+	 * @return Step up account.
 	 */
 	public StepUpAccount getAccount() {
 		return account;

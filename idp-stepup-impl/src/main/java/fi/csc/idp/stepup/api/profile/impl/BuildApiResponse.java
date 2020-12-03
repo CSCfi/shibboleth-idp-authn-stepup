@@ -1,6 +1,6 @@
 /*
  * The MIT License
- * Copyright (c) 2015 CSC - IT Center for Science, http://www.csc.fi
+ * Copyright (c) 2015-2020 CSC - IT Center for Science, http://www.csc.fi
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -34,7 +34,6 @@ import com.google.gson.Gson;
 /**
  * This action builds a response for the ApiRequest.
  */
-@SuppressWarnings("rawtypes")
 public class BuildApiResponse extends AbstractApiAction {
 
     /** Class logger. */

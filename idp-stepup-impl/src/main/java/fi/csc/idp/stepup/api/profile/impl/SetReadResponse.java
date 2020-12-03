@@ -1,6 +1,6 @@
 /*
  * The MIT License
- * Copyright (c) 2015 CSC - IT Center for Science, http://www.csc.fi
+ * Copyright (c) 2015-2020 CSC - IT Center for Science, http://www.csc.fi
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -29,10 +29,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * This actions stores response for the api call read. The response is the whether the user has account(s). The response
- * is true/false stored to with key 'account'.
+ * This actions stores response for the API call - Read. The response is the
+ * whether the user has account. The response is true/false stored to parameter
+ * 'account'.
  */
-@SuppressWarnings("rawtypes")
 public class SetReadResponse extends AbstractApiAction {
 
     /** Class logger. */
@@ -42,7 +42,7 @@ public class SetReadResponse extends AbstractApiAction {
     /** {@inheritDoc} */
     @Override
     protected void doExecute(@Nonnull final ProfileRequestContext profileRequestContext) {
-        boolean result = (getCtx().getAccounts() != null && getCtx().getAccounts().size() > 0);
+        boolean result = (getCtx().getAccount().getTarget() != null);
         response.put("userid", getRequest().getUserId());
         response.put("account", result);
         log.debug("{} For user {} set response value account:{}", getLogPrefix(), getRequest().getUserId(), result);

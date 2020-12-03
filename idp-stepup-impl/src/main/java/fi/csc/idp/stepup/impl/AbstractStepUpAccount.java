@@ -1,6 +1,6 @@
 /*
  * The MIT License
- * Copyright (c) 2015 CSC - IT Center for Science, http://www.csc.fi
+ * Copyright (c) 2015-2020 CSC - IT Center for Science, http://www.csc.fi
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -35,7 +35,7 @@ import net.minidev.json.JSONObject;
 import net.minidev.json.parser.JSONParser;
 import net.minidev.json.parser.ParseException;
 
-/** Helper class for StepUpAccount implementations. */
+/** Base class for step up account implementations. */
 public abstract class AbstractStepUpAccount implements StepUpAccount {
 
     /** Class logger. */
@@ -49,51 +49,12 @@ public abstract class AbstractStepUpAccount implements StepUpAccount {
     private String challenge;
     /** Target parameter for challenge. **/
     private String target;
-
-    /** id of the account. */
-    private long id;
     /** Challenge Generator. */
     private ChallengeGenerator challengeGenerator;
-    /** account is editable. */
-    private boolean editable;
-    /** account is enabled. */
-    private boolean enabled;
-    /** user has been verified. */
-    private boolean verified;
-   
+
     /** default constructor. */
     public AbstractStepUpAccount() {
         super();
-
-        this.editable = true;
-    }
-
-    /**
-     * Get the id of the account.
-     * 
-     * @return id of the account
-     */
-    @Override
-    public long getId() {
-
-        return this.id;
-    }
-
-    /**
-     * Set the id of the account. Non editable account cannot be modified.
-     * 
-     * @param idValue
-     *            of the account.
-     */
-    @Override
-    public void setId(long idValue) {
-
-        if (this.editable) {
-            this.id = idValue;
-        } else {
-            log.warn("not supported");
-        }
-
     }
 
     /**
@@ -108,8 +69,7 @@ public abstract class AbstractStepUpAccount implements StepUpAccount {
     /**
      * Set the challenge generator implementation.
      * 
-     * @param generator
-     *            implementation
+     * @param generator implementation
      */
     public void setChallengeGenerator(ChallengeGenerator generator) {
 
@@ -119,8 +79,7 @@ public abstract class AbstractStepUpAccount implements StepUpAccount {
     /**
      * Set the challenge verifier implementation.
      * 
-     * @param verifier
-     *            implementation
+     * @param verifier implementation
      */
     public void setChallengeVerifier(ChallengeVerifier verifier) {
 
@@ -130,16 +89,11 @@ public abstract class AbstractStepUpAccount implements StepUpAccount {
     /**
      * Set the name of the account. Non editable account cannot be modified.
      * 
-     * @param accountName
-     *            name of the account
+     * @param accountName name of the account
      */
     public void setName(String accountName) {
 
-        if (this.editable) {
-            this.name = accountName;
-        } else {
-            log.warn("not supported");
-        }
+        this.name = accountName;
 
     }
 
@@ -155,78 +109,9 @@ public abstract class AbstractStepUpAccount implements StepUpAccount {
     }
 
     /**
-     * Is the account editable.
-     * 
-     * @return true if editable
-     */
-    @Override
-    public boolean isEditable() {
-
-        return this.editable;
-    }
-
-    /**
-     * If the account has been used to verify the the user.
-     * 
-     * @return true if verified.
-     */
-    @Override
-    public boolean isVerified() {
-
-        return this.verified;
-    }
-
-    /**
-     * Set the account editable/non editable. Non editable account cannot be
-     * modified.
-     * 
-     * @param isEditable
-     *            true if editable.
-     */
-    @Override
-    public void setEditable(boolean isEditable) {
-
-        if (this.editable) {
-            this.editable = isEditable;
-        } else {
-            log.warn("not supported");
-        }
-
-    }
-
-    /**
-     * Set account enabled/disabled. Non editable account cannot be modified.
-     * 
-     * @param isEnabled
-     *            true if enabled
-     */
-    @Override
-    public void setEnabled(boolean isEnabled) {
-
-        if (this.editable) {
-            this.enabled = isEnabled;
-        } else {
-            log.warn("not supported");
-        }
-
-    }
-
-    /**
-     * Get the account enabled status.
-     * 
-     * @return true if the account is enabled
-     */
-    @Override
-    public boolean isEnabled() {
-
-        return this.enabled;
-    }
-
-    /**
      * Send the challenge.
      * 
-     * @throws Exception
-     *             if something unexpected occurred
+     * @throws Exception if something unexpected occurred
      */
     @Override
     public void sendChallenge() throws Exception {
@@ -241,33 +126,27 @@ public abstract class AbstractStepUpAccount implements StepUpAccount {
     /**
      * Override to implement the challenge sending.
      * 
-     * @throws Exception
-     *             if something unexpected occurs.
+     * @throws Exception if something unexpected occurs.
      */
     protected abstract void doSendChallenge() throws Exception;
 
     /**
      * Verify the response to challenge.
      * 
-     * @param response
-     *            response to be verified.
-     * @throws Exception
-     *             if something unexpected occurred
+     * @param response response to be verified.
+     * @throws Exception if something unexpected occurred
      */
     @Override
     public boolean verifyResponse(String response) throws Exception {
-        this.verified = doVerifyResponse(response);
-        return this.verified;
+        return doVerifyResponse(response);
     }
 
     /**
      * Override to implement different challenge verification.
      * 
-     * @param response
-     *            response to check against challenge.
+     * @param response response to check against challenge.
      * @return true if challenge response was valid.
-     * @throws Exception
-     *             if something unexpected occurs.
+     * @throws Exception if something unexpected occurs.
      */
     protected boolean doVerifyResponse(String response) throws Exception {
         if (challenge == null) {
@@ -282,17 +161,12 @@ public abstract class AbstractStepUpAccount implements StepUpAccount {
     /**
      * Set the target parameter. Non editable account cannot be modified.
      * 
-     * @param accountTarget
-     *            representing the Target
+     * @param accountTarget representing the Target
      */
     @Override
     public void setTarget(String accountTarget) {
 
-        if (this.editable) {
-            this.target = accountTarget;
-        } else {
-            log.warn("not supported");
-        }
+        this.target = accountTarget;
 
     }
 
@@ -305,43 +179,36 @@ public abstract class AbstractStepUpAccount implements StepUpAccount {
     public String getTarget() {
         return this.target;
     }
-    
-	/**
-	 * Serialize the account information to string for storing it.
-	 * 
-	 * @return serialized account.
-	 */
-	public String serializeAccountInformation() {
-		JSONObject serializedAccount = new JSONObject();
-		serializedAccount.put("id", getId());
-		serializedAccount.put("name", getName());
-		serializedAccount.put("target", getTarget());
-		serializedAccount.put("enabled", isEnabled());
-		serializedAccount.put("editable", isEditable());
-		return serializedAccount.toJSONString();
-	}
 
-	/**
-	 * Initialize the account from serialized account information.
-	 * 
-	 * @param serializedAccount
-	 *            serialized account information
-	 * @return true if information successfully read, otherwise false.
-	 * @throws ParseException
-	 */
-	public boolean deserializeAccountInformation(String serializedAccountInformation) {
-		try {
-			JSONObject serializedAccount = (JSONObject) new JSONParser(JSONParser.MODE_PERMISSIVE)
-					.parse(serializedAccountInformation);
-			setId(((Integer) serializedAccount.get("id")).longValue());
-			setName((String) serializedAccount.get("name"));
-			setTarget((String) serializedAccount.get("target"));
-			setEnabled((boolean) serializedAccount.get("enabled"));
-			setEditable((boolean) serializedAccount.get("editable"));
-			return true;
-		} catch (ParseException e) {
-			return false;
-		}
-	}
+    /**
+     * Serialize the account information to string for storing it.
+     * 
+     * @return serialized account.
+     */
+    public String serializeAccountInformation() {
+        JSONObject serializedAccount = new JSONObject();
+        serializedAccount.put("name", getName());
+        serializedAccount.put("target", getTarget());
+        return serializedAccount.toJSONString();
+    }
+
+    /**
+     * Initialise the account from serialised account information.
+     * 
+     * @param serializedAccount serialised account information
+     * @return true if information successfully read, otherwise false.
+     * @throws ParseException
+     */
+    public boolean deserializeAccountInformation(String serializedAccountInformation) {
+        try {
+            JSONObject serializedAccount = (JSONObject) new JSONParser(JSONParser.MODE_PERMISSIVE)
+                    .parse(serializedAccountInformation);
+            setName((String) serializedAccount.get("name"));
+            setTarget((String) serializedAccount.get("target"));
+            return true;
+        } catch (ParseException e) {
+            return false;
+        }
+    }
 
 }

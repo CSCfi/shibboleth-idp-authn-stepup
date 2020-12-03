@@ -1,6 +1,6 @@
 /*
  * The MIT License
- * Copyright (c) 2015 CSC - IT Center for Science, http://www.csc.fi
+ * Copyright (c) 2015-2020 CSC - IT Center for Science, http://www.csc.fi
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -38,9 +38,7 @@ import fi.csc.idp.stepup.api.messaging.impl.ApiRequestImpl;
 /**
  * A message decoder for {@link ApiRequest}.
  */
-public class ApiRequestDecoder 
-    extends AbstractHttpServletRequestMessageDecoder
-    implements MessageDecoder {
+public class ApiRequestDecoder extends AbstractHttpServletRequestMessageDecoder implements MessageDecoder {
 
     /** Class logger. */
     @Nonnull
@@ -51,8 +49,15 @@ public class ApiRequestDecoder
     protected void doDecode() throws MessageDecodingException {
         final MessageContext messageContext = new MessageContext();
         final HttpServletRequest httpRequest = getHttpServletRequest();
-        final ApiRequestImpl request = new ApiRequestImpl(httpRequest.getParameterMap());
-        log.debug("Decoded api request request with token = {} targeting user = {}", request.getToken(), request.getUserId());
+        final ApiRequestImpl request;
+        try {
+            request = new ApiRequestImpl(httpRequest.getParameterMap());
+        } catch (Exception e) {
+            log.error("Unable to decode inbound request", e);
+            throw new MessageDecodingException(e);
+        }
+        log.debug("Decoded api request request with token = {} targeting user = {}", request.getToken(),
+                request.getUserId());
         messageContext.setMessage(request);
         setMessageContext(messageContext);
     }

@@ -1,6 +1,6 @@
 /*
  * The MIT License
- * Copyright (c) 2015 CSC - IT Center for Science, http://www.csc.fi
+ * Copyright (c) 2015-2020 CSC - IT Center for Science, http://www.csc.fi
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -24,9 +24,11 @@
 package fi.csc.idp.stepup.api.messaging.impl;
 
 import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.annotation.Nonnull;
 
+import org.opensaml.messaging.decoder.MessageDecodingException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,49 +52,39 @@ public class ApiRequestImpl implements ApiRequest {
      * 
      * @param parameterMap Api request parameter map.
      */
-    public ApiRequestImpl(Map<String, String[]> parameterMap) {
+    public ApiRequestImpl(Map<String, String[]> parameterMap) throws MessageDecodingException {
         Constraint.isNotNull(parameterMap, "Api request parameter map cannot be null");
+        for (Entry<String, String[]> entry : parameterMap.entrySet()) {
+            if (entry.getValue() == null || entry.getValue().length != 1) {
+                throw new MessageDecodingException("There must be exactly one value for parameter");
+            }
+        }
         this.parameterMap = parameterMap;
     }
 
     @Override
     public String getToken() {
-        return (parameterMap.get("token") != null && parameterMap.get("token").length > 0)
-                ? parameterMap.get("token")[0] : null;
+        return parameterMap.get("token") != null ? parameterMap.get("token")[0] : null;
     }
 
     @Override
     public String getUserId() {
-        return (parameterMap.get("userid") != null && parameterMap.get("userid").length > 0)
-                ? parameterMap.get("userid")[0] : null;
+        return parameterMap.get("userid") != null ? parameterMap.get("userid")[0] : null;
+    }
+
+    @Override
+    public boolean getForceUpdate() {
+        return parameterMap.get("forceUpdate") != null ? parameterMap.get("forceUpdate")[0].toLowerCase().equals("true")
+                : false;
+    }
+
+    @Override
+    public String getValue() {
+        return parameterMap.get("value") != null ? parameterMap.get("value")[0] : null;
     }
 
     @Override
     public Map<String, String[]> getRequestParameterMap() {
         return parameterMap;
-    }
-
-    @Override
-    public boolean getForceUpdate() {
-        return (parameterMap.get("forceUpdate") != null && parameterMap.get("forceUpdate").length > 0)
-                ? parameterMap.get("forceUpdate")[0].toLowerCase().equals("true") : false;
-    }
-
-    @Override
-    public int getMaxAccounts() {
-        try {
-            return (parameterMap.get("accountLimit") != null && parameterMap.get("accountLimit").length > 0)
-                    ? Integer.parseInt(parameterMap.get("accountLimit")[0]) : 1;
-        } catch (NumberFormatException e) {
-            log.warn("Unable to parse accountLimit {}, setting to default value 1",
-                    parameterMap.get("accountLimit")[0]);
-            return 1;
-        }
-    }
-
-    @Override
-    public String getValue() {
-        return (parameterMap.get("value") != null && parameterMap.get("value").length > 0)
-                ? parameterMap.get("value")[0] : null;
     }
 }
