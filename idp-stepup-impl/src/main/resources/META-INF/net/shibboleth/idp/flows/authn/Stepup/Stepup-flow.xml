@@ -4,12 +4,6 @@
 	xsi:schemaLocation="http://www.springframework.org/schema/webflow http://www.springframework.org/schema/webflow/spring-webflow.xsd"
 	parent="intercept.abstract">
 
-
-	<!-- Even though project structure suggests something else this is not a 
-		proper authentication flow. This flow performs mfa when invoked either from 
-		mfa oidc handler or by mfa interceptor. Successful termination via "proceed" 
-		end-state suggests that the user has been authenticated using mfa. -->
-
 	<!-- Rudimentary impediment to direct execution of subflow. -->
 	<input name="calledAsSubflow" type="boolean" required="true" />
 
@@ -108,6 +102,7 @@
 	<!-- views START -->
 
 	<view-state id="DisplayChallenge" view="#{flowScope.viewName}">
+	    <attribute name="csrf_excluded" value="true" type="boolean"/>
 		<on-render>
 			<evaluate expression="environment" result="viewScope.environment" />
 			<evaluate expression="opensamlProfileRequestContext" result="viewScope.profileRequestContext" />
@@ -141,6 +136,7 @@
 	</view-state>
 
 	<view-state id="DisplayInformation" view="#{flowScope.viewName}">
+	    <attribute name="csrf_excluded" value="true" type="boolean"/>
 		<on-render>
 			<evaluate expression="environment" result="viewScope.environment" />
 			<evaluate expression="opensamlProfileRequestContext" result="viewScope.profileRequestContext" />
@@ -167,6 +163,7 @@
 	</view-state>
 
 	<view-state id="DisplayEnd" view="#{flowScope.viewName}">
+	    <attribute name="csrf_excluded" value="true" type="boolean"/>
 		<on-render>
 			<evaluate expression="environment" result="viewScope.environment" />
 			<evaluate expression="opensamlProfileRequestContext" result="viewScope.profileRequestContext" />
@@ -197,6 +194,7 @@
 
 	<view-state id="ManageAccounts"
 		view="#{flowRequestContext.activeFlow.id}-managesimple">
+		<attribute name="csrf_excluded" value="true" type="boolean"/>
 		<on-entry>
 			<evaluate expression="InitializeStepUpChallengeContext" />
 		</on-entry>

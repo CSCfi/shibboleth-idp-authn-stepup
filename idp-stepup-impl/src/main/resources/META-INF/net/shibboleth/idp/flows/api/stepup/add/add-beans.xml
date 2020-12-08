@@ -7,7 +7,7 @@
                            http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd"
     default-init-method="initialize" default-destroy-method="destroy">
 
-    <import resource="../common-beans.xml" />
+    <import resource="classpath*:/META-INF/net/shibboleth/idp/flows/api/stepup/common-beans.xml"/>
 
     <bean id="AddAccount" class="fi.csc.idp.stepup.api.profile.impl.AddAccount" scope="prototype" />
 

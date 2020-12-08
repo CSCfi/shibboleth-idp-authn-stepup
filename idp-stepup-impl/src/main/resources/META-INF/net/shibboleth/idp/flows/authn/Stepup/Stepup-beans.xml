@@ -38,10 +38,9 @@
         scope="prototype" p:httpServletRequest-ref="shibboleth.HttpServletRequest" />
 
     <bean id="GoogleAuthStepUpManager" class="fi.csc.idp.stepup.impl.AttributeKeyBasedStorageStepUpAccountManager"
-        scope="prototype" p:name="TOTP" p:attributeId="#{'%{stepup.GoogleAuthStepUpManager.keyclaim:otp_key}'.trim()}"
-        p:accountLimit="1" p:autoRemove="true"
+        scope="prototype" p:name="TOTP" p:claimName="#{'%{stepup.GoogleAuthStepUpManager.keyclaim:otp_key}'.trim()}"
         p:stepUpAccountStorage-ref="#{'%{stepup.GoogleAuthStepUpManager.accountstore:ShibStorageAccountStorage}'.trim()}"
-        p:accountID="GoogleAuthenticatorStepUpAccount" />
+        p:autoRemove="true" p:accountID="GoogleAuthenticatorStepUpAccount" />
 
     <bean id="ShibStorageAccountStorage" class="fi.csc.idp.stepup.impl.ShibStorageSingleStepUpAccountStorage"
         p:Storage-ref="#{'%{stepup.ShibStorageAccountStorage.storageservice:shibboleth.StorageService}'.trim()}"
@@ -57,11 +56,11 @@
         p:name="Logfile" p:AccountID="LogStepUpAccount" />
 
     <bean id="MailStepUpManager" class="fi.csc.idp.stepup.impl.AttributeTargetBasedStepUpAccountManager"
-        scope="prototype" p:name="Email" p:AttributeId="#{'%{stepup.MailStepUpManager.keyclaim:INTmail}'.trim()}"
+        scope="prototype" p:name="Email" p:claimName="#{'%{stepup.MailStepUpManager.keyclaim:INTmail}'.trim()}"
         p:AccountID="EmailStepUpAccount" />
 
     <bean id="SMSStepUpManager" class="fi.csc.idp.stepup.impl.AttributeTargetBasedStepUpAccountManager"
-        scope="prototype" p:name="SMS Sender" p:AttributeId="#{'%{stepup.SMSStepUpManager.keyclaim:mobile}'.trim()}"
+        scope="prototype" p:name="SMS Sender" p:claimName="#{'%{stepup.SMSStepUpManager.keyclaim:mobile}'.trim()}"
         p:AccountID="SMSStepUpAccount" />
 
     <bean id="LogStepUpAccount" class="fi.csc.idp.stepup.impl.ChallengeSenderStepUpAccount" scope="prototype"

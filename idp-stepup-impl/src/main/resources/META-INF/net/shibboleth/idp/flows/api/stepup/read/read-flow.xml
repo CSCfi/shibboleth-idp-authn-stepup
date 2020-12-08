@@ -23,12 +23,7 @@
     
     <action-state id="Read">
         <evaluate expression="ReadAccount" />
-        <evaluate expression="'proceed'" />
-        <transition on="proceed" to="Add" />
-    </action-state>
-    
-    <action-state id="Add">
-        <evaluate expression="AddAccount" />
+        <evaluate expression="SetReadResponse" />
         <evaluate expression="'proceed'" />
         <transition on="proceed" to="BuildResponse" />
     </action-state>
@@ -74,7 +69,6 @@
             to="HandleError" />
     </global-transitions>
 
-    <bean-import resource="../../../system/flows/saml/security-beans.xml" />
-    <bean-import resource="add-beans.xml" />
+    <bean-import resource="read-beans.xml" />
 
 </flow>

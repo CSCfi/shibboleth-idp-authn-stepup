@@ -7,9 +7,9 @@
                            http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd"
     default-init-method="initialize" default-destroy-method="destroy">
 
-    <import resource="../authn/Stepup/Stepup-beans.xml" />
-    <import resource="../../conf/authn/stepup-authn-config.xml" />
-
+    <import resource="classpath*:/META-INF/net/shibboleth/idp/flows/authn/Stepup/Stepup-beans.xml"/>
+    <import resource="file:/opt/shibboleth-idp/conf/authn/stepup-authn-config.xml" />
+    
     <bean class="org.springframework.context.support.PropertySourcesPlaceholderConfigurer" p:placeholderPrefix="%{"
         p:placeholderSuffix="}" />
 

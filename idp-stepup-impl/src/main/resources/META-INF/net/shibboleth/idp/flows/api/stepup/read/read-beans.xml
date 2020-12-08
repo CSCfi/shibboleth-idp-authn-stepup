@@ -8,8 +8,12 @@
                            http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd"
     default-init-method="initialize" default-destroy-method="destroy">
 
-    <import resource="../common-beans.xml" />
-
-    <bean id="RemoveAccount" class="fi.csc.idp.stepup.api.profile.impl.RemoveAccount" scope="prototype" />
+    <import resource="classpath*:/META-INF/net/shibboleth/idp/flows/api/stepup/common-beans.xml"/>
     
+    <bean id="SetReadResponse" class="fi.csc.idp.stepup.api.profile.impl.SetReadResponse"
+        scope="prototype"/>
+        
+    <bean id="ValidateToken" class="fi.csc.idp.stepup.api.profile.impl.ValidateToken" scope="prototype"
+        p:tokenValidator-ref="ValueTokenValidator" p:selfServiceAction="true"/>
+
 </beans>
