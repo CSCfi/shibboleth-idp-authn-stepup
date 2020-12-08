@@ -41,8 +41,8 @@ public class AttributeKeyBasedStorageStepUpAccountManager extends AbstractStepUp
     @Nonnull
     private final Logger log = LoggerFactory.getLogger(AttributeKeyBasedStorageStepUpAccountManager.class);
 
-    /** The attribute ID to look for. */
-    private String attributeId;
+    /** The claim name to look for. */
+    private String claimName;
 
     /** The account key. */
     private String key;
@@ -63,12 +63,12 @@ public class AttributeKeyBasedStorageStepUpAccountManager extends AbstractStepUp
     }
 
     /**
-     * Set the attribute id containing the value for the key.
+     * Set the name for claim containing the value for the key.
      * 
-     * @param id of the attribute containing the value of key
+     * @param name of the claim containing the value of key
      */
-    public void setAttributeId(String id) {
-        attributeId = id;
+    public void setClaimName(String name) {
+        claimName = name;
     }
 
     /**
@@ -82,10 +82,64 @@ public class AttributeKeyBasedStorageStepUpAccountManager extends AbstractStepUp
     }
 
     /**
-     * Add a new editable account. Store it.
+     * Initialises account by reading the value for key, using that to read accounts
+     * from storage.
+     * 
+     * @param entry to look for the key value
+     */
+    @Override
+    public boolean initialize(Collection<Entry> entry) throws Exception {
+
+        log.debug("Adding accounts of type {}", getName());
+        key = null;
+        if (stepUpAccountStorage == null) {
+            throw new Exception("repository implementation not set, cannot add accounts");
+        }
+        if (entry == null) {
+            throw new Exception("requested id token claims cannot be null");
+        }
+        if (claimName == null) {
+            throw new Exception("Attribute Id has to be set");
+        }
+        if (getAccountID() == null) {
+            throw new Exception("No account bean defined");
+        }
+        for (Entry claim : entry) {
+            if (claimName.equals(claim.getClaimName())) {
+                key = claim.getValue();
+                if (key == null) {
+                    log.warn("No attribute value for " + claimName);
+                    continue;
+                }
+                setAccount(stepUpAccountStorage.getAccount(key, getAppContext().getBean(getAccountID()).getClass()));
+                break;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Method checks the operation can be performed.
+     * 
+     * @param account the account to be operated.
+     * @throws Exception if operation cannot be performed.
+     */
+    private void preCheck(StepUpAccount account) throws Exception {
+
+        if (stepUpAccountStorage == null) {
+            throw new Exception("Storage implementation not set, cannot add accounts");
+        }
+        if (account == null) {
+            throw new Exception("Account cannot be null");
+        }
+
+    }
+
+    /**
+     * Add a new account. Store it.
      * 
      * 
-     * @return new account. Null if account limits have been reached.
+     * @return new account. Null if no new account is added.
      * @throws Exception if something unexpected occurred.
      */
     @Override
@@ -109,24 +163,7 @@ public class AttributeKeyBasedStorageStepUpAccountManager extends AbstractStepUp
     }
 
     /**
-     * Method checks the operation can be performed.
-     * 
-     * @param account the account to be operated.
-     * @throws Exception if operation cannot be performed.
-     */
-    private void preCheck(StepUpAccount account) throws Exception {
-
-        if (stepUpAccountStorage == null) {
-            throw new Exception("Storage implementation not set, cannot add accounts");
-        }
-        if (account == null) {
-            throw new Exception("Account cannot be null");
-        }
-
-    }
-
-    /**
-     * Remove a editable account.
+     * Remove account.
      * 
      * @param account to be removd.
      * @throws Exception
@@ -137,44 +174,6 @@ public class AttributeKeyBasedStorageStepUpAccountManager extends AbstractStepUp
         preCheck(account);
         stepUpAccountStorage.remove(account, key);
         setAccount(null);
-
     }
 
-    // Checkstyle: CyclomaticComplexity OFF
-
-    /**
-     * Initialises accounts by reading the value for key, using that to read
-     * accounts from storage.
-     * 
-     * @param attributeContext to look for the key value
-     */
-    @Override
-    public boolean initialize(Collection<Entry> entry) throws Exception {
-
-        log.debug("Adding accounts of type {}", getName());
-        key = null;
-        if (stepUpAccountStorage == null) {
-            throw new Exception("repository implementation not set, cannot add accounts");
-        }
-        if (entry == null) {
-            throw new Exception("requested id token claims cannot be null");
-        }
-        if (attributeId == null) {
-            throw new Exception("Attribute Id has to be set");
-        }
-        if (getAccountID() == null) {
-            throw new Exception("No account bean defined");
-        }
-        for (Entry claim : entry) {
-            if (attributeId.equals(claim.getClaimName())) {
-                key = claim.getValue();
-                if (key == null) {
-                    log.warn("No attribute value for " + attributeId);
-                    continue;
-                }
-                setAccount(stepUpAccountStorage.getAccount(key, getAppContext().getBean(getAccountID()).getClass()));
-            }
-        }
-        return true;
-    }
 }

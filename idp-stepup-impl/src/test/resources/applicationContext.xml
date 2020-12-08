@@ -1,25 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://www.springframework.org/schema/beans
-	http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+       xmlns:p="http://www.springframework.org/schema/p" 
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+                           http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
 
-	<bean id="ChallengeSender" class="fi.csc.idp.stepup.impl.ChallengeSenderStepUpAccount">
-	</bean>
+  <bean id="ChallengeSender" class="fi.csc.idp.stepup.impl.ChallengeSenderStepUpAccount"/>
 
-	<bean id="hikariConfig" class="com.zaxxer.hikari.HikariConfig">
-		<property name="dataSourceProperties">
-			<props>
-				<prop key="DatabaseName">jdbc:hsqldb:mem:test</prop>
-				<prop key="User">sa</prop>
-				<prop key="Password">test</prop>
-			</props>
-		</property>
-		<property name="dataSourceClassName" value="org.hsqldb.jdbc.JDBCDataSource" />
-	</bean>
+  <bean id="LogStepUpAccount" class="fi.csc.idp.stepup.impl.ChallengeSenderStepUpAccount" 
+      scope="prototype" p:ChallengeGenerator-ref="ChallengeGenerator" 
+      p:ChallengeVerifier-ref="EqualVerifier" p:ChallengeSender-ref="LogChallengeSender"/>
 
-	<bean id="dataSource" class="com.zaxxer.hikari.HikariDataSource">
-		<constructor-arg ref="hikariConfig" />
-	</bean>
+  <bean id="LogChallengeSender" class="fi.csc.idp.stepup.impl.LogChallengeSender"/>
 
+  <bean id="ChallengeGenerator" class="fi.csc.idp.stepup.impl.DigestChallengeGenerator" p:decimal="true"/>
+
+  <bean id="EqualVerifier" class="fi.csc.idp.stepup.impl.EqualChallengeResponseVerifier"/>
+  
 </beans>

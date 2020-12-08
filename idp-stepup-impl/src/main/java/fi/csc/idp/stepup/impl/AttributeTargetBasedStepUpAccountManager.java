@@ -40,16 +40,16 @@ public class AttributeTargetBasedStepUpAccountManager extends AbstractStepUpAcco
     @Nonnull
     private final Logger log = LoggerFactory.getLogger(AttributeTargetBasedStepUpAccountManager.class);
 
-    /** The attribute ID to look for. */
-    private String attributeId;
+    /** The claim name to look for. */
+    private String claimName;
 
     /**
-     * Set the attribute id containing the value for the key.
+     * Set the name for claim containing the value for the key.
      * 
-     * @param id of the attribute containing the value of key
+     * @param name of the claim containing the value of key
      */
-    public void setAttributeId(String id) {
-        this.attributeId = id;
+    public void setClaimName(String name) {
+        claimName = name;
     }
 
     /**
@@ -67,14 +67,14 @@ public class AttributeTargetBasedStepUpAccountManager extends AbstractStepUpAcco
         if (entry == null) {
             throw new Exception("requested id token claims cannot be null");
         }
-        if (attributeId == null) {
+        if (claimName == null) {
             throw new Exception("Attribute Id has to be set");
         }
         if (getAccountID() == null) {
             throw new Exception("No account bean defined");
         }
         for (Entry claim : entry) {
-            if (attributeId.equals(claim.getClaimName())) {
+            if (claimName.equals(claim.getClaimName())) {
                 target = claim.getValue();
                 if (target != null) {
                     log.debug("Adding account with target value {}", target);
