@@ -210,8 +210,8 @@ public class MailChallengeSender implements ChallengeSender {
 
             return velocityEngine.getTemplate(templateFileName);
         }
-        velocityEngine.setProperty(RuntimeConstants.RESOURCE_LOADER, "classpath");
-        velocityEngine.setProperty("classpath.resource.loader.class", ClasspathResourceLoader.class.getName());
+        velocityEngine.setProperty(RuntimeConstants.RESOURCE_LOADERS, "classpath");
+        velocityEngine.setProperty("resource.loader.classpath.class", ClasspathResourceLoader.class.getName());
         velocityEngine.init();
 
         return velocityEngine.getTemplate(File.separator + "emails" + File.separator + "default.vm");
