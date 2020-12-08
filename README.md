@@ -1,7 +1,9 @@
 # shibboleth-idp-authn-stepup
-Authentication flow performing TOTP for the user and a API to manage the TOTP secrets. This module turns a Shibboleth OP (i.e. Shibboleth IdP having shibboleth-idp-oidc-extension) to a stepup service. Service requests OTP code from users initially authenticated by the client.
+Authentication flow performing TOTP (and other methods) for the user and a API to manage the TOTP secrets. This module turns a Shibboleth OP (i.e. Shibboleth IdP having shibboleth-idp-oidc-extension) to a step up service requesting a second factor from the user. User must have been initially authenticated by the client.
 
-The flow is not a Shibboleth compliant authentication flow. The flow may be perfomed successfully to only oidc clients. Client creates a oidc authentication request to authenticate the user. The request contains in claims parameter the information necessary for the operaton. In standard use case this would be claims containing values for subject, key to users TOTP secret and phone number for bootstrapping the TOTP secret if such does not exist. The properties file can then be used to alter the behaviour. Once the user has been successfully authenticated the response is sent back.
+The flow is not a Shibboleth compliant authentication flow. The flow may be perfomed successfully to only oidc clients. 
+
+The overall idea is for the client to initially authenticate the user with first factor. Then the client may create oidc authentication request to the step up service. This authentication request must contain as requested claim information necessary for the service to perform second factor. The second factor may be OTP code, SMS or email depending on the configuration.
 
 ## Prerequisite for installation
 - Shibboleth IdP 4.0+ 
