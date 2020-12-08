@@ -28,6 +28,8 @@ import org.opensaml.profile.action.ActionSupport;
 import org.opensaml.profile.context.ProfileRequestContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import fi.csc.idp.stepup.api.StepUpAccount;
 import fi.csc.idp.stepup.api.StepUpApiContext;
 import fi.csc.idp.stepup.api.StepUpEventIds;
 
@@ -52,10 +54,12 @@ public class ReadAccount extends AbstractApiAction {
             return;
         }
         try {
-            getCtx().setAccount(
-                    getCtx().getStorage().getAccount(getRequest().getUserId(), getCtx().getAccount().getClass()));
-            log.debug("{} Located {} user accounts for user {}", getLogPrefix(),
-                    getCtx().getAccount() == null ? 0 : getRequest().getUserId());
+            StepUpAccount account = getCtx().getStorage().getAccount(getRequest().getUserId(),
+                    getCtx().getAccountPrototype().getClass());
+            if (account != null) {
+                getCtx().setAccount(account);
+                log.debug("{} Located user account for user {}", getLogPrefix(), getRequest().getUserId());
+            }
         } catch (Exception e) {
             log.error("{} Failed reading user accounts", getLogPrefix(), e);
             response.put("userid", getRequest().getUserId());

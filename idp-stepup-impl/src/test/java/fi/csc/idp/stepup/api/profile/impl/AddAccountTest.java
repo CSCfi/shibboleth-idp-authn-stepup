@@ -75,6 +75,7 @@ public class AddAccountTest {
 
     @Test
     public void testFailExist() throws ComponentInitializationException {
+        prc.getSubcontext(StepUpApiContext.class).setAccount(new MockAccount());
         prc.getSubcontext(StepUpApiContext.class).getAccount().setTarget("target_value");
         final Event event = action.execute(src);
         ActionTestingSupport.assertEvent(event, StepUpEventIds.EVENTID_FORBIDDEN);
@@ -84,6 +85,7 @@ public class AddAccountTest {
 
     @Test
     public void testForceUpdate() throws ComponentInitializationException {
+        prc.getSubcontext(StepUpApiContext.class).setAccount(new MockAccount());
         prc.getSubcontext(StepUpApiContext.class).getAccount().setTarget("target_value");
         ((ApiRequest) prc.getInboundMessageContext().getMessage()).getRequestParameterMap().put("forceUpdate",
                 new String[] { "true" });
@@ -95,6 +97,7 @@ public class AddAccountTest {
 
     @Test
     public void testStorageRemoveFailure() throws Exception {
+        prc.getSubcontext(StepUpApiContext.class).setAccount(new MockAccount());
         prc.getSubcontext(StepUpApiContext.class).getAccount().setTarget("target_value");
         ((ApiRequest) prc.getInboundMessageContext().getMessage()).getRequestParameterMap().put("forceUpdate",
                 new String[] { "true" });

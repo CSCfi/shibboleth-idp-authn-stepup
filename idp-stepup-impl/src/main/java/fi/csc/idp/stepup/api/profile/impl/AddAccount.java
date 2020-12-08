@@ -43,7 +43,7 @@ public class AddAccount extends AbstractApiAction {
     /** {@inheritDoc} */
     @Override
     protected void doExecute(@Nonnull final ProfileRequestContext profileRequestContext) {
-        if (getCtx().getAccount().getTarget() != null) {
+        if (getCtx().getAccount() != null) {
             if (!getRequest().getForceUpdate()) {
                 // Form response
                 response.put("userid", getRequest().getUserId());
@@ -65,12 +65,14 @@ public class AddAccount extends AbstractApiAction {
                 }
             }
         }
-        StepUpAccount account = getCtx().getAccount();
-        if (getRequest().getValue() != null && !getRequest().getValue().isEmpty()) {
-            account.setTarget(getRequest().getValue());
-        }
+        StepUpAccount account;
         try {
+            account = getCtx().getAccountPrototype().getClass().getDeclaredConstructor().newInstance();
+            if (getRequest().getValue() != null && !getRequest().getValue().isEmpty()) {
+                account.setTarget(getRequest().getValue());
+            }
             getCtx().getStorage().add(account, getRequest().getUserId());
+            getCtx().setAccount(account);
         } catch (Exception e) {
             log.error("{} Exception occurred while adding account {}", getLogPrefix(), e.getMessage());
             response.put("userid", getRequest().getUserId());

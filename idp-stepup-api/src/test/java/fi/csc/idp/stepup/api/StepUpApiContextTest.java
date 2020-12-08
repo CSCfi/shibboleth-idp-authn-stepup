@@ -1,6 +1,6 @@
 /*
  * The MIT License
- * Copyright (c) 2015-2020 CSC - IT Center for Science, http://www.csc.fi
+ * Copyright (c) 2020 CSC - IT Center for Science, http://www.csc.fi
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,32 +21,33 @@
  * THE SOFTWARE.
  */
 
-package fi.csc.idp.stepup.api.profile.impl;
+package fi.csc.idp.stepup.api;
 
-import javax.annotation.Nonnull;
-import org.opensaml.profile.context.ProfileRequestContext;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.testng.Assert;
 
-/**
- * This actions stores response for the API call - Read. The response is the
- * whether the user has account. The response is true/false stored to parameter
- * 'account'.
- */
-public class SetReadResponse extends AbstractApiAction {
+import java.util.HashMap;
+import org.mockito.Mockito;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
 
-    /** Class logger. */
-    @Nonnull
-    private final Logger log = LoggerFactory.getLogger(SetReadResponse.class);
+public class StepUpApiContextTest {
 
-    /** {@inheritDoc} */
-    @Override
-    protected void doExecute(@Nonnull final ProfileRequestContext profileRequestContext) {
-        boolean result = getCtx().getAccount() != null;
-        response.put("userid", getRequest().getUserId());
-        response.put("account", result);
-        log.debug("{} For user {} set response value account:{}", getLogPrefix(), getRequest().getUserId(), result);
-        getCtx().setResponse(response);
+    private StepUpApiContext ctx;
+
+    @BeforeMethod
+    public void setUp() {
+        ctx = new StepUpApiContext(Mockito.mock(StepUpAccount.class),Mockito.mock(StepUpAccountStorage.class));
     }
 
+    @Test
+    public void testSettersAndGetters() {
+        Assert.assertNull(ctx.getAccount());
+        Assert.assertNull(ctx.getResponse());
+        Assert.assertNotNull(ctx.getAccountPrototype());
+        Assert.assertNotNull(ctx.getStorage());
+        ctx.setAccount(Mockito.mock(StepUpAccount.class));
+        ctx.setResponse(new HashMap<String, Object>());
+        Assert.assertNotNull(ctx.getAccount());
+        Assert.assertNotNull(ctx.getResponse());
+    }
 }

@@ -23,8 +23,6 @@
 
 package fi.csc.idp.stepup.api.profile.impl;
 
-import net.shibboleth.utilities.java.support.component.ComponentInitializationException;
-
 import java.util.HashMap;
 import java.util.Map;
 import org.mockito.Mockito;
@@ -37,7 +35,6 @@ import org.testng.annotations.Test;
 import fi.csc.idp.stepup.api.StepUpAccountStorage;
 import fi.csc.idp.stepup.api.StepUpApiContext;
 import fi.csc.idp.stepup.api.StepUpEventIds;
-import fi.csc.idp.stepup.api.messaging.ApiRequest;
 import fi.csc.idp.stepup.api.messaging.impl.ApiRequestImpl;
 import fi.csc.idp.stepup.impl.MockAccount;
 import net.shibboleth.idp.profile.ActionTestingSupport;
@@ -60,6 +57,7 @@ public class RemoveAccountTest {
         parameterMap.put("userid", new String[] { "userid_value" });
         prc.getInboundMessageContext().setMessage(new ApiRequestImpl(parameterMap));
         prc.addSubcontext(new StepUpApiContext(new MockAccount(), storage));
+        prc.getSubcontext(StepUpApiContext.class).setAccount(new MockAccount());
         action = new RemoveAccount();
         action.initialize();
     }
@@ -69,15 +67,6 @@ public class RemoveAccountTest {
         final Event event = action.execute(src);
         ActionTestingSupport.assertProceedEvent(event);
         Assert.assertEquals(action.getCtx().getResponse().get("userid"), "userid_value");
-    }
-
-    // @Test
-    public void testFailNoUser() throws ComponentInitializationException {
-        ((ApiRequest) prc.getInboundMessageContext().getMessage()).getRequestParameterMap().remove("forceUpdate");
-        prc.getSubcontext(StepUpApiContext.class).getAccount().setTarget("target_value");
-        final Event event = action.execute(src);
-        ActionTestingSupport.assertEvent(event, StepUpEventIds.EVENTID_NO_USER);
-        Assert.assertEquals(action.getCtx().getResponse().get("error"), "No userid in request");
     }
 
     @Test

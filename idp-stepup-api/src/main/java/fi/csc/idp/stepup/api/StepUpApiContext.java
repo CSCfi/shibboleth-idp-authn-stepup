@@ -31,68 +31,82 @@ import net.shibboleth.utilities.java.support.logic.Constraint;
  */
 public class StepUpApiContext extends BaseContext {
 
-	/** Response map. */
-	private Map<String, Object> response;
-	
-	/** Step up account.  */  
-	private StepUpAccount account;
-	
+    /** Response map. */
+    private Map<String, Object> response;
+
+    /** Step up account. */
+    private StepUpAccount account;
+
+    /** Step up account prototype. */
+    private StepUpAccount accountPrototype;
 
     /** Storage for the step up accounts. */
     private StepUpAccountStorage storage;
 
-	/**
-	 * Constructor.
-	 * @param account stepup account
-	 * @param storage storage for the step up accounts
-	 */
-	public StepUpApiContext(StepUpAccount account, StepUpAccountStorage storage) {
-		Constraint.isNotNull(account, "Step up account must not be null");
-		Constraint.isNotNull(storage, "Step up account storage account must not be null");
-		this.account=account;
-		this.storage=storage;
-	}
+    /**
+     * Constructor.
+     *
+     * @param accountProto   step up account prototype
+     * @param accountStorage storage for the step up accounts
+     */
+    public StepUpApiContext(StepUpAccount accountProto, StepUpAccountStorage accountStorage) {
+        Constraint.isNotNull(accountProto, "Step up proto account must not be null");
+        Constraint.isNotNull(accountStorage, "Step up account storage account must not be null");
+        accountPrototype = accountProto;
+        storage = accountStorage;
+    }
 
-	/**
+    /**
      * Get storage for the step up accounts.
+     *
      * @return storage for the step up accounts
      */
-	public StepUpAccountStorage getStorage() {
-		return storage;
-	}
-	
-	/**
-	 * Get response map.
-	 * 
-	 * @return response map
-	 */
-	public Map<String, Object> getResponse() {
-		return response;
-	}
-
-	/**
-	 * Set response map.
-	 * 
-	 * @param response
-	 *            response map
-	 */
-	public void setResponse(Map<String, Object> response) {
-		this.response = response;
-	}
-	
-	/**
-	 * Set account
-	 * @param account account to be set
-	 */
-	public void setAccount(StepUpAccount account) {
-        this.account = account;
+    public StepUpAccountStorage getStorage() {
+        return storage;
     }
-	
-	/**
-	 * Stepup account.
-	 * @return Step up account.
-	 */
-	public StepUpAccount getAccount() {
-		return account;
-	}
+
+    /**
+     * Get response map.
+     *
+     * @return response map
+     */
+    public Map<String, Object> getResponse() {
+        return response;
+    }
+
+    /**
+     * Set response parameter map.
+     *
+     * @param responseParameters response map
+     */
+    public void setResponse(Map<String, Object> responseParameters) {
+        response = responseParameters;
+    }
+
+    /**
+     * Set account for step up.
+     *
+     * @param accountStepUp account to be set
+     */
+    public void setAccount(StepUpAccount accountStepUp) {
+        account = accountStepUp;
+    }
+
+    /**
+     * Get account for step up.
+     * 
+     * @return Step up account.
+     */
+    public StepUpAccount getAccount() {
+        return account;
+    }
+
+    /**
+     * Step up account prototype.
+     * 
+     * @return Step up account prototype.
+     */
+    public StepUpAccount getAccountPrototype() {
+        return accountPrototype;
+    }
 }

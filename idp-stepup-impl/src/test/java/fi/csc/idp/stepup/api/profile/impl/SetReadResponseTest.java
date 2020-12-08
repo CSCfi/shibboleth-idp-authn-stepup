@@ -48,6 +48,7 @@ public class SetReadResponseTest {
     private ProfileRequestContext prc;
     private StepUpAccountStorage storage;
     private StepUpAccount account;
+    private StepUpApiContext ctx;
 
     @BeforeMethod
     public void setUp() throws Exception {
@@ -58,14 +59,14 @@ public class SetReadResponseTest {
         Map<String, String[]> parameterMap = new HashMap<String, String[]>();
         parameterMap.put("userid", new String[] { "userid_value" });
         prc.getInboundMessageContext().setMessage(new ApiRequestImpl(parameterMap));
-        prc.addSubcontext(new StepUpApiContext(account, storage));
+        ctx = (StepUpApiContext)prc.addSubcontext(new StepUpApiContext(account, storage));
+        ctx.setAccount(account);
         action = new SetReadResponse();
         action.initialize();
     }
 
     @Test
     public void testSuccess() throws Exception {
-        Mockito.doReturn("sometarget").when(account).getTarget();
         final Event event = action.execute(src);
         ActionTestingSupport.assertProceedEvent(event);
         Assert.assertEquals(action.getCtx().getResponse().get("userid"), "userid_value");
@@ -74,6 +75,7 @@ public class SetReadResponseTest {
 
     @Test
     public void testSuccessNoAccount() throws Exception {
+        ctx.setAccount(null);
         final Event event = action.execute(src);
         ActionTestingSupport.assertProceedEvent(event);
         Assert.assertEquals(action.getCtx().getResponse().get("userid"), "userid_value");
