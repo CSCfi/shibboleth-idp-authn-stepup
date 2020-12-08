@@ -1,11 +1,11 @@
 # shibboleth-idp-authn-stepup
 Authentication flow performing TOTP for the user and a API to manage the TOTP secrets. This module turns a Shibboleth OP (i.e. Shibboleth IdP having shibboleth-idp-oidc-extension) to a stepup service. Service requests OTP code from users initially authenticated by the client.
 
-The flow of events is that the client creates a oidc authentication request to authenticate the user. The request contains in claims parameter the information necessary for the operaton. In standard use case this would be claims containing values for subject, key to users TOTP secret and phone number for bootstrapping the TOTP secret if such does not exist. The properties file can then be used to alter the behaviour. Once the user has been successfully authenticated the response is sent back.
+The flow is not a Shibboleth compliant authentication flow. The flow may be perfomed successfully to only oidc clients. Client creates a oidc authentication request to authenticate the user. The request contains in claims parameter the information necessary for the operaton. In standard use case this would be claims containing values for subject, key to users TOTP secret and phone number for bootstrapping the TOTP secret if such does not exist. The properties file can then be used to alter the behaviour. Once the user has been successfully authenticated the response is sent back.
 
 ## Prerequisite for installation
-- Shibboleth IdP 3.4+ 
-- [shibboleth-idp-oidc-extension](https://github.com/CSCfi/shibboleth-idp-oidc-extension) v1.0.0
+- Shibboleth IdP 4.0+ 
+- [shibboleth-idp-oidc-extension](https://github.com/CSCfi/shibboleth-idp-oidc-extension/wiki) v2.0.0+
 
 ## Installation
 First you need extract the archive and rebuild the package. Please not that you most likely *need* to change the owner and group information of the extracted files to suite your installation.
@@ -50,7 +50,7 @@ and activate it.
     # Regular expression matching login flows to enable, e.g. IPAddress|Password
     idp.authn.flows=Stepup
   
-### Attributes
+### Attribute definition
 We will resolve the subject from the request. For that we need to replace the default subject resolver with following one:
 
     <AttributeDefinition id="subject" xsi:type="ScriptedAttribute">
