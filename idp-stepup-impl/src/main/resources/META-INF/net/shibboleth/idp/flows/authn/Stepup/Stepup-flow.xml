@@ -45,7 +45,6 @@
 		<transition on="StepUpWrongResponse" to="DisplayChallenge">
 			<set name="flowScope.verifyResponseFailed" value="true" type="boolean" />
 		</transition>
-		<transition on="StepUpLimitReached" to="DisplayWrongResponse" />
 	</action-state>
 
 	<action-state id="AddOrRemoveAccount">
