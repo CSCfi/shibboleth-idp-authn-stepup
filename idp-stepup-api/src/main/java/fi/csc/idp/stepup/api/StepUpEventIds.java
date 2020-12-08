@@ -1,6 +1,6 @@
 /*
  * The MIT License
- * Copyright (c) 2015 CSC - IT Center for Science, http://www.csc.fi
+ * Copyright (c) 2015-2020 CSC - IT Center for Science, http://www.csc.fi
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -37,65 +37,10 @@ public final class StepUpEventIds {
     @NotEmpty
     public static final String EXCEPTION = "StepUpException";
 
-    /** event id for case of missing or invalid relying party context. */
-    @Nonnull
-    @NotEmpty
-    public static final String EVENTID_INVALID_RPCONTEXT = "InvalidRPContext";
-
-    /** event id for case of missing verifier implementation. */
-    @Nonnull
-    @NotEmpty
-    public static final String EVENTID_MISSING_VERIFIERIMPL = "MissingVerifierImpl";
-
-    /** event id for case of missing sender implementation. */
-    @Nonnull
-    @NotEmpty
-    public static final String EVENTID_MISSING_SENDERIMPL = "MissingSenderImpl";
-
-    /** event id for case of missing generator implementation. */
-    @Nonnull
-    @NotEmpty
-    public static final String EVENTID_MISSING_GENERATORIMPL = "MissingGeneratorImpl";
-
-    /** event id for case of missing attribute context. */
-    @Nonnull
-    @NotEmpty
-    public static final String EVENTID_MISSING_ATTRIBUTECONTEXT = "MissingAttributeContext";
-
-    /** event id for case of missing shibboleth sp context. */
-    @Nonnull
-    @NotEmpty
-    public static final String EVENTID_MISSING_SHIBSPCONTEXT = "MissingShibSPContext";
-
     /** event id for case of missing stepup context. */
     @Nonnull
     @NotEmpty
     public static final String EVENTID_MISSING_STEPUPMETHODCONTEXT = "MissingStepUpMethodContext";
-
-    /** event id for case of invalid shibboleth sp context. */
-    @Nonnull
-    @NotEmpty
-    public static final String EVENTID_INVALID_SHIBSPCONTEXT = "InvalidShibSPContext";
-
-    /**
-     * event id for case of requested authentication context that is not step
-     * up.
-     */
-    @Nonnull
-    @NotEmpty
-    public static final String EVENTID_AUTHNCONTEXT_NOT_STEPUP = "AuthnContextNotStepUp";
-
-    /**
-     * event id for case of provider already offering step up level up.
-     */
-    @Nonnull
-    @NotEmpty
-    public static final String EVENTID_AUTHNCONTEXT_STEPUP = "AuthnContextStepUp";
-
-    /** event id for the case of continuing with stepup. */
-    @Nonnull
-    @NotEmpty
-    public static final String EVENTID_CONTINUE_STEPUP = "ContinueStepUp";
 
     /** event id for case of user not able to perform step up. */
     @Nonnull
@@ -107,16 +52,11 @@ public final class StepUpEventIds {
     @NotEmpty
     public static final String EVENTID_INVALID_RESPONSE = "StepUpWrongResponse";
 
-    /** event id for case of user reaching retry limit for challenge response. */
-    @Nonnull
-    @NotEmpty
-    public static final String EVENTID_RESPONSE_LIMIT = "StepUpLimitReached";
-    
     /** event id for case of no user information. */
     @Nonnull
     @NotEmpty
     public static final String EVENTID_NO_USER = "NoUser";
-    
+
     /** event id for case of unauthorized access. */
     @Nonnull
     @NotEmpty
