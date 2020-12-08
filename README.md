@@ -5,6 +5,11 @@ The flow is not a Shibboleth compliant authentication flow. The flow may be perf
 
 The overall idea is for the client to initially authenticate the user with first factor. Then the client may create oidc authentication request to the step up service. This authentication request must contain as requested claim information necessary for the service to perform second factor. The second factor may be OTP code, SMS or email depending on the configuration. 
 
+## Build
+    git clone https://github.com/CSCfi/shibboleth-idp-authn-stepup.git
+    cd shibboleth-idp-authn-stepup
+    mvn package
+
 ## Prerequisite for installation
 - Shibboleth IdP 4.0+ 
 - [shibboleth-idp-oidc-extension](https://github.com/CSCfi/shibboleth-idp-oidc-extension/wiki) v2.0.0+
@@ -13,7 +18,7 @@ The overall idea is for the client to initially authenticate the user with first
 First you need extract the archive and rebuild the package. Please not that you most likely *need* to change the owner and group information of the extracted files to suite your installation.
 
     cd /opt/shibboleth-idp
-    tar -xf path/to/idp-stepup-distribution-0.10.0-bin.tar.gz  --strip-components=1
+    tar -xf path/to/idp-stepup-distribution-1.0.0-bin.tar.gz  --strip-components=1
     bin/build.sh
 
 Restart the Shibboleth IdP.
