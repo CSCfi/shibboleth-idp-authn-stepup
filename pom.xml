@@ -28,9 +28,6 @@
     <shib.idp.version>4.0.0</shib.idp.version>
     <opensaml.version>4.0.0</opensaml.version>
     <guava.version>28.2-jre</guava.version>
-    <checkstyle.configLocation>
-            conf/checkstyle.xml
-        </checkstyle.configLocation>
   </properties>
   <repositories>
     <repository>
