@@ -3,7 +3,7 @@ Authentication flow performing TOTP (and other methods) for the user and a API t
 
 The flow is not a Shibboleth compliant authentication flow. The flow may be perfomed successfully to only oidc clients. 
 
-The overall idea is for the client to initially authenticate the user with first factor. Then the client may create oidc authentication request to the step up service. This authentication request must contain as requested claim information necessary for the service to perform second factor. The second factor may be OTP code, SMS or email depending on the configuration.
+The overall idea is for the client to initially authenticate the user with first factor. Then the client may create oidc authentication request to the step up service. This authentication request must contain as requested claim information necessary for the service to perform second factor. The second factor may be OTP code, SMS or email depending on the configuration. 
 
 ## Prerequisite for installation
 - Shibboleth IdP 4.0+ 
@@ -51,6 +51,9 @@ and activate it.
     
     # Regular expression matching login flows to enable, e.g. IPAddress|Password
     idp.authn.flows=Stepup
+
+### Second Factor properties
+The second factor, the actaul method and configuration is configured in /opt/shibboleth-idp/conf/authn/stepup.properties
   
 ### Attribute definition
 We will resolve the subject from the request. For that we need to replace the default subject resolver with following one:
