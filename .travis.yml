@@ -4,4 +4,4 @@ jdk:
 script: 
 - mvn package
 after_success:
-- mvn coveralls:report
+- mvn clean test jacoco:report coveralls:jacoco
