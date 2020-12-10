@@ -96,7 +96,7 @@ public class AddOrRemoveAccount extends AbstractStepUpMethodAction {
         try {
             log.debug("{} running command {}", getLogPrefix(), command);
             accountCommand(command, getStepUpMethodCtx().getStepUpMethod().getAccount(),
-                    getStepUpMethodCtx().getStepUpMethod(), request);
+                    getStepUpMethodCtx().getStepUpMethod());
         } catch (Exception e) {
             log.debug("{} unexpected exception occurred", getLogPrefix());
             log.error(e.getMessage());
@@ -106,18 +106,15 @@ public class AddOrRemoveAccount extends AbstractStepUpMethodAction {
         log.debug("{} update value to be interpreted is {}", getLogPrefix(), updateValue);
     }
 
-    // Checkstyle: CyclomaticComplexity OFF
     /**
      * Method performs account operations.
      * 
      * @param command StepUpAccount or StepUpMethod command
      * @param account the operation is targeting
      * @param method  the operation is targeting
-     * @param request for reading user input
      * @throws Exception if something unexpected occurs
      */
-    private void accountCommand(String command, StepUpAccount account, StepUpMethod method, HttpServletRequest request)
-            throws Exception {
+    private void accountCommand(String command, StepUpAccount account, StepUpMethod method) throws Exception {
 
         if (method == null) {
             throw new Exception("operations require method");
@@ -136,5 +133,4 @@ public class AddOrRemoveAccount extends AbstractStepUpMethodAction {
             throw new Exception("Unsupported command");
         }
     }
-    // Checkstyle: CyclomaticComplexity ON
 }
