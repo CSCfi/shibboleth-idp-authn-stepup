@@ -76,12 +76,6 @@
         <version>${guava.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.mockito</groupId>
-        <artifactId>mockito-core</artifactId>
-        <version>3.6.28</version>
-        <scope>test</scope>
-      </dependency>
-      <dependency>
         <groupId>org.testng</groupId>
         <artifactId>testng</artifactId>
         <version>7.3.0</version>
