@@ -1,6 +1,6 @@
 /*
  * The MIT License
- * Copyright (c) 2015,2019 CSC - IT Center for Science, http://www.csc.fi
+ * Copyright (c) 2015-2020 CSC - IT Center for Science, http://www.csc.fi
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -53,12 +53,13 @@ import fi.csc.idp.stepup.api.StepUpMethod;
 import fi.csc.idp.stepup.api.StepUpMethodContext;
 
 /**
- * Action initializes {@link StepUpChallengeContext} with a {@link StepUpMethod}. Action assumes the authentication
- * request is a OIDC authentication request. Action extracts the requested claims of the OIDC Authentication request.
- * The extracted claims are used to initialize the {@link StepUpMethod}.
+ * Action initialises {@link StepUpChallengeContext} with a
+ * {@link StepUpMethod}. Action assumes the authentication request is a OIDC
+ * authentication request. Action extracts the requested claims of the OIDC
+ * Authentication request. The extracted claims are used to initialise the
+ * {@link StepUpMethod}.
  */
 
-@SuppressWarnings("rawtypes")
 public class InitializeStepUpChallengeContext extends AbstractOIDCResponseAction {
 
     /** Class logger. */
@@ -69,8 +70,8 @@ public class InitializeStepUpChallengeContext extends AbstractOIDCResponseAction
     private StepUpMethod stepUpMethod;
 
     /**
-     * Strategy used to extract, and create if necessary, the {@link AuthenticationContext} from the
-     * {@link ProfileRequestContext}.
+     * Strategy used to extract, and create if necessary, the
+     * {@link AuthenticationContext} from the {@link ProfileRequestContext}.
      */
     @Nonnull
     private Function<ProfileRequestContext, AuthenticationContext> authnCtxLookupStrategy;
@@ -79,7 +80,7 @@ public class InitializeStepUpChallengeContext extends AbstractOIDCResponseAction
     @Nullable
     private AuthenticationContext authnContext;
 
-    /** Initialization claims. */
+    /** Initialisation claims. */
     @Nullable
     private Collection<Entry> claims;
 
@@ -94,7 +95,8 @@ public class InitializeStepUpChallengeContext extends AbstractOIDCResponseAction
     /**
      * Whether the claims must be in request object.
      * 
-     * @param acceptOnlyRequestObjectClaims whether the claims must be in request object
+     * @param acceptOnlyRequestObjectClaims whether the claims must be in request
+     *                                      object
      */
     public void setAcceptOnlyRequestObjectClaims(boolean acceptOnly) {
         acceptOnlyRequestObjectClaims = acceptOnly;
@@ -191,8 +193,8 @@ public class InitializeStepUpChallengeContext extends AbstractOIDCResponseAction
     protected void doExecute(@Nonnull final ProfileRequestContext profileRequestContext) {
 
         log.debug("{} Creating StepUpMethodContext", getLogPrefix());
-        StepUpMethodContext stepUpMethodContext =
-                (StepUpMethodContext) authnContext.addSubcontext(new StepUpMethodContext(), true);
+        StepUpMethodContext stepUpMethodContext = (StepUpMethodContext) authnContext
+                .addSubcontext(new StepUpMethodContext(), true);
         try {
             stepUpMethod.initialize(claims);
         } catch (Exception e) {

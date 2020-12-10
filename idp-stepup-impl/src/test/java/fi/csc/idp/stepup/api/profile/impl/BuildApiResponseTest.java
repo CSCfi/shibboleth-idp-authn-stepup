@@ -33,13 +33,13 @@ import org.opensaml.profile.context.ProfileRequestContext;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.webflow.execution.Event;
 import org.springframework.webflow.execution.RequestContext;
+import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 import fi.csc.idp.stepup.api.StepUpAccountStorage;
 import fi.csc.idp.stepup.api.StepUpApiContext;
 import fi.csc.idp.stepup.api.messaging.impl.ApiRequestImpl;
 import fi.csc.idp.stepup.impl.MockAccount;
-import junit.framework.Assert;
 import net.minidev.json.JSONObject;
 import net.minidev.json.parser.JSONParser;
 import net.minidev.json.parser.ParseException;
@@ -87,5 +87,4 @@ public class BuildApiResponseTest {
         Assert.assertEquals("value1", parsedContent.get("param1"));
         Assert.assertEquals("value2", parsedContent.get("param2"));
     }
-
 }

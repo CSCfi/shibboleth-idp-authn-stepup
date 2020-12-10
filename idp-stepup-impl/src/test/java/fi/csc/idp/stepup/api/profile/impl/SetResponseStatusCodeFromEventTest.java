@@ -36,11 +36,11 @@ import org.opensaml.profile.context.ProfileRequestContext;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.webflow.execution.Event;
 import org.springframework.webflow.execution.RequestContext;
+import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import fi.csc.idp.stepup.api.StepUpEventIds;
-import junit.framework.Assert;
 import net.shibboleth.idp.profile.ActionTestingSupport;
 import net.shibboleth.idp.profile.RequestContextBuilder;
 
