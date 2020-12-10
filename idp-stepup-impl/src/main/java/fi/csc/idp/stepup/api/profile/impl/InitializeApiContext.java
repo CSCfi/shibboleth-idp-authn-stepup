@@ -60,7 +60,7 @@ public class InitializeApiContext extends AbstractProfileAction {
     /**
      * Set the step up account storage.
      * 
-     * @param id is bean id
+     * @param storage is bean id
      */
     public void setStepUpAccountStorage(StepUpAccountStorage storage) {
         Constraint.isNotNull(storage, "StepUpAccountStorage must not be null or empty");

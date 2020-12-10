@@ -95,7 +95,7 @@ public class InitializeStepUpChallengeContext extends AbstractOIDCResponseAction
     /**
      * Whether the claims must be in request object.
      * 
-     * @param acceptOnlyRequestObjectClaims whether the claims must be in request
+     * @param acceptOnly whether the claims must be in request
      *                                      object
      */
     public void setAcceptOnlyRequestObjectClaims(boolean acceptOnly) {
@@ -119,9 +119,9 @@ public class InitializeStepUpChallengeContext extends AbstractOIDCResponseAction
     }
 
     /**
-     * Set the stepup method used.
+     * Set the step up method used.
      * 
-     * @param methods stepup method used
+     * @param method step up method used
      */
 
     public void setStepUpMethod(StepUpMethod method) {

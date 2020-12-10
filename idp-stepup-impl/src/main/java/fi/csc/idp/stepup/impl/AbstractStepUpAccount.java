@@ -195,7 +195,7 @@ public abstract class AbstractStepUpAccount implements StepUpAccount {
     /**
      * Initialise the account from serialised account information.
      * 
-     * @param serializedAccount serialised account information
+     * @param serializedAccountInformation serialised account information
      * @return true if information successfully read, otherwise false.
      * @throws ParseException
      */

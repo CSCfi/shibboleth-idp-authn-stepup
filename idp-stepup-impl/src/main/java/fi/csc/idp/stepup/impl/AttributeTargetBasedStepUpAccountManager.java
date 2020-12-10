@@ -56,7 +56,7 @@ public class AttributeTargetBasedStepUpAccountManager extends AbstractStepUpAcco
      * Initialises account by reading the value for key, using that to instantiate
      * non editable accounts.
      * 
-     * @param attributeContext to look for the key value
+     * @param entry claims to look for the key value
      * @throws Exception if something unexpected occurred.
      */
     @Override

@@ -145,7 +145,7 @@ public class AbstractStepUpAccountManager implements StepUpMethod {
     /**
      * Add a one default account.
      * 
-     * @param attributeContext , not used.
+     * @param entry not used.
      * @return true if successful
      */
     @Override

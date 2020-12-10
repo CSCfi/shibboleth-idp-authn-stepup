@@ -83,7 +83,7 @@ public interface StepUpAccount {
     
     /**
      * Initialise the account from serialised account information.
-     * @param serializedAccount serialised account information
+     * @param serializedAccountInformation serialised account information
      * @return true if information successfully read, otherwise false.
      */
     public boolean deserializeAccountInformation(String serializedAccountInformation); 

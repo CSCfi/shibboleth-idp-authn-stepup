@@ -50,7 +50,7 @@ public class ValidateToken extends AbstractApiAction {
     /**
      * Set whether we are validating token for self-service action.
      * 
-     * @param readAction Whether we are validating token for self-service action
+     * @param selfServiceAction Whether we are validating token for self-service action
      */
     public void setSelfServiceAction(boolean selfServiceAction) {
         this.selfServiceAction = selfServiceAction;
