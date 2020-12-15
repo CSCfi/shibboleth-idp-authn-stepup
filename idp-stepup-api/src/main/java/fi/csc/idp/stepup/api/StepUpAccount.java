@@ -1,6 +1,6 @@
 /*
  * The MIT License
- * Copyright (c) 2015 CSC - IT Center for Science, http://www.csc.fi
+ * Copyright (c) 2015-2020 CSC - IT Center for Science, http://www.csc.fi
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,37 +22,10 @@
  */
 package fi.csc.idp.stepup.api;
 
-import net.minidev.json.parser.ParseException;
 
 /** Interface implemented by accounts. */
 public interface StepUpAccount {
-
-    /** string code for setEnabled(true).*/
-    public static final String ENABLE = "enable";
-    /** string code for setEnabled(false).*/
-    public static final String DISABLE = "disable";
-    /** string code for setName(string).*/
-    public static final String SET_NAME = "setname";
-    /** string code for setEditable(true).*/
-    public static final String SET_EDITABLE = "seteditable";
-    /** string code for setEditable(false).*/
-    public static final String SET_NOT_EDITABLE = "setnoteditable";
     
-    /**
-     * Unique id of the account, may be null.
-     * 
-     * @return id
-     */
-    public long getId();
-
-    /**
-     * Set id of the account.
-     * 
-     * @param id
-     *            of account
-     */
-    public void setId(long id);
-
     /**
      * Name of the account.
      * 
@@ -67,36 +40,6 @@ public interface StepUpAccount {
      *            name
      */
     public void setName(String name);
-
-    /**
-     * If account can be modified.
-     * 
-     * @return true if accounts can be modified
-     */
-    public boolean isEditable();
-
-    /**
-     * Set account to be editable or not.
-     * 
-     * @param isEditable true if editable.
-     */
-    public void setEditable(boolean isEditable);
-
-    /**
-     * Set the account enabled/disabled.
-     * 
-     * @param isEnabled
-     *            true if enabled
-     */
-    public void setEnabled(boolean isEnabled);
-
-    /**
-     * Status of the account.
-     * 
-     * @return true if enabled
-     */
-
-    public boolean isEnabled();
 
     /**
      * Invoked when a new fresh challenge should be sent. Not relevant to all
@@ -115,13 +58,6 @@ public interface StepUpAccount {
      * @throws Exception if something unexpected has occurred.
      */
     public boolean verifyResponse(String response) throws Exception;
-
-    /**
-     * If account has been used successfully to verify user.
-     * 
-     * @return true if account has been used to verify user.
-     */
-    public boolean isVerified();
     
     /**
      * Target parameter for stepup operations. May be sms number, email address,
@@ -140,14 +76,14 @@ public interface StepUpAccount {
     public String getTarget();
     
     /**
-     * Serialize the account information to string for storing it.
-     * @return serialized account.
+     * Serialise the account information to string for storing it.
+     * @return serialised account.
      */
     public String serializeAccountInformation();
     
     /**
-     * Initialize the account from serialized account information.
-     * @param serializedAccount serialized account information
+     * Initialise the account from serialised account information.
+     * @param serializedAccountInformation serialised account information
      * @return true if information successfully read, otherwise false.
      */
     public boolean deserializeAccountInformation(String serializedAccountInformation); 

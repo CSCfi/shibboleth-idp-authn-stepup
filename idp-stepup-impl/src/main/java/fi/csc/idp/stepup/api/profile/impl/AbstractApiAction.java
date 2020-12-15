@@ -1,6 +1,6 @@
 /*
  * The MIT License
- * Copyright (c) 2015 CSC - IT Center for Science, http://www.csc.fi
+ * Copyright (c) 2015-2020 CSC - IT Center for Science, http://www.csc.fi
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -37,9 +37,9 @@ import fi.csc.idp.stepup.api.messaging.ApiRequest;
 import net.shibboleth.idp.profile.AbstractProfileAction;
 
 /**
- * This is base class for Api actions offering StepUpApiContext and ApiRequest.
+ * This is base class for API actions that require StepUpApiContext and
+ * ApiRequest.
  */
-@SuppressWarnings("rawtypes")
 public abstract class AbstractApiAction extends AbstractProfileAction {
 
     /** Class logger. */
@@ -47,7 +47,7 @@ public abstract class AbstractApiAction extends AbstractProfileAction {
     private final Logger log = LoggerFactory.getLogger(AbstractApiAction.class);
 
     /** Response. */
-    Map<String, Object> response = new HashMap<String, Object>();
+    protected Map<String, Object> response = new HashMap<String, Object>();
 
     /** StepUp API context. */
     private StepUpApiContext ctx;

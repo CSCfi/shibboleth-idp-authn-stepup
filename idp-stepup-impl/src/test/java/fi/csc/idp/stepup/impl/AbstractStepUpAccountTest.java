@@ -1,7 +1,27 @@
-package fi.csc.idp.stepup.impl;
+/*
+ * The MIT License
+ * Copyright (c) 2020 CSC - IT Center for Science, http://www.csc.fi
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
 
-import java.util.HashMap;
-import java.util.Map;
+package fi.csc.idp.stepup.impl;
 
 import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
@@ -21,86 +41,49 @@ public class AbstractStepUpAccountTest {
         testStepUpAccount = new TestStepUpAccount();
         challengeGen = new ChallengeGen();
         challengeVer = new ChallengeVer();
-        Map<Long, Integer> accountEventLimits=new HashMap<Long, Integer>();
-        //5th event within second will hit limits 
-        accountEventLimits.put((long)1000, (int)5);
-        //2nd fail event within second will hit limits
-        Map<Long, Integer> accountFailEventLimits=new HashMap<Long, Integer>();
-        accountFailEventLimits.put((long)1000, (int)2);
     }
 
-    /** test default behavior */
     @Test
     public void testUnitialized() throws Exception {
         Assert.assertNull(testStepUpAccount.getChallenge());
         Assert.assertNull(testStepUpAccount.getName());
-        Assert.assertEquals(testStepUpAccount.getId(), 0);
         Assert.assertNull(testStepUpAccount.getTarget());
-        Assert.assertTrue(testStepUpAccount.isEditable());
-        Assert.assertTrue(!testStepUpAccount.isEnabled());
     }
 
     private void setValues() {
         testStepUpAccount.setTarget("target");
         testStepUpAccount.setName("name");
-        testStepUpAccount.setId(1);
-        testStepUpAccount.setEnabled(true);
-        testStepUpAccount.setEditable(false);
     }
 
     private void setValues2() {
         testStepUpAccount.setTarget("target2");
         testStepUpAccount.setName("name2");
-        testStepUpAccount.setId(2);
-        testStepUpAccount.setEnabled(false);
-        testStepUpAccount.setEditable(true);
     }
 
-    /** test setters behavior */
     @Test
     public void testSetters() throws Exception {
         setValues();
         Assert.assertEquals(testStepUpAccount.getTarget(), "target");
         Assert.assertEquals(testStepUpAccount.getName(), "name");
-        Assert.assertEquals(testStepUpAccount.getId(), 1);
-        Assert.assertTrue(testStepUpAccount.isEnabled());
-        Assert.assertTrue(!testStepUpAccount.isEditable());
-        // editing disabled, should not have any impact
         setValues2();
-        Assert.assertEquals(testStepUpAccount.getTarget(), "target");
-        Assert.assertEquals(testStepUpAccount.getName(), "name");
-        Assert.assertEquals(testStepUpAccount.getId(), 1);
-        Assert.assertTrue(testStepUpAccount.isEnabled());
-        Assert.assertTrue(!testStepUpAccount.isEditable());
+        Assert.assertEquals(testStepUpAccount.getTarget(), "target2");
+        Assert.assertEquals(testStepUpAccount.getName(), "name2");
 
     }
 
-    /** test account serialization */
-	@Test
-	public void testSerialization() {
-		TestStepUpAccount account = new TestStepUpAccount();
-		// Uninitialized account
-		account.deserializeAccountInformation(testStepUpAccount.serializeAccountInformation());
-		Assert.assertEquals(testStepUpAccount.getTarget(), account.getTarget());
-		Assert.assertEquals(testStepUpAccount.getName(), account.getName());
-		Assert.assertEquals(testStepUpAccount.getId(), account.getId());
-		Assert.assertEquals(testStepUpAccount.isEnabled(), account.isEnabled());
-		Assert.assertEquals(testStepUpAccount.isEditable(), account.isEditable());
-		// Initialized account
-		testStepUpAccount.setTarget("Target");
-		testStepUpAccount.setName("Name");
-		testStepUpAccount.setId(101010L);
-		testStepUpAccount.setEnabled(true);
-		testStepUpAccount.setEditable(false);
-		account.deserializeAccountInformation(testStepUpAccount.serializeAccountInformation());
-		Assert.assertEquals(testStepUpAccount.getTarget(), account.getTarget());
-		Assert.assertEquals(testStepUpAccount.getName(), account.getName());
-		Assert.assertEquals(testStepUpAccount.getId(), account.getId());
-		Assert.assertEquals(testStepUpAccount.isEnabled(), account.isEnabled());
-		Assert.assertEquals(testStepUpAccount.isEditable(), account.isEditable());
-	}
-    
-    /** test challenge verification behavior */
+    @Test
+    public void testSerialization() {
+        TestStepUpAccount account = new TestStepUpAccount();
+        account.deserializeAccountInformation(testStepUpAccount.serializeAccountInformation());
+        Assert.assertEquals(testStepUpAccount.getTarget(), account.getTarget());
+        Assert.assertEquals(testStepUpAccount.getName(), account.getName());
+        testStepUpAccount.setTarget("Target");
+        testStepUpAccount.setName("Name");
+        account.deserializeAccountInformation(testStepUpAccount.serializeAccountInformation());
+        Assert.assertEquals(testStepUpAccount.getTarget(), account.getTarget());
+        Assert.assertEquals(testStepUpAccount.getName(), account.getName());
+    }
+
     @Test
     public void testChallengeVerificator() {
         boolean exceptionOccurred = false;
@@ -121,16 +104,12 @@ public class AbstractStepUpAccountTest {
         }
         Assert.assertTrue(!exceptionOccurred);
     }
-    
-    
 
     class TestStepUpAccount extends AbstractStepUpAccount {
 
         @Override
         protected void doSendChallenge() throws Exception {
-            
         }
-
     }
 
     class ChallengeGen implements ChallengeGenerator {
@@ -139,7 +118,6 @@ public class AbstractStepUpAccountTest {
         public String generate(String target) throws Exception {
             return "challengeGenerated";
         }
-
     }
 
     class ChallengeVer implements ChallengeVerifier {
@@ -148,7 +126,5 @@ public class AbstractStepUpAccountTest {
         public boolean verify(String challenge, String response, String target) {
             return response.equals("response") && challenge.equals("challengeGenerated");
         }
-
     }
-
 }

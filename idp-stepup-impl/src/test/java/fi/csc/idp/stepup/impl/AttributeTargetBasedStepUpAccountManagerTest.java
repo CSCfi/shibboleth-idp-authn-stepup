@@ -1,98 +1,84 @@
+/*
+ * The MIT License
+ * Copyright (c) 2020 CSC - IT Center for Science, http://www.csc.fi
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
 package fi.csc.idp.stepup.impl;
 
-import java.util.Arrays;
-
-import net.shibboleth.idp.attribute.ByteAttributeValue;
-import net.shibboleth.idp.attribute.IdPAttribute;
-import net.shibboleth.idp.attribute.StringAttributeValue;
-import net.shibboleth.idp.attribute.context.AttributeContext;
-
-import org.springframework.context.ApplicationContext;
+import java.util.ArrayList;
+import java.util.Collection;
+import org.mockito.Mockito;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
+import com.nimbusds.openid.connect.sdk.ClaimsRequest.Entry;
+import com.nimbusds.openid.connect.sdk.claims.ClaimRequirement;
+
+import fi.csc.idp.stepup.api.StepUpAccount;
+import fi.csc.idp.stepup.api.StepUpAccountStorage;
+
 public class AttributeTargetBasedStepUpAccountManagerTest {
 
-    private AttributeTargetBasedStepUpAccountManager attributeTargetBasedStepUpAccountManager;
-
-    private AttributeContext attribCtx;
+    private AttributeTargetBasedStepUpAccountManager manager;
+    Collection<Entry> claims;
 
     @BeforeMethod
-    public void setUp() {
-        attributeTargetBasedStepUpAccountManager = new AttributeTargetBasedStepUpAccountManager();
-        attribCtx = new AttributeContext();
-        final IdPAttribute attribute1 = new IdPAttribute("attr1");
-        attribute1.setValues(Arrays.asList(new StringAttributeValue("foo@bar")));
-        final IdPAttribute attribute2 = new IdPAttribute("attr2");
-        attribute2.setValues(Arrays.asList(new ByteAttributeValue(new byte[1])));
-        attribCtx.setIdPAttributes(Arrays.asList(attribute1, attribute2));
-    }
-
-    private ApplicationContext getApplicationContext() {
-
-        ClassPathXmlApplicationContext ctx = new ClassPathXmlApplicationContext("applicationContext.xml");
-        return ctx;
-    }
-
-    /*
-    @Test
-    public void testNoAttributeContext() {
-        boolean exception = false;
-        try {
-            attributeTargetBasedStepUpAccountManager.initialize(null);
-        } catch (Exception e) {
-            exception = true;
-            Assert.assertEquals("Attribute context has to be set", e.getMessage());
-        }
-        Assert.assertEquals(exception, true);
-    }*/
-
-    /*
-    @Test
-    public void testNoAttributeId() {
-        boolean exception = false;
-        try {
-            attributeTargetBasedStepUpAccountManager.initialize(new AttributeContext());
-        } catch (Exception e) {
-            exception = true;
-            Assert.assertEquals("Attribute Id has to be set", e.getMessage());
-        }
-        Assert.assertEquals(exception, true);
+    public void setUp() throws Exception {
+        manager = new AttributeTargetBasedStepUpAccountManager();
+        StepUpAccountStorage storage = Mockito.mock(StepUpAccountStorage.class);
+        Mockito.doReturn(Mockito.mock(StepUpAccount.class)).when(storage).getAccount(Mockito.any(), Mockito.any());
+        manager.setAccountID("LogStepUpAccount");
+        manager.setAppContext(new ClassPathXmlApplicationContext("applicationContext.xml"));
+        claims = new ArrayList<Entry>();
+        claims.add(new Entry("sub", ClaimRequirement.ESSENTIAL, null, "XYZ"));
+        claims.add(new Entry("mail", ClaimRequirement.ESSENTIAL, null, "mail@example.com"));
+        manager.setClaimName("mail");
     }
 
     @Test
-    public void testNoBeanId() {
-        boolean exception = false;
-        try {
-            attributeTargetBasedStepUpAccountManager.setAttributeId("not found");
-            attributeTargetBasedStepUpAccountManager.initialize(new AttributeContext());
-        } catch (Exception e) {
-            exception = true;
-            Assert.assertEquals("No account bean defined", e.getMessage());
-        }
-        Assert.assertEquals(exception, true);
+    public void testInitialisationSuccess() throws Exception {
+        manager.initialize(claims);
+        Assert.assertNotNull(manager.getAccount());
     }
 
     @Test
-    public void testNoMatchingAttributeId() throws Exception {
-        attributeTargetBasedStepUpAccountManager.setAttributeId("not found");
-        attributeTargetBasedStepUpAccountManager.setAccountID("id");
-        attributeTargetBasedStepUpAccountManager.initialize(new AttributeContext());
-        Assert.assertEquals(attributeTargetBasedStepUpAccountManager.getAccounts().size(), 0);
+    public void testInitialisationSuccessNoAccount() throws Exception {
+        manager.setClaimName("not_eppn");
+        manager.initialize(claims);
+        Assert.assertNull(manager.getAccount());
     }
 
-    @Test
-    public void testAccountInitialized() throws Exception {
-        attributeTargetBasedStepUpAccountManager.setAppContext(getApplicationContext());
-        attributeTargetBasedStepUpAccountManager.setAttributeId("attr1");
-        attributeTargetBasedStepUpAccountManager.setAccountID("ChallengeSender");
-        // attribute found but set account implementation missing
-        attributeTargetBasedStepUpAccountManager.initialize(attribCtx);
-        Assert.assertEquals(attributeTargetBasedStepUpAccountManager.getAccounts().size(), 1);
-
+    @Test(expectedExceptions = Exception.class)
+    public void testInitialisationFailNoAccountID() throws Exception {
+        manager.setAccountID(null);
+        manager.initialize(claims);
+        Assert.assertNull(manager.getAccount());
     }
-    */
+
+    @Test(expectedExceptions = Exception.class)
+    public void testInitialisationFailNoClaimName() throws Exception {
+        manager.setClaimName(null);
+        manager.initialize(claims);
+        Assert.assertNull(manager.getAccount());
+    }
 
 }

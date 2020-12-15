@@ -1,6 +1,6 @@
 /*
  * The MIT License
- * Copyright (c) 2015 CSC - IT Center for Science, http://www.csc.fi
+ * Copyright (c) 2015-2020 CSC - IT Center for Science, http://www.csc.fi
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -28,13 +28,11 @@ import org.opensaml.profile.action.ActionSupport;
 import org.opensaml.profile.context.ProfileRequestContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import fi.csc.idp.stepup.api.StepUpAccount;
 import fi.csc.idp.stepup.api.StepUpEventIds;
 
 /**
  * Removes user accounts.
  */
-@SuppressWarnings("rawtypes")
 public class RemoveAccount extends AbstractApiAction {
 
     /** Class logger. */
@@ -44,18 +42,18 @@ public class RemoveAccount extends AbstractApiAction {
     /** {@inheritDoc} */
     @Override
     protected void doExecute(@Nonnull final ProfileRequestContext profileRequestContext) {
-        if (getCtx().getAccounts() != null) {
-            for (StepUpAccount account : getCtx().getAccounts()) {
-                try {
-                    getCtx().getStorage().remove(account, getRequest().getUserId());
-                } catch (Exception e) {
-                    log.error("{} Exception occurred while removing account {}", getLogPrefix(), e.getMessage());
-                    ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EXCEPTION);
-                    return;
-                }
+        if (getCtx().getAccount() != null) {
+            try {
+                getCtx().getStorage().remove(getCtx().getAccount(), getRequest().getUserId());
+            } catch (Exception e) {
+                log.error("{} Exception occurred while removing account {}", getLogPrefix(), e.getMessage());
+                ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EXCEPTION);
+                response.put("userid", getRequest().getUserId());
+                response.put("error", "Internal error");
+                getCtx().setResponse(response);
+                return;
             }
         }
-        // Form response
         response.put("userid", getRequest().getUserId());
         getCtx().setResponse(response);
     }

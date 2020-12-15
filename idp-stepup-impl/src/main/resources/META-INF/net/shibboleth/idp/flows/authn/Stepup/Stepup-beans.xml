@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:context="http://www.springframework.org/schema/context" xmlns:c="http://www.springframework.org/schema/c"
+    xmlns:p="http://www.springframework.org/schema/p" xmlns:util="http://www.springframework.org/schema/util"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+                        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+                        http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd"
+    default-init-method="initialize" default-destroy-method="destroy">
+
+    <bean class="org.springframework.context.support.PropertySourcesPlaceholderConfigurer" p:placeholderPrefix="%{"
+        p:placeholderSuffix="}" />
+
+    <bean class="net.shibboleth.idp.profile.impl.ProfileActionBeanPostProcessor" />
+    <bean class="net.shibboleth.ext.spring.config.IdentifiableBeanPostProcessor" />
+
+    <bean id="InitializeStepUpChallengeContext" class="fi.csc.idp.stepup.impl.InitializeStepUpChallengeContext"
+        scope="prototype" p:stepUpMethod-ref="#{'%{stepup.authenticationManager:GoogleAuthStepUpManager}'.trim()}"
+        p:httpServletRequest-ref="shibboleth.HttpServletRequest" />
+
+    <bean id="InitializeRegistrationStepUpChallengeContext"
+        class="fi.csc.idp.stepup.impl.InitializeStepUpChallengeContext" scope="prototype"
+        p:stepUpMethod-ref="#{'%{stepup.registration.authenticationManager:SMSStepUpManager}'.trim()}"
+        p:acceptOnlyRequestObjectClaims="true" p:httpServletRequest-ref="shibboleth.HttpServletRequest" />
+
+    <bean id="ValidateStepupAuthentication" class="fi.csc.idp.stepup.impl.ValidateStepupAuthentication"
+        scope="prototype" />
+
+    <bean id="AddAccount" class="fi.csc.idp.stepup.impl.AddAccount" scope="prototype"
+        p:httpServletRequest-ref="shibboleth.HttpServletRequest" />
+
+    <bean id="AddOrRemoveAccount" class="fi.csc.idp.stepup.impl.AddOrRemoveAccount" scope="prototype"
+        p:httpServletRequest-ref="shibboleth.HttpServletRequest" />
+
+    <bean id="GenerateStepUpChallenge" class="fi.csc.idp.stepup.impl.GenerateStepUpChallenge" scope="prototype"
+        p:httpServletRequest-ref="shibboleth.HttpServletRequest" />
+
+    <bean id="VerifyPasswordFromFormRequest" class="fi.csc.idp.stepup.impl.VerifyPasswordFromFormRequest"
+        scope="prototype" p:httpServletRequest-ref="shibboleth.HttpServletRequest" />
+
+    <bean id="GoogleAuthStepUpManager" class="fi.csc.idp.stepup.impl.AttributeKeyBasedStorageStepUpAccountManager"
+        scope="prototype" p:name="TOTP" p:claimName="#{'%{stepup.GoogleAuthStepUpManager.keyclaim:otp_key}'.trim()}"
+        p:stepUpAccountStorage-ref="#{'%{stepup.GoogleAuthStepUpManager.accountstore:ShibStorageAccountStorage}'.trim()}"
+        p:autoRemove="true" p:accountID="GoogleAuthenticatorStepUpAccount" />
+
+    <bean id="ShibStorageAccountStorage" class="fi.csc.idp.stepup.impl.ShibStorageSingleStepUpAccountStorage"
+        p:Storage-ref="#{'%{stepup.ShibStorageAccountStorage.storageservice:shibboleth.StorageService}'.trim()}"
+        p:encryptKey="TRUE" p:encryptTarget="TRUE" p:encryptor-ref="ShibStorageAccountStorageEncryptor" />
+
+    <bean id="ShibStorageAccountStorageEncryptor" class="org.springframework.security.crypto.encrypt.Encryptors"
+        factory-method="queryableText">
+        <constructor-arg value="key" />
+        <constructor-arg value="#{'%{stepup.ShibStorageAccountStorageEncryptor.encryptKey}'.trim()}" />
+    </bean>
+
+    <bean id="LogStepUpManager" class="fi.csc.idp.stepup.impl.DefaultStepUpAccountManager" scope="prototype"
+        p:name="Logfile" p:AccountID="LogStepUpAccount" />
+
+    <bean id="MailStepUpManager" class="fi.csc.idp.stepup.impl.AttributeTargetBasedStepUpAccountManager"
+        scope="prototype" p:name="Email" p:claimName="#{'%{stepup.MailStepUpManager.keyclaim:INTmail}'.trim()}"
+        p:AccountID="EmailStepUpAccount" />
+
+    <bean id="SMSStepUpManager" class="fi.csc.idp.stepup.impl.AttributeTargetBasedStepUpAccountManager"
+        scope="prototype" p:name="SMS Sender" p:claimName="#{'%{stepup.SMSStepUpManager.keyclaim:mobile}'.trim()}"
+        p:AccountID="SMSStepUpAccount" />
+
+    <bean id="LogStepUpAccount" class="fi.csc.idp.stepup.impl.ChallengeSenderStepUpAccount" scope="prototype"
+        p:ChallengeGenerator-ref="ChallengeGenerator" p:ChallengeVerifier-ref="EqualVerifier"
+        p:ChallengeSender-ref="LogChallengeSender" />
+
+    <bean id="EmailStepUpAccount" class="fi.csc.idp.stepup.impl.ChallengeSenderStepUpAccount" scope="prototype"
+        p:ChallengeGenerator-ref="ChallengeGenerator" p:ChallengeVerifier-ref="EqualVerifier"
+        p:ChallengeSender-ref="MailChallengeSender" />
+
+    <bean id="SMSStepUpAccount" class="fi.csc.idp.stepup.impl.ChallengeSenderStepUpAccount" scope="prototype"
+        p:ChallengeGenerator-ref="ChallengeGenerator" p:ChallengeVerifier-ref="EqualVerifier"
+        p:ChallengeSender-ref="SMSChallengeSender" />
+
+    <bean id="GoogleAuthenticatorStepUpAccount" class="fi.csc.idp.stepup.impl.GoogleAuthenticatorStepUpAccount"
+        scope="prototype" />
+
+    <bean id="LogChallengeSender" class="fi.csc.idp.stepup.impl.LogChallengeSender" />
+
+    <bean id="MailChallengeSender" class="fi.csc.idp.stepup.impl.MailChallengeSender"
+        p:subjectField="#{'%{stepup.mail.subject:OTP code}'.trim()}"
+        p:fromField="#{'%{stepup.mail.from:OTP account}'.trim()}" p:host="#{'%{stepup.mail.host:localhost}'.trim()}"
+        p:port="#{'%{stepup.mail.port:25}'.trim()}" p:templatePath="#{'%{stepup.mail.templatepath:}'.trim()}"
+        p:templateFile="#{'%{stepup.mail.templatefile:}'.trim()}" p:sMTPAuth="#{'%{stepup.mail.smtpauth:false}'.trim()}"
+        p:sMTPTtls="#{'%{stepup.mail.smtpttls:true}'.trim()}" />
+
+    <bean id="SMSChallengeSender" class="fi.csc.idp.stepup.impl.TwilioSMSChallengeSender"
+        p:senderNumber="#{'%{stepup.SMSAccount.sender}'.trim()}" p:accountSid="#{'%{stepup.SMSAccount.sid}'.trim()}"
+        p:authToken="#{'%{stepup.SMSAccount.token}'.trim()}"
+        p:message="The code to access the service is %s, reply with the code" />
+
+    <bean id="ChallengeGenerator" class="fi.csc.idp.stepup.impl.DigestChallengeGenerator" p:decimal="true" />
+
+    <bean id="EmptyChallengeGenerator" class="fi.csc.idp.stepup.impl.DigestChallengeGenerator" p:maxLength="0" />
+
+    <bean id="OneCharChallengeGenerator" class="fi.csc.idp.stepup.impl.DigestChallengeGenerator" p:maxLength="1" />
+
+    <bean id="EqualVerifier" class="fi.csc.idp.stepup.impl.EqualChallengeResponseVerifier" />
+
+</beans>

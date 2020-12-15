@@ -1,6 +1,6 @@
 /*
  * The MIT License
- * Copyright (c) 2015 CSC - IT Center for Science, http://www.csc.fi
+ * Copyright (c) 2015-2020 CSC - IT Center for Science, http://www.csc.fi
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,8 +23,6 @@
 
 package fi.csc.idp.stepup.impl;
 
-import java.util.ArrayList;
-import java.util.List;
 import javax.annotation.Nonnull;
 import org.opensaml.storage.StorageService;
 import fi.csc.idp.stepup.api.StepUpAccount;
@@ -35,8 +33,8 @@ import org.opensaml.storage.StorageCapabilitiesEx;
 import org.opensaml.storage.StorageRecord;
 
 /**
- * Shibboleth storage implementation of Step Up Account storage. Capable of storing only one account per user. Treats
- * add and update operations as the same.
+ * Shibboleth storage implementation of step up account storage. Adding a
+ * account automatically overwrites any pre-existing.
  */
 public class ShibStorageSingleStepUpAccountStorage extends AbstractStepUpAccountStorage
         implements StepUpAccountStorage {
@@ -82,35 +80,24 @@ public class ShibStorageSingleStepUpAccountStorage extends AbstractStepUpAccount
     }
 
     @Override
-    public void update(StepUpAccount account, String key) throws Exception {
-        Constraint.isNotNull(storage, "StorageService cannot be null");
-        Constraint.isNotNull(account, "Account cannot be null");
-        Constraint.isNotNull(key, "Key cannot be null");
-        add(account, encryptKey(key));
-
-    }
-
-    @Override
-    public <T> List<StepUpAccount> getAccounts(String key, Class<T> aClass) throws Exception {
+    public <T> StepUpAccount getAccount(String key, Class<T> aClass) throws Exception {
         Constraint.isNotNull(storage, "StorageService cannot be null");
         Constraint.isNotNull(aClass, "Class cannot be null");
         Constraint.isNotNull(key, "Key cannot be null");
-        List<StepUpAccount> accounts = new ArrayList<StepUpAccount>();
-        @SuppressWarnings("rawtypes") StorageRecord entry = storage.read(STORAGE_CONTEXT, encryptKey(key));
+        StorageRecord entry = storage.read(STORAGE_CONTEXT, encryptKey(key));
         if (entry != null) {
-            Object obj = aClass.newInstance();
+            Object obj = aClass.getDeclaredConstructor().newInstance();
             if (!(obj instanceof StepUpAccount)) {
                 throw new Exception("Unable to instantiate StepUpAccount");
             }
             StepUpAccount stepUpAccount = (StepUpAccount) obj;
             if (stepUpAccount.deserializeAccountInformation(decryptTarget(entry.getValue()))) {
-                accounts.add(stepUpAccount);
+                return stepUpAccount;
             } else {
                 throw new Exception(
                         "Unable to deserialize StepUpAccount from value " + decryptTarget(entry.getValue()));
             }
         }
-        return accounts;
+        return null;
     }
-
 }

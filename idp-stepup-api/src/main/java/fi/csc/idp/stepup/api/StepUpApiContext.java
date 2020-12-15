@@ -1,6 +1,6 @@
 /*
  * The MIT License
- * Copyright (c) 2015 CSC - IT Center for Science, http://www.csc.fi
+ * Copyright (c) 2015-2020 CSC - IT Center for Science, http://www.csc.fi
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,93 +22,91 @@
  */
 package fi.csc.idp.stepup.api;
 
-import java.util.List;
 import java.util.Map;
-
 import org.opensaml.messaging.context.BaseContext;
-
 import net.shibboleth.utilities.java.support.logic.Constraint;
 
 /**
- * Context for stepup api.
+ * Context for that holds information specific to step up API.
  */
 public class StepUpApiContext extends BaseContext {
 
-	/** Response map. */
-	private Map<String, Object> response;
-	
-	/** Stepup account.  */  
-	private StepUpAccount account;
-	
-	/** Storage for the step up accounts. */
+    /** Response map. */
+    private Map<String, Object> response;
+
+    /** Step up account. */
+    private StepUpAccount account;
+
+    /** Step up account prototype. */
+    private StepUpAccount accountPrototype;
+
+    /** Storage for the step up accounts. */
     private StepUpAccountStorage storage;
 
-	/**
-	 * Constructor.
-	 * @param account stepup account
-	 * @param storage storage for the step up accounts
-	 */
-	public StepUpApiContext(StepUpAccount account, StepUpAccountStorage storage) {
-		Constraint.isNotNull(account, "Stepup account must not be null");
-		Constraint.isNotNull(storage, "StepUpAccountStorage account must not be null");
-		this.account=account;
-		this.storage=storage;
-	}
+    /**
+     * Constructor.
+     *
+     * @param accountProto   step up account prototype
+     * @param accountStorage storage for the step up accounts
+     */
+    public StepUpApiContext(StepUpAccount accountProto, StepUpAccountStorage accountStorage) {
+        Constraint.isNotNull(accountProto, "Step up proto account must not be null");
+        Constraint.isNotNull(accountStorage, "Step up account storage account must not be null");
+        accountPrototype = accountProto;
+        storage = accountStorage;
+    }
 
-	/**
+    /**
      * Get storage for the step up accounts.
+     *
      * @return storage for the step up accounts
      */
-	public StepUpAccountStorage getStorage() {
-		return storage;
-	}
-	
-	/**
-	 * Get response map.
-	 * 
-	 * @return response map
-	 */
-	public Map<String, Object> getResponse() {
-		return response;
-	}
+    public StepUpAccountStorage getStorage() {
+        return storage;
+    }
 
-	/**
-	 * Set response map.
-	 * 
-	 * @param response
-	 *            response map
-	 */
-	public void setResponse(Map<String, Object> response) {
-		this.response = response;
-	}
+    /**
+     * Get response map.
+     *
+     * @return response map
+     */
+    public Map<String, Object> getResponse() {
+        return response;
+    }
 
-	/** Accounts of the user. */
-	private List<StepUpAccount> accounts;
+    /**
+     * Set response parameter map.
+     *
+     * @param responseParameters response map
+     */
+    public void setResponse(Map<String, Object> responseParameters) {
+        response = responseParameters;
+    }
 
-	/**
-	 * Get accounts of the user.
-	 * 
-	 * @return accounts of the user
-	 */
-	public List<StepUpAccount> getAccounts() {
-		return accounts;
-	}
+    /**
+     * Set account for step up.
+     *
+     * @param accountStepUp account to be set
+     */
+    public void setAccount(StepUpAccount accountStepUp) {
+        account = accountStepUp;
+    }
 
-	/**
-	 * Set accounts of the user.
-	 * 
-	 * @param accounts
-	 *            accounts of the user
-	 */
-	public void setAccounts(List<StepUpAccount> accounts) {
-		this.accounts = accounts;
-	}
-	
-	/**
-	 * Stepup account.
-	 * @return Stepup account.
-	 */
-	public StepUpAccount getAccount() {
-		return account;
-	}
+    /**
+     * Get account for step up.
+     * 
+     * @return Step up account.
+     */
+    public StepUpAccount getAccount() {
+        return account;
+    }
+
+    /**
+     * Step up account prototype.
+     * 
+     * @return Step up account prototype.
+     */
+    public StepUpAccount getAccountPrototype() {
+        return accountPrototype;
+    }
 }

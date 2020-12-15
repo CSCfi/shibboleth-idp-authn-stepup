@@ -1,0 +1,304 @@
+
+<flow xmlns="http://www.springframework.org/schema/webflow"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/webflow http://www.springframework.org/schema/webflow/spring-webflow.xsd"
+	parent="intercept.abstract">
+
+	<!-- Rudimentary impediment to direct execution of subflow. -->
+	<input name="calledAsSubflow" type="boolean" required="true" />
+
+	<!-- stepup execution START -->
+
+	<action-state id="InitializeStepUp">
+		<evaluate expression="InitializeStepUpChallengeContext" />
+		<evaluate expression="GenerateStepUpChallenge" />
+		<evaluate expression="'proceed'" />
+		<transition on="InvalidUser" to="InitializeRegistration">
+			<set name="flowScope.regAction" value="'AddAccount'" type="string" />
+		</transition>
+		<transition on="proceed" to="DisplayChallenge" >
+		<set name="flowScope.viewName" value="flowRequestContext.activeFlow.id"
+				type="string" />
+			<set name="flowScope.proceedAction" value="'VerifyPasswordFromFormRequest'"
+				type="string" />
+		</transition>
+	</action-state>
+
+	<action-state id="AddAccount">
+		<evaluate expression="InitializeStepUpChallengeContext" />
+		<evaluate expression="AddAccount" />
+		<evaluate expression="'proceed'" />
+		<transition on="proceed" to="DisplayEnd">
+			<set name="flowScope.viewName" value="flowRequestContext.activeFlow.id+'-performed'"
+				type="string" />
+		</transition>
+	</action-state>
+
+	<action-state id="VerifyPasswordFromFormRequest">
+		<on-entry>
+			<set name="flowScope.verifyResponseFailed" value="false" type="boolean" />
+		</on-entry>
+		<evaluate expression="VerifyPasswordFromFormRequest" />
+        <evaluate expression="ValidateStepupAuthentication" />
+		<evaluate expression="'proceed'" />
+		<transition on="proceed" to="proceed" />
+		<transition on="StepUpWrongResponse" to="DisplayChallenge">
+			<set name="flowScope.verifyResponseFailed" value="true" type="boolean" />
+		</transition>
+	</action-state>
+
+	<action-state id="AddOrRemoveAccount">
+		<evaluate expression="AddOrRemoveAccount" />
+		<evaluate expression="'proceed'" />
+		<transition on="proceed" to="ManageAccounts">
+			<set name="flowScope.accountUpdated" value="true" type="boolean" />
+		</transition>
+	</action-state>
+    
+	<!-- stepup execution STOP -->
+
+	<!-- registration execution START -->
+
+	<action-state id="InitializeRegistration">
+		<evaluate expression="InitializeRegistrationStepUpChallengeContext" />
+		<evaluate expression="'proceed'" />
+		<transition on="proceed" to="DisplayInformation">
+			<set name="flowScope.viewName" value="flowRequestContext.activeFlow.id+'-startregister'"
+				type="string" />
+			<set name="flowScope.proceedAction" value="'RegistrationStepUp'"
+				type="string" />
+		</transition>
+	</action-state>
+
+	<action-state id="RegistrationStepUp">
+		<evaluate expression="GenerateStepUpChallenge" />
+		<evaluate expression="'proceed'" />
+		<!-- user does not meet preconditions to perform stepup -->
+		<transition on="InvalidUser" to="DisplayCondolences" />
+		<transition on="proceed" to="DisplayChallenge">
+			<set name="flowScope.viewName" value="flowRequestContext.activeFlow.id+'-register'"
+				type="string" />
+			<set name="flowScope.proceedAction" value="'VerifyRegistrationPasswordFromFormRequest'"
+				type="string" />
+		</transition>
+	</action-state>
+
+	<action-state id="VerifyRegistrationPasswordFromFormRequest">
+		<on-entry>
+			<set name="flowScope.verifyRegResponseFailed" value="false" type="boolean" />
+		</on-entry>
+		<evaluate expression="VerifyPasswordFromFormRequest" />
+        <evaluate expression="'proceed'" />
+		<transition on="proceed" to="#{flowScope.regAction}" />
+		<transition on="StepUpWrongResponse" to="DisplayChallenge">
+			<set name="flowScope.verifyResponseFailed" value="true" type="boolean" />
+		</transition>
+		<transition on="StepUpLimitReached" to="DisplayWrongResponse" />
+	</action-state>
+
+	<!-- registration execution END -->
+
+	<!-- views START -->
+
+	<view-state id="DisplayChallenge" view="#{flowScope.viewName}">
+	    <attribute name="csrf_excluded" value="true" type="boolean"/>
+		<on-render>
+			<evaluate expression="environment" result="viewScope.environment" />
+			<evaluate expression="opensamlProfileRequestContext" result="viewScope.profileRequestContext" />
+			<evaluate
+				expression="opensamlProfileRequestContext.getSubcontext(T(net.shibboleth.idp.authn.context.AuthenticationContext))"
+				result="viewScope.authenticationContext" />
+			<evaluate
+				expression="authenticationContext.getSubcontext(T(net.shibboleth.idp.authn.context.AuthenticationErrorContext))"
+				result="viewScope.authenticationErrorContext" />
+			<evaluate
+				expression="authenticationContext.getSubcontext(T(net.shibboleth.idp.authn.context.AuthenticationWarningContext))"
+				result="viewScope.authenticationWarningContext" />
+			<evaluate
+				expression="authenticationContext.getSubcontext(T(fi.csc.idp.stepup.api.StepUpMethodContext))"
+				result="viewScope.stepUpMethodContext" />
+			<evaluate
+				expression="T(net.shibboleth.utilities.java.support.codec.HTMLEncoder)"
+				result="viewScope.encoder" />
+			<evaluate
+				expression="flowRequestContext.getExternalContext().getNativeRequest()"
+				result="viewScope.request" />
+			<evaluate
+				expression="flowRequestContext.getExternalContext().getNativeResponse()"
+				result="viewScope.response" />
+		</on-render>
+		<transition on="proceed" to="#{flowScope.proceedAction}" />
+		<!-- this should result in registration challenge -->
+		<transition on="ManageAccounts" to="InitializeRegistration">
+			<set name="flowScope.regAction" value="'ManageAccounts'" type="string" />
+		</transition>
+	</view-state>
+
+	<view-state id="DisplayInformation" view="#{flowScope.viewName}">
+	    <attribute name="csrf_excluded" value="true" type="boolean"/>
+		<on-render>
+			<evaluate expression="environment" result="viewScope.environment" />
+			<evaluate expression="opensamlProfileRequestContext" result="viewScope.profileRequestContext" />
+			<evaluate
+				expression="opensamlProfileRequestContext.getSubcontext(T(net.shibboleth.idp.authn.context.AuthenticationContext))"
+				result="viewScope.authenticationContext" />
+			<evaluate
+				expression="authenticationContext.getSubcontext(T(net.shibboleth.idp.authn.context.AuthenticationErrorContext))"
+				result="viewScope.authenticationErrorContext" />
+			<evaluate
+				expression="authenticationContext.getSubcontext(T(net.shibboleth.idp.authn.context.AuthenticationWarningContext))"
+				result="viewScope.authenticationWarningContext" />
+			<evaluate
+				expression="T(net.shibboleth.utilities.java.support.codec.HTMLEncoder)"
+				result="viewScope.encoder" />
+			<evaluate
+				expression="flowRequestContext.getExternalContext().getNativeRequest()"
+				result="viewScope.request" />
+			<evaluate
+				expression="flowRequestContext.getExternalContext().getNativeResponse()"
+				result="viewScope.response" />
+		</on-render>
+		<transition on="proceed" to="#{flowScope.proceedAction}" />
+	</view-state>
+
+	<view-state id="DisplayEnd" view="#{flowScope.viewName}">
+	    <attribute name="csrf_excluded" value="true" type="boolean"/>
+		<on-render>
+			<evaluate expression="environment" result="viewScope.environment" />
+			<evaluate expression="opensamlProfileRequestContext" result="viewScope.profileRequestContext" />
+			<evaluate
+				expression="opensamlProfileRequestContext.getSubcontext(T(net.shibboleth.idp.authn.context.AuthenticationContext))"
+				result="viewScope.authenticationContext" />
+			<evaluate
+				expression="authenticationContext.getSubcontext(T(net.shibboleth.idp.authn.context.AuthenticationErrorContext))"
+				result="viewScope.authenticationErrorContext" />
+			<evaluate
+				expression="authenticationContext.getSubcontext(T(net.shibboleth.idp.authn.context.AuthenticationWarningContext))"
+				result="viewScope.authenticationWarningContext" />
+			<evaluate
+				expression="authenticationContext.getSubcontext(T(fi.csc.idp.stepup.api.StepUpMethodContext))"
+				result="viewScope.stepupMethodContext" />
+			<evaluate
+				expression="T(net.shibboleth.utilities.java.support.codec.HTMLEncoder)"
+				result="viewScope.encoder" />
+			<evaluate
+				expression="flowRequestContext.getExternalContext().getNativeRequest()"
+				result="viewScope.request" />
+			<evaluate
+				expression="flowRequestContext.getExternalContext().getNativeResponse()"
+				result="viewScope.response" />
+		</on-render>
+		<transition on="proceed" to="InitializeStepUp" />
+	</view-state>
+
+	<view-state id="ManageAccounts"
+		view="#{flowRequestContext.activeFlow.id}-managesimple">
+		<attribute name="csrf_excluded" value="true" type="boolean"/>
+		<on-entry>
+			<evaluate expression="InitializeStepUpChallengeContext" />
+		</on-entry>
+		<on-render>
+			<evaluate expression="environment" result="viewScope.environment" />
+			<evaluate expression="opensamlProfileRequestContext" result="viewScope.profileRequestContext" />
+			<evaluate
+				expression="opensamlProfileRequestContext.getSubcontext(T(net.shibboleth.idp.authn.context.AuthenticationContext))"
+				result="viewScope.authenticationContext" />
+			<evaluate
+				expression="authenticationContext.getSubcontext(T(net.shibboleth.idp.authn.context.AuthenticationErrorContext))"
+				result="viewScope.authenticationErrorContext" />
+			<evaluate
+				expression="authenticationContext.getSubcontext(T(net.shibboleth.idp.authn.context.AuthenticationWarningContext))"
+				result="viewScope.authenticationWarningContext" />
+			<evaluate
+				expression="authenticationContext.getSubcontext(T(fi.csc.idp.stepup.api.StepUpMethodContext))"
+				result="viewScope.stepUpMethodContext" />
+			<evaluate
+				expression="T(net.shibboleth.utilities.java.support.codec.HTMLEncoder)"
+				result="viewScope.encoder" />
+			<evaluate
+				expression="flowRequestContext.getExternalContext().getNativeRequest()"
+				result="viewScope.request" />
+			<evaluate
+				expression="flowRequestContext.getExternalContext().getNativeResponse()"
+				result="viewScope.response" />
+		</on-render>
+		<transition on="proceed" to="InitializeStepUp" />
+		<transition on="update" to="AddOrRemoveAccount" />
+	</view-state>
+
+	<view-state id="DisplayCondolences"
+		view="#{flowRequestContext.activeFlow.id}-condolences">
+		<on-render>
+			<evaluate expression="environment" result="viewScope.environment" />
+			<evaluate expression="opensamlProfileRequestContext" result="viewScope.profileRequestContext" />
+			<evaluate
+				expression="opensamlProfileRequestContext.getSubcontext(T(net.shibboleth.idp.authn.context.AuthenticationContext))"
+				result="viewScope.authenticationContext" />
+			<evaluate
+				expression="authenticationContext.getSubcontext(T(net.shibboleth.idp.authn.context.AuthenticationErrorContext))"
+				result="viewScope.authenticationErrorContext" />
+			<evaluate
+				expression="authenticationContext.getSubcontext(T(net.shibboleth.idp.authn.context.AuthenticationWarningContext))"
+				result="viewScope.authenticationWarningContext" />
+			<evaluate
+				expression="T(net.shibboleth.utilities.java.support.codec.HTMLEncoder)"
+				result="viewScope.encoder" />
+			<evaluate
+				expression="flowRequestContext.getExternalContext().getNativeRequest()"
+				result="viewScope.request" />
+			<evaluate
+				expression="flowRequestContext.getExternalContext().getNativeResponse()"
+				result="viewScope.response" />
+		</on-render>
+	</view-state>
+
+	<view-state id="DisplayWrongResponse"
+		view="#{flowRequestContext.activeFlow.id}-wrongresponse">
+		<on-render>
+			<evaluate expression="environment" result="viewScope.environment" />
+			<evaluate expression="opensamlProfileRequestContext" result="viewScope.profileRequestContext" />
+			<evaluate
+				expression="opensamlProfileRequestContext.getSubcontext(T(net.shibboleth.idp.authn.context.AuthenticationContext))"
+				result="viewScope.authenticationContext" />
+			<evaluate
+				expression="authenticationContext.getSubcontext(T(net.shibboleth.idp.authn.context.AuthenticationErrorContext))"
+				result="viewScope.authenticationErrorContext" />
+			<evaluate
+				expression="authenticationContext.getSubcontext(T(net.shibboleth.idp.authn.context.AuthenticationWarningContext))"
+				result="viewScope.authenticationWarningContext" />
+			<evaluate
+				expression="T(net.shibboleth.utilities.java.support.codec.HTMLEncoder)"
+				result="viewScope.encoder" />
+			<evaluate
+				expression="flowRequestContext.getExternalContext().getNativeRequest()"
+				result="viewScope.request" />
+			<evaluate
+				expression="flowRequestContext.getExternalContext().getNativeResponse()"
+				result="viewScope.response" />
+		</on-render>
+	</view-state>
+
+	<!-- views END -->
+
+	<!-- Passthrough state if an exception is thrown. -->
+	<action-state id="LogRuntimeException">
+		<on-entry>
+			<evaluate
+				expression="T(org.slf4j.LoggerFactory).getLogger('net.shibboleth.idp.saml.profile').error('Uncaught runtime exception', flowExecutionException.getCause())" />
+		</on-entry>
+		<evaluate expression="'RuntimeException'" />
+		<transition to="DisplayCondolences" />
+	</action-state>
+
+	<!-- Successful end state -->
+	<end-state id="proceed" />
+
+	<!-- all unhandled non proceed results are turned into errors -->
+	<global-transitions>
+		<transition on-exception="java.lang.RuntimeException" to="LogRuntimeException" />
+		<transition on="#{!'proceed'.equals(currentEvent.id)}" to="DisplayCondolences" />
+	</global-transitions>
+
+	<bean-import resource="Stepup-beans.xml" />
+
+</flow>

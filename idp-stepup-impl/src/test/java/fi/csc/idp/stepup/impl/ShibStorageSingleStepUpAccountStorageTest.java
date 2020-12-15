@@ -1,6 +1,6 @@
 /*
  * The MIT License
- * Copyright (c) 2015 CSC - IT Center for Science, http://www.csc.fi
+ * Copyright (c) 2015-2020 CSC - IT Center for Science, http://www.csc.fi
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -25,18 +25,16 @@ package fi.csc.idp.stepup.impl;
 import org.opensaml.storage.impl.MemoryStorageService;
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import java.util.List;
 import fi.csc.idp.stepup.api.StepUpAccount;
 
 public class ShibStorageSingleStepUpAccountStorageTest {
 
     private ShibStorageSingleStepUpAccountStorage shibStepUpAccountStorage;
-    
-    
+
     @Test
     public void runSequence() throws Exception {
         shibStepUpAccountStorage = new ShibStorageSingleStepUpAccountStorage();
-        MemoryStorageService service=new MemoryStorageService();
+        MemoryStorageService service = new MemoryStorageService();
         service.setId("componentId");
         service.initialize();
         shibStepUpAccountStorage.setStorage(service);
@@ -44,41 +42,17 @@ public class ShibStorageSingleStepUpAccountStorageTest {
         ma1.setName("ma1");
         MockAccount ma2 = new MockAccount();
         ma2.setName("ma2");
-        ma2.setId(2);
-        // Insert accounts to storage
         shibStepUpAccountStorage.add(ma1, "user1");
+        // Overwrite previous
         shibStepUpAccountStorage.add(ma2, "user1");
         shibStepUpAccountStorage.add(new MockAccount(), "user2");
         // Check that accounts may be found from storage
-        Assert.assertEquals(shibStepUpAccountStorage.getAccounts("user1", MockAccount.class).size(), 1);
-        Assert.assertEquals(shibStepUpAccountStorage.getAccounts("user2", MockAccount.class).size(), 1);
-        Assert.assertEquals(shibStepUpAccountStorage.getAccounts("user3", MockAccount.class).size(), 0);
-        List<StepUpAccount> accounts = shibStepUpAccountStorage.getAccounts("user1", MockAccount.class);
-        // can we locate account named ma2 and modify it
-        long id = -1;
-        for (StepUpAccount account : accounts) {
-            if ("ma2".equals(account.getName())) {
-                id = account.getId();
-                account.setName("ma2_updated");
-                shibStepUpAccountStorage.update(account, "user1");
-            }
-        }
-        Assert.assertEquals(shibStepUpAccountStorage.getAccounts("user1", MockAccount.class).size(), 1);
-        boolean found = false;
-        accounts = shibStepUpAccountStorage.getAccounts("user1", MockAccount.class);
-        StepUpAccount acc = null;
-        for (StepUpAccount account : accounts) {
-            if ("ma2_updated".equals(account.getName())) {
-                acc = account;
-                found = true;
-                Assert.assertEquals(id, account.getId());
-            }
-        }
-        Assert.assertTrue(found);
-        // remove the updated account
-        found = false;
-        shibStepUpAccountStorage.remove(acc, "user1");
-        Assert.assertEquals(shibStepUpAccountStorage.getAccounts("user1", MockAccount.class).size(), 0);
+        Assert.assertNotNull(shibStepUpAccountStorage.getAccount("user1", MockAccount.class));
+        Assert.assertNotNull(shibStepUpAccountStorage.getAccount("user2", MockAccount.class));
+        Assert.assertNull(shibStepUpAccountStorage.getAccount("user3", MockAccount.class));
+        StepUpAccount account = shibStepUpAccountStorage.getAccount("user1", MockAccount.class);
+        Assert.assertEquals(account.getName(), "ma2");
+        shibStepUpAccountStorage.remove(account, "user1");
+        Assert.assertNull(shibStepUpAccountStorage.getAccount("user1", MockAccount.class));
     }
-
 }

@@ -1,11 +1,28 @@
+/*
+ * The MIT License
+ * Copyright (c) 2015-2020 CSC - IT Center for Science, http://www.csc.fi
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
 package fi.csc.idp.stepup.impl;
 
-import java.security.Principal;
-import java.util.ArrayList;
-import java.util.List;
-
 import net.shibboleth.utilities.java.support.component.ComponentInitializationException;
-
 import org.opensaml.profile.context.ProfileRequestContext;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.webflow.execution.Event;
@@ -13,8 +30,6 @@ import org.springframework.webflow.execution.RequestContext;
 import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
-
-import fi.csc.idp.stepup.api.StepUpAccount;
 import fi.csc.idp.stepup.api.StepUpEventIds;
 import fi.csc.idp.stepup.api.StepUpMethodContext;
 import net.shibboleth.idp.authn.AuthnEventIds;
@@ -29,7 +44,6 @@ public class VerifyPasswordFromFormRequestTest {
     private VerifyPasswordFromFormRequest action;
 
     protected RequestContext src;
-    @SuppressWarnings("rawtypes")
     protected ProfileRequestContext prc;
 
     AuthnContextClassRefPrincipal class1 = new AuthnContextClassRefPrincipal("test1");
@@ -85,8 +99,8 @@ public class VerifyPasswordFromFormRequestTest {
     private void baseInit(MockAccount account) {
         AuthenticationContext ctx = (AuthenticationContext) prc.addSubcontext(new AuthenticationContext(), true);
         StepUpMethodContext stepUpContext = new StepUpMethodContext();
-        if (account == null){
-            account=new MockAccount();
+        if (account == null) {
+            account = new MockAccount();
         }
         stepUpContext.setStepUpAccount(account);
         MockHttpServletRequest request = new MockHttpServletRequest();
@@ -97,8 +111,7 @@ public class VerifyPasswordFromFormRequestTest {
     }
 
     /**
-     * Test that action copes with servlet having no challenge response
-     * parameter
+     * Test that action copes with servlet having no challenge response parameter
      */
     @Test
     public void testNoParameterInServletRequest() throws ComponentInitializationException {
@@ -117,8 +130,7 @@ public class VerifyPasswordFromFormRequestTest {
         final Event event = action.execute(src);
         ActionTestingSupport.assertEvent(event, StepUpEventIds.EVENTID_INVALID_RESPONSE);
     }
-    
-   
+
     /** Test that action copes with user entering correct response */
     @Test
     public void testCorrectResponse() throws ComponentInitializationException {
@@ -128,7 +140,4 @@ public class VerifyPasswordFromFormRequestTest {
         final Event event = action.execute(src);
         Assert.assertNull(event);
     }
-
-   
-   
 }

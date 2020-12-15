@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:c="http://www.springframework.org/schema/c"
+    xmlns:context="http://www.springframework.org/schema/context" xmlns:p="http://www.springframework.org/schema/p"
+    xmlns:util="http://www.springframework.org/schema/util" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+                           http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+                           http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd"
+    default-init-method="initialize" default-destroy-method="destroy">
+
+    <import resource="classpath*:/META-INF/net/shibboleth/idp/flows/authn/Stepup/Stepup-beans.xml"/>
+    <import resource="file:/opt/shibboleth-idp/conf/authn/stepup-authn-config.xml" />
+    
+    <bean class="org.springframework.context.support.PropertySourcesPlaceholderConfigurer" p:placeholderPrefix="%{"
+        p:placeholderSuffix="}" />
+
+    <bean class="net.shibboleth.ext.spring.config.IdentifiableBeanPostProcessor" />
+    <bean class="net.shibboleth.idp.profile.impl.ProfileActionBeanPostProcessor" />
+
+    <bean id="InitializeProfileRequestContext"
+        class="net.shibboleth.idp.profile.impl.InitializeProfileRequestContext" scope="prototype"
+        p:profileId="http://csc.fi/ns/profiles/stepup/api" p:loggingId="%{idp.service.logging.saml2sso:SSO}"
+        p:browserProfile="true" />
+
+    <bean id="InitializeApiContext" class="fi.csc.idp.stepup.api.profile.impl.InitializeApiContext"
+        scope="prototype" p:accountID="GoogleAuthenticatorStepUpAccount"
+        p:stepUpAccountStorage-ref="#{'%{stepup.GoogleAuthStepUpManager.accountstore:ShibStorageAccountStorage}'.trim()}" />
+
+    <bean id="DecodeMessage" class="org.opensaml.profile.action.impl.DecodeMessage" scope="prototype">
+        <constructor-arg>
+            <bean class="fi.csc.idp.stepup.api.decoding.impl.ApiRequestDecoder" scope="prototype"
+                p:httpServletRequest-ref="shibboleth.HttpServletRequest" />
+        </constructor-arg>
+    </bean>
+
+    <bean id="ValidateToken" class="fi.csc.idp.stepup.api.profile.impl.ValidateToken" scope="prototype"
+        p:tokenValidator-ref="#{'%{stepup.api.tokenvalidator:ValueTokenValidator}'.trim()}" />
+
+    <bean id="ValueTokenValidator" class="fi.csc.idp.stepup.api.profile.impl.ValueTokenValidator"
+        p:validationMap-ref="valueMap" />
+
+    <bean id="UserInfoTokenValidator" class="fi.csc.idp.stepup.api.profile.impl.UserInfoTokenValidator"
+        p:httpClient-ref="shibboleth.NonCachingHttpClient"
+        p:userInfoEndpoint="#{'%{stepup.UserInfoTokenValidator.userinfoendpoint}'.trim()}" p:validationMap-ref="userInfoMap" />
+
+    <bean id="ReadAccount" class="fi.csc.idp.stepup.api.profile.impl.ReadAccount" scope="prototype" />
+
+    <bean id="SetResponseStatusCodeFromEvent"
+        class="fi.csc.idp.stepup.api.profile.impl.SetResponseStatusCodeFromEvent" scope="prototype"
+        p:httpServletResponse-ref="shibboleth.HttpServletResponse">
+        <property name="eventContextLookupStrategy">
+            <bean class="net.shibboleth.idp.profile.context.navigate.WebFlowCurrentEventLookupFunction" />
+        </property>
+        <property name="mappedErrors">
+            <map value-type="java.lang.Integer">
+                <entry key="#{T(fi.csc.idp.stepup.api.StepUpEventIds).EVENTID_NO_USER}" value="400" />
+                <entry key="#{T(fi.csc.idp.stepup.api.StepUpEventIds).EVENTID_FORBIDDEN}" value="403" />
+            </map>
+        </property>
+    </bean>
+
+    <bean id="BuildApiResponse" class="fi.csc.idp.stepup.api.profile.impl.BuildApiResponse" scope="prototype"
+        p:httpServletResponse-ref="shibboleth.HttpServletResponse" />
+
+    <bean id="LogEvent" class="org.opensaml.profile.action.impl.LogEvent" scope="prototype"
+        p:suppressedEvents="#{getObject('shibboleth.SuppressedEvents') ?: getObject('shibboleth.DefaultSuppressedEvents')}">
+        <property name="eventContextLookupStrategy">
+            <bean class="net.shibboleth.idp.profile.context.navigate.WebFlowCurrentEventLookupFunction" />
+        </property>
+    </bean>
+
+    <bean id="RecordResponseComplete" class="net.shibboleth.idp.profile.impl.RecordResponseComplete"
+        scope="prototype" />
+
+</beans>

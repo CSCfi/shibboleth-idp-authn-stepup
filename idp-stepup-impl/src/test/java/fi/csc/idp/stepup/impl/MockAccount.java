@@ -1,6 +1,6 @@
 /*
  * The MIT License
- * Copyright (c) 2015 CSC - IT Center for Science, http://www.csc.fi
+ * Copyright (c) 2015-2020 CSC - IT Center for Science, http://www.csc.fi
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,17 +23,10 @@
 
 package fi.csc.idp.stepup.impl;
 
-
 public class MockAccount extends AbstractStepUpAccount {
 
     public String correctResponse = "response_success";
-
     public boolean noRetries;
-
-    @Override
-    public boolean isEnabled() {
-        return true;
-    }
 
     @Override
     public boolean verifyResponse(String response) throws Exception {
@@ -46,8 +39,5 @@ public class MockAccount extends AbstractStepUpAccount {
 
     @Override
     protected void doSendChallenge() throws Exception {
-        // TODO Auto-generated method stub
-
     }
-
 }

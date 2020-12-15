@@ -30,7 +30,7 @@ If flow indicated updates have happened the target is shown in plaintext and as 
                 #if ($method.isEditable() == true)
                   <p>#springMessageText("idp.stepup.method", "Authentication Method:")$encoder.encodeForHTML($methodName)</p><br>
                   <p>#springMessageText("idp.stepup.method.exp", "Creating a new authentication method will revoke any existing TOTP secret. Creating a new method will result in a new TOTP secret.")</p><br>
-                  #set ($action = $methodName+':-1:addaccount')
+                  #set ($action = $methodName+':addaccount')
                   <form action="$flowExecutionUrl" method="post">
                     <div class="form-element-wrapper">
                       <button class="form-element form-button" value=$encoder.encodeForHTML($action) type="submit" name="_eventId_update">#springMessageText("idp.stepup.method.newaccount", "Create Authentication Method")</button>
@@ -62,7 +62,7 @@ If flow indicated updates have happened the target is shown in plaintext and as 
 
                      <!-- remove button -->
                     <p>#springMessageText("idp.stepup.method.remove", "Removing the authentication method will revoke your existing TOTP secret.")</p><br>
-                    #set ($action = $methodName+':'+$account.getId()+':removeaccount')
+                    #set ($action = $methodName+':removeaccount')
                     <form action="$flowExecutionUrl" method="post">
                     <div class="form-element-wrapper">
                       <button class="form-element form-button" value=$encoder.encodeForHTML($action) type="submit" name="_eventId_update">#springMessageText("idp.stepup.update.removeaccount", "Remove Current Authentication Method")</button>

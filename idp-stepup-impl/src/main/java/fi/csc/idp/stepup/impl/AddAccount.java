@@ -1,6 +1,6 @@
 /*
  * The MIT License
- * Copyright (c) 2015 CSC - IT Center for Science, http://www.csc.fi
+ * Copyright (c) 2015-2020 CSC - IT Center for Science, http://www.csc.fi
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -33,12 +33,9 @@ import fi.csc.idp.stepup.api.StepUpEventIds;
 import fi.csc.idp.stepup.api.StepUpAccount;
 
 /**
- * An action that creates a new account and sets it as a active account.
- * 
- * 
+ * An action that users step up method to create a new step up account for the
+ * user.
  */
-
-@SuppressWarnings("rawtypes")
 public class AddAccount extends AbstractStepUpMethodAction {
 
     /** Class logger. */
@@ -66,8 +63,8 @@ public class AddAccount extends AbstractStepUpMethodAction {
     protected void doExecute(@Nonnull final ProfileRequestContext profileRequestContext,
             @Nonnull final AuthenticationContext authenticationContext) {
 
-        log.debug("{} adding a stepup account of type {}", getLogPrefix(), getStepUpMethodCtx().getStepUpMethod()
-                .getName());
+        log.debug("{} adding a stepup account of type {}", getLogPrefix(),
+                getStepUpMethodCtx().getStepUpMethod().getName());
         StepUpAccount account;
         try {
             account = getStepUpMethodCtx().getStepUpMethod().addAccount();
@@ -84,5 +81,4 @@ public class AddAccount extends AbstractStepUpMethodAction {
         // We set the account as active
         getStepUpMethodCtx().setStepUpAccount(account);
     }
-
 }
