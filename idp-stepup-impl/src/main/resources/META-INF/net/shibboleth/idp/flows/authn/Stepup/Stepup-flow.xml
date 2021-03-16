@@ -101,7 +101,6 @@
 	<!-- views START -->
 
 	<view-state id="DisplayChallenge" view="#{flowScope.viewName}">
-	    <attribute name="csrf_excluded" value="true" type="boolean"/>
 		<on-render>
 			<evaluate expression="environment" result="viewScope.environment" />
 			<evaluate expression="opensamlProfileRequestContext" result="viewScope.profileRequestContext" />
@@ -135,7 +134,6 @@
 	</view-state>
 
 	<view-state id="DisplayInformation" view="#{flowScope.viewName}">
-	    <attribute name="csrf_excluded" value="true" type="boolean"/>
 		<on-render>
 			<evaluate expression="environment" result="viewScope.environment" />
 			<evaluate expression="opensamlProfileRequestContext" result="viewScope.profileRequestContext" />
@@ -162,7 +160,6 @@
 	</view-state>
 
 	<view-state id="DisplayEnd" view="#{flowScope.viewName}">
-	    <attribute name="csrf_excluded" value="true" type="boolean"/>
 		<on-render>
 			<evaluate expression="environment" result="viewScope.environment" />
 			<evaluate expression="opensamlProfileRequestContext" result="viewScope.profileRequestContext" />
@@ -193,7 +190,6 @@
 
 	<view-state id="ManageAccounts"
 		view="#{flowRequestContext.activeFlow.id}-managesimple">
-		<attribute name="csrf_excluded" value="true" type="boolean"/>
 		<on-entry>
 			<evaluate expression="InitializeStepUpChallengeContext" />
 		</on-entry>

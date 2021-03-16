@@ -20,7 +20,7 @@
           #end
           <p>#springMessageText("idp.stepup.TOTP", "Please provide your TOTP passcode.")</p>
           <form action="$flowExecutionUrl" method="post">
-
+            #parse("csrf/csrf.vm")
             <div class="form-element-wrapper">
               <label for="loginhint">#springMessageText("idp.stepup.response", "Password")</label>
               <input class="form-element form-field" id="loginhint" name="j_challengeResponse" type="text" value="" autofocus>

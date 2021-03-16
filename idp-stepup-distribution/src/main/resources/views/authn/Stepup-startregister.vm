@@ -14,6 +14,7 @@
         <div class="content">
         #springMessageText("idp.stepup.startregister","TOTP account management requires first SMS verification.")<br><br>
         <form action="$flowExecutionUrl" method="post">
+        #parse("csrf/csrf.vm")
         <div class="form-element-wrapper">
               <button class="form-element form-button" type="submit" name="_eventId_proceed">#springMessageText("idp.stepup.proceedregistration", "Proceed to Verification")</button>
         </div>

@@ -15,6 +15,7 @@
         <div class="content">
           <p>#springMessageText("idp.stepup.register.explanation","A password to has been sent to your mobile number account ")$encoder.encodeForHTML($mobileNumber)</p>
           <form action="$flowExecutionUrl" method="post">
+          #parse("csrf/csrf.vm")
             <div class="form-element-wrapper">
               <label for="loginhint">#springMessageText("idp.stepup.response", "Password")</label>
               <input class="form-element form-field" id="loginhint" name="j_challengeResponse" type="text" value="" autofocus>

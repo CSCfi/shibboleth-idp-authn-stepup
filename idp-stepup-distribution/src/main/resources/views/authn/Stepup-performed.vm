@@ -20,6 +20,7 @@
         $encoder.encodeForHTML($target)</br>
         <img src='$qrCode' alt="HTML5 Icon" style="width:128px;height:128px;"> 
         <form action="$flowExecutionUrl" method="post">
+        #parse("csrf/csrf.vm")
         <div class="form-element-wrapper">
               <button class="form-element form-button" type="submit" name="_eventId_proceed">#springMessageText("idp.stepup.proceedlogin", "Proceed to Login")</button>
         </div>

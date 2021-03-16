@@ -32,6 +32,7 @@ If flow indicated updates have happened the target is shown in plaintext and as 
                   <p>#springMessageText("idp.stepup.method.exp", "Creating a new authentication method will revoke any existing TOTP secret. Creating a new method will result in a new TOTP secret.")</p><br>
                   #set ($action = $methodName+':addaccount')
                   <form action="$flowExecutionUrl" method="post">
+                  #parse("csrf/csrf.vm")
                     <div class="form-element-wrapper">
                       <button class="form-element form-button" value=$encoder.encodeForHTML($action) type="submit" name="_eventId_update">#springMessageText("idp.stepup.method.newaccount", "Create Authentication Method")</button>
                     </div>
