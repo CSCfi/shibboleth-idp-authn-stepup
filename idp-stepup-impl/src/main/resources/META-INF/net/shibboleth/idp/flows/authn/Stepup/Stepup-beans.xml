@@ -20,7 +20,7 @@
     <bean id="InitializeRegistrationStepUpChallengeContext"
         class="fi.csc.idp.stepup.impl.InitializeStepUpChallengeContext" scope="prototype"
         p:stepUpMethod-ref="#{'%{stepup.registration.authenticationManager:SMSStepUpManager}'.trim()}"
-        p:acceptOnlyRequestObjectClaims="true" p:httpServletRequest-ref="shibboleth.HttpServletRequest" />
+        p:acceptOnlyRequestObjectClaims="#{'%{stepup.registration.signed:true}'.trim()}" p:httpServletRequest-ref="shibboleth.HttpServletRequest" />
 
     <bean id="ValidateStepupAuthentication" class="fi.csc.idp.stepup.impl.ValidateStepupAuthentication"
         scope="prototype" />
