@@ -1,12 +1,5 @@
-<!--
-This simple manage view list only editable methods and their accounts.
-For method a possibility to create a new account is presented.
-For accounts only possibility to remove the account is presented.
-If flow indicated updates have happened the target is shown in plaintext and as qr code.
--->
-
 #set ($method = $stepUpMethodContext.getStepUpMethod())
-<!-- really should be set by account method -->
+#set ($account = $method.getAccount())
 #set ($qrLocation = "https://chart.googleapis.com/chart?chs=200x200&chld=M%%7C0&cht=qr&chl=otpauth://totp/%s@%s%%3Fsecret%%3D%s")
 #set ($proxyName = "Haka")
 <!DOCTYPE html>
@@ -24,61 +17,46 @@ If flow indicated updates have happened the target is shown in plaintext and as 
           <img src="$request.getContextPath()#springMessage("idp.logo")" alt="#springMessageText("idp.logo.alt-text", "logo")">
         </header>
         <div style="width:100%">
-                #set ($method = $mapEntry.getKey())
-            	#set ($methodName = $method.getName())
-                 <!-- add new account -->
-                #if ($method.isEditable() == true)
-                  <p>#springMessageText("idp.stepup.method", "Authentication Method:")$encoder.encodeForHTML($methodName)</p><br>
-                  <p>#springMessageText("idp.stepup.method.exp", "Creating a new authentication method will revoke any existing TOTP secret. Creating a new method will result in a new TOTP secret.")</p><br>
-                  #set ($action = $methodName+':addaccount')
-                  <form action="$flowExecutionUrl" method="post">
-                  #parse("csrf/csrf.vm")
-                    <div class="form-element-wrapper">
-                      <button class="form-element form-button" value=$encoder.encodeForHTML($action) type="submit" name="_eventId_update">#springMessageText("idp.stepup.method.newaccount", "Create Authentication Method")</button>
-                    </div>
-                  </form>
-                #end
-                <!-- add new account end-->
-                <!-- list all accounts of method -->
-                #set ($counter = 0)
-                #foreach ($account in $$method.getAccounts())
-                  #set ($counter = $counter+1)
-                  #set ($accountName = $account.getName())
-                  #if (!$account.getName())
-                    #set ($accountName = "")
-                  #else
-                    #set ($accountName = $account.getName())
-                  #end
-                  <!-- if account is editable, we have controls -->
-                  #if ($account.isEditable() == true)
-                     #if ($accountUpdated == true)
-                     <!-- key is shown if there is indication from flow that update has happened-->
-                      #springMessageText("idp.stepup.performed","Authentication method has been added. Please set the shared secret to your device: <br>")
-                      $encoder.encodeForHTML($account.getTarget())<br><br>
-                      <!-- TODO: show only for specific method types -->
-                      #set ($qrCode = $qrLocation.format($qrLocation,$accountName,$proxyName,$account.getTarget()))
-                      <img src='$qrCode' style="width:128px;height:128px;">
-                    <!-- key end -->
-                    #end
-
-                     <!-- remove button -->
-                    <p>#springMessageText("idp.stepup.method.remove", "Removing the authentication method will revoke your existing TOTP secret.")</p><br>
-                    #set ($action = $methodName+':removeaccount')
-                    <form action="$flowExecutionUrl" method="post">
-                    <div class="form-element-wrapper">
-                      <button class="form-element form-button" value=$encoder.encodeForHTML($action) type="submit" name="_eventId_update">#springMessageText("idp.stepup.update.removeaccount", "Remove Current Authentication Method")</button>
-                    </div>
-                    </form>
-                    <!-- remove button end -->
-       	       	  #end
-                #end
-          </div>
+          #set ($method = $mapEntry.getKey())
+          #set ($methodName = $method.getName())
+          <!-- add new account -->
+          <p>#springMessageText("idp.stepup.method", "Authentication Method:")$encoder.encodeForHTML($methodName)</p>
+          <br>
+          <p>#springMessageText("idp.stepup.method.exp", "Creating a new authentication method will revoke any existing TOTP secret. Creating a new method will result in a new TOTP secret.")</p>
+          <br>
+          #set ($action = $methodName+':addaccount')
           <form action="$flowExecutionUrl" method="post">
+            #parse("csrf/csrf.vm")
             <div class="form-element-wrapper">
-              <button class="form-element form-button" type="submit" name="_eventId_proceed">#springMessageText("idp.stepup.reinitlogin", "Return to service")</button>
+              <button class="form-element form-button" value=$encoder.encodeForHTML($action) type="submit" name="_eventId_update">#springMessageText("idp.stepup.method.newaccount", "Create Authentication Method")</button>
             </div>
           </form>
-
+          <!-- show new otp secret -->
+          #if ($accountUpdated == true && $account)
+          #springMessageText("idp.stepup.performed","Authentication method has been added. Please set the shared secret to your device: <br>")
+          $encoder.encodeForHTML($account.getTarget())<br><br>
+          #set ($qrCode = $qrLocation.format($qrLocation,"",$proxyName,$account.getTarget()))
+          <img src='$qrCode' style="width:128px;height:128px;">
+          #end
+          <!-- remove otp secret -->
+          #if ($account)
+          <p>#springMessageText("idp.stepup.method.remove", "Removing the authentication method will revoke your existing TOTP secret.")</p>
+          <br>
+          #set ($action = $methodName+':removeaccount')
+          <form action="$flowExecutionUrl" method="post">
+            #parse("csrf/csrf.vm")
+            <div class="form-element-wrapper">
+              <button class="form-element form-button" value=$encoder.encodeForHTML($action) type="submit" name="_eventId_update">#springMessageText("idp.stepup.update.removeaccount", "Remove Current Authentication Method")</button>
+            </div>
+          </form>
+          #end        
+        </div>
+        <form action="$flowExecutionUrl" method="post">
+          #parse("csrf/csrf.vm")
+          <div class="form-element-wrapper">
+            <button class="form-element form-button" type="submit" name="_eventId_proceed">#springMessageText("idp.stepup.reinitlogin", "Return to service")</button>
+          </div>
+        </form>
       </div>
       <footer>
         <div class="container container-footer">
