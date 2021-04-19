@@ -20,7 +20,6 @@
           #set ($method = $mapEntry.getKey())
           #set ($methodName = $method.getName())
           <!-- add new account -->
-          <p>#springMessageText("idp.stepup.method", "Authentication Method:")$encoder.encodeForHTML($methodName)</p>
           <br>
           <p>#springMessageText("idp.stepup.method.exp", "Creating a new authentication method will revoke any existing TOTP secret. Creating a new method will result in a new TOTP secret.")</p>
           <br>
