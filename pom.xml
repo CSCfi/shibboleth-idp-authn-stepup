@@ -12,7 +12,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>fi.csc.idp.stepup</groupId>
   <artifactId>idp-stepup-parent</artifactId>
-  <version>1.0.0-RC4</version>
+  <version>1.0.0-RC5</version>
   <packaging>pom</packaging>
   <modules>
     <module>idp-stepup-api</module>
