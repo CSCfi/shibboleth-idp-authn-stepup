@@ -13,12 +13,12 @@
     <bean class="net.shibboleth.idp.profile.impl.ProfileActionBeanPostProcessor" />
     <bean class="net.shibboleth.ext.spring.config.IdentifiableBeanPostProcessor" />
 
-    <bean id="InitializeStepUpChallengeContext" class="fi.csc.idp.stepup.impl.InitializeStepUpChallengeContext"
+    <bean id="InitializeStepUpChallengeContext" class="#{'%{stepup.idpMFAFlow:false}' != 'true' ? 'fi.csc.idp.stepup.impl.InitializeStepUpChallengeContext' : 'fi.csc.idp.stepup.impl.InitializeIdPMFAConfStepUpChallengeContext'}"
         scope="prototype" p:stepUpMethod-ref="#{'%{stepup.authenticationManager:GoogleAuthStepUpManager}'.trim()}"
         p:httpServletRequest-ref="shibboleth.HttpServletRequest" />
 
     <bean id="InitializeRegistrationStepUpChallengeContext"
-        class="fi.csc.idp.stepup.impl.InitializeStepUpChallengeContext" scope="prototype"
+        class="#{'%{stepup.idpMFAFlow:false}' != 'true' ? 'fi.csc.idp.stepup.impl.InitializeStepUpChallengeContext' : 'fi.csc.idp.stepup.impl.InitializeIdPMFAConfStepUpChallengeContext'}" scope="prototype"
         p:stepUpMethod-ref="#{'%{stepup.registration.authenticationManager:SMSStepUpManager}'.trim()}"
         p:acceptOnlyRequestObjectClaims="#{'%{stepup.registration.signed:true}'.trim()}" p:httpServletRequest-ref="shibboleth.HttpServletRequest" />
 
