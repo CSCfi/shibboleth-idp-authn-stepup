@@ -31,14 +31,25 @@ import com.nimbusds.openid.connect.sdk.ClaimsRequest.Entry;
 import fi.csc.idp.stepup.api.StepUpAccount;
 
 /**
- * Class implementing step up account manager for accounts initialised by key
- * found in attribute values.
+ * Class implementing step up account manager for accounts initialised by key found in attribute values.
  */
 public class AttributeTargetBasedStepUpAccountManager extends AbstractStepUpAccountManager {
 
     /** Class logger. */
     @Nonnull
     private final Logger log = LoggerFactory.getLogger(AttributeTargetBasedStepUpAccountManager.class);
+
+    /** Decryptor for encrypted attribute value. */
+    private AttributeDecryptor decryptor;
+
+    /**
+     * Set decryptor for encrypted attribute value.
+     * 
+     * @param decryptor decryptor for encrypted attribute value
+     */
+    public void setDecryptor(AttributeDecryptor decryptor) {
+        this.decryptor = decryptor;
+    }
 
     /** The claim name to look for. */
     private String claimName;
@@ -53,8 +64,7 @@ public class AttributeTargetBasedStepUpAccountManager extends AbstractStepUpAcco
     }
 
     /**
-     * Initialises account by reading the value for key, using that to instantiate
-     * non editable accounts.
+     * Initialises account by reading the value for key, using that to instantiate non editable accounts.
      * 
      * @param entry claims to look for the key value
      * @throws Exception if something unexpected occurred.
@@ -75,7 +85,7 @@ public class AttributeTargetBasedStepUpAccountManager extends AbstractStepUpAcco
         }
         for (Entry claim : entry) {
             if (claimName.equals(claim.getClaimName())) {
-                target = claim.getValue();
+                target = decryptor == null ? claim.getValue() : decryptor.decrypt(claim.getValue());
                 if (target != null) {
                     log.debug("Adding account with target value {}", target);
                     StepUpAccount account = (StepUpAccount) getAppContext().getBean(getAccountID());

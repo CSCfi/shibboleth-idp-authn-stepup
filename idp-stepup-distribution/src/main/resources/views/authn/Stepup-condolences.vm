@@ -15,6 +15,12 @@
         #springMessageText("idp.stepup.condolences","Unfortunately we are not able to perform elevated authentication required to access service.")
         #springMessageText("idp.stepup.condolences.explanation","You may be missing a required attribute value. Please contact administrator.")
        </div>
+       <form action="$flowExecutionUrl" method="post">
+         #parse("csrf/csrf.vm")
+         <div class="form-element-wrapper">
+           <button class="form-element form-button" type="submit" name="_eventId_proceed">#springMessageText("idp.stepup.failureproceed", "Proceed")</button>
+         </div>
+       </form>
       </div>
       <footer>
         <div class="container container-footer">

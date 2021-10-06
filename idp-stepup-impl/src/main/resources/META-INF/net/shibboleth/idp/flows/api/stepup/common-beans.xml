@@ -40,7 +40,7 @@
 
     <bean id="UserInfoTokenValidator" class="fi.csc.idp.stepup.api.profile.impl.UserInfoTokenValidator"
         p:httpClient-ref="shibboleth.NonCachingHttpClient"
-        p:userInfoEndpoint="#{'%{stepup.UserInfoTokenValidator.userinfoendpoint}'.trim()}" p:validationMap-ref="userInfoMap" />
+        p:userInfoEndpoint="#{'%{stepup.UserInfoTokenValidator.userinfoendpoint:replaceme}'.trim()}" p:validationMap-ref="userInfoMap" />
 
     <bean id="ReadAccount" class="fi.csc.idp.stepup.api.profile.impl.ReadAccount" scope="prototype" />
 
