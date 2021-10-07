@@ -25,3 +25,21 @@ Write one time password to debug logs. No input is required.
 ## API and stuff.
 See Wiki.
 
+## Build
+    git clone https://github.com/CSCfi/shibboleth-idp-authn-stepup.git
+    cd shibboleth-idp-authn-stepup
+    mvn package
+
+## Prerequisite for installation
+- Shibboleth IdP 4.0+ 
+- Shibboleth IdP OP plugin if run as OIDC second factor service. 
+
+## Installation
+First you need extract the archive and rebuild the package. Please not that you most likely *need* to change the owner and group information of the extracted files to suite your installation.
+
+    cd /opt/shibboleth-idp
+    tar -xf path/to/idp-stepup-distribution-X.X.X-bin.tar.gz  --strip-components=1
+    bin/build.sh
+
+Restart the Shibboleth IdP.
+
