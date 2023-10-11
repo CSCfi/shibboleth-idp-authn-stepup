@@ -31,9 +31,6 @@ import org.slf4j.LoggerFactory;
 import fi.csc.idp.stepup.api.ChallengeGenerator;
 import fi.csc.idp.stepup.api.ChallengeVerifier;
 import fi.csc.idp.stepup.api.StepUpAccount;
-import net.minidev.json.JSONObject;
-import net.minidev.json.parser.JSONParser;
-import net.minidev.json.parser.ParseException;
 
 /** Base class for step up account implementations. */
 public abstract class AbstractStepUpAccount implements StepUpAccount {
@@ -178,37 +175,6 @@ public abstract class AbstractStepUpAccount implements StepUpAccount {
     @Override
     public String getTarget() {
         return this.target;
-    }
-
-    /**
-     * Serialize the account information to string for storing it.
-     * 
-     * @return serialized account.
-     */
-    public String serializeAccountInformation() {
-        JSONObject serializedAccount = new JSONObject();
-        serializedAccount.put("name", getName());
-        serializedAccount.put("target", getTarget());
-        return serializedAccount.toJSONString();
-    }
-
-    /**
-     * Initialise the account from serialised account information.
-     * 
-     * @param serializedAccountInformation serialised account information
-     * @return true if information successfully read, otherwise false.
-     * @throws ParseException
-     */
-    public boolean deserializeAccountInformation(String serializedAccountInformation) {
-        try {
-            JSONObject serializedAccount = (JSONObject) new JSONParser(JSONParser.MODE_PERMISSIVE)
-                    .parse(serializedAccountInformation);
-            setName((String) serializedAccount.get("name"));
-            setTarget((String) serializedAccount.get("target"));
-            return true;
-        } catch (ParseException e) {
-            return false;
-        }
     }
 
 }

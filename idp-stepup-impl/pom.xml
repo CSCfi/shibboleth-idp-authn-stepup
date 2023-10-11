@@ -23,20 +23,8 @@
   <name>idp-stepup-impl</name>
   <dependencies>
     <dependency>
-      <groupId>org.geant</groupId>
-      <artifactId>idp-oidc-extension-api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.geant</groupId>
-      <artifactId>idp-oidc-extension-impl</artifactId>
-    </dependency>
-    <dependency>
       <groupId>com.google.code.gson</groupId>
       <artifactId>gson</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>com.nimbusds</groupId>
-      <artifactId>oauth2-oidc-sdk</artifactId>
     </dependency>
     <dependency>
       <groupId>javax.servlet</groupId>
@@ -45,6 +33,18 @@
     <dependency>
       <groupId>com.google.code.findbugs</groupId>
       <artifactId>jsr305</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>net.shibboleth.idp</groupId>
+      <artifactId>idp-attribute-resolver-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>net.shibboleth.idp</groupId>
+      <artifactId>idp-session-api</artifactId>
+    </dependency>
+    <dependency>
+        <groupId>javax.mail</groupId>
+        <artifactId>mail</artifactId>
     </dependency>
     <dependency>
       <groupId>net.shibboleth.idp</groupId>

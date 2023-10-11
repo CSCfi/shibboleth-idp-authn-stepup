@@ -23,17 +23,16 @@
 
 package fi.csc.idp.stepup.impl;
 
-import java.util.Collection;
+import java.util.Map;
+
 import javax.annotation.Nonnull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
-
-import com.nimbusds.openid.connect.sdk.ClaimsRequest.Entry;
-
 import fi.csc.idp.stepup.api.StepUpAccount;
 import fi.csc.idp.stepup.api.StepUpMethod;
+import net.shibboleth.idp.attribute.IdPAttribute;
 
 /** Base class for step up method/manager implementations. */
 public class AbstractStepUpAccountManager implements StepUpMethod {
@@ -145,11 +144,11 @@ public class AbstractStepUpAccountManager implements StepUpMethod {
     /**
      * Add a one default account.
      * 
-     * @param entry not used.
+     * @param attributes not used.
      * @return true if successful
      */
     @Override
-    public boolean initialize(Collection<Entry> entry) throws Exception {
+    public boolean initialize(Map<String, IdPAttribute> attributes) throws Exception {
 
         account = (StepUpAccount) getAppContext().getBean(getAccountID());
         return true;

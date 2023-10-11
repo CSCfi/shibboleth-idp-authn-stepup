@@ -23,7 +23,7 @@
 
 package fi.csc.idp.stepup.impl;
 
-import java.util.Collection;
+import java.util.Map;
 
 import net.shibboleth.utilities.java.support.component.ComponentInitializationException;
 
@@ -33,11 +33,11 @@ import org.springframework.webflow.execution.Event;
 import org.springframework.webflow.execution.RequestContext;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
-import com.nimbusds.openid.connect.sdk.ClaimsRequest.Entry;
 import fi.csc.idp.stepup.api.StepUpAccount;
 import fi.csc.idp.stepup.api.StepUpEventIds;
 import fi.csc.idp.stepup.api.StepUpMethod;
 import fi.csc.idp.stepup.api.StepUpMethodContext;
+import net.shibboleth.idp.attribute.IdPAttribute;
 import net.shibboleth.idp.attribute.context.AttributeContext;
 import net.shibboleth.idp.authn.AuthnEventIds;
 import net.shibboleth.idp.authn.context.AuthenticationContext;
@@ -214,7 +214,7 @@ public class AddOrRemoveAccountTest {
         }
 
         @Override
-        public boolean initialize(Collection<Entry> entry) throws Exception {
+        public boolean initialize(Map<String, IdPAttribute> attributes) throws Exception {
             // TODO Auto-generated method stub
             return false;
         }

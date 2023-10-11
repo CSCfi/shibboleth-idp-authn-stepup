@@ -37,7 +37,6 @@ import net.shibboleth.idp.authn.context.AuthenticationContext;
 import net.shibboleth.idp.profile.ActionTestingSupport;
 import net.shibboleth.idp.profile.RequestContextBuilder;
 import net.shibboleth.idp.profile.context.navigate.WebflowRequestContextProfileRequestContextLookup;
-import net.shibboleth.idp.saml.authn.principal.AuthnContextClassRefPrincipal;
 
 public class VerifyPasswordFromFormRequestTest {
 
@@ -46,7 +45,6 @@ public class VerifyPasswordFromFormRequestTest {
     protected RequestContext src;
     protected ProfileRequestContext prc;
 
-    AuthnContextClassRefPrincipal class1 = new AuthnContextClassRefPrincipal("test1");
 
     @BeforeMethod
     public void setUp() throws Exception {
