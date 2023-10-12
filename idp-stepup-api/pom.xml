@@ -8,32 +8,36 @@
     NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL 
     THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT 
     OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" 
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <artifactId>idp-stepup-api</artifactId>
   <parent>
     <groupId>fi.csc.idp.stepup</groupId>
     <artifactId>idp-stepup-parent</artifactId>
-    <version>1.1.0</version>
+    <version>2.0.0</version>
     <relativePath>..</relativePath>
   </parent>
   <packaging>jar</packaging>
   <name>idp-stepup-api</name>
   <dependencies>
-    <dependency>
-      <groupId>org.mockito</groupId>
-      <artifactId>mockito-core</artifactId>
-      <scope>test</scope>
-    </dependency>
+    <!-- Provided -->
     <dependency>
       <groupId>net.shibboleth.idp</groupId>
       <artifactId>idp-authn-api</artifactId>
+      <version>${shib.idp.version}</version>
+      <scope>provided</scope>
     </dependency>
+    <!-- Test -->
     <dependency>
       <groupId>org.testng</groupId>
       <artifactId>testng</artifactId>
+      <version>7.3.0</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.mockito</groupId>
+      <artifactId>mockito-core</artifactId>
+      <version>5.6.0</version>
       <scope>test</scope>
     </dependency>
   </dependencies>

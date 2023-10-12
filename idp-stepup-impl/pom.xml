@@ -8,97 +8,91 @@
     NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL 
     THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT 
     OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" 
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <artifactId>idp-stepup-impl</artifactId>
   <parent>
     <groupId>fi.csc.idp.stepup</groupId>
     <artifactId>idp-stepup-parent</artifactId>
-    <version>1.1.0</version>
+    <version>2.0.0</version>
     <relativePath>..</relativePath>
   </parent>
   <packaging>jar</packaging>
   <name>idp-stepup-impl</name>
   <dependencies>
-    <dependency>
-      <groupId>com.google.code.gson</groupId>
-      <artifactId>gson</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>javax.servlet</groupId>
-      <artifactId>javax.servlet-api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>com.google.code.findbugs</groupId>
-      <artifactId>jsr305</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>net.shibboleth.idp</groupId>
-      <artifactId>idp-attribute-resolver-api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>net.shibboleth.idp</groupId>
-      <artifactId>idp-session-api</artifactId>
-    </dependency>
-    <dependency>
-        <groupId>javax.mail</groupId>
-        <artifactId>mail</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>net.shibboleth.idp</groupId>
-      <artifactId>idp-authn-api</artifactId>
-    </dependency>
+    <!-- Compile -->
     <dependency>
       <groupId>fi.csc.idp.stepup</groupId>
       <artifactId>idp-stepup-api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.velocity</groupId>
-      <artifactId>velocity</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>com.warrenstrange</groupId>
-      <artifactId>googleauth</artifactId>
     </dependency>
     <dependency>
       <groupId>com.twilio.sdk</groupId>
       <artifactId>twilio</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.springframework.security</groupId>
-      <artifactId>spring-security-crypto</artifactId>
+      <groupId>com.warrenstrange</groupId>
+      <artifactId>googleauth</artifactId>
     </dependency>
+    <dependency>
+      <groupId>com.sun.mail</groupId>
+      <artifactId>jakarta.mail</artifactId>
+    </dependency>
+    <!-- Provided -->
+    <dependency>
+      <groupId>jakarta.servlet</groupId>
+      <artifactId>jakarta.servlet-api</artifactId>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>net.shibboleth.idp</groupId>
+      <artifactId>idp-authn-api</artifactId>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>net.shibboleth.idp</groupId>
+      <artifactId>idp-session-api</artifactId>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>net.shibboleth</groupId>
+      <artifactId>shib-attribute-resolver-api</artifactId>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.velocity</groupId>
+      <artifactId>velocity</artifactId>
+      <version>1.7</version>
+      <scope>provided</scope>
+    </dependency>
+    <!-- Test -->
     <dependency>
       <groupId>org.testng</groupId>
       <artifactId>testng</artifactId>
+      <version>7.3.0</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-test</artifactId>
+      <version>6.0.11</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.mockito</groupId>
       <artifactId>mockito-core</artifactId>
+      <version>5.6.0</version>
       <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>net.shibboleth.idp</groupId>
-      <artifactId>idp-profile-api</artifactId>
-      <scope>test</scope>
-      <type>test-jar</type>
     </dependency>
     <dependency>
       <groupId>com.icegreen</groupId>
       <artifactId>greenmail</artifactId>
+      <version>2.0.0</version>
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>org.opensaml</groupId>
-      <artifactId>opensaml-storage-impl</artifactId>
+      <groupId>net.shibboleth.idp</groupId>
+      <version>${shib.idp.version}</version>
+      <artifactId>idp-testing</artifactId>
       <scope>test</scope>
     </dependency>
   </dependencies>
@@ -131,3 +125,4 @@
     </plugins>
   </build>
 </project>
+

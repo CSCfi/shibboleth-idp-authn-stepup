@@ -24,8 +24,6 @@ package fi.csc.idp.stepup.impl;
 
 import java.io.IOException;
 
-import javax.mail.MessagingException;
-import javax.mail.internet.AddressException;
 
 import org.testng.Assert;
 import org.testng.annotations.AfterMethod;
@@ -35,6 +33,9 @@ import org.testng.annotations.Test;
 import com.icegreen.greenmail.util.GreenMail;
 import com.icegreen.greenmail.util.GreenMailUtil;
 import com.icegreen.greenmail.util.ServerSetupTest;
+
+import jakarta.mail.MessagingException;
+import jakarta.mail.internet.AddressException;
 
 public class MailChallengeSenderTest {
 
@@ -66,13 +67,16 @@ public class MailChallengeSenderTest {
         mailChallengeSender.setUserName("from");
         mailChallengeSender.setPassword("password");
 
+        
         for (int i = 0; i < 100; i++) {
             mailChallengeSender.send("" + i, "to@foo.bar");
         }
+        
         Assert.assertEquals(mailServer.getReceivedMessages().length, 100);
         Assert.assertEquals(GreenMailUtil.getBody(mailServer.getReceivedMessages()[0]).trim().replaceAll("\\s", ""),
                 "Dearrecipient,yourfinalpasswordtoaccesstheserviceis0.Pleasedonotreplytothisautomaticallygeneratedmessage.");
         Assert.assertEquals(mailServer.getReceivedMessages()[0].getSubject(), "subjectField 0");
+        
 
     }
 }

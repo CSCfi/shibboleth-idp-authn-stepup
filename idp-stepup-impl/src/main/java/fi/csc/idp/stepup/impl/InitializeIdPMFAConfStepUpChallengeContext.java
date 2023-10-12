@@ -31,8 +31,7 @@ import net.shibboleth.idp.authn.AuthnEventIds;
 import net.shibboleth.idp.authn.context.AuthenticationContext;
 import net.shibboleth.idp.profile.AbstractProfileAction;
 import net.shibboleth.idp.session.context.navigate.CanonicalUsernameLookupStrategy;
-import net.shibboleth.utilities.java.support.component.ComponentSupport;
-import net.shibboleth.utilities.java.support.logic.Constraint;
+import net.shibboleth.shared.logic.Constraint;
 
 import org.opensaml.messaging.context.navigate.ChildContextLookup;
 import org.opensaml.profile.action.ActionSupport;
@@ -89,7 +88,7 @@ public class InitializeIdPMFAConfStepUpChallengeContext extends AbstractProfileA
      */
     public void setAuthenticationContextLookupStrategy(
             @Nonnull final Function<ProfileRequestContext, AuthenticationContext> strategy) {
-        ComponentSupport.ifInitializedThrowUnmodifiabledComponentException(this);
+        checkSetterPreconditions();
         authnCtxLookupStrategy = Constraint.isNotNull(strategy, "Strategy cannot be null");
     }
 
