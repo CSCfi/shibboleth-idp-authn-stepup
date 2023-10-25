@@ -24,14 +24,15 @@
 package fi.csc.idp.stepup.impl;
 
 import javax.annotation.Nonnull;
-import javax.servlet.http.HttpServletRequest;
 import net.shibboleth.idp.authn.context.AuthenticationContext;
-import net.shibboleth.utilities.java.support.annotation.constraint.NotEmpty;
+import net.shibboleth.shared.annotation.constraint.NotEmpty;
+
 import org.opensaml.profile.action.ActionSupport;
 import org.opensaml.profile.context.ProfileRequestContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import fi.csc.idp.stepup.api.StepUpEventIds;
+import jakarta.servlet.http.HttpServletRequest;
 
 /**
  * An action that verifies user challenge response.

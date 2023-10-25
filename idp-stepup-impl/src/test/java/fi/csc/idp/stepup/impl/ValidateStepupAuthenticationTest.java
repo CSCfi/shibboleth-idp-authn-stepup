@@ -23,7 +23,6 @@
 
 package fi.csc.idp.stepup.impl;
 
-import net.shibboleth.utilities.java.support.component.ComponentInitializationException;
 
 import org.opensaml.messaging.decoder.MessageDecodingException;
 import org.opensaml.profile.context.ProfileRequestContext;
@@ -38,9 +37,10 @@ import net.shibboleth.idp.authn.AuthenticationFlowDescriptor;
 import net.shibboleth.idp.authn.AuthnEventIds;
 import net.shibboleth.idp.authn.context.AuthenticationContext;
 import net.shibboleth.idp.authn.principal.UsernamePrincipal;
-import net.shibboleth.idp.profile.ActionTestingSupport;
-import net.shibboleth.idp.profile.RequestContextBuilder;
 import net.shibboleth.idp.profile.context.navigate.WebflowRequestContextProfileRequestContextLookup;
+import net.shibboleth.idp.profile.testing.ActionTestingSupport;
+import net.shibboleth.idp.profile.testing.RequestContextBuilder;
+import net.shibboleth.shared.component.ComponentInitializationException;
 
 public class ValidateStepupAuthenticationTest {
 

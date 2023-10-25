@@ -22,7 +22,6 @@
  */
 package fi.csc.idp.stepup.impl;
 
-import net.shibboleth.utilities.java.support.component.ComponentInitializationException;
 import org.opensaml.profile.context.ProfileRequestContext;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.webflow.execution.Event;
@@ -32,12 +31,14 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 import fi.csc.idp.stepup.api.StepUpEventIds;
 import fi.csc.idp.stepup.api.StepUpMethodContext;
+import jakarta.servlet.http.HttpServletRequest;
 import net.shibboleth.idp.authn.AuthnEventIds;
 import net.shibboleth.idp.authn.context.AuthenticationContext;
-import net.shibboleth.idp.profile.ActionTestingSupport;
-import net.shibboleth.idp.profile.RequestContextBuilder;
 import net.shibboleth.idp.profile.context.navigate.WebflowRequestContextProfileRequestContextLookup;
-import net.shibboleth.idp.saml.authn.principal.AuthnContextClassRefPrincipal;
+import net.shibboleth.idp.profile.testing.ActionTestingSupport;
+import net.shibboleth.idp.profile.testing.RequestContextBuilder;
+import net.shibboleth.shared.component.ComponentInitializationException;
+import net.shibboleth.shared.primitive.NonnullSupplier;
 
 public class VerifyPasswordFromFormRequestTest {
 
@@ -46,7 +47,6 @@ public class VerifyPasswordFromFormRequestTest {
     protected RequestContext src;
     protected ProfileRequestContext prc;
 
-    AuthnContextClassRefPrincipal class1 = new AuthnContextClassRefPrincipal("test1");
 
     @BeforeMethod
     public void setUp() throws Exception {
@@ -106,7 +106,11 @@ public class VerifyPasswordFromFormRequestTest {
         MockHttpServletRequest request = new MockHttpServletRequest();
         request.addParameter("parameter_key", "response_failure");
         request.addParameter("parameter_key2", "response_success");
-        action.setHttpServletRequest(request);
+        action.setHttpServletRequestSupplier(new NonnullSupplier<>() {
+            public HttpServletRequest get() {
+                return request;
+            }
+        });
         ctx.addSubcontext(stepUpContext, true);
     }
 

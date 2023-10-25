@@ -23,8 +23,10 @@
 
 package fi.csc.idp.stepup.api;
 
-import java.util.Collection;
-import com.nimbusds.openid.connect.sdk.ClaimsRequest.Entry;
+import java.util.Map;
+
+
+import net.shibboleth.idp.attribute.IdPAttribute;
 
 /** Interface for managing step up methods. */
 public interface StepUpMethod {
@@ -36,17 +38,12 @@ public interface StepUpMethod {
 	public static final String REMOVE_ACCOUNT = "removeaccount";
 
 	/**
-	 * This is called before any other calls to initialise the step up method and
-	 * possibly existing accounts.
 	 * 
-	 * @param attributeContext
-	 *            may be used by initialisation.
-	 * @return true if initialisation was successful.
+	 * @param attributes
+	 * @return
 	 * @throws Exception
-	 *             if something unexpected occurred
 	 */
-
-	public boolean initialize(Collection<Entry> entry) throws Exception;
+	public boolean initialize(Map<String, IdPAttribute> attributes) throws Exception;
 
 	/**
 	 * Name of the step up method.

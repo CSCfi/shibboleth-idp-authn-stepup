@@ -22,10 +22,9 @@
  */
 package fi.csc.idp.stepup.api;
 
-
 /** Interface implemented by accounts. */
 public interface StepUpAccount {
-    
+
     /**
      * Name of the account.
      * 
@@ -36,15 +35,14 @@ public interface StepUpAccount {
     /**
      * Set name of the account.
      * 
-     * @param name
-     *            name
+     * @param name name
      */
     public void setName(String name);
 
     /**
      * Invoked when a new fresh challenge should be sent. Not relevant to all
      * implementations.
-     *  
+     * 
      * @throws Exception if something unexpected has occurred.
      */
     public void sendChallenge() throws Exception;
@@ -52,19 +50,17 @@ public interface StepUpAccount {
     /**
      * Invoked when user has response to challenge.
      * 
-     * @param response
-     *            to challenge
+     * @param response to challenge
      * @return true if user has entered a valid response
      * @throws Exception if something unexpected has occurred.
      */
     public boolean verifyResponse(String response) throws Exception;
-    
+
     /**
      * Target parameter for stepup operations. May be sms number, email address,
      * shared secret or what ever is applicable for the implementation.
      * 
-     * @param target
-     *            to send challenge to or form of.
+     * @param target to send challenge to or form of.
      */
     public void setTarget(String target);
 
@@ -74,18 +70,5 @@ public interface StepUpAccount {
      * @return target parameter.
      */
     public String getTarget();
-    
-    /**
-     * Serialise the account information to string for storing it.
-     * @return serialised account.
-     */
-    public String serializeAccountInformation();
-    
-    /**
-     * Initialise the account from serialised account information.
-     * @param serializedAccountInformation serialised account information
-     * @return true if information successfully read, otherwise false.
-     */
-    public boolean deserializeAccountInformation(String serializedAccountInformation); 
 
 }

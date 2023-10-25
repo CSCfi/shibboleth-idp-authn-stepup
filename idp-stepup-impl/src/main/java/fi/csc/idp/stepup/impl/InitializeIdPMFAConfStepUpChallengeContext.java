@@ -23,20 +23,15 @@
 
 package fi.csc.idp.stepup.impl;
 
-import java.util.ArrayList;
-import java.util.Collection;
-
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import net.shibboleth.idp.attribute.IdPAttributeValue;
 import net.shibboleth.idp.attribute.resolver.context.AttributeResolutionContext;
 import net.shibboleth.idp.authn.AuthnEventIds;
 import net.shibboleth.idp.authn.context.AuthenticationContext;
 import net.shibboleth.idp.profile.AbstractProfileAction;
 import net.shibboleth.idp.session.context.navigate.CanonicalUsernameLookupStrategy;
-import net.shibboleth.utilities.java.support.component.ComponentSupport;
-import net.shibboleth.utilities.java.support.logic.Constraint;
+import net.shibboleth.shared.logic.Constraint;
 
 import org.opensaml.messaging.context.navigate.ChildContextLookup;
 import org.opensaml.profile.action.ActionSupport;
@@ -46,8 +41,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.function.Function;
-import com.nimbusds.openid.connect.sdk.ClaimsRequest.Entry;
-import com.nimbusds.openid.connect.sdk.claims.ClaimRequirement;
 import fi.csc.idp.stepup.api.StepUpEventIds;
 import fi.csc.idp.stepup.api.StepUpMethod;
 import fi.csc.idp.stepup.api.StepUpMethodContext;
@@ -76,10 +69,6 @@ public class InitializeIdPMFAConfStepUpChallengeContext extends AbstractProfileA
     @Nullable
     private AuthenticationContext authnContext;
 
-    /** Initialisation claims. */
-    @Nullable
-    private Collection<Entry> claims;
-    
     /** Subject for whom the request is made. */
     @Nullable
     private String subject;
@@ -87,8 +76,7 @@ public class InitializeIdPMFAConfStepUpChallengeContext extends AbstractProfileA
     /**
      * Dummy method for xml wiring.
      * 
-     * @param acceptOnly whether the claims must be in request
-     *                                      object
+     * @param acceptOnly whether the claims must be in request object
      */
     public void setAcceptOnlyRequestObjectClaims(boolean acceptOnly) {
     }
@@ -100,13 +88,14 @@ public class InitializeIdPMFAConfStepUpChallengeContext extends AbstractProfileA
      */
     public void setAuthenticationContextLookupStrategy(
             @Nonnull final Function<ProfileRequestContext, AuthenticationContext> strategy) {
-        ComponentSupport.ifInitializedThrowUnmodifiabledComponentException(this);
+        checkSetterPreconditions();
         authnCtxLookupStrategy = Constraint.isNotNull(strategy, "Strategy cannot be null");
     }
-    
+
     /** Constructor. */
     public InitializeIdPMFAConfStepUpChallengeContext() {
-        authnCtxLookupStrategy = new ChildContextLookup(AuthenticationContext.class);
+        authnCtxLookupStrategy = new ChildContextLookup<ProfileRequestContext, AuthenticationContext>(
+                AuthenticationContext.class);
     }
 
     /**
@@ -137,31 +126,7 @@ public class InitializeIdPMFAConfStepUpChallengeContext extends AbstractProfileA
             ActionSupport.buildEvent(profileRequestContext, AuthnEventIds.INVALID_AUTHN_CTX);
             return false;
         }
-        AttributeResolutionContext attributeCtx;
-        try {
-            attributeCtx = (AttributeResolutionContext)profileRequestContext.getSubcontext(
-                    "net.shibboleth.idp.attribute.resolver.context.AttributeResolutionContext", false);
-        } catch (ClassNotFoundException e) {
-            log.error("{} Attribute Resolution Context not available", getLogPrefix());
-            ActionSupport.buildEvent(profileRequestContext, EventIds.INVALID_PROFILE_CTX);
-            return false;
-        }
-        if (attributeCtx == null) {
-            log.error("{} Attribute Resolution Context not available", getLogPrefix());
-            ActionSupport.buildEvent(profileRequestContext, EventIds.INVALID_PROFILE_CTX);
-            return false;
-        }
-        claims=new ArrayList<Entry>();
-        attributeCtx.getResolvedIdPAttributes().forEach((k,v) ->{
-            log.debug("Located initialization attribute {}", v.getId());
-            for (IdPAttributeValue value:v.getValues()) {
-                if (value.getNativeValue() instanceof String) {
-                    log.debug("Initialization attribute {} has value {}", v.getId(), (String)value.getNativeValue());
-                    claims.add(new Entry(v.getId(), ClaimRequirement.VOLUNTARY, null, (String)value.getNativeValue()));
-                    break;
-                }
-            }
-        });
+
         CanonicalUsernameLookupStrategy usernameLookup = new CanonicalUsernameLookupStrategy();
         subject = usernameLookup.apply(profileRequestContext);
         if (subject == null) {
@@ -179,14 +144,23 @@ public class InitializeIdPMFAConfStepUpChallengeContext extends AbstractProfileA
         log.debug("{} Creating StepUpMethodContext", getLogPrefix());
         StepUpMethodContext stepUpMethodContext = (StepUpMethodContext) authnContext
                 .addSubcontext(new StepUpMethodContext(), true);
+        AttributeResolutionContext attributeCtx = (AttributeResolutionContext) profileRequestContext
+                .getSubcontext(AttributeResolutionContext.class, false);
+
+        if (attributeCtx == null) {
+            log.error("{} Attribute Resolution Context not available", getLogPrefix());
+            ActionSupport.buildEvent(profileRequestContext, EventIds.INVALID_PROFILE_CTX);
+            return;
+        }
         try {
-            stepUpMethod.initialize(claims);
+            stepUpMethod.initialize(attributeCtx.getResolvedIdPAttributes());
         } catch (Exception e) {
             log.error("{} Failed initializing stepup method {}", getLogPrefix(), e);
             ActionSupport.buildEvent(profileRequestContext, StepUpEventIds.EXCEPTION);
             return;
         }
-        log.debug("{} Setting method {} to StepUpMethodContext for user {}", getLogPrefix(), stepUpMethod.getName(), subject);
+        log.debug("{} Setting method {} to StepUpMethodContext for user {}", getLogPrefix(), stepUpMethod.getName(),
+                subject);
         stepUpMethodContext.setSubject(subject);
         stepUpMethodContext.setStepUpMethod(stepUpMethod);
         stepUpMethodContext.setStepUpAccount(stepUpMethod.getAccount());

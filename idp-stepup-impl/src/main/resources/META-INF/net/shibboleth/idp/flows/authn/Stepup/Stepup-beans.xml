@@ -13,48 +13,22 @@
     <bean class="net.shibboleth.idp.profile.impl.ProfileActionBeanPostProcessor" />
     <bean class="net.shibboleth.ext.spring.config.IdentifiableBeanPostProcessor" />
 
-    <bean id="InitializeStepUpChallengeContext" class="#{'%{stepup.idpMFAFlow:true}' != 'true' ? 'fi.csc.idp.stepup.impl.InitializeStepUpChallengeContext' : 'fi.csc.idp.stepup.impl.InitializeIdPMFAConfStepUpChallengeContext'}"
+    <bean id="InitializeStepUpChallengeContext" class="fi.csc.idp.stepup.impl.InitializeIdPMFAConfStepUpChallengeContext"
         scope="prototype" p:stepUpMethod-ref="#{'%{stepup.authenticationManager:AttributeSeededGoogleAuthStepUpManager}'.trim()}"
-        p:httpServletRequest-ref="shibboleth.HttpServletRequest" />
-
-    <bean id="InitializeRegistrationStepUpChallengeContext"
-        class="#{'%{stepup.idpMFAFlow:true}' != 'true' ? 'fi.csc.idp.stepup.impl.InitializeStepUpChallengeContext' : 'fi.csc.idp.stepup.impl.InitializeIdPMFAConfStepUpChallengeContext'}" scope="prototype"
-        p:stepUpMethod-ref="#{'%{stepup.registration.authenticationManager:SMSStepUpManager}'.trim()}"
-        p:acceptOnlyRequestObjectClaims="#{'%{stepup.registration.signed:true}'.trim()}" p:httpServletRequest-ref="shibboleth.HttpServletRequest" />
-
+        p:httpServletRequestSupplier-ref="shibboleth.HttpServletRequestSupplier" />
+ 
     <bean id="ValidateStepupAuthentication" class="fi.csc.idp.stepup.impl.ValidateStepupAuthentication"
         scope="prototype" />
 
-    <bean id="AddAccount" class="fi.csc.idp.stepup.impl.AddAccount" scope="prototype"
-        p:httpServletRequest-ref="shibboleth.HttpServletRequest" />
-
-    <bean id="AddOrRemoveAccount" class="fi.csc.idp.stepup.impl.AddOrRemoveAccount" scope="prototype"
-        p:httpServletRequest-ref="shibboleth.HttpServletRequest" />
-
     <bean id="GenerateStepUpChallenge" class="fi.csc.idp.stepup.impl.GenerateStepUpChallenge" scope="prototype"
-        p:httpServletRequest-ref="shibboleth.HttpServletRequest" />
+        p:httpServletRequestSupplier-ref="shibboleth.HttpServletRequestSupplier" />
 
     <bean id="VerifyPasswordFromFormRequest" class="fi.csc.idp.stepup.impl.VerifyPasswordFromFormRequest"
-        scope="prototype" p:httpServletRequest-ref="shibboleth.HttpServletRequest" />
+        scope="prototype" p:httpServletRequestSupplier-ref="shibboleth.HttpServletRequestSupplier" />
 
     <bean id="AttributeSeededGoogleAuthStepUpManager" class="fi.csc.idp.stepup.impl.AttributeTargetBasedStepUpAccountManager"
         scope="prototype" p:name="TOTP" p:claimName="#{'%{stepup.AttributeSeededGoogleAuthStepUpManager.keyclaim:totpSeed}'.trim()}"
         p:AccountID="GoogleAuthenticatorStepUpAccount" p:decryptor-ref="AttributeDecryptor" />
-        
-    <bean id="GoogleAuthStepUpManager" class="fi.csc.idp.stepup.impl.AttributeKeyBasedStorageStepUpAccountManager"
-        scope="prototype" p:name="TOTP" p:claimName="#{'%{stepup.GoogleAuthStepUpManager.keyclaim:otp_key}'.trim()}"
-        p:stepUpAccountStorage-ref="#{'%{stepup.GoogleAuthStepUpManager.accountstore:ShibStorageAccountStorage}'.trim()}"
-        p:autoRemove="true" p:accountID="GoogleAuthenticatorStepUpAccount" />
-
-    <bean id="ShibStorageAccountStorage" class="fi.csc.idp.stepup.impl.ShibStorageSingleStepUpAccountStorage"
-        p:Storage-ref="#{'%{stepup.ShibStorageAccountStorage.storageservice:shibboleth.StorageService}'.trim()}"
-        p:encryptKey="TRUE" p:encryptTarget="TRUE" p:encryptor-ref="ShibStorageAccountStorageEncryptor" />
-
-    <bean id="ShibStorageAccountStorageEncryptor" class="org.springframework.security.crypto.encrypt.Encryptors"
-        factory-method="queryableText">
-        <constructor-arg value="key" />
-        <constructor-arg value="#{'%{stepup.ShibStorageAccountStorageEncryptor.encryptKey:ABBAABBA}'.trim()}" />
-    </bean>
 
     <bean id="LogStepUpManager" class="fi.csc.idp.stepup.impl.DefaultStepUpAccountManager" scope="prototype"
         p:name="Logfile" p:AccountID="LogStepUpAccount" />
@@ -103,10 +77,6 @@
     <bean id="OneCharChallengeGenerator" class="fi.csc.idp.stepup.impl.DigestChallengeGenerator" p:maxLength="1" />
 
     <bean id="EqualVerifier" class="fi.csc.idp.stepup.impl.EqualChallengeResponseVerifier" />
-
-    <bean id="SelfService" class="java.lang.Boolean">
-        <constructor-arg value="%{stepup.selfService:false}" type="boolean" />
-    </bean>
 
     <bean id="AttributeDecryptor" class="fi.csc.idp.stepup.impl.AttributeDecryptor" p:key="#{'%{stepup.attributedecryptor.key:replaceme}'.trim()}"/>
 

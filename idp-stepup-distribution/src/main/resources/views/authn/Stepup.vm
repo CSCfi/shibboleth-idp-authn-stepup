@@ -33,11 +33,6 @@
             <div class="form-element-wrapper">
               <button class="form-element form-button" type="submit" name="_eventId_proceed">#springMessageText("idp.stepup.login", "Login")</button>
             </div>
-            #if ($selfService == true)
-              <div class="form-element-wrapper">
-                <button class="form-element form-button" type="submit" name="_eventId_ManageAccounts">#springMessageText("idp.stepup.manage", "Manage accounts")</button>
-              </div>
-            #end
           </form>
         </div>
       </div>

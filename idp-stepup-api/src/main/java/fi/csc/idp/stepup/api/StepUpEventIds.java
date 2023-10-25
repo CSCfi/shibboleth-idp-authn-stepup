@@ -25,7 +25,7 @@ package fi.csc.idp.stepup.api;
 
 import javax.annotation.Nonnull;
 
-import net.shibboleth.utilities.java.support.annotation.constraint.NotEmpty;
+import net.shibboleth.shared.annotation.constraint.NotEmpty;
 
 /**
  * Constants to use for error results related to step up interceptor flow.

@@ -24,7 +24,8 @@ package fi.csc.idp.stepup.api;
 
 import java.util.Map;
 import org.opensaml.messaging.context.BaseContext;
-import net.shibboleth.utilities.java.support.logic.Constraint;
+
+import net.shibboleth.shared.logic.Constraint;
 
 /**
  * Context for that holds information specific to step up API.

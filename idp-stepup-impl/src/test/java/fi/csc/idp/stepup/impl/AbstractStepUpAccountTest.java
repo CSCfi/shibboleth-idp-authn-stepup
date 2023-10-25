@@ -72,19 +72,6 @@ public class AbstractStepUpAccountTest {
     }
 
     @Test
-    public void testSerialization() {
-        TestStepUpAccount account = new TestStepUpAccount();
-        account.deserializeAccountInformation(testStepUpAccount.serializeAccountInformation());
-        Assert.assertEquals(testStepUpAccount.getTarget(), account.getTarget());
-        Assert.assertEquals(testStepUpAccount.getName(), account.getName());
-        testStepUpAccount.setTarget("Target");
-        testStepUpAccount.setName("Name");
-        account.deserializeAccountInformation(testStepUpAccount.serializeAccountInformation());
-        Assert.assertEquals(testStepUpAccount.getTarget(), account.getTarget());
-        Assert.assertEquals(testStepUpAccount.getName(), account.getName());
-    }
-
-    @Test
     public void testChallengeVerificator() {
         boolean exceptionOccurred = false;
         try {
