@@ -6,8 +6,6 @@ This project offers a shibboleth auhentication flow *authn/Stepup*. The flow may
 ## Authentication Methods
 ### AttributeSeededGoogleAuthStepUpManager
 Perform TOTP. TOTP seed must be given as input - like with all inputs, either as attribute in AttributeResolutionContext or as OIDC requested claim value. The seed is assumed to be encrypted with a proprietary method.
-### GoogleAuthStepUpManager
-Perform TOTP. User key must be given as input. Key is used to fetch the TOTP seed from local storage.
 ### MailStepUpManager
 Send user one time password in email. User email is required as input.
 ### SMSStepUpManager
