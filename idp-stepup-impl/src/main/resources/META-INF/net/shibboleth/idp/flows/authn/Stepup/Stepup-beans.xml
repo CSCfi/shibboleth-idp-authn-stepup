@@ -15,16 +15,16 @@
 
     <bean id="InitializeStepUpChallengeContext" class="fi.csc.idp.stepup.impl.InitializeIdPMFAConfStepUpChallengeContext"
         scope="prototype" p:stepUpMethod-ref="#{'%{stepup.authenticationManager:AttributeSeededGoogleAuthStepUpManager}'.trim()}"
-        p:httpServletRequest-ref="shibboleth.HttpServletRequest" />
+        p:httpServletRequestSupplier-ref="shibboleth.HttpServletRequestSupplier" />
  
     <bean id="ValidateStepupAuthentication" class="fi.csc.idp.stepup.impl.ValidateStepupAuthentication"
         scope="prototype" />
 
     <bean id="GenerateStepUpChallenge" class="fi.csc.idp.stepup.impl.GenerateStepUpChallenge" scope="prototype"
-        p:httpServletRequest-ref="shibboleth.HttpServletRequest" />
+        p:httpServletRequestSupplier-ref="shibboleth.HttpServletRequestSupplier" />
 
     <bean id="VerifyPasswordFromFormRequest" class="fi.csc.idp.stepup.impl.VerifyPasswordFromFormRequest"
-        scope="prototype" p:httpServletRequest-ref="shibboleth.HttpServletRequest" />
+        scope="prototype" p:httpServletRequestSupplier-ref="shibboleth.HttpServletRequestSupplier" />
 
     <bean id="AttributeSeededGoogleAuthStepUpManager" class="fi.csc.idp.stepup.impl.AttributeTargetBasedStepUpAccountManager"
         scope="prototype" p:name="TOTP" p:claimName="#{'%{stepup.AttributeSeededGoogleAuthStepUpManager.keyclaim:totpSeed}'.trim()}"
