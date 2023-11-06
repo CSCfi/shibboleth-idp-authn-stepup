@@ -57,7 +57,7 @@ public class ValidateStepupAuthentication extends AbstractValidationAction {
             return false;
         }
         StepUpMethodContext stepUpMethodContext = (StepUpMethodContext) authenticationContext
-                .getSubcontext(StepUpMethodContext.class, false);
+                .getSubcontext(StepUpMethodContext.class);
         if (stepUpMethodContext == null) {
             log.error("{} StepUpMethodContext not available under AuthenticationContext", getLogPrefix());
             ActionSupport.buildEvent(profileRequestContext, AuthnEventIds.INVALID_AUTHN_CTX);

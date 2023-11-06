@@ -145,7 +145,7 @@ public class InitializeIdPMFAConfStepUpChallengeContext extends AbstractProfileA
         StepUpMethodContext stepUpMethodContext = (StepUpMethodContext) authnContext
                 .addSubcontext(new StepUpMethodContext(), true);
         AttributeResolutionContext attributeCtx = (AttributeResolutionContext) profileRequestContext
-                .getSubcontext(AttributeResolutionContext.class, false);
+                .getSubcontext(AttributeResolutionContext.class);
 
         if (attributeCtx == null) {
             log.error("{} Attribute Resolution Context not available", getLogPrefix());
